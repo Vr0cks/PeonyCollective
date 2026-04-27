@@ -92,6 +92,16 @@ export default function SellForm() {
             <label className={labelClasses}>Model</label>
             <input className={inputClasses} name="model_name" placeholder="Birkin 30, Kelly..." required />
           </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClasses}>Kondisyon</label>
+            <select className={inputClasses} name="condition" required>
+              <option value="">Seçiniz...</option>
+              <option value="Yeni / Etiketli">Yeni / Etiketli</option>
+              <option value="Yeni Gibi">Yeni Gibi</option>
+              <option value="Çok İyi">Çok İyi</option>
+              <option value="İyi">İyi</option>
+            </select>
+          </div>
         </div>
         <div className="flex flex-col gap-1.5">
           <label className={labelClasses}>Ürün Hikayesi / Açıklama</label>
