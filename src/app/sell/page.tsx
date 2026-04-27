@@ -13,11 +13,12 @@ export default async function SellPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Profil bilgisini çekiyoruz ama hata verse bile sayfayı çökertmiyoruz
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
     
   // Herhangi bir giriş yapmış kullanıcı artık ürün yükleyebilir (Birleşik Panel mantığı)
 

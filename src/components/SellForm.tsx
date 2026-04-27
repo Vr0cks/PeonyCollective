@@ -49,7 +49,7 @@ export default function SellForm() {
       const authUrls = await uploadImages(authFiles, 'verification')
 
       setMessage('Veriler kaydediliyor...')
-      await addProduct({
+      const result = await addProduct({
         brand: formData.get('brand') as string,
         model_name: formData.get('model_name') as string,
         description: formData.get('description') as string,
@@ -62,6 +62,12 @@ export default function SellForm() {
         public_images: publicUrls,
         authenticity_docs: authUrls
       })
+
+      if (result?.error) {
+        setMessage(`Hata: ${result.error}`)
+        setIsSubmitting(false)
+        return
+      }
 
       router.push('/sell?message=Ürün başarıyla onaya gönderildi.')
     } catch (error: any) {
