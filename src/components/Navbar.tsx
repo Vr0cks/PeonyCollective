@@ -33,9 +33,9 @@ export default async function Navbar() {
           <Link href="/?brand=Chanel" className="hover:text-black transition-colors">Chanel</Link>
           <Link href="/?brand=Dior" className="hover:text-black transition-colors">Dior</Link>
           
-          {profile?.role === 'seller' || profile?.role === 'admin' ? (
-            <Link href="/dashboard" className="bg-black text-white px-4 py-2 rounded-full hover:bg-[#AF9164] transition-all text-white font-bold">
-              Mağazamı Yönet
+          {user ? (
+            <Link href="/dashboard" className="bg-black text-white px-6 py-2.5 rounded-full hover:bg-[#AF9164] transition-all text-[10px] font-bold uppercase tracking-widest">
+              Panelim
             </Link>
           ) : (
             <Link href="/sell" className="hover:text-black transition-colors">

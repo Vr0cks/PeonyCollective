@@ -30,8 +30,10 @@ export default function AuthPage() {
         router.push('/')
       } else {
         const result = await signup(formData)
-        if (result?.message) {
-          setMessage(result.message) // "Lütfen e-postanızı doğrulayın" mesajı dönecek
+        if (result?.error) {
+          setMessage(result.error)
+        } else if (result?.message) {
+          setMessage(result.message)
         }
       }
     } catch (error: any) {
