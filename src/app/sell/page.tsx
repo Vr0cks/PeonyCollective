@@ -19,13 +19,7 @@ export default async function SellPage({
     .eq('id', user.id)
     .single()
     
-  if (profile?.role !== 'seller' && profile?.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500 font-medium text-lg">Bu sayfayı görüntülemek için "Satıcı" hesabına sahip olmalısınız.</p>
-      </div>
-    )
-  }
+  // Herhangi bir giriş yapmış kullanıcı artık ürün yükleyebilir (Birleşik Panel mantığı)
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

@@ -2,6 +2,24 @@ import { createClient } from '@/src/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createOrder } from './actions'
+import { Metadata } from 'next'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: product } = await supabase.from('products').select('brand, model_name').eq('id', id).single()
+
+  if (!product) return { title: 'Ürün Bulunamadı | Peony' }
+
+  return {
+    title: `${product.brand} ${product.model_name} | Peony Collective`,
+    description: `${product.brand} markasına ait ${product.model_name} model lüks çanta. Orijinalliği onaylanmış, yatırım değeri taşıyan arşiv parçası.`,
+  }
+}
 
 export default async function ProductDetailPage({
   params,
