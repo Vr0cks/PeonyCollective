@@ -2,6 +2,7 @@
 
 import { createClient } from '@/src/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -15,6 +16,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
+  redirect('/')
 }
 
 export async function logout() {
@@ -44,6 +46,7 @@ export async function signup(formData: FormData) {
         data: {
           first_name: firstName,
           last_name: lastName,
+          full_name: `${firstName} ${lastName}`,
           role: role,
         },
         emailRedirectTo: `https://peony-collective.vercel.app/auth/callback`,
@@ -61,5 +64,25 @@ export async function signup(formData: FormData) {
   } catch (error: any) {
     console.error('Signup error:', error)
     return { error: 'Kayıt işlemi sırasında teknik bir hata oluştu. Lütfen tekrar deneyin.' }
+  }
+}
+
+// ─── Sosyal Giriş (Google / Facebook) ───
+export async function signInWithProvider(provider: 'google' | 'facebook') {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `https://peony-collective.vercel.app/auth/callback`,
+    },
+  })
+
+  if (error) {
+    throw new Error('Sosyal giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.')
+  }
+
+  if (data.url) {
+    redirect(data.url)
   }
 }

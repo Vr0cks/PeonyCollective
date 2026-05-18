@@ -4,6 +4,10 @@ import { createClient } from '@/src/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export async function addProduct(data: {
+  gender: string;
+  category: string;
+  subcategory: string;
+  size?: string;
   brand: string;
   model_name: string;
   description: string;
@@ -11,7 +15,7 @@ export async function addProduct(data: {
   condition: string;
   material: string;
   dimensions: string;
-  production_year: number;
+  purchase_year: number;
   serial_number: string;
   public_images: string[];
   authenticity_docs: string[];
@@ -24,6 +28,10 @@ export async function addProduct(data: {
 
     const { error: insertError } = await supabase.from('products').insert({
       seller_id: user.id,
+      gender: data.gender,
+      category: data.category,
+      subcategory: data.subcategory,
+      size: data.size || null,
       brand: data.brand,
       model_name: data.model_name,
       description: data.description,
@@ -31,7 +39,7 @@ export async function addProduct(data: {
       condition: data.condition,
       material: data.material,
       dimensions: data.dimensions,
-      production_year: data.production_year,
+      purchase_year: data.purchase_year,
       serial_number: data.serial_number,
       public_images: data.public_images,
       authenticity_docs: data.authenticity_docs,

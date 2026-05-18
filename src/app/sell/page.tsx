@@ -27,8 +27,8 @@ export default async function SellPage({
       <div className="max-w-3xl mx-auto bg-white p-8 md:p-10 border border-gray-100 rounded-2xl shadow-sm">
         
         <div className="mb-10 text-center">
-          <h1 className="text-2xl font-light tracking-widest uppercase mb-2">Çanta Yükle</h1>
-          <p className="text-gray-500 text-sm">Satmak istediğiniz lüks çantanızın detaylarını ve fotoğraflarını girin.</p>
+          <h1 className="text-2xl font-light tracking-widest uppercase mb-2">Ürün Yükle</h1>
+          <p className="text-gray-500 text-sm">Satmak istediğiniz lüks ürünün detaylarını ve fotoğraflarını girin.</p>
         </div>
 
         {resolvedParams?.message && (
