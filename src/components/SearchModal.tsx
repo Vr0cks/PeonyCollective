@@ -110,7 +110,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           {/* Modal Container */}
           <motion.div
             variants={modalVariants}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            transition={{ type: 'spring' as const, stiffness: 300, damping: 30 }}
             className="w-full max-w-3xl flex flex-col gap-12"
           >
             

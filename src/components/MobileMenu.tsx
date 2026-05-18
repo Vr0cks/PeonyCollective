@@ -21,7 +21,7 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
     closed: {
       x: '-100%',
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 35
       }
@@ -29,7 +29,7 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
     open: {
       x: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 30
       }

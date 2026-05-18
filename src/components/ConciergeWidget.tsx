@@ -31,7 +31,7 @@ export default function ConciergeWidget() {
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+            transition={{ type: 'spring' as const, stiffness: 350, damping: 25 }}
             className="absolute bottom-20 right-0 w-[360px] bg-[#1A1A1A] border border-[#AF9164]/30 rounded-2xl shadow-2xl overflow-hidden text-white z-[991]"
           >
             {/* Header */}
