@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
-  // Next.js 15 kuralı: cookies() artık asenkron, await edilmeli!
+  // Next.js 15 ile beraber cookies() artık asenkron çalışıyor, o yüzden await kullanmamız şart yoksa hata alırız.
   const cookieStore = await cookies()
 
   return createServerClient(
@@ -19,11 +19,12 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // Bu catch bloğu bilerek boş bırakılır. Server Component'ler 
-            // render edilirken cookie set edemez, hata fırlatmasını engelleriz.
+            // Bu catch bloğunu bilerek boş bıraktım. Server Component'ler render edilirken
+            // cookie set etmeye çalışırsa uygulamanın çökmesini istemiyoruz.
           }
         },
       },
     }
   )
 }
+
