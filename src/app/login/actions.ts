@@ -25,6 +25,32 @@ export async function logout() {
   revalidatePath('/', 'layout')
 }
 
+export async function resetPassword(formData: FormData) {
+  try {
+    const supabase = await createClient()
+    const email = formData.get('email') as string
+
+    if (!email) {
+      return { error: 'Lütfen geçerli bir e-posta adresi girin.' }
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/update-password`,
+    })
+
+    if (error) {
+      return { error: error.message }
+    }
+
+    return { 
+      success: true, 
+      message: "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin." 
+    }
+  } catch (error) {
+    return { error: 'İşlem sırasında bir hata oluştu.' }
+  }
+}
+
 export async function signup(formData: FormData) {
   try {
     const supabase = await createClient()

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { signup, login, signInWithProvider } from './actions'
+import { signup, login, signInWithProvider, resetPassword } from './actions'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -10,6 +10,7 @@ export default function AuthPage() {
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [socialLoading, setSocialLoading] = useState<string | null>(null)
+  const [isForgotPassword, setIsForgotPassword] = useState(false)
   
   const [showPassword, setShowPassword] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
@@ -41,7 +42,14 @@ export default function AuthPage() {
     }
 
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        const result = await resetPassword(formData)
+        if (result?.error) {
+          setMessage(result.error)
+        } else if (result?.message) {
+          setMessage(result.message)
+        }
+      } else if (isLogin) {
         await login(formData)
         // Server-side redirect ile anasayfaya yönlendirilecek
       } else {
@@ -85,36 +93,40 @@ export default function AuthPage() {
         {/* Başlık ve Sekmeler */}
         <div className="text-center mb-8">
           <h1 className="text-3xl serif-display italic tracking-widest uppercase mb-6 text-gray-900">
-            {isLogin ? 'Giriş' : 'Kayıt Ol'}
+            {isForgotPassword ? 'Şifremi Unuttum' : isLogin ? 'Giriş' : 'Kayıt Ol'}
           </h1>
           
-          <div className="flex bg-gray-50 p-1 rounded-full relative">
-            <button 
-              type="button"
-              onClick={() => { setIsLogin(true); setMessage(''); setPasswordInput('') }}
-              className={`flex-1 py-2 text-[10px] sans-detail z-10 transition-colors uppercase tracking-widest font-bold ${isLogin ? 'text-white' : 'text-gray-400 hover:text-black'}`}
-            >
-              Giriş Yap
-            </button>
-            <button 
-              type="button"
-              onClick={() => { setIsLogin(false); setMessage(''); setPasswordInput('') }}
-              className={`flex-1 py-2 text-[10px] sans-detail z-10 transition-colors uppercase tracking-widest font-bold ${!isLogin ? 'text-white' : 'text-gray-400 hover:text-black'}`}
-            >
-              Hesap Oluştur
-            </button>
-            {/* Animasyonlu Sekme Arka Planı */}
-            <motion.div 
-              className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-black rounded-full"
-              initial={false}
-              animate={{ left: isLogin ? '4px' : 'calc(50%)' }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            />
-          </div>
+          {!isForgotPassword && (
+            <div className="flex bg-gray-50 p-1 rounded-full relative">
+              <button 
+                type="button"
+                onClick={() => { setIsLogin(true); setMessage(''); setPasswordInput('') }}
+                className={`flex-1 py-2 text-[10px] sans-detail z-10 transition-colors uppercase tracking-widest font-bold ${isLogin ? 'text-white' : 'text-gray-400 hover:text-black'}`}
+              >
+                Giriş Yap
+              </button>
+              <button 
+                type="button"
+                onClick={() => { setIsLogin(false); setMessage(''); setPasswordInput('') }}
+                className={`flex-1 py-2 text-[10px] sans-detail z-10 transition-colors uppercase tracking-widest font-bold ${!isLogin ? 'text-white' : 'text-gray-400 hover:text-black'}`}
+              >
+                Hesap Oluştur
+              </button>
+              {/* Animasyonlu Sekme Arka Planı */}
+              <motion.div 
+                className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-black rounded-full"
+                initial={false}
+                animate={{ left: isLogin ? '4px' : 'calc(50%)' }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            </div>
+          )}
         </div>
 
         {/* ─── Sosyal Giriş Butonları ─── */}
-        <div className="space-y-3 mb-6">
+        {!isForgotPassword && (
+          <>
+            <div className="space-y-3 mb-6">
           <button
             type="button"
             onClick={() => handleSocialLogin('google')}
@@ -153,14 +165,16 @@ export default function AuthPage() {
               </>
             )}
           </button>
-        </div>
+            </div>
 
-        {/* ─── Ayırıcı ─── */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-gray-100" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">veya e-posta ile</span>
-          <div className="flex-1 h-px bg-gray-100" />
-        </div>
+            {/* ─── Ayırıcı ─── */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 h-px bg-gray-100" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">veya e-posta ile</span>
+              <div className="flex-1 h-px bg-gray-100" />
+            </div>
+          </>
+        )}
 
         {message && (
           <div className="mb-6 p-4 bg-black text-white border border-gray-800 rounded-xl text-xs font-bold text-center">
@@ -170,7 +184,7 @@ export default function AuthPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <AnimatePresence mode="popLayout">
-            {!isLogin && (
+            {!isLogin && !isForgotPassword && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -219,49 +233,62 @@ export default function AuthPage() {
             <input type="email" name="email" required className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:bg-white focus:border-black transition-all outline-none" />
           </div>
 
-          <div className="relative">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2 flex justify-between">
-              <span>Şifre</span>
-              {isLogin && <a href="#" className="text-[#AF9164] hover:underline">Şifremi Unuttum</a>}
-            </label>
-            <div className="relative">
-              <input 
-                type={showPassword ? 'text' : 'password'} 
-                name="password" 
-                required 
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:bg-white focus:border-black transition-all outline-none pr-12" 
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+          <AnimatePresence mode="popLayout">
+            {!isForgotPassword && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="relative"
               >
-                {showPassword ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                )}
-              </button>
-            </div>
-
-            {/* Kayıt Modunda Şifre Gücü Göstergesi */}
-            {!isLogin && passwordInput.length > 0 && (
-              <div className="mt-3">
-                <div className="flex gap-1 mb-1">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className={`h-1 flex-1 rounded-full ${i < strengthScore ? strengthColors[strengthScore] : 'bg-gray-200'}`}></div>
-                  ))}
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2 flex justify-between">
+                  <span>Şifre</span>
+                  {isLogin && (
+                    <button type="button" onClick={() => { setIsForgotPassword(true); setMessage(''); }} className="text-[#AF9164] hover:underline cursor-pointer">
+                      Şifremi Unuttum
+                    </button>
+                  )}
+                </label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? 'text' : 'password'} 
+                    name="password" 
+                    required={!isForgotPassword} 
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:bg-white focus:border-black transition-all outline-none pr-12" 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                  >
+                    {showPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    )}
+                  </button>
                 </div>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-right">{strengthLabels[strengthScore]}</p>
-              </div>
+
+                {/* Kayıt Modunda Şifre Gücü Göstergesi */}
+                {!isLogin && passwordInput.length > 0 && (
+                  <div className="mt-3">
+                    <div className="flex gap-1 mb-1">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className={`h-1 flex-1 rounded-full ${i < strengthScore ? strengthColors[strengthScore] : 'bg-gray-200'}`}></div>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-right">{strengthLabels[strengthScore]}</p>
+                  </div>
+                )}
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
 
           {/* Giriş Modunda Beni Hatırla */}
           <AnimatePresence>
-            {isLogin && (
+            {isLogin && !isForgotPassword && (
               <motion.div 
                 initial={{ opacity: 0, height: 0 }} 
                 animate={{ opacity: 1, height: 'auto' }}
@@ -279,8 +306,20 @@ export default function AuthPage() {
             disabled={isLoading}
             className="w-full bg-black text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-zinc-800 hover:shadow-xl hover:-translate-y-0.5 transition-all mt-6 disabled:opacity-50 cursor-pointer"
           >
-            {isLoading ? 'İşleniyor...' : isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
+            {isLoading ? 'İşleniyor...' : isForgotPassword ? 'Sıfırlama Linki Gönder' : isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
           </button>
+
+          {isForgotPassword && (
+            <div className="text-center mt-4">
+              <button 
+                type="button" 
+                onClick={() => { setIsForgotPassword(false); setMessage(''); }}
+                className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+              >
+                Giriş Ekranına Dön
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </main>
