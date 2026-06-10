@@ -160,8 +160,14 @@ export default function Footer() {
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
           
           {/* Sol: Copyright */}
-          <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
-            © 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.
+          {/* Sol: Copyright ve Credit */}
+          <div className="flex flex-col gap-2">
+            <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
+              © 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.
+            </div>
+            <div className="text-[8px] font-medium tracking-[0.2em] text-zinc-600 text-center md:text-left">
+              CRAFTED BY <a href="https://www.vr0cks.com/en" target="_blank" rel="noopener noreferrer" className="text-[#AF9164] hover:text-white transition-colors">VR0CKS</a>
+            </div>
           </div>
 
           {/* Sağ: Güven Rozetleri */}

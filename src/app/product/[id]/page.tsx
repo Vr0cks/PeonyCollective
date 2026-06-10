@@ -309,10 +309,10 @@ export default async function ProductDetailPage({
                     <Link href={`/checkout/${product.id}`} className="w-full bg-black text-white py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-gray-800 transition-all shadow-xl active:scale-95 block">
                       Satın Almayı Başlat
                     </Link>
-                    <Link href="/concierge" className="w-full border border-[#AF9164] bg-[#AF9164]/5 text-[#AF9164] py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-[#AF9164] hover:text-white transition-all active:scale-95 block flex items-center justify-center gap-2">
+                    <a href="mailto:concierge@peonycollective.com?subject=Peony%20Concierge%20Talebi" className="w-full border border-[#AF9164] bg-[#AF9164]/5 text-[#AF9164] py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-[#AF9164] hover:text-white transition-all active:scale-95 block flex items-center justify-center gap-2">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                       Peony Concierge Asistanı
-                    </Link>
+                    </a>
                   </>
                 )}
               </div>
