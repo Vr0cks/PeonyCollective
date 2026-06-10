@@ -1,6 +1,7 @@
 import { createClient } from '@/src/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Shield, Sparkles, Check, ArrowLeft, Cpu } from 'lucide-react'
 
 interface PageProps {
@@ -29,7 +30,6 @@ export default async function PassportPage({ params }: PageProps) {
   // Trend grafiği için fiyat noktaları hesaplama (Yıllık artış)
   const basePrice = Math.round(product.price * 0.7)
   const yr1 = Math.round(product.price * 0.8)
-  const yr2 = Math.round(product.price * 0.9)
   const yr3 = product.price
   const yr4Proj = Math.round(product.price * 1.15)
   const yr5Proj = Math.round(product.price * 1.3)
@@ -79,11 +79,13 @@ export default async function PassportPage({ params }: PageProps) {
             
             {/* SOL: Ürün Görseli & Laboratuvar Mührü */}
             <div className="lg:col-span-4 flex flex-col items-center gap-8">
-              <div className="w-full aspect-[3/4] bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-inner group">
-                <img
-                  src={product.public_images?.[0]}
-                  alt={product.model_name}
-                  className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-700"
+              <div className="w-full aspect-[3/4] bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-inner group relative">
+                <Image
+                  src={product.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=800'}
+                  alt={product.model_name || 'Ürün'}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-700"
                 />
               </div>
 

@@ -49,7 +49,7 @@ export async function signup(formData: FormData) {
           full_name: `${firstName} ${lastName}`,
           role: role,
         },
-        emailRedirectTo: `https://peony-collective.vercel.app/auth/callback`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
       },
     })
 
@@ -61,7 +61,7 @@ export async function signup(formData: FormData) {
       success: true, 
       message: "Harika! Peony Collective'e hoş geldiniz. Lütfen gelen kutunuzu (ve spam klasörünü) kontrol ederek e-postanızı doğrulayın." 
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('Signup error:', error)
     return { error: 'Kayıt işlemi sırasında teknik bir hata oluştu. Lütfen tekrar deneyin.' }
   }
@@ -74,7 +74,7 @@ export async function signInWithProvider(provider: 'google' | 'facebook') {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `https://peony-collective.vercel.app/auth/callback`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
     },
   })
 

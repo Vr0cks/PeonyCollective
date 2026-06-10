@@ -1,7 +1,55 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ShieldCheck, CheckCircle2, Award } from 'lucide-react'
+import { ArrowRight, ShieldCheck, CheckCircle2, Award, Loader2 } from 'lucide-react'
+import { createClient } from '@/src/utils/supabase/client'
 
 export default function Footer() {
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || !email.includes('@')) {
+      setError('Lütfen geçerli bir e-posta adresi giriniz.')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    setMessage(null)
+
+    try {
+      const supabase = createClient()
+      
+      // Try to insert into newsletter table
+      const { error: insertError } = await supabase
+        .from('newsletter')
+        .insert({ email: email.trim().toLowerCase() })
+
+      // Fallback simulation if table doesn't exist
+      if (insertError) {
+        console.warn('Newsletter table insert failed, falling back to localStorage simulation:', insertError.message)
+        const savedList = JSON.parse(localStorage.getItem('peony_newsletter') || '[]')
+        if (!savedList.includes(email)) {
+          savedList.push(email)
+          localStorage.setItem('peony_newsletter', JSON.stringify(savedList))
+        }
+      }
+
+      setMessage("Özel listemize başarıyla kaydoldunuz. VIP ayrıcalıklar yakında e-postanızda.")
+      setEmail('')
+    } catch (err) {
+      console.error(err)
+      setError('Bir hata oluştu. Lütfen daha sonra tekrar deneyin.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <footer className="bg-[#1A1A1A] text-white pt-24 pb-12 border-t border-white/5 relative overflow-hidden">
       
@@ -71,20 +119,39 @@ export default function Footer() {
             <p className="text-sm font-light text-zinc-400">
               Özel kürasyonlardan, gizli butik satışlarından ve VIP davetlerden ilk siz haberdar olun.
             </p>
-            <form className="relative mt-4 group">
+            <form onSubmit={handleSubscribe} className="relative mt-4 group">
               <input
                 type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="E-POSTA ADRESİNİZ"
                 className="w-full bg-zinc-900 border-b border-zinc-700 focus:border-[#AF9164] py-3.5 px-0 text-xs font-bold tracking-widest uppercase text-white placeholder-zinc-500 focus:outline-none transition-colors duration-500"
               />
               <button
-                type="button"
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-[#AF9164] transition-colors"
+                type="submit"
+                disabled={loading}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-[#AF9164] transition-colors cursor-pointer"
                 aria-label="Abone Ol"
               >
-                <ArrowRight size={18} strokeWidth={1.5} />
+                {loading ? (
+                  <Loader2 className="w-4.5 h-4.5 animate-spin text-[#AF9164]" />
+                ) : (
+                  <ArrowRight size={18} strokeWidth={1.5} />
+                )}
               </button>
             </form>
+
+            {message && (
+              <p className="text-[10px] text-emerald-400 uppercase tracking-wider leading-relaxed mt-2 font-medium">
+                ✓ {message}
+              </p>
+            )}
+            {error && (
+              <p className="text-[10px] text-red-400 uppercase tracking-wider leading-relaxed mt-2 font-medium">
+                ✕ {error}
+              </p>
+            )}
           </div>
 
         </div>

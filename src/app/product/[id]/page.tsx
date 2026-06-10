@@ -1,8 +1,9 @@
 import { createClient } from '@/src/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { createOrder } from './actions'
+import Image from 'next/image'
 import { Metadata } from 'next'
+import { Product, Profile } from '@/src/types'
 
 export async function generateMetadata({
   params,
@@ -23,55 +24,82 @@ export async function generateMetadata({
 
 export default async function ProductDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ error?: string }>
 }) {
   const { id } = await params
+  const { error: searchError } = await searchParams
   const supabase = await createClient()
 
-  // Sadece 'approved' (onaylı) olan ürünleri çekiyoruz
-  const { data: product, error } = await supabase
+  // Sadece 'approved' veya 'sold' olan ürünleri çekiyoruz
+  const { data: productData, error } = await supabase
     .from('products')
     .select(`
       *,
       profiles:seller_id (first_name, last_name, rating, sales_count)
     `)
     .eq('id', id)
-    .eq('status', 'approved') // Güvenlik: Onaylanmamış ürün linkle bile açılmasın
     .single()
 
-  if (error || !product) return notFound()
+  if (error || !productData) return notFound()
+  const product = productData as Product
 
-  // Action Binding
-  const orderAction = createOrder.bind(null, product.id, product.price)
+  // Security check: Only approved or sold products can be viewed by public
+  if (product.status !== 'approved' && product.status !== 'sold') {
+    // If not approved/sold, verify if it's the seller or admin
+    const { data: { user } } = await supabase.auth.getUser()
+    let isOwnerOrAdmin = false
+    if (user) {
+      if (user.id === product.seller_id) {
+        isOwnerOrAdmin = true
+      } else {
+        const { data: adminProf } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+        if (adminProf?.role === 'admin') isOwnerOrAdmin = true
+      }
+    }
+    if (!isOwnerOrAdmin) return notFound()
+  }
+
+  const sellerProfile = product.profiles as Profile
 
   return (
     <main className="min-h-screen bg-white">
       <div className="max-w-[1400px] mx-auto px-6 py-12">
         
-        {/* Breadcrumb - Navigasyon yolu */}
+        {/* Breadcrumb */}
         <nav className="flex text-xs uppercase tracking-widest text-gray-400 mb-8 gap-2">
           <Link href="/" className="hover:text-black">Koleksiyon</Link>
           <span>/</span>
           <span className="text-black font-bold">{product.brand}</span>
         </nav>
 
+        {searchError && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-100 text-red-800 text-xs uppercase tracking-widest rounded-xl font-medium">
+            ✕ {searchError}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           
-          {/* SOL: GÖRSEL GALERİSİ (Lüks hissi için büyük ve alt alta) */}
+          {/* SOL: GÖRSEL GALERİSİ */}
           <div className="lg:col-span-7 space-y-4">
             {product.public_images?.map((img: string, idx: number) => (
-              <div key={idx} className="aspect-[4/5] bg-gray-50 overflow-hidden">
-                <img 
+              <div key={idx} className="relative aspect-[4/5] bg-gray-50 overflow-hidden">
+                <Image 
                   src={img} 
                   alt={`${product.brand} ${idx + 1}`} 
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  priority={idx === 0}
+                  className="object-cover hover:scale-105 transition-transform duration-700" 
                 />
               </div>
             ))}
           </div>
 
-          {/* SAĞ: ÜRÜN BİLGİLERİ (Sticky - Sayfayı kaydırırken sabit kalacak) */}
+          {/* SAĞ: ÜRÜN BİLGİLERİ */}
           <div className="lg:col-span-5">
             <div className="sticky top-32 space-y-8">
               
@@ -99,8 +127,8 @@ export default async function ProductDetailPage({
                   <p className="font-bold">{product.material || 'Deri'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 mb-1">Dönem</p>
-                  <p className="font-bold">{product.production_year || 'Modern'}</p>
+                  <p className="text-gray-400 mb-1">Satın Alındığı Yıl</p>
+                  <p className="font-bold">{product.purchase_year || 'Bilinmiyor'}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 mb-1">Boyut</p>
@@ -114,12 +142,12 @@ export default async function ProductDetailPage({
                 {product.description}
               </div>
 
-              {/* 1. INVESTMENT INSIGHTS CARD */}
+              {/* INVESTMENT INSIGHTS CARD */}
               <div className="bg-zinc-900 text-white p-6 rounded-2xl shadow-2xl border border-[#AF9164]/30 my-8">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#AF9164] mb-1">Asset Grade</p>
-                    <h4 className="text-2xl font-playfair italic">Investment Grade {product.investment_rating || 'A+'}</h4>
+                    <h4 className="text-2xl font-playfair italic">Investment Grade A+</h4>
                   </div>
                   <div className="bg-[#AF9164] text-black text-[10px] font-bold px-2 py-1 rounded">PRO ANALYTICS</div>
                 </div>
@@ -142,16 +170,16 @@ export default async function ProductDetailPage({
                 </div>
               </div>
 
-              {/* 2. AUTHENTICATION PROOF OF WORK (STEPPER) */}
+              {/* EXPERT CHECK */}
               <div className="py-8 border-t border-gray-100">
                 <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] mb-6">Ekspertiz Süreci (Verified)</h3>
                 <div className="relative space-y-6">
-                  {(product.authentication_steps || [
+                  {[
                     "Materyal Analizi",
                     "Dikiş ve Donanım Kontrolü",
                     "Seri Numarası Doğrulama",
                     "Fatura ve Provenans Onayı"
-                  ]).map((step: string, i: number, arr: any[]) => (
+                  ].map((step: string, i: number, arr: string[]) => (
                     <div key={i} className="flex items-center gap-4 group">
                       <div className="relative">
                         <div className="w-2 h-2 bg-black rounded-full z-10 relative" />
@@ -167,29 +195,42 @@ export default async function ProductDetailPage({
                 </div>
               </div>
 
-              {/* Satıcı Kartı - Müşteri için güven odaklı */}
-              <div className="bg-gray-50 p-6 rounded-2xl flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Satıcı</p>
-                  <h4 className="text-sm font-bold text-black">
-                    {product.profiles.first_name} {product.profiles.last_name[0]}.
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-black font-bold">{product.profiles.rating} ⭐</span>
-                    <span className="text-[10px] text-gray-400 uppercase tracking-tighter">({product.profiles.sales_count} Başarılı Satış)</span>
+              {/* Satıcı Kartı */}
+              {sellerProfile && (
+                <div className="bg-gray-50 p-6 rounded-2xl flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Satıcı</p>
+                    <h4 className="text-sm font-bold text-black">
+                      {sellerProfile.first_name} {sellerProfile.last_name ? sellerProfile.last_name[0] : ''}.
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-black font-bold">{sellerProfile.rating || '5.0'} ⭐</span>
+                      <span className="text-[10px] text-gray-400 uppercase tracking-tighter">({sellerProfile.sales_count || '0'} Başarılı Satış)</span>
+                    </div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                    {sellerProfile.first_name ? sellerProfile.first_name[0] : 'S'}
                   </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-bold">
-                  {product.profiles.first_name[0]}
-                </div>
-              </div>
+              )}
 
-              {/* Satın Al Butonu */}
-              <form action={orderAction}>
-                <button className="w-full bg-black text-white py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs hover:bg-gray-800 transition-all shadow-xl active:scale-95">
-                  Satın Almayı Başlat
-                </button>
-              </form>
+              {/* Butonlar */}
+              <div className="flex flex-col gap-3">
+                {product.status === 'sold' ? (
+                  <button disabled className="w-full bg-gray-100 text-gray-400 py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center cursor-not-allowed">
+                    BU PARÇA SATILMIŞTIR
+                  </button>
+                ) : (
+                  <>
+                    <Link href={`/checkout/${product.id}`} className="w-full bg-black text-white py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-gray-800 transition-all shadow-xl active:scale-95 block">
+                      Satın Almayı Başlat
+                    </Link>
+                    <Link href={`/messages?new=true&seller=${product.seller_id}&product=${product.id}`} className="w-full border border-black/20 text-black py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-gray-50 transition-all active:scale-95 block">
+                      Satıcıya Soru Sor
+                    </Link>
+                  </>
+                )}
+              </div>
 
               <p className="text-[10px] text-center text-gray-400 uppercase tracking-widest">
                 ✓ %100 Orijinallik Garantisi & Ücretsiz Sigortalı Kargo

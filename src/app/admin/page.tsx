@@ -1,7 +1,9 @@
 import { createClient } from '@/src/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { updateProductStatus } from './actions'
+import { Product, Profile } from '@/src/types'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -23,7 +25,7 @@ export default async function AdminPage() {
     )
   }
 
-  const { data: pendingProducts, error } = await supabase
+  const { data: pendingProductsRaw, error } = await supabase
     .from('products')
     .select(`
       *,
@@ -31,6 +33,8 @@ export default async function AdminPage() {
     `)
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
+
+  const pendingProducts: Product[] = (pendingProductsRaw || []) as Product[]
 
   if (error) {
     console.error("Ürünler çekilirken hata:", error)
@@ -66,7 +70,7 @@ export default async function AdminPage() {
               const rejectAction = updateProductStatus.bind(null, product.id, 'rejected')
 
               const sellerName = product.profiles 
-                ? `${(product.profiles as any).first_name} ${(product.profiles as any).last_name}` 
+                ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim()
                 : 'Bilinmeyen Satıcı'
 
               // Çantanın ilk görselini alıyoruz
@@ -80,10 +84,12 @@ export default async function AdminPage() {
                   {/* Görsel Alanı */}
                   <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
                     {firstImage ? (
-                      <img 
+                      <Image 
                         src={firstImage} 
-                        alt={product.model_name} 
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        alt={product.model_name || 'Ürün'} 
+                        fill
+                        sizes="(max-width: 640px) 100vw, 25vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm font-medium">

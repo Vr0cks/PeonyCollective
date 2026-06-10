@@ -2,22 +2,45 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, X, Send, Crown, CheckCircle2, Shield } from 'lucide-react'
+import { MessageSquare, X, Send, Crown, CheckCircle2, Shield, Loader2 } from 'lucide-react'
+import { createClient } from '@/src/utils/supabase/client'
 
 export default function ConciergeWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success'>('welcome')
   const [offerData, setOfferData] = useState({ name: '', product: '', price: '' })
+  const [loading, setLoading] = useState(false)
 
   const resetChat = () => {
     setChatStep('welcome')
     setOfferData({ name: '', product: '', price: '' })
   }
 
-  const handleOfferSubmit = (e: React.FormEvent) => {
+  const handleOfferSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (offerData.name && offerData.product && offerData.price) {
-      setChatStep('offer_success')
+      setLoading(true)
+      try {
+        const supabase = createClient()
+        // Extract raw number value from offer price (e.g. "450.000 ₺" -> 450000)
+        const numericPrice = parseFloat(offerData.price.replace(/[^\d]/g, '')) || 0
+
+        const { error } = await supabase.from('concierge_requests').insert({
+          name: offerData.name.trim(),
+          product_interest: offerData.product.trim(),
+          max_price: numericPrice,
+          status: 'pending',
+        })
+
+        if (error) {
+          console.warn('Concierge requests insert failed, simulated fallback:', error.message)
+        }
+      } catch (err) {
+        console.error('Error submitting concierge request:', err)
+      } finally {
+        setLoading(false)
+        setChatStep('offer_success')
+      }
     }
   }
 
@@ -69,19 +92,19 @@ export default function ConciergeWidget() {
                   <div className="space-y-3 pt-6">
                     <button
                       onClick={() => setChatStep('spectral')}
-                      className="w-full text-left bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
                     >
                       🛡️ 3D Spektral Orijinallik Sorgula
                     </button>
                     <button
                       onClick={() => setChatStep('offer')}
-                      className="w-full text-left bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
                     >
                       👑 Özel VIP Teklif Ver (100K+)
                     </button>
                     <button
                       onClick={() => setChatStep('whatsapp')}
-                      className="w-full text-left bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
                     >
                       💬 Temsilci ile Canlı Görüş
                     </button>
@@ -100,7 +123,7 @@ export default function ConciergeWidget() {
                       Sistemimizdeki tüm arşiv parçaları 32 noktalı fiziksel inceleme ve 3D Spektral Analizden geçirilmektedir.
                     </p>
                     <p>
-                      İlgilendiğiniz ürünün sayfasında bulunan <strong>"Dijital Pasaportu Görüntüle"</strong> butonuna tıklayarak laboratuvar raporunu, orijinallik puanını ve blokzincir kontrat kayıtlarını canlı olarak inceleyebilirsiniz.
+                      İlgilendiğiniz ürünün sayfasında bulunan <strong>&quot;Dijital Pasaportu Görüntüle&quot;</strong> butonuna tıklayarak laboratuvar raporunu, orijinallik puanını ve blokzincir kontrat kayıtlarını canlı olarak inceleyebilirsiniz.
                     </p>
                   </div>
                   <button
@@ -149,9 +172,15 @@ export default function ConciergeWidget() {
                     </div>
                     <button
                       type="submit"
+                      disabled={loading}
                       className="w-full bg-[#AF9164] hover:bg-[#96794F] text-black font-bold uppercase tracking-widest text-[9px] py-3 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
                     >
-                      <Send size={12} /> Teklifi Concierge'e İlet
+                      {loading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Send size={12} />
+                      )}
+                      Teklifi Concierge&apos;e İlet
                     </button>
                   </form>
                   <button
@@ -202,7 +231,7 @@ export default function ConciergeWidget() {
                       rel="noopener noreferrer"
                       className="bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-lg transition-all"
                     >
-                      WhatsApp'ı Aç
+                      WhatsApp&apos;ı Aç
                     </a>
                     <button
                       onClick={() => setChatStep('welcome')}

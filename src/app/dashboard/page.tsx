@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import CuratorView from '@/src/components/CuratorView'
 import CollectorView from '@/src/components/CollectorView'
 import DashboardSwitcher from '@/src/components/DashboardSwitcher'
+import { Product, Order } from '@/src/types'
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -16,24 +17,35 @@ export default async function Dashboard({ searchParams }: PageProps) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Satıcı Verileri (Küratör)
-  const { data: myProducts } = await supabase
-    .from('products')
-    .select('*, orders(total_price)')
-    .eq('seller_id', user.id)
+  // Initialize default variables to hold results
+  let myProducts: Product[] = []
+  let totalEarnings = 0
+  let pendingApproval = 0
+  let activeSales = 0
+  let myOrders: Order[] = []
 
-  const totalEarnings = myProducts
-    ?.filter(p => p.status === 'sold')
-    .reduce((sum, p) => sum + (p.price || 0), 0) || 0
+  if (currentView === 'curator') {
+    // Satıcı Verileri (Küratör) - Sadece küratör görünümünde çekilir
+    const { data } = await supabase
+      .from('products')
+      .select('*, orders(total_price)')
+      .eq('seller_id', user.id)
 
-  const pendingApproval = myProducts?.filter(p => p.status === 'pending').length || 0
-  const activeSales = myProducts?.filter(p => p.status === 'approved').length || 0
+    myProducts = data || []
+    totalEarnings = myProducts
+      ?.filter(p => p.status === 'sold')
+      .reduce((sum, p) => sum + (p.price || 0), 0) || 0
 
-  // Alıcı Verileri (Koleksiyoner)
-  const { data: myOrders } = await supabase
-    .from('orders')
-    .select('*, products(*)')
-    .eq('buyer_id', user.id)
+    pendingApproval = myProducts?.filter(p => p.status === 'pending').length || 0
+    activeSales = myProducts?.filter(p => p.status === 'approved').length || 0
+  } else {
+    // Alıcı Verileri (Koleksiyoner) - Sadece koleksiyoner görünümünde çekilir
+    const { data } = await supabase
+      .from('orders')
+      .select('*, products(*)')
+      .eq('buyer_id', user.id)
+    myOrders = data || []
+  }
 
   return (
     <main className="min-h-screen bg-[#FCFCFB] py-20 px-6">

@@ -1,6 +1,8 @@
 import { createClient } from '@/src/utils/supabase/server'
 import HomeClient from '@/src/components/HomeClient'
 
+import { Product } from '@/src/types'
+
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
@@ -30,7 +32,8 @@ export default async function Home({ searchParams }: PageProps) {
     query = query.eq('gender', gender)
   }
 
-  const { data: products } = await query
+  const { data: productsData } = await query
+  const products: Product[] = (productsData || []) as Product[]
 
   // 2. Filtreleme için benzersiz markaları çekiyoruz
   const { data: allProducts } = await supabase

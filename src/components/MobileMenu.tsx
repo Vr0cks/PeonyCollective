@@ -3,12 +3,15 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Search, User, LogOut } from 'lucide-react'
+import { Menu, X, User, LogOut } from 'lucide-react'
 import { logout } from '@/src/app/login/actions'
 
+import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { Profile } from '@/src/types'
+
 interface MobileMenuProps {
-  user: any
-  profile: any
+  user: SupabaseUser | null
+  profile: Profile | null
 }
 
 export default function MobileMenu({ user, profile }: MobileMenuProps) {

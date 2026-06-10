@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signup, login, signInWithProvider } from './actions'
 
 export default function AuthPage() {
-  const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
   const [role, setRole] = useState<'buyer' | 'seller'>('buyer')
   const [message, setMessage] = useState('')
@@ -37,12 +35,13 @@ export default function AuthPage() {
           setMessage(result.message)
         }
       }
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error & { digest?: string }
       // NEXT_REDIRECT hatası normal - redirect çalışıyor demektir
-      if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+      if (err.digest?.startsWith('NEXT_REDIRECT')) {
         return
       }
-      setMessage(error.message || 'Bir hata oluştu.')
+      setMessage(err.message || 'Bir hata oluştu.')
     } finally {
       setIsLoading(false)
     }
@@ -52,11 +51,12 @@ export default function AuthPage() {
     try {
       setSocialLoading(provider)
       await signInWithProvider(provider)
-    } catch (error: any) {
-      if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+    } catch (error) {
+      const err = error as Error & { digest?: string }
+      if (err.digest?.startsWith('NEXT_REDIRECT')) {
         return
       }
-      setMessage(error.message || 'Sosyal giriş sırasında bir hata oluştu.')
+      setMessage(err.message || 'Sosyal giriş sırasında bir hata oluştu.')
       setSocialLoading(null)
     }
   }
@@ -175,7 +175,7 @@ export default function AuthPage() {
 
                 {/* Rol Seçici */}
                 <div className="space-y-2">
-                  <label className="text-[10px] sans-detail text-gray-400 block">Peony Collective'e Katılış Amacınız</label>
+                  <label className="text-[10px] sans-detail text-gray-400 block">Peony Collective&apos;e Katılış Amacınız</label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"

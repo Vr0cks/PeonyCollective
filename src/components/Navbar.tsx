@@ -5,6 +5,7 @@ import NotificationBell from './NotificationBell'
 import MobileMenu from './MobileMenu'
 import SearchTrigger from './SearchTrigger'
 import { User } from 'lucide-react'
+import { Profile } from '@/src/types'
 
 export default async function Navbar() {
   const supabase = await createClient()
@@ -12,17 +13,17 @@ export default async function Navbar() {
   // Aktif kullanıcıyı alıyoruz
   const { data: { user } } = await supabase.auth.getUser()
   
-  let profile = null;
+  let profile: Profile | null = null;
   
   // Eğer kullanıcı varsa, adını ve rolünü göstermek için profiles tablosuna bakıyoruz
   if (user) {
     const { data } = await supabase
       .from('profiles')
-      .select('first_name, last_name, role')
+      .select('*')
       .eq('id', user.id)
       .single()
       
-    profile = data;
+    profile = data as Profile;
   }
 
   return (
@@ -35,10 +36,10 @@ export default async function Navbar() {
           <MobileMenu user={user} profile={profile} />
 
           {/* Masaüstü Menü Linkleri */}
-          <div className="hidden lg:flex items-center gap-10 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-            <Link href="/?brand=Hermès#collection" className="hover:text-black transition-colors">Hermès</Link>
-            <Link href="/?brand=Chanel#collection" className="hover:text-black transition-colors">Chanel</Link>
-            <Link href="/?brand=Dior#collection" className="hover:text-black transition-colors">Dior</Link>
+          <div className="hidden lg:flex items-center gap-10 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-900">
+            <Link href="/?brand=Hermès#collection" className="hover:text-[#AF9164] transition-colors">Hermès</Link>
+            <Link href="/?brand=Chanel#collection" className="hover:text-[#AF9164] transition-colors">Chanel</Link>
+            <Link href="/?brand=Dior#collection" className="hover:text-[#AF9164] transition-colors">Dior</Link>
             
             {user ? (
               <Link href="/dashboard" className="bg-black text-white px-6 py-2.5 rounded-full hover:bg-[#AF9164] transition-all text-[10px] font-bold uppercase tracking-widest">

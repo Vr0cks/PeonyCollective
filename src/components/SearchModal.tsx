@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Search, ArrowRight } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
+import { Product } from '@/src/types'
 
 interface SearchModalProps {
   isOpen: boolean
@@ -13,8 +15,7 @@ interface SearchModalProps {
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState('')
-  const [products, setProducts] = useState<any[]>([])
-  const [filtered, setFiltered] = useState<any[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -27,17 +28,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  // Modal açıldığında inputa odaklanma
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100)
-      loadProducts()
-    } else {
-      setQuery('')
-      setFiltered([])
-    }
-  }, [isOpen])
-
   // Veritabanındaki aktif tüm ürünleri önbelleğe alıp hızlı arama yapmak
   const loadProducts = async () => {
     setLoading(true)
@@ -48,27 +38,33 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       .eq('status', 'approved')
     
     if (data) {
-      setProducts(data)
+      setProducts(data as Product[])
     }
     setLoading(false)
   }
 
-  // Arama filtresi tetiklendiğinde
+  // Modal açıldığında inputa odaklanma
   useEffect(() => {
-    if (!query.trim()) {
-      setFiltered([])
-      return
+    if (isOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus()
+        loadProducts()
+      }, 100)
+    } else {
+      setTimeout(() => setQuery(''), 0)
     }
+  }, [isOpen])
 
-    const lowerQuery = query.toLowerCase()
-    const matches = products.filter(p => 
-      p.brand.toLowerCase().includes(lowerQuery) ||
-      p.model_name.toLowerCase().includes(lowerQuery) ||
-      p.category.toLowerCase().includes(lowerQuery) ||
-      p.subcategory.toLowerCase().includes(lowerQuery)
-    )
-    setFiltered(matches)
-  }, [query, products])
+  // Arama filtresi (derived state)
+  const lowerQuery = query.toLowerCase()
+  const filtered = query.trim()
+    ? products.filter(p => 
+        (p.brand?.toLowerCase() || '').includes(lowerQuery) ||
+        (p.model_name?.toLowerCase() || '').includes(lowerQuery) ||
+        (p.category?.toLowerCase() || '').includes(lowerQuery) ||
+        (p.subcategory?.toLowerCase() || '').includes(lowerQuery)
+      )
+    : []
 
   const popularSearches = [
     'Hermès Birkin',
@@ -136,7 +132,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   {loading ? (
                     <p className="text-zinc-500 text-sm font-light italic">Aranıyor...</p>
                   ) : filtered.length === 0 ? (
-                    <p className="text-zinc-500 text-sm font-light italic">"{query}" ile eşleşen seçkin bir parça bulunamadı.</p>
+                    <p className="text-zinc-500 text-sm font-light italic">&quot;{query}&quot; ile eşleşen seçkin bir parça bulunamadı.</p>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {filtered.map(p => (
@@ -146,11 +142,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                           onClick={onClose}
                           className="bg-zinc-900/50 border border-zinc-800/40 rounded-xl p-4 flex items-center gap-4 hover:border-[#AF9164]/30 hover:bg-zinc-900 transition-all group"
                         >
-                          <div className="w-16 h-20 bg-zinc-800 rounded overflow-hidden flex-shrink-0">
-                            <img
-                              src={p.public_images?.[0]}
-                              alt={p.model_name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          <div className="w-16 h-20 bg-zinc-800 rounded overflow-hidden flex-shrink-0 relative">
+                            <Image
+                              src={p.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=200'}
+                              alt={p.model_name || 'Ürün'}
+                              fill
+                              sizes="64px"
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                           </div>
                           <div className="flex-grow min-w-0">

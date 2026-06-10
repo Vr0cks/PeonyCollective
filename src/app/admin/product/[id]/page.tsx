@@ -1,7 +1,9 @@
 import { createClient } from '@/src/utils/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { updateProductStatus } from '../../actions'
+import { Product, Profile } from '@/src/types'
 
 export default async function AdminProductDetailPage({
   params,
@@ -19,7 +21,7 @@ export default async function AdminProductDetailPage({
   if (profile?.role !== 'admin') redirect('/')
 
   // 2. Ürün ve Satıcı Detaylarını Çek
-  const { data: product, error } = await supabase
+  const { data: productData, error } = await supabase
     .from('products')
     .select(`
       *,
@@ -28,29 +30,31 @@ export default async function AdminProductDetailPage({
     .eq('id', id)
     .single()
 
-  if (error || !product) return notFound()
+  if (error || !productData) return notFound()
+  const product = productData as Product
+  const sellerProfile = product.profiles as Profile
 
   // Action binding
   const approveAction = updateProductStatus.bind(null, product.id, 'approved')
   const rejectAction = updateProductStatus.bind(null, product.id, 'rejected')
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8 text-[#1A1A1A]">
       <div className="max-w-5xl mx-auto">
         
         {/* Üst Navigasyon */}
-        <div className="mb-8 flex items-center justify-between">
-          <Link href="/admin" className="text-sm text-gray-500 hover:text-black transition-colors flex items-center gap-2">
+        <div className="mb-8 flex items-center justify-between border-b border-gray-100 pb-6">
+          <Link href="/admin" className="text-xs uppercase tracking-widest text-gray-500 hover:text-black transition-colors flex items-center gap-2">
             ← Panele Dön
           </Link>
           <div className="flex gap-3">
             <form action={rejectAction}>
-              <button className="px-6 py-2 border border-red-200 text-red-600 rounded-full text-sm font-semibold hover:bg-red-50 transition-all">
+              <button className="px-6 py-2.5 border border-red-200 text-red-600 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-50 transition-all cursor-pointer">
                 Reddet
               </button>
             </form>
             <form action={approveAction}>
-              <button className="px-8 py-2 bg-black text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all">
+              <button className="px-8 py-2.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all cursor-pointer">
                 Onayla ve Yayınla
               </button>
             </form>
@@ -61,11 +65,17 @@ export default async function AdminProductDetailPage({
           
           {/* SOL KOLON: GÖRSELLER */}
           <div className="space-y-6">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Ürün Fotoğrafları ({product.public_images?.length})</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Ürün Fotoğrafları ({product.public_images?.length || 0})</h3>
             <div className="grid grid-cols-1 gap-4">
               {product.public_images?.map((img: string, idx: number) => (
-                <div key={idx} className="aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-                  <img src={img} alt={`Görsel ${idx}`} className="w-full h-full object-cover" />
+                <div key={idx} className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
+                  <Image 
+                    src={img} 
+                    alt={`Görsel ${idx}`} 
+                    fill 
+                    sizes="(max-width: 1024px) 100vw, 50vw" 
+                    className="object-cover" 
+                  />
                 </div>
               ))}
             </div>
@@ -76,8 +86,14 @@ export default async function AdminProductDetailPage({
                 <h3 className="text-xs font-bold uppercase tracking-widest text-red-500 mb-4 italic">Gizli Belgeler (Sadece Admin Görür)</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {product.authenticity_docs.map((doc: string, idx: number) => (
-                    <div key={idx} className="aspect-video bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-red-100">
-                      <img src={doc} alt="Belge" className="w-full h-full object-contain" />
+                    <div key={idx} className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-red-100">
+                      <Image 
+                        src={doc} 
+                        alt="Belge" 
+                        fill 
+                        sizes="(max-width: 1024px) 50vw, 25vw" 
+                        className="object-contain" 
+                      />
                     </div>
                   ))}
                 </div>
@@ -90,52 +106,58 @@ export default async function AdminProductDetailPage({
             
             {/* Başlık ve Fiyat */}
             <div>
-              <h1 className="text-4xl font-light text-gray-900 mb-2 uppercase tracking-tighter">{product.brand}</h1>
+              <h1 className="text-4xl font-light text-gray-900 mb-2 uppercase tracking-tighter serif-display">{product.brand}</h1>
               <p className="text-xl text-gray-500 font-light mb-4">{product.model_name}</p>
               <div className="text-3xl font-bold text-black tabular-nums">
                 {product.price.toLocaleString('tr-TR')} ₺
               </div>
             </div>
 
-            {/* Satıcı Kartı */}
-            <Link href={`/admin/seller/${product.seller_id}`} className="block p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:border-black transition-all group">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Satıcı Bilgileri</p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 group-hover:underline">
-                    {product.profiles.first_name} {product.profiles.last_name}
-                  </h4>
-                  <p className="text-sm text-gray-500">Satış: {product.profiles.sales_count} | Puan: {product.profiles.rating}⭐</p>
+            {/* Satıcı Kartı (Div olarak güncellendi - Dead link düzeltildi) */}
+            {sellerProfile && (
+              <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Satıcı Bilgileri</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-base font-bold text-gray-900">
+                      {sellerProfile.first_name} {sellerProfile.last_name}
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Satış: {sellerProfile.sales_count || '0'} | Puan: {sellerProfile.rating || '5.0'} ⭐
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                    {sellerProfile.first_name ? sellerProfile.first_name[0] : 'S'}
+                  </div>
                 </div>
-                <span className="text-xl text-gray-300 group-hover:text-black transition-colors">→</span>
               </div>
-            </Link>
+            )}
 
             {/* Teknik Detaylar Tablosu */}
             <div className="space-y-4">
               <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-2">Teknik Özellikler</h3>
-              <div className="grid grid-cols-2 gap-y-4 text-sm">
-                <p className="text-gray-500">Kondisyon</p>
-                <p className="font-medium text-right">{product.condition}</p>
+              <div className="grid grid-cols-2 gap-y-4 text-xs uppercase tracking-widest">
+                <p className="text-gray-400">Kondisyon</p>
+                <p className="font-bold text-right">{product.condition}</p>
                 
-                <p className="text-gray-500">Materyal</p>
-                <p className="font-medium text-right">{product.material || 'Belirtilmemiş'}</p>
+                <p className="text-gray-400">Materyal</p>
+                <p className="font-bold text-right">{product.material || 'Belirtilmemiş'}</p>
                 
-                <p className="text-gray-500">Boyutlar</p>
-                <p className="font-medium text-right">{product.dimensions || 'Belirtilmemiş'}</p>
+                <p className="text-gray-400">Boyutlar</p>
+                <p className="font-bold text-right">{product.dimensions || 'Belirtilmemiş'}</p>
                 
-                <p className="text-gray-500">Üretim Yılı</p>
-                <p className="font-medium text-right">{product.production_year || 'Belirtilmemiş'}</p>
+                <p className="text-gray-400">Satın Alındığı Yıl</p>
+                <p className="font-bold text-right">{product.purchase_year || 'Belirtilmemiş'}</p>
                 
-                <p className="text-gray-500 font-semibold text-red-600 italic">Seri Numarası</p>
-                <p className="font-bold text-right text-red-600">{product.serial_number || 'YOK'}</p>
+                <p className="text-red-500 font-bold italic">Seri Numarası</p>
+                <p className="font-bold text-right text-red-500">{product.serial_number || 'YOK'}</p>
               </div>
             </div>
 
             {/* Açıklama */}
             <div className="space-y-4">
               <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-2">Satıcı Notu</h3>
-              <p className="text-gray-700 leading-relaxed italic">"{product.description}"</p>
+              <p className="text-sm text-gray-600 font-light leading-relaxed italic">&quot;{product.description}&quot;</p>
             </div>
 
           </div>

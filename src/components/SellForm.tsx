@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/src/utils/supabase/client'
 import { addProduct } from '@/src/app/sell/actions'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  genders, mainCategories, categoryTree,
-  brands, conditions, generalMaterials,
+  genders, mainCategories,
+  brands, conditions,
   getModelsForBrand, getMaterialsForBrand,
   getSubcategories, getSizesForSubcategory,
   type Gender, type MainCategory,
@@ -46,11 +46,49 @@ export default function SellForm() {
   // ─── Gizli Kod (Onay bölümünde) ───
   const [serialNumber, setSerialNumber] = useState('')
 
-  // ─── Görseller ───
+  // ─── Görseller & Önizlemeler ───
   const [publicFiles, setPublicFiles] = useState<File[]>([])
+  const [publicPreviews, setPublicPreviews] = useState<string[]>([])
   const [verificationFiles, setVerificationFiles] = useState<Record<string, File[]>>({
     logo: [], stitching: [], hardware: [], serial: [], receipt: [],
   })
+  const [verificationPreviews, setVerificationPreviews] = useState<Record<string, string[]>>({
+    logo: [], stitching: [], hardware: [], serial: [], receipt: [],
+  })
+
+  // Object URL tracking for unmount cleanup
+  const allGeneratedUrls = useRef<string[]>([])
+
+  const handlePublicFilesChange = (files: File[]) => {
+    // Revoke old public previews
+    publicPreviews.forEach(url => URL.revokeObjectURL(url))
+    allGeneratedUrls.current = allGeneratedUrls.current.filter(u => !publicPreviews.includes(u))
+
+    const newUrls = files.map(file => URL.createObjectURL(file))
+    allGeneratedUrls.current.push(...newUrls)
+    
+    setPublicFiles(files)
+    setPublicPreviews(newUrls)
+  }
+
+  const handleVerificationFilesChange = (key: string, files: File[]) => {
+    const oldUrls = verificationPreviews[key] || []
+    oldUrls.forEach(url => URL.revokeObjectURL(url))
+    allGeneratedUrls.current = allGeneratedUrls.current.filter(u => !oldUrls.includes(u))
+
+    const newUrls = files.map(file => URL.createObjectURL(file))
+    allGeneratedUrls.current.push(...newUrls)
+
+    setVerificationFiles(prev => ({ ...prev, [key]: files }))
+    setVerificationPreviews(prev => ({ ...prev, [key]: newUrls }))
+  }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      allGeneratedUrls.current.forEach(url => URL.revokeObjectURL(url))
+    }
+  }, [])
 
   // ─── Computed Values ───
   const currentBrand = selectedBrand === '__other__' ? customBrand : selectedBrand
@@ -133,8 +171,9 @@ export default function SellForm() {
       }
 
       router.push('/sell?message=Ürün başarıyla onaya gönderildi.')
-    } catch (error: any) {
-      setMessage(`Hata: ${error.message}`)
+    } catch (error) {
+      const err = error as Error
+      setMessage(`Hata: ${err.message}`)
       setIsSubmitting(false)
     }
   }
@@ -419,12 +458,12 @@ export default function SellForm() {
               <div className="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200">
                 <label className="text-xs font-bold block mb-2">VİTRİN FOTOĞRAFLARI</label>
                 <p className="text-[10px] text-gray-400 mb-4">Müşterilerin göreceği profesyonel ürün fotoğrafları.</p>
-                <input type="file" multiple accept="image/*" className="w-full text-xs" onChange={(e) => setPublicFiles(Array.from(e.target.files || []))} required />
-                {publicFiles.length > 0 && (
+                <input type="file" multiple accept="image/*" className="w-full text-xs" onChange={(e) => handlePublicFilesChange(Array.from(e.target.files || []))} required />
+                {publicPreviews.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-4">
-                    {publicFiles.map((f, i) => (
+                    {publicPreviews.map((url, i) => (
                       <div key={i} className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
-                        <img src={URL.createObjectURL(f)} className="w-full h-full object-cover" alt={`Vitrin ${i + 1}`} />
+                        <img src={url} className="w-full h-full object-cover" alt={`Vitrin ${i + 1}`} />
                       </div>
                     ))}
                   </div>
@@ -477,17 +516,17 @@ export default function SellForm() {
                       className="w-full text-xs file:bg-white file:text-black file:rounded file:px-4 file:py-2 file:mr-4 file:border-0 file:cursor-pointer"
                       onChange={(e) => {
                         const files = Array.from(e.target.files || [])
-                        setVerificationFiles(prev => ({ ...prev, [cat.key]: files }))
+                        handleVerificationFilesChange(cat.key, files)
                       }}
                       required={cat.min > 0}
                     />
 
                     {/* Küçük Önizleme */}
-                    {verificationFiles[cat.key]?.length > 0 && (
+                    {verificationPreviews[cat.key]?.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {verificationFiles[cat.key].map((f, i) => (
+                        {verificationPreviews[cat.key].map((url, i) => (
                           <div key={i} className="w-12 h-12 rounded-lg overflow-hidden bg-zinc-700 border border-zinc-600">
-                            <img src={URL.createObjectURL(f)} className="w-full h-full object-cover" alt={`${cat.label} ${i + 1}`} />
+                            <img src={url} className="w-full h-full object-cover" alt={`${cat.label} ${i + 1}`} />
                           </div>
                         ))}
                       </div>

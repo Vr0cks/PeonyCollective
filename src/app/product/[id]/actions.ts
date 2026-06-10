@@ -10,6 +10,25 @@ export async function createOrder(productId: string, price: number) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // 0. Ürün durumunu ve satıcıyı kontrol et (Race Condition ve Kendi Ürününü Alma Engeli)
+  const { data: product, error: productFetchError } = await supabase
+    .from('products')
+    .select('seller_id, status')
+    .eq('id', productId)
+    .single()
+
+  if (productFetchError || !product) {
+    redirect(`/product/${productId}?error=Ürün bulunamadı.`)
+  }
+
+  if (product.status !== 'approved') {
+    redirect(`/product/${productId}?error=Bu ürün satılmıştır veya şu an satın alınamaz durumda.`)
+  }
+
+  if (product.seller_id === user.id) {
+    redirect(`/product/${productId}?error=Kendi sattığınız ürünü satın alamazsınız.`)
+  }
+
   // 1. Siparişi oluştur
   const { error: orderError } = await supabase.from('orders').insert({
     buyer_id: user.id,
