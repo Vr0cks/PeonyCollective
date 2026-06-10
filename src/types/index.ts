@@ -30,7 +30,13 @@ export interface Product {
   serial_number: string | null;
   public_images: string[];
   authenticity_docs: string[];
+  flaw_images?: string[];
+  video_url?: string | null;
+  odor_score?: number | null;
+  has_spa_treatment?: boolean | null;
+  full_set_items?: string[] | null;
   status: 'pending' | 'approved' | 'rejected' | 'sold';
+  locked_until?: string | null;
   created_at: string;
   profiles?: Partial<Profile>;
 }

@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/src/utils/supabase/server'
 import { createPaymentToken } from '@/src/lib/paytr'
 
+// Basit In-Memory Rate Limiting (Üretim ortamında Redis / Upstash önerilir)
+const rateLimitCache = new Map<string, number>()
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
@@ -14,8 +17,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 })
     }
 
+    // 1.5 Rate Limiting (Siber Güvenlik Önlemi)
+    const userIp = request.headers.get('x-forwarded-for') || '127.0.0.1'
+    const nowTs = Date.now()
+    const lastRequestTs = rateLimitCache.get(userIp)
+    
+    // Aynı IP'den 10 saniye içinde yeni ödeme başlatma isteği gelirse reddet
+    if (lastRequestTs && nowTs - lastRequestTs < 10000) {
+      return NextResponse.json({ 
+        error: 'Çok fazla istek gönderdiniz. Güvenliğiniz için lütfen 10 saniye bekleyin.' 
+      }, { status: 429 })
+    }
+    rateLimitCache.set(userIp, nowTs)
+
     // 2. Parse request body
-    const { productId } = await request.json()
+    const { productId, deliveryMethod } = await request.json()
     if (!productId) {
       return NextResponse.json({ error: "Ürün ID'si eksik" }, { status: 400 })
     }
@@ -47,6 +63,19 @@ export async function POST(request: Request) {
       )
     }
 
+    // 5.5 Concurrency Lock Check (Race Condition Önlemi)
+    const now = new Date()
+    if (product.locked_until && new Date(product.locked_until) > now) {
+      return NextResponse.json(
+        { error: 'Bu ürün şu an başka bir koleksiyoner tarafından satın alınıyor. Lütfen 15 dakika sonra tekrar deneyin.' },
+        { status: 409 }
+      )
+    }
+
+    // Ürünü kilitle (15 dakika)
+    const lockTime = new Date(now.getTime() + 15 * 60000).toISOString()
+    await supabase.from('products').update({ locked_until: lockTime }).eq('id', productId)
+
     // 6. Get buyer profile to retrieve address, name, phone, etc.
     const { data: buyerProfile } = await supabase
       .from('profiles')
@@ -72,8 +101,9 @@ export async function POST(request: Request) {
       )
     }
 
-    // 7. Get client IP
-    const userIp = request.headers.get('x-forwarded-for') || '127.0.0.1'
+    // Toplam Fiyat Hesaplama
+    const deliveryFee = deliveryMethod === 'private_viewing' ? 15000 : deliveryMethod === 'vip' ? 2500 : 0
+    const finalPrice = product.price + deliveryFee
 
     // Generate order draft in database first to get unique order ID
     const { data: newOrder, error: orderInsertError } = await supabase
@@ -81,7 +111,7 @@ export async function POST(request: Request) {
       .insert({
         buyer_id: user.id,
         product_id: productId,
-        total_price: product.price,
+        total_price: finalPrice,
         order_status: 'pending_payment',
       })
       .select('id')
@@ -97,7 +127,7 @@ export async function POST(request: Request) {
     const merchantOid = newOrder.id
 
     // Amount in kuruş (price * 100)
-    const paymentAmount = Math.round(product.price * 100)
+    const paymentAmount = Math.round(finalPrice * 100)
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 

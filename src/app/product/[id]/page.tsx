@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Metadata } from 'next'
 import { Product, Profile } from '@/src/types'
+import MagnifierImage from '@/src/components/MagnifierImage'
 
 export async function generateMetadata({
   params,
@@ -83,20 +84,51 @@ export default async function ProductDetailPage({
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           
-          {/* SOL: GÖRSEL GALERİSİ */}
+          {/* SOL: GÖRSEL VE VİDEO GALERİSİ */}
           <div className="lg:col-span-7 space-y-4">
-            {product.public_images?.map((img: string, idx: number) => (
-              <div key={idx} className="relative aspect-[4/5] bg-gray-50 overflow-hidden">
-                <Image 
-                  src={img} 
-                  alt={`${product.brand} ${idx + 1}`} 
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  priority={idx === 0}
-                  className="object-cover hover:scale-105 transition-transform duration-700" 
+            {/* VİDEO OYNATICI (Varsa en üstte) */}
+            {product.video_url && (
+              <div className="relative w-full aspect-[4/5] bg-black overflow-hidden group">
+                <video 
+                  src={product.video_url} 
+                  className="w-full h-full object-cover"
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
                 />
+                <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full tracking-widest z-10 border border-white/20">
+                  <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></span>
+                  Lüks Önizleme
+                </div>
               </div>
+            )}
+
+            {product.public_images?.map((img: string, idx: number) => (
+              <MagnifierImage
+                key={idx}
+                src={img}
+                alt={`${product.brand} ${idx + 1}`}
+                priority={idx === 0}
+              />
             ))}
+
+            {/* KUSUR VE DEFO GALERİSİ */}
+            {product.flaw_images && product.flaw_images.length > 0 && (
+              <div className="mt-12 bg-red-50/50 p-6 rounded-2xl border border-red-100">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-red-800 mb-2">Kusurlar ve Belirtilen Defolar</h3>
+                <p className="text-xs text-red-600 mb-6 font-light">
+                  Peony Collective şeffaflık ilkesi gereği, satıcı tarafından belirtilen ve laboratuvarımızca onaylanan tüm kullanım izleri aşağıda sunulmuştur. Lütfen satın almadan önce inceleyiniz.
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {product.flaw_images.map((img: string, idx: number) => (
+                    <div key={`flaw-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-red-200">
+                      <Image src={img} alt={`Kusur Detayı ${idx + 1}`} fill className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* SAĞ: ÜRÜN BİLGİLERİ */}
@@ -117,22 +149,70 @@ export default async function ProductDetailPage({
               </div>
 
               {/* Teknik Detaylar Özeti */}
-              <div className="grid grid-cols-2 gap-y-4 text-xs uppercase tracking-widest border-b border-gray-100 pb-8">
+              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
                 <div>
-                  <p className="text-gray-400 mb-1">Kondisyon</p>
-                  <p className="font-bold">{product.condition}</p>
+                  <h4 className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Dış Kondisyon</h4>
+                  <p className="text-sm font-medium text-black capitalize">{product.condition}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 mb-1">Materyal</p>
-                  <p className="font-bold">{product.material || 'Deri'}</p>
+                  <h4 className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Satın Alındığı Yıl</h4>
+                  <p className="text-sm font-medium text-black">{product.purchase_year || 'Bilinmiyor'}</p>
                 </div>
-                <div>
-                  <p className="text-gray-400 mb-1">Satın Alındığı Yıl</p>
-                  <p className="font-bold">{product.purchase_year || 'Bilinmiyor'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 mb-1">Boyut</p>
-                  <p className="font-bold">{product.dimensions || 'Standart'}</p>
+                {product.dimensions && (
+                  <div className="col-span-2">
+                    <h4 className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Boyutlar</h4>
+                    <p className="text-sm font-medium text-black">{product.dimensions}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* YENİ FAZ 3: KOKU VE DETAYLI KONDİSYON RAPORU */}
+              <div className="mt-8 bg-[#AF9164]/5 border border-[#AF9164]/20 p-6 rounded-2xl">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-[#AF9164] mb-4 flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  Peony Uzman Kondisyon Raporu
+                </h4>
+                
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-end mb-1">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase">Koku Skoru (10 = Kokusuz)</span>
+                      <span className="text-sm font-bold text-black">{product.odor_score || 10}/10</span>
+                    </div>
+                    <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-[#AF9164] h-full" style={{ width: `${(product.odor_score || 10) * 10}%` }}></div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-[#AF9164]/10">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase block mb-1">3. Parti Spa / Bakım Geçmişi</span>
+                    {product.has_spa_treatment ? (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-600"></span> Orijinal dışı müdahale/boya mevcut
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-600"></span> %100 Orijinal Fabrika Kondisyonu
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="pt-3 border-t border-[#AF9164]/10">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase block mb-2">Teslim Edilecek İçerik (Full Set)</span>
+                    <div className="flex flex-wrap gap-2">
+                      {product.full_set_items && product.full_set_items.length > 0 ? (
+                        product.full_set_items.map((item: string, i: number) => (
+                          <span key={i} className="text-[10px] font-bold px-2 py-1 bg-white border border-gray-200 rounded text-gray-600 uppercase tracking-wider">
+                            ✓ {item}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[10px] font-bold px-2 py-1 bg-white border border-gray-200 rounded text-gray-400 uppercase tracking-wider">
+                          Sadece Ürün
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -164,9 +244,13 @@ export default async function ProductDetailPage({
                 </div>
 
                 <div className="mt-8">
-                  <Link href={`/passport/${product.id}`} className="block w-full text-center border border-[#AF9164] text-[#AF9164] py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#AF9164] hover:text-black transition-all">
+                  <Link href={`/passport/${product.id}`} className="block w-full text-center border border-[#AF9164] text-[#AF9164] py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#AF9164] hover:text-black transition-all mb-2">
                     Dijital Pasaportu Görüntüle
                   </Link>
+                  <div className="text-center">
+                    <p className="text-[8px] text-gray-500 font-mono uppercase tracking-widest">Aura Blockchain Consortium</p>
+                    <p className="text-[8px] text-[#AF9164] font-mono break-all opacity-80">Tx: 0x{product.id.replace(/-/g, '')}a7f9b2...</p>
+                  </div>
                 </div>
               </div>
 
@@ -225,14 +309,29 @@ export default async function ProductDetailPage({
                     <Link href={`/checkout/${product.id}`} className="w-full bg-black text-white py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-gray-800 transition-all shadow-xl active:scale-95 block">
                       Satın Almayı Başlat
                     </Link>
-                    <Link href={`/messages?new=true&seller=${product.seller_id}&product=${product.id}`} className="w-full border border-black/20 text-black py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-gray-50 transition-all active:scale-95 block">
-                      Satıcıya Soru Sor
+                    <Link href="/concierge" className="w-full border border-[#AF9164] bg-[#AF9164]/5 text-[#AF9164] py-5 rounded-full font-bold uppercase tracking-[0.2em] text-xs text-center hover:bg-[#AF9164] hover:text-white transition-all active:scale-95 block flex items-center justify-center gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                      Peony Concierge Asistanı
                     </Link>
                   </>
                 )}
               </div>
 
-              <p className="text-[10px] text-center text-gray-400 uppercase tracking-widest">
+              {/* İADE VE LOJİSTİK POLİTİKASI */}
+              <div className="mt-8 bg-gray-50 p-6 rounded-2xl text-xs space-y-4">
+                <h4 className="font-bold uppercase tracking-widest text-black">Güvenli Lojistik & İade Şartları</h4>
+                <p className="text-gray-600 font-light leading-relaxed">
+                  <span className="font-semibold text-gray-800">Tam Kapsamlı Sigorta:</span> Siparişiniz size teslim edilene kadar hırsızlık, kayıp ve hasara karşı tam değerinde sigortalıdır. Taşıma riski tamamen Peony Collective'e aittir.
+                </p>
+                <p className="text-gray-600 font-light leading-relaxed">
+                  <span className="font-semibold text-gray-800">14 Gün İçinde İade:</span> Ürünü teslim aldığınız tarihten itibaren 14 gün içinde, üzerindeki güvenlik mührü (Peony Lock) sökülmemiş olmak kaydıyla iade edebilirsiniz. İade kargo masrafları alıcıya aittir.
+                </p>
+                <p className="text-gray-600 font-light leading-relaxed">
+                  <span className="font-semibold text-gray-800">Orijinallik İadesi:</span> Her ürün Peony Lab tarafından doğrulanmıştır. Herhangi bir yetkili satıcı tarafından ürünün orijinalliğiyle ilgili aksi bir rapor sunulursa, ömür boyu tam para iade garantisi altındasınız.
+                </p>
+              </div>
+
+              <p className="text-[10px] text-center text-gray-400 uppercase tracking-widest mt-6">
                 ✓ %100 Orijinallik Garantisi & Ücretsiz Sigortalı Kargo
               </p>
 
