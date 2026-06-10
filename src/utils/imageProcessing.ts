@@ -6,7 +6,7 @@
  * Örnek kullanım: await sharp(buffer).jpeg().toBuffer()
  */
 
-export async function stripExifData(fileBuffer: Buffer, mimeType: string): Promise<Buffer> {
+export async function stripExifData(fileBuffer: any, mimeType: string): Promise<any> {
   // SİBER GÜVENLİK (OSINT) KORUMASI:
   // Eğer bu gerçek bir sunucu ortamı olsaydı ve sharp kurulu olsaydı:
   //
