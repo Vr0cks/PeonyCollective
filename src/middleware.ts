@@ -61,18 +61,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Veritabanından kullanıcının rolünü kontrol ediyoruz, admin değilse yönlendirme yapacağız.
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
-      const url = request.nextUrl.clone()
-      url.pathname = '/'
-      return NextResponse.redirect(url)
-    }
+    // NOT: Veritabanı (profiles) kontrolü Edge middleware üzerinden kaldırıldı. (Performans Optimizasyonu)
+    // Admin yetki kontrolü artık sunucu bileşeni olan src/app/admin/layout.tsx dosyasında yapılıyor.
   }
 
   return response

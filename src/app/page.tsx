@@ -18,7 +18,7 @@ export default async function Home({ searchParams }: PageProps) {
   // 1. Tüm onaylı ürünleri çekiyoruz
   let query = supabase
     .from('products')
-    .select('*')
+    .select('id, brand, model_name, price, condition, public_images, category, gender, created_at')
     .eq('status', 'approved')
     .order('created_at', { ascending: false })
 
@@ -32,16 +32,12 @@ export default async function Home({ searchParams }: PageProps) {
     query = query.eq('gender', gender)
   }
 
-  const { data: productsData } = await query
-  const products: Product[] = (productsData || []) as Product[]
+  const { data: productsData } = await query.returns<Product[]>()
+  const products: Product[] = productsData || []
 
-  // 2. Filtreleme için benzersiz markaları çekiyoruz
-  const { data: allProducts } = await supabase
-    .from('products')
-    .select('brand, category, gender')
-    .eq('status', 'approved')
-
-  const brands = Array.from(new Set(allProducts?.map(p => p.brand))).filter(Boolean) as string[]
+  // 2. Veritabanından doğrudan tekilleştirilmiş (DISTINCT) markaları RPC ile ışık hızında çekiyoruz
+  const { data: brandData } = await supabase.rpc('get_unique_approved_brands')
+  const brands = brandData?.map((row: { brand: string }) => row.brand).filter(Boolean) || []
 
   return (
     <HomeClient 
