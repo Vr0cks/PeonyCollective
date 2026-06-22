@@ -1,18 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, X, Send, Crown, CheckCircle2, Shield, Loader2 } from 'lucide-react'
+import { MessageSquare, X, Send, Crown, CheckCircle2, Shield, Loader2, Terminal, Server, Activity } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
+import { usePathname } from 'next/navigation'
 
 export default function ConciergeWidget() {
+  const pathname = usePathname()
+  const isAdmin = pathname?.startsWith('/admin')
+
   const [isOpen, setIsOpen] = useState(false)
-  const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success'>('welcome')
+  const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success' | 'admin_welcome' | 'admin_status'>('welcome')
   const [offerData, setOfferData] = useState({ name: '', product: '', price: '' })
   const [loading, setLoading] = useState(false)
 
+  // Widget her açıldığında role göre doğru sayfaya sıfırla
+  useEffect(() => {
+    if (isOpen) {
+      setChatStep(isAdmin ? 'admin_welcome' : 'welcome')
+    }
+  }, [isOpen, isAdmin])
+
   const resetChat = () => {
-    setChatStep('welcome')
+    setChatStep(isAdmin ? 'admin_welcome' : 'welcome')
     setOfferData({ name: '', product: '', price: '' })
   }
 
@@ -22,7 +33,6 @@ export default function ConciergeWidget() {
       setLoading(true)
       try {
         const supabase = createClient()
-        // Extract raw number value from offer price (e.g. "450.000 ₺" -> 450000)
         const numericPrice = parseFloat(offerData.price.replace(/[^\d]/g, '')) || 0
 
         const { error } = await supabase.from('concierge_requests').insert({
@@ -44,28 +54,35 @@ export default function ConciergeWidget() {
     }
   }
 
+  // Tematik renkler
+  const themeColor = isAdmin ? 'emerald-500' : '#AF9164'
+  const ThemeIcon = isAdmin ? Terminal : Crown
+
   return (
     <div className="fixed bottom-6 right-6 z-[990]">
       <AnimatePresence>
         
-        {/* VIP Concierge Panel */}
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring' as const, stiffness: 350, damping: 25 }}
-            className="absolute bottom-20 right-0 w-[360px] bg-[#1A1A1A] border border-[#AF9164]/30 rounded-2xl shadow-2xl overflow-hidden text-white z-[991]"
+            className={`absolute bottom-20 right-0 w-[360px] bg-[#1A1A1A] border rounded-2xl shadow-2xl overflow-hidden text-white z-[991] ${isAdmin ? 'border-emerald-500/30' : 'border-[#AF9164]/30'}`}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-zinc-900 to-zinc-950 px-6 py-5 border-b border-[#AF9164]/20 flex items-center justify-between">
+            <div className={`bg-gradient-to-r from-zinc-900 to-zinc-950 px-6 py-5 border-b flex items-center justify-between ${isAdmin ? 'border-emerald-500/20' : 'border-[#AF9164]/20'}`}>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#AF9164] flex items-center justify-center text-black">
-                  <Crown size={16} strokeWidth={1.5} />
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-black ${isAdmin ? 'bg-emerald-500' : 'bg-[#AF9164]'}`}>
+                  <ThemeIcon size={16} strokeWidth={1.5} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-[0.25em] text-[#AF9164]">Peony Concierge</h4>
-                  <p className="text-[9px] text-zinc-400 uppercase tracking-widest">VIP Destek & Teklif Hattı</p>
+                  <h4 className={`text-xs font-bold uppercase tracking-[0.25em] ${isAdmin ? 'text-emerald-500' : 'text-[#AF9164]'}`}>
+                    {isAdmin ? 'Systems & Ops' : 'Peony Concierge'}
+                  </h4>
+                  <p className="text-[9px] text-zinc-400 uppercase tracking-widest">
+                    {isAdmin ? 'IT Destek & Altyapı' : 'VIP Destek & Teklif Hattı'}
+                  </p>
                 </div>
               </div>
               <button
@@ -80,7 +97,56 @@ export default function ConciergeWidget() {
             {/* Chat Body */}
             <div className="p-6 max-h-[380px] overflow-y-auto min-h-[260px] flex flex-col justify-between">
               
-              {/* Adım 1: Karşılama ve Seçenekler */}
+              {/* ADMIN: Karşılama */}
+              {chatStep === 'admin_welcome' && (
+                <div className="space-y-6 flex-grow flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="bg-zinc-900 border border-emerald-500/20 p-4 rounded-2xl text-xs font-mono leading-relaxed text-emerald-400 shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]">
+                      <p className="opacity-50 mb-2">{'> root@peony-core:~#'}</p>
+                      Sistem bağlantısı stabil. Veritabanı sekronize. IT Destek Merkezine hoş geldiniz. Nasıl yardımcı olabilirim?
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-6">
+                    <button
+                      onClick={() => setChatStep('admin_status')}
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-zinc-300 hover:text-emerald-400 group"
+                    >
+                      <Activity size={12} className="inline mr-2 group-hover:animate-pulse" /> Sistem Durumunu Kontrol Et
+                    </button>
+                    <button
+                      onClick={() => alert('IT destek ekibine (dev@peonycollective.com) ping gönderildi. Kısa süre içinde ulaşacağız.')}
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-zinc-300 hover:text-emerald-400"
+                    >
+                      <Terminal size={12} className="inline mr-2" /> Developer Ekibiyle Görüş
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ADMIN: Sistem Durumu */}
+              {chatStep === 'admin_status' && (
+                <div className="space-y-6">
+                  <div className="bg-zinc-900 border border-emerald-500/20 p-4 rounded-2xl text-xs font-mono leading-relaxed text-emerald-400 space-y-3 shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]">
+                    <p className="opacity-50 mb-2">{'> systemctl status peony-services'}</p>
+                    <div className="space-y-1">
+                      <p>● Postgres DB: <span className="text-white">ONLINE (9ms)</span></p>
+                      <p>● Next.js Edge: <span className="text-white">ONLINE</span></p>
+                      <p>● Entrupy API: <span className="text-white">SYNCED</span></p>
+                      <p>● Supabase Storage: <span className="text-white">ONLINE</span></p>
+                    </div>
+                    <p className="pt-2 border-t border-emerald-500/20 mt-2 opacity-80 text-[10px]">Tüm altyapı servisleri yeşil durumda.</p>
+                  </div>
+                  <button
+                    onClick={() => setChatStep('admin_welcome')}
+                    className="text-[10px] font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-widest border-b border-emerald-500/30 pb-0.5 transition-colors cursor-pointer"
+                  >
+                    ← Konsola Dön
+                  </button>
+                </div>
+              )}
+
+              {/* USER: Karşılama ve Seçenekler */}
               {chatStep === 'welcome' && (
                 <div className="space-y-6 flex-grow flex flex-col justify-between">
                   <div className="space-y-4">
@@ -92,19 +158,19 @@ export default function ConciergeWidget() {
                   <div className="space-y-3 pt-6">
                     <button
                       onClick={() => setChatStep('spectral')}
-                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-white"
                     >
                       🛡️ 3D Spektral Orijinallik Sorgula
                     </button>
                     <button
                       onClick={() => setChatStep('offer')}
-                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-white"
                     >
                       👑 Özel VIP Teklif Ver (100K+)
                     </button>
                     <button
                       onClick={() => setChatStep('whatsapp')}
-                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer"
+                      className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-white"
                     >
                       💬 Temsilci ile Canlı Görüş
                     </button>
@@ -112,7 +178,7 @@ export default function ConciergeWidget() {
                 </div>
               )}
 
-              {/* Adım 2: Orijinallik Bilgisi */}
+              {/* USER: Orijinallik Bilgisi */}
               {chatStep === 'spectral' && (
                 <div className="space-y-6">
                   <div className="bg-zinc-900 border border-zinc-800/80 p-4 rounded-2xl text-xs font-light leading-relaxed text-zinc-300 space-y-3">
@@ -135,7 +201,7 @@ export default function ConciergeWidget() {
                 </div>
               )}
 
-              {/* Adım 3: VIP Teklif Formu */}
+              {/* USER: VIP Teklif Formu */}
               {chatStep === 'offer' && (
                 <div className="space-y-4">
                   <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">VIP Özel Teklif Formu</p>
@@ -192,7 +258,7 @@ export default function ConciergeWidget() {
                 </div>
               )}
 
-              {/* Adım 4: Teklif Başarılı */}
+              {/* USER: Teklif Başarılı */}
               {chatStep === 'offer_success' && (
                 <div className="space-y-6 text-center py-6">
                   <div className="w-12 h-12 rounded-full bg-[#AF9164]/10 border border-[#AF9164] flex items-center justify-center mx-auto text-[#AF9164]">
@@ -213,7 +279,7 @@ export default function ConciergeWidget() {
                 </div>
               )}
 
-              {/* Adım 5: WhatsApp Yönlendirme */}
+              {/* USER: WhatsApp Yönlendirme */}
               {chatStep === 'whatsapp' && (
                 <div className="space-y-6">
                   <div className="bg-zinc-900 border border-zinc-800/80 p-4 rounded-2xl text-xs font-light leading-relaxed text-zinc-300 space-y-4">
@@ -248,16 +314,18 @@ export default function ConciergeWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Golden Ring Button */}
+      {/* Floating Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="w-14 h-14 rounded-full bg-[#AF9164] hover:bg-[#96794F] text-black shadow-2xl flex items-center justify-center border border-black/20 relative cursor-pointer focus:outline-none"
-        aria-label="Concierge Aç"
+        className={`w-14 h-14 rounded-full text-black shadow-2xl flex items-center justify-center border relative cursor-pointer focus:outline-none transition-colors ${
+          isAdmin ? 'bg-emerald-500 hover:bg-emerald-400 border-emerald-400/20' : 'bg-[#AF9164] hover:bg-[#96794F] border-black/20'
+        }`}
+        aria-label="Destek Aç"
       >
         <span className="absolute inset-0.5 rounded-full border border-black/10 animate-ping opacity-25" />
-        {isOpen ? <X size={22} strokeWidth={1.5} /> : <MessageSquare size={22} strokeWidth={1.5} />}
+        {isOpen ? <X size={22} strokeWidth={1.5} /> : <ThemeIcon size={22} strokeWidth={1.5} />}
       </motion.button>
     </div>
   )

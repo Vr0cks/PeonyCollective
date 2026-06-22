@@ -1,163 +1,173 @@
 import { createClient } from '@/src/utils/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { updateProductStatus } from './actions'
 import { Product, Profile } from '@/src/types'
 
-export default async function AdminPage() {
+export default async function AdminDashboardPage() {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // İstatistikler
+  const [
+    { count: totalCount },
+    { count: pendingCount },
+    { count: approvedCount },
+    { count: rejectedCount },
+    { count: soldCount },
+  ] = await Promise.all([
+    supabase.from('products').select('*', { count: 'exact', head: true }),
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'sold'),
+  ])
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500 font-medium text-lg">Bu sayfaya erişim yetkiniz yok.</p>
-      </div>
-    )
-  }
-
-  const { data: pendingProductsRaw, error } = await supabase
+  // Son 8 ürün
+  const { data: recentRaw } = await supabase
     .from('products')
-    .select(`
-      *,
-      profiles:seller_id (first_name, last_name)
-    `)
-    .eq('status', 'pending')
+    .select(`*, profiles:seller_id (first_name, last_name)`)
     .order('created_at', { ascending: false })
+    .limit(8)
 
-  const pendingProducts: Product[] = (pendingProductsRaw || []) as Product[]
+  const recentProducts: Product[] = (recentRaw || []) as Product[]
 
-  if (error) {
-    console.error("Ürünler çekilirken hata:", error)
+  const stats = [
+    { label: 'Toplam Ürün', value: totalCount ?? 0, color: 'text-white', bg: 'bg-white/5', border: 'border-white/10' },
+    { label: 'Onay Bekliyor', value: pendingCount ?? 0, color: 'text-amber-400', bg: 'bg-amber-500/5', border: 'border-amber-500/20', href: '/admin/pending', pulse: (pendingCount ?? 0) > 0 },
+    { label: 'Aktif / Onaylı', value: approvedCount ?? 0, color: 'text-emerald-400', bg: 'bg-emerald-500/5', border: 'border-emerald-500/20' },
+    { label: 'Satıldı', value: soldCount ?? 0, color: 'text-[#AF9164]', bg: 'bg-[#AF9164]/5', border: 'border-[#AF9164]/20' },
+    { label: 'Reddedildi', value: rejectedCount ?? 0, color: 'text-red-400', bg: 'bg-red-500/5', border: 'border-red-500/20' },
+  ]
+
+  const statusStyle: Record<string, { label: string; cls: string }> = {
+    pending: { label: 'Bekliyor', cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+    approved: { label: 'Onaylı', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+    rejected: { label: 'Reddedildi', cls: 'bg-red-500/10 text-red-400 border-red-500/20' },
+    sold: { label: 'Satıldı', cls: 'bg-[#AF9164]/10 text-[#AF9164] border-[#AF9164]/20' },
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        
-        <div className="mb-10 flex flex-col md:flex-row md:justify-between md:items-end border-b border-gray-200 pb-6 gap-4">
-          <div>
-            <h1 className="text-3xl font-light tracking-widest uppercase mb-2 text-gray-900">Yönetim Paneli</h1>
-            <p className="text-gray-500 text-sm">Orijinallik ve kalite onayı bekleyen lüks çantalar.</p>
+    <div className="p-8 min-h-full">
+
+      {/* Başlık */}
+      <div className="mb-10">
+        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Admin Panel</p>
+        <h1 className="text-3xl font-bold text-white tracking-tight">Genel Bakış</h1>
+        <p className="text-white/40 text-sm mt-1">
+          {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+      </div>
+
+      {/* İSTATİSTİK KARTLARI */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className={`relative ${s.bg} border ${s.border} rounded-2xl p-6 ${s.href ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
+          >
+            {s.href ? (
+              <Link href={s.href} className="absolute inset-0 rounded-2xl" />
+            ) : null}
+            {s.pulse && (
+              <div className="absolute top-4 right-4">
+                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              </div>
+            )}
+            <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-3">{s.label}</p>
+            <p className={`text-4xl font-bold ${s.color}`}>{s.value}</p>
           </div>
-          <div className="inline-flex items-center bg-black text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></span>
-            {pendingProducts?.length || 0} İncelenecek Ürün
-          </div>
+        ))}
+      </div>
+
+      {/* HIZLI ERİŞİM */}
+      <div className="grid grid-cols-3 gap-4 mb-10">
+        {[
+          { href: '/admin/pending', label: 'Onay Kuyruğu', desc: 'Bekleyen ürünleri incele ve onayla', count: pendingCount ?? 0, accent: 'amber' },
+          { href: '/admin/products', label: 'Tüm Ürünler', desc: 'Tüm statüslerdeki ürünleri listele', count: totalCount ?? 0, accent: 'blue' },
+          { href: '/admin/lab', label: 'Lab — A/B', desc: 'Orijinallik karşılaştırma ekranı', count: null, accent: 'purple' },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="block bg-white/5 hover:bg-white/8 border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-200 group"
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className={`w-2 h-2 rounded-full ${item.accent === 'amber' ? 'bg-amber-400' : item.accent === 'blue' ? 'bg-blue-400' : 'bg-purple-400'}`} />
+              {item.count !== null && (
+                <span className="text-xs font-bold text-white/20">{item.count}</span>
+              )}
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1 group-hover:text-white transition-colors">{item.label}</h3>
+            <p className="text-xs text-white/30">{item.desc}</p>
+          </Link>
+        ))}
+      </div>
+
+      {/* SON ÜRÜNLER */}
+      <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden">
+        <div className="px-6 py-5 border-b border-white/8 flex justify-between items-center">
+          <h2 className="text-sm font-bold text-white">Son Eklenen Ürünler</h2>
+          <Link href="/admin/products" className="text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white transition-colors">
+            Tümünü Gör →
+          </Link>
         </div>
 
-        {(!pendingProducts || pendingProducts.length === 0) ? (
-          <div className="bg-white p-16 text-center rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center">
-            <div className="w-16 h-16 mb-4 bg-gray-50 rounded-full flex items-center justify-center">
-              <span className="text-2xl text-gray-300">✓</span>
-            </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">Tüm ürünler incelendi</h3>
-            <p className="text-gray-500">Şu an vitrine çıkmayı bekleyen yeni bir ürün bulunmuyor.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {pendingProducts.map((product) => {
-              const approveAction = updateProductStatus.bind(null, product.id, 'approved')
-              const rejectAction = updateProductStatus.bind(null, product.id, 'rejected')
+        <div className="divide-y divide-white/5">
+          {recentProducts.map((product) => {
+            const firstImage = product.public_images?.[0]
+            const sellerName = product.profiles
+              ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim() || 'Anonim'
+              : 'Anonim'
+            const st = statusStyle[product.status] || { label: product.status, cls: 'bg-white/10 text-white/50 border-white/10' }
 
-              const sellerName = product.profiles 
-                ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim()
-                : 'Bilinmeyen Satıcı'
-
-              // Çantanın ilk görselini alıyoruz
-              const firstImage = product.public_images && product.public_images.length > 0 
-                ? product.public_images[0] 
-                : null;
-
-              return (
-                <div key={product.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col group">
-                  
-                  {/* Görsel Alanı */}
-                  <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-                    {firstImage ? (
-                      <Image 
-                        src={firstImage} 
-                        alt={product.model_name || 'Ürün'} 
-                        fill
-                        sizes="(max-width: 640px) 100vw, 25vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm font-medium">
-                        Görsel Yok
-                      </div>
-                    )}
-
-                    {/* Detaylı İncele Butonu (Hover) */}
-                    <Link 
-                      href={`/admin/product/${product.id}`}
-                      className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 bg-black/40 backdrop-blur-sm transition-all flex items-center justify-center text-white font-bold uppercase tracking-widest text-xs"
-                    >
-                      Detaylı İncele
-                    </Link>
-                    
-                    {/* Görsel Üzeri Rozetler */}
-                    <div className="absolute top-3 right-3 flex flex-col gap-2">
-                      <span className="bg-white/90 backdrop-blur-md text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                        {product.condition}
-                      </span>
-                      <span className="bg-black/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full text-center shadow-sm">
-                        {product.public_images?.length || 0} Foto
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* İçerik Alanı */}
-                  <div className="p-5 flex-grow flex flex-col">
-                    <div className="mb-3">
-                      <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wide">{product.brand}</h2>
-                      <h3 className="text-sm text-gray-500">{product.model_name}</h3>
-                    </div>
-                    
-                    <p className="text-xs text-gray-600 mb-4 line-clamp-2 leading-relaxed flex-grow">
-                      {product.description}
-                    </p>
-                    
-                    <div className="flex justify-between items-end pt-4 border-t border-gray-50 mb-4">
-                      <div>
-                        <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">Satıcı</p>
-                        <p className="text-xs font-semibold text-gray-800">{sellerName}</p>
-                      </div>
-                      <span className="text-lg font-bold text-black tracking-tight">
-                        {product.price.toLocaleString('tr-TR')} ₺
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* İşlem Butonları */}
-                  <div className="grid grid-cols-2 gap-px bg-gray-100">
-                    <form action={approveAction}>
-                      <button className="w-full py-3.5 text-xs font-bold text-white bg-black hover:bg-gray-800 transition-colors uppercase tracking-widest flex justify-center items-center">
-                        Onayla
-                      </button>
-                    </form>
-                    <form action={rejectAction}>
-                      <button className="w-full py-3.5 text-xs font-bold text-red-600 bg-white hover:bg-red-50 hover:text-red-700 transition-colors uppercase tracking-widest flex justify-center items-center">
-                        Reddet
-                      </button>
-                    </form>
-                  </div>
-                  
+            return (
+              <div key={product.id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/3 transition-colors">
+                {/* Küçük görsel */}
+                <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 relative">
+                  {firstImage ? (
+                    <Image src={firstImage} alt="" fill sizes="48px" className="object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white/20 text-[10px]">—</div>
+                  )}
                 </div>
-              )
-            })}
-          </div>
-        )}
+
+                {/* Bilgi */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-[#AF9164] uppercase tracking-wider truncate">{product.brand}</p>
+                  <p className="text-sm text-white/70 truncate">{product.model_name}</p>
+                </div>
+
+                {/* Satıcı */}
+                <div className="hidden md:block w-32 shrink-0">
+                  <p className="text-xs text-white/30 truncate">{sellerName}</p>
+                </div>
+
+                {/* Fiyat */}
+                <div className="w-28 text-right shrink-0">
+                  <p className="text-sm font-bold text-white">{(product.price || 0).toLocaleString('tr-TR')} ₺</p>
+                </div>
+
+                {/* Durum */}
+                <div className="shrink-0">
+                  <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${st.cls}`}>
+                    {st.label}
+                  </span>
+                </div>
+
+                {/* Onay kuyruğuna git (sadece pending) */}
+                {product.status === 'pending' && (
+                  <Link
+                    href="/admin/pending"
+                    className="shrink-0 text-[9px] font-bold uppercase tracking-wider text-amber-400 hover:text-white transition-colors"
+                  >
+                    İncele →
+                  </Link>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
+
     </div>
   )
 }

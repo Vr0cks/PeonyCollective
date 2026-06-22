@@ -105,6 +105,11 @@ export async function POST(request: Request) {
     const deliveryFee = deliveryMethod === 'private_viewing' ? 15000 : deliveryMethod === 'vip' ? 2500 : 0
     const finalPrice = product.price + deliveryFee
 
+    // Komisyon Hesaplama (Split Payment Hazırlığı)
+    const commissionRate = product.is_peony_vip ? 0.30 : 0.20
+    const commissionAmount = product.price * commissionRate
+    const sellerAmount = product.price - commissionAmount
+
     // Generate order draft in database first to get unique order ID
     const { data: newOrder, error: orderInsertError } = await supabase
       .from('orders')
@@ -112,6 +117,8 @@ export async function POST(request: Request) {
         buyer_id: user.id,
         product_id: productId,
         total_price: finalPrice,
+        commission_amount: commissionAmount,
+        seller_amount: sellerAmount,
         order_status: 'pending_payment',
       })
       .select('id')

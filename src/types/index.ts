@@ -37,6 +37,7 @@ export interface Product {
   full_set_items?: string[] | null;
   status: 'pending' | 'approved' | 'rejected' | 'sold';
   locked_until?: string | null;
+  is_peony_vip?: boolean | null;
   created_at: string;
   profiles?: Partial<Profile>;
 }
@@ -51,6 +52,8 @@ export interface Order {
   shipping_tracking_seller: string | null;
   shipping_tracking_buyer: string | null;
   payment_id: string | null;
+  commission_amount?: number | null;
+  seller_amount?: number | null;
   created_at: string;
   products?: Product;
   buyer?: Partial<Profile>;

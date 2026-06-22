@@ -13,27 +13,27 @@ export default async function SellPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Herhangi bir giriş yapmış kullanıcı artık ürün yükleyebilir (Birleşik Panel mantığı)
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto bg-white p-8 md:p-10 border border-gray-100 rounded-2xl shadow-sm">
-        
-        <div className="mb-10 text-center">
-          <h1 className="text-2xl font-light tracking-widest uppercase mb-2">Ürün Yükle</h1>
-          <p className="text-gray-500 text-sm">Satmak istediğiniz lüks ürünün detaylarını ve fotoğraflarını girin.</p>
-        </div>
+    <div className="min-h-screen bg-[#FAFAFA] py-20 px-4 sm:px-6 lg:px-8 selection:bg-[#AF9164] selection:text-white">
+      
+      <div className="max-w-4xl mx-auto mb-16 text-center space-y-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#AF9164]">PEONY CONCIERGE</p>
+        <h1 className="text-4xl md:text-5xl serif-display italic text-black">Emanet & Satış Terminali</h1>
+        <p className="text-gray-500 text-sm max-w-xl mx-auto font-light leading-relaxed">
+          Koleksiyonunuzdaki seçkin parçaları Peony ekosistemine dahil edin. Aşağıdaki adımları tamamlayarak ürününüzü uzman laboratuvarımızın onayına sunabilirsiniz.
+        </p>
+      </div>
 
+      <div className="max-w-4xl mx-auto">
         {resolvedParams?.message && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 text-center text-sm font-medium text-green-800 rounded-lg">
+          <div className="mb-10 p-5 bg-[#AF9164]/10 border border-[#AF9164]/20 text-center text-xs font-bold uppercase tracking-widest text-[#AF9164] rounded-xl animate-fade-in">
             {resolvedParams.message}
           </div>
         )}
 
-        {/* Yeni, okunaklı ve önizlemeli form bileşenimizi çağırıyoruz */}
         <SellForm />
-        
       </div>
+      
     </div>
   )
 }

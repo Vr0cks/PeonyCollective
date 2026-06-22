@@ -88,6 +88,7 @@ export async function addProductAction(formData: FormData) {
       video_url: videoUrl,
       odor_score: formData.get('odor_score') ? parseInt(formData.get('odor_score') as string) : null,
       has_spa_treatment: formData.get('has_spa_treatment') === 'true',
+      is_peony_vip: formData.get('is_peony_vip') === 'true',
       full_set_items: formData.getAll('full_set_items') as string[],
       status: 'pending' 
     })
