@@ -82,9 +82,12 @@ export default function HomeClient({ products, brands, brand, category, gender }
             <h1 className="text-[clamp(4rem,15vw,10rem)] leading-[0.8] text-white serif-display tracking-tight">
               Arzunun <br /> <span className="italic font-light">Objeleri</span>
             </h1>
-            <div className="mt-16">
-              <Link href="#collection" className="sans-detail border-b border-white/50 pb-2 text-white hover:border-white transition-all">
+            <div className="mt-16 flex flex-col md:flex-row items-center justify-center gap-6">
+              <Link href="#collection" className="sans-detail border border-white/30 px-10 py-4 text-white hover:bg-white hover:text-black transition-all duration-500 uppercase tracking-widest text-xs">
                 Koleksiyonu Keşfet
+              </Link>
+              <Link href="/sell" className="sans-detail bg-[#AF9164] border border-[#AF9164] px-10 py-4 text-white hover:bg-transparent hover:text-[#AF9164] transition-all duration-500 uppercase tracking-widest text-xs">
+                Lüksü Nakde Çevir
               </Link>
             </div>
           </motion.div>
@@ -587,6 +590,38 @@ export default function HomeClient({ products, brands, brand, category, gender }
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* MASSIVE FINAL SELL CTA */}
+      <section className="relative py-40 bg-black flex flex-col items-center text-center justify-center overflow-hidden">
+        <Image 
+          src="https://images.unsplash.com/photo-1596854273338-cbf078ec7071?auto=format&fit=crop&q=80&w=2000" 
+          fill
+          sizes="100vw"
+          className="object-cover opacity-40 grayscale-[50%]"
+          alt="Sell Your Luxury"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        
+        <div className="relative z-10 max-w-4xl px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+          >
+            <p className="sans-detail text-[#AF9164] mb-6 tracking-[0.4em]">UNLOCK YOUR WARDROBE'S VALUE</p>
+            <h2 className="text-5xl md:text-7xl lg:text-8xl serif-display text-white leading-[1.1] mb-8">
+              Kullanmadığınız lüks, <br/> <span className="italic font-light">başkası için bir hazine.</span>
+            </h2>
+            <p className="text-gray-400 font-light text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+              Peony Collective ayrıcalığıyla anında fiyat teklifi alın, ürünlerinizi güvenle satın ve hiç vakit kaybetmeden nakde çevirin.
+            </p>
+            <Link href="/sell" className="inline-flex items-center justify-center px-14 py-6 bg-white text-black hover:bg-[#AF9164] hover:text-white transition-all duration-500 sans-detail tracking-[0.3em] uppercase text-sm font-bold shadow-2xl hover:scale-105">
+              HEMEN SATIŞ YAP
+            </Link>
+          </motion.div>
         </div>
       </section>
 

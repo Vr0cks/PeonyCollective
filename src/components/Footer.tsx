@@ -58,11 +58,11 @@ export default function Footer() {
 
       <div className="max-w-[1800px] mx-auto px-8">
         
-        {/* Üst Alan: 4 Kolonlu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 lg:gap-8 pb-20 border-b border-white/10">
+        {/* Üst Alan: 2 Kolonlu Grid (Linkler Temizlendi) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 pb-20 border-b border-white/10">
           
-          {/* Kolon 1: Marka Tanıtımı (4/12 genişlik) */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Kolon 1: Marka Tanıtımı */}
+          <div className="space-y-6">
             <Link href="/" className="text-3xl font-playfair tracking-[0.3em] uppercase block">
               Peony<span className="italic font-light text-[#AF9164]">Collective</span>
             </Link>
@@ -72,52 +72,8 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Kolon 2: Marka Koleksiyonu (2/12 genişlik) */}
-          <div className="lg:col-span-2 space-y-6">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">Koleksiyon</h4>
-            <ul className="space-y-4 text-xs font-medium uppercase tracking-widest text-zinc-400">
-              <li>
-                <Link href="/?brand=Hermès#collection" className="hover:text-white hover:translate-x-1 transition-all inline-block">Hermès</Link>
-              </li>
-              <li>
-                <Link href="/?brand=Chanel#collection" className="hover:text-white hover:translate-x-1 transition-all inline-block">Chanel</Link>
-              </li>
-              <li>
-                <Link href="/?brand=Dior#collection" className="hover:text-white hover:translate-x-1 transition-all inline-block">Dior</Link>
-              </li>
-              <li>
-                <Link href="/?brand=Rolex#collection" className="hover:text-white hover:translate-x-1 transition-all inline-block">Rolex</Link>
-              </li>
-              <li>
-                <Link href="/#collection" className="hover:text-white hover:translate-x-1 transition-all inline-block">Tümünü Keşfet</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Kolon 3: VIP Concierge & Support (3/12 genişlik) */}
-          <div className="lg:col-span-3 space-y-6">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">VIP Concierge</h4>
-            <ul className="space-y-4 text-xs font-medium uppercase tracking-widest text-zinc-400">
-              <li>
-                <Link href="/how-it-works" className="hover:text-white hover:translate-x-1 transition-all inline-block">Denetim Süreci</Link>
-              </li>
-              <li>
-                <Link href="/sell" className="hover:text-white hover:translate-x-1 transition-all inline-block">Satış Rehberi</Link>
-              </li>
-              <li>
-                <Link href="/dashboard" className="hover:text-white hover:translate-x-1 transition-all inline-block">Dijital Pasaport</Link>
-              </li>
-              <li>
-                <Link href="/return" className="hover:text-white hover:translate-x-1 transition-all inline-block">İade Talebi</Link>
-              </li>
-              <li>
-                <Link href="/settings" className="hover:text-white hover:translate-x-1 transition-all inline-block">Hesap Ayarlarım</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Kolon 4: VIP Bülten Aboneliği (3/12 genişlik) */}
-          <div className="lg:col-span-3 space-y-6">
+          {/* Kolon 2: VIP Bülten Aboneliği */}
+          <div className="space-y-6 lg:pl-12">
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">Private List</h4>
             <p className="text-sm font-light text-zinc-400">
               Özel kürasyonlardan, gizli butik satışlarından ve VIP davetlerden ilk siz haberdar olun.
@@ -159,16 +115,11 @@ export default function Footer() {
 
         </div>
 
-        {/* Alt Alan: Lisanslar, Güven Rozetleri ve Copyright */}
+        {/* Alt Alan: Güven Rozetleri ve Copyright */}
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
           
-          {/* Sol: Copyright, Credit ve Legal Links */}
+          {/* Sol: Copyright, Credit */}
           <div className="flex flex-col gap-4">
-            <div className="flex gap-4 text-[10px] uppercase tracking-widest font-bold text-zinc-400">
-              <Link href="/legal/privacy" className="hover:text-white transition-colors">Gizlilik Politikası</Link>
-              <Link href="/legal/terms" className="hover:text-white transition-colors">Kullanım Koşulları</Link>
-              <Link href="/legal/kvkk" className="hover:text-white transition-colors">KVKK</Link>
-            </div>
             <div className="flex flex-col gap-2">
               <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
                 © 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.
