@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Metadata } from 'next'
 import { Product, Profile } from '@/src/types'
 import MagnifierImage from '@/src/components/MagnifierImage'
+import EntrupyModal from '@/src/components/EntrupyModal'
 
 export async function generateMetadata({
   params,
@@ -277,6 +278,7 @@ export default async function ProductDetailPage({
                     </div>
                   ))}
                 </div>
+                <EntrupyModal />
               </div>
 
               {/* Satıcı Kartı */}

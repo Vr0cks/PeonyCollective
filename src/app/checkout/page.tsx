@@ -1,17 +1,44 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart } from '@/src/context/CartContext'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ShieldCheck, Truck } from 'lucide-react'
+import { ArrowLeft, ShieldCheck, Truck, LogIn, AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
+import { createClient } from '@/src/utils/supabase/client'
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal } = useCart()
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null) // null = kontrol ediliyor
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsLoggedIn(!!user)
+      
+      if (user) {
+        // Profil bilgilerini çekip formu otomatik doldur
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+        if (profile) {
+          setFormData(prev => ({
+            ...prev,
+            firstName: profile.first_name || '',
+            lastName: profile.last_name || '',
+            email: user.email || '',
+            phone: profile.phone_number || '',
+            address: profile.address || '',
+          }))
+        }
+      }
+    }
+    checkAuth()
+  }, [])
 
   // Adres Formu State'leri
   const [formData, setFormData] = useState({
@@ -22,12 +49,19 @@ export default function CheckoutPage() {
     address: '',
     city: '',
     district: '',
-    zipCode: ''
+    zipCode: '',
+    isGift: false,
+    giftNote: ''
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    const { name, value, type } = e.target
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked
+      setFormData(prev => ({ ...prev, [name]: checked }))
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }))
+    }
   }
 
   const [paytrToken, setPaytrToken] = useState<string | null>(null)
@@ -35,31 +69,66 @@ export default function CheckoutPage() {
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsProcessing(true)
+    setCheckoutError(null)
 
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          cartItems,
-          formData
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cartItems, formData })
       })
 
       const data = await res.json()
 
+      if (res.status === 401) {
+        // Oturum süresi dolmuş, login'e yönlendir
+        router.push('/login?redirect=/checkout')
+        return
+      }
+
       if (res.ok && data.token) {
-        setPaytrToken(data.token) // Token'i state'e kaydet (iFrame'i açar)
+        setPaytrToken(data.token)
       } else {
-        alert('Ödeme başlatılamadı: ' + (data.error || 'Bilinmeyen Hata'))
+        setCheckoutError(data.error || 'Ödeme başlatılamadı. Lütfen tekrar deneyin.')
       }
     } catch (error) {
-      alert('Sistemsel bir hata oluştu.')
+      setCheckoutError('Bağlantı hatası oluştu. İnternet bağlantınızı kontrol edin.')
     } finally {
       setIsProcessing(false)
     }
+  }
+
+  // Giriş durumu kontrol ediliyor
+  if (isLoggedIn === null) {
+    return (
+      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // Giriş yapılmamış
+  if (isLoggedIn === false) {
+    return (
+      <div className="min-h-screen bg-[#F9F9F8] flex flex-col items-center justify-center pt-24 px-6 text-center">
+        <div className="bg-white p-16 md:p-20 border border-gray-100 shadow-2xl shadow-black/5 max-w-lg w-full">
+          <LogIn size={48} className="mx-auto mb-8 text-black" strokeWidth={1} />
+          <h1 className="text-3xl serif-display mb-4">Giriş Gerekli</h1>
+          <p className="text-gray-500 font-light mb-10 leading-relaxed">
+            Ödeme yapabilmek için Peony hesabınıza giriş yapmanız gerekmektedir.
+          </p>
+          <Link
+            href="/login?redirect=/checkout"
+            className="block w-full bg-black text-white py-4 uppercase tracking-widest text-xs font-bold hover:bg-[#AF9164] transition-colors text-center mb-4"
+          >
+            Giriş Yap
+          </Link>
+          <Link href="/" className="text-xs text-gray-400 hover:text-black transition-colors uppercase tracking-widest">
+            Alışverişe Dön
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   if (cartItems.length === 0) {
@@ -152,6 +221,35 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Hediye Seçeneği */}
+                <div className="pt-8 border-t border-gray-100">
+                  <div className="flex items-center gap-3 mb-4">
+                    <input 
+                      type="checkbox" 
+                      id="isGift" 
+                      name="isGift" 
+                      checked={formData.isGift} 
+                      onChange={handleChange}
+                      className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black accent-black"
+                    />
+                    <label htmlFor="isGift" className="text-sm font-medium cursor-pointer">Bu sipariş bir hediye</label>
+                  </div>
+                  
+                  {formData.isGift && (
+                    <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Hediye Notu (İsteğe Bağlı)</label>
+                      <textarea 
+                        name="giftNote" 
+                        value={formData.giftNote} 
+                        onChange={handleChange} 
+                        placeholder="Hediye kartına yazılacak mesajınızı buraya ekleyebilirsiniz..."
+                        className={`${inputClasses} resize-none h-20 bg-gray-50 p-4 border border-gray-200 rounded-md`} 
+                      />
+                      <p className="text-[10px] text-gray-400 mt-2">Notunuz özel Peony Collective hediye zarfında gönderilecektir. İrsaliye faturasında fiyat gizlenecektir.</p>
+                    </div>
+                  )}
+                </div>
               </form>
 
               <div className="flex items-start gap-4 p-6 bg-gray-100 rounded-lg">
@@ -200,6 +298,13 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
+                {checkoutError && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded flex items-start gap-3">
+                    <AlertCircle size={16} className="text-red-500 shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-700 font-medium">{checkoutError}</p>
+                  </div>
+                )}
+
                 <button 
                   type="submit" 
                   form="checkout-form"
@@ -209,6 +314,7 @@ export default function CheckoutPage() {
                   {isProcessing ? 'İŞLENİYOR...' : 'ÖDEMEYİ TAMAMLA'}
                 </button>
               </div>
+
             </div>
 
           </div>

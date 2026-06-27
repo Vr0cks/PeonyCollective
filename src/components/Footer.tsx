@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ShieldCheck, CheckCircle2, Award, Loader2 } from 'lucide-react'
+import { ArrowRight, ShieldCheck, CheckCircle2, Award, Loader2, Instagram, Twitter, Linkedin } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
 
 export default function Footer() {
@@ -108,6 +108,9 @@ export default function Footer() {
                 <Link href="/dashboard" className="hover:text-white hover:translate-x-1 transition-all inline-block">Dijital Pasaport</Link>
               </li>
               <li>
+                <Link href="/return" className="hover:text-white hover:translate-x-1 transition-all inline-block">İade Talebi</Link>
+              </li>
+              <li>
                 <Link href="/settings" className="hover:text-white hover:translate-x-1 transition-all inline-block">Hesap Ayarlarım</Link>
               </li>
             </ul>
@@ -160,29 +163,50 @@ export default function Footer() {
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
           
           {/* Sol: Copyright */}
-          {/* Sol: Copyright ve Credit */}
-          <div className="flex flex-col gap-2">
-            <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
-              © 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.
+          {/* Sol: Copyright, Credit ve Legal Links */}
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4 text-[10px] uppercase tracking-widest font-bold text-zinc-400">
+              <Link href="/legal/privacy" className="hover:text-white transition-colors">Gizlilik Politikası</Link>
+              <Link href="/legal/terms" className="hover:text-white transition-colors">Kullanım Koşulları</Link>
+              <Link href="/legal/kvkk" className="hover:text-white transition-colors">KVKK</Link>
             </div>
-            <div className="text-[8px] font-medium tracking-[0.2em] text-zinc-600 text-center md:text-left">
-              CRAFTED BY <a href="https://www.vr0cks.com/en" target="_blank" rel="noopener noreferrer" className="text-[#AF9164] hover:text-white transition-colors">VR0CKS</a>
+            <div className="flex flex-col gap-2">
+              <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
+                © 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.
+              </div>
+              <div className="text-[8px] font-medium tracking-[0.2em] text-zinc-600 text-center md:text-left">
+                CRAFTED BY <a href="https://www.vr0cks.com/en" target="_blank" rel="noopener noreferrer" className="text-[#AF9164] hover:text-white transition-colors">VR0CKS</a>
+              </div>
             </div>
           </div>
 
-          {/* Sağ: Güven Rozetleri */}
-          <div className="flex flex-wrap justify-center gap-8 opacity-40 hover:opacity-75 transition-opacity duration-500">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={14} className="text-[#AF9164]" />
-              <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Orijinallik Garantisi</span>
+          {/* Sağ: Sosyal Medya ve Güven Rozetleri */}
+          <div className="flex flex-col items-center md:items-end gap-6">
+            <div className="flex gap-4 text-zinc-400">
+              <a href="https://instagram.com/peonycollective" target="_blank" rel="noopener noreferrer" className="hover:text-[#AF9164] transition-colors">
+                <Instagram size={18} />
+              </a>
+              <a href="https://twitter.com/peonycollective" target="_blank" rel="noopener noreferrer" className="hover:text-[#AF9164] transition-colors">
+                <Twitter size={18} />
+              </a>
+              <a href="https://linkedin.com/company/peonycollective" target="_blank" rel="noopener noreferrer" className="hover:text-[#AF9164] transition-colors">
+                <Linkedin size={18} />
+              </a>
             </div>
-            <div className="flex items-center gap-2">
-              <Award size={14} className="text-[#AF9164]" />
-              <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Peony Lab™ Onaylı</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={14} className="text-[#AF9164]" />
-              <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">VIP Sigortalı Teslimat</span>
+            
+            <div className="flex flex-wrap justify-center gap-8 opacity-40 hover:opacity-75 transition-opacity duration-500">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={14} className="text-[#AF9164]" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Orijinallik Garantisi</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Award size={14} className="text-[#AF9164]" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Peony Lab™ Onaylı</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-[#AF9164]" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">VIP Sigortalı Teslimat</span>
+              </div>
             </div>
           </div>
 

@@ -1,64 +1,73 @@
-# Peony Collective
+# Peony Collective - Architecture & Operations Manual
 
-Merhaba, ben Yiğit. Bu repo, dolap mantığında çalışan, Next.js 15 ve Supabase
-kullanarak geliştirdiğim ikinci el platformumuz Peony Collective'in ana kod
-yapısını barındırıyor. İçerisinde veri modellemeleri, veritabanı operasyonları
-ve PayTR gibi ödeme altyapıları mevcut. Proje tamamen modern web standartlarına
-uygun olarak tasarlandı.
+This repository contains the core application logic, database architecture, and frontend implementation for Peony Collective, a verified luxury second-hand marketplace.
 
-Eğer projeyi bilgisayarınızda çalıştırmak isterseniz aşağıdaki adımları takip
-edebilirsiniz.
+The infrastructure is designed with a strict focus on security, scalability, and modern web standards. This document serves as the primary technical reference for current operations and future maintenance.
 
-## Nasıl Kullanılır?
+## 1. Technology Stack
 
-Projeyi çalıştırmak oldukça basit. Sadece aşağıdaki adımları uygulamanız
-yeterli:
+* **Framework:** Next.js 15 (App Router paradigm)
+* **Language:** TypeScript (Strict mode enabled)
+* **Database & Authentication:** Supabase (PostgreSQL, Row Level Security)
+* **Styling:** Tailwind CSS
+* **Payment Gateway:** PayTR Integration (Server-side validated)
+* **Email Infrastructure:** Resend API
+* **Client Architecture:** Progressive Web App (PWA) with Service Worker caching
 
-### 1. Repoyu Klonla ve Paketleri Kur
+## 2. Directory Structure and Architectural Pattern
 
-İlk olarak projeyi bilgisayarınıza indirin ve gerekli bağımlılıkları yükleyin.
-Node.js'in güncel bir sürümünün (v18+) kurulu olduğundan emin olun.
+The project adheres to a modular component architecture. Separation of concerns is maintained strictly between server components (data fetching) and client components (interactivity).
 
-```bash
-# Bağımlılıkları yüklüyoruz
-npm install
-```
+* `/src/app`: Contains the Next.js App Router definitions. Routes are segmented by domain logic (e.g., `/admin`, `/checkout`, `/dashboard`).
+* `/src/components`: Reusable UI components. Global state and DOM manipulations are isolated here using `"use client"`.
+* `/src/utils`: Shared utilities, specifically Supabase client/server instantiation methods (`supabase/client.ts`, `supabase/server.ts`).
+* `/src/context`: React Context providers (e.g., `CartContext.tsx`) for global state management.
+* `/public`: Static assets, PWA manifests (`manifest.json`), and Service Workers (`sw.js`).
+* `peony_schema.sql` & `supabase_rls_policies.sql`: Database schema definitions and crucial Row Level Security (RLS) policies.
 
-### 2. Çevre Değişkenlerini (Env Variables) Ayarla
+## 3. Database and Security Standards
 
-Supabase bağlantısı için `.env.local` dosyasına ihtiyacınız var. Proje dizininde
-`.env.local` adında bir dosya oluşturup içine Supabase URL ve Key'lerinizi
-eklemelisiniz:
+The application relies on PostgreSQL provided by Supabase. Direct client-to-database connections are permitted only through strictly defined Row Level Security (RLS) policies.
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=senin_supabase_url_adresin_buraya
-NEXT_PUBLIC_SUPABASE_ANON_KEY=senin_supabase_anon_key_buraya
-```
+### Critical Security Implementations:
+1. **Row Level Security (RLS):** All tables (`profiles`, `products`, `orders`) must have RLS enabled. Anonymous keys can only execute operations explicitly permitted by policy definitions.
+2. **Server-Side Price Validation:** The checkout process (`/api/checkout/route.ts`) never trusts client-provided pricing. Prices are fetched directly from the database based on the product ID before initializing the payment gateway.
+3. **Admin Authorization:** Administrative routes (`/admin/*`) are protected at the layout level (`src/app/admin/layout.tsx`). The system verifies the user's role directly from the `profiles` table via a secure server call.
 
-Bu bilgileri Supabase kontrol panelinizdeki proje ayarlarından (Project Settings
-> API) bulabilirsiniz.
+## 4. Development and Deployment Setup
 
-### 3. Sunucuyu Başlat
+### Prerequisites
+* Node.js (v18.0.0 or higher recommended)
+* NPM or Yarn package manager
+* A configured Supabase project
 
-Gerekli ayarları yaptıktan sonra geliştirme sunucusunu başlatabiliriz:
+### Initialization
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-```
+2. Configure Environment Variables:
+   Create a `.env.local` file in the root directory. Required keys:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=<Supabase_Project_URL>
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<Supabase_Anon_Key>
+   ```
 
-Sonrasında tarayıcınızdan `http://localhost:3000` adresine giderek projenin
-çalıştığını görebilirsiniz. Değişiklik yaptığınızda sayfaya anında
-yansıyacaktır.
+3. Database Initialization:
+   Execute the `peony_schema.sql` and `supabase_rls_policies.sql` scripts within your Supabase SQL Editor to construct the schema and enforce security boundaries.
 
-## Proje Yapısı Hakkında
+4. Start the Development Server:
+   ```bash
+   npm run dev
+   ```
 
-- **Next.js App Router**: Projenin temel mimarisi. Sayfa yapıları ve klasör
-  düzeni (`src/app`) tamamen buna göre oluşturuldu.
-- **Supabase (Auth & DB)**: Kullanıcı girişleri ve veri işlemleri için Supabase
-  kullanıyoruz. Bütün veritabanı mantığı `src/utils/supabase` altında.
-- **Middleware**: Güvenlik ve yetki kontrollerini `src/middleware.ts` üzerinden
-  yönetiyoruz. Sadece yetkili kullanıcıların erişmesi gereken sayfaları bu
-  dosyada kısıtladık.
+## 5. Maintenance Guidelines for Future Developers
 
-Projeye katkıda bulunmak isterseniz PR'lara açığım. Kodlara göz atıp geliştirmek
-istediğiniz noktaları ekleyebilirsiniz.
+* **Type Safety:** Always define comprehensive interfaces in `src/types/index.ts`. Avoid using `any`.
+* **Component Abstraction:** If a component exceeds 300 lines or handles multiple distinct domain logic operations, refactor it into smaller sub-components.
+* **API Routes:** Keep serverless functions within `/src/app/api` strictly for operations requiring secret keys (e.g., Resend, PayTR) or complex database transactions. Standard CRUD operations should utilize Supabase Server Actions where possible.
+* **Documentation:** Ensure all new utility functions and complex React components are documented using standard TSDoc conventions.
+
+---
+*Maintained by the Peony Collective IT Department.*

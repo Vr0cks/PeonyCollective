@@ -2,25 +2,16 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center bg-[#FCFCFB] px-6 text-center text-[#1A1A1A]">
-      <div className="max-w-md space-y-6">
-        <h1 className="serif-display text-8xl font-extralight text-[#AF9164] tracking-widest leading-none">
-          404
-        </h1>
-        <p className="sans-detail text-sm uppercase tracking-widest text-[#555555]">
-          Sayfa Bulunamadı
+    <div className="min-h-[80vh] bg-[#F9F9F8] flex flex-col items-center justify-center px-6 text-center">
+      <div className="max-w-2xl w-full flex flex-col items-center">
+        <h1 className="text-8xl md:text-9xl serif-display mb-4 text-gray-200">404</h1>
+        <h2 className="text-3xl md:text-4xl serif-display mb-6">Sayfa Bulunamadı</h2>
+        <p className="text-gray-500 font-light mb-12 max-w-md leading-relaxed">
+          Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya geçici olarak kullanılamıyor olabilir. Lüks koleksiyonumuzu incelemeye devam edebilirsiniz.
         </p>
-        <p className="text-zinc-500 font-light text-sm max-w-xs mx-auto">
-          Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya geçici olarak kullanılamıyor olabilir.
-        </p>
-        <div className="pt-4">
-          <Link
-            href="/"
-            className="inline-block px-8 py-3 bg-[#1A1A1A] text-white hover:bg-[#AF9164] transition-all duration-300 font-light tracking-wider text-xs uppercase"
-          >
-            Koleksiyona Geri Dön
-          </Link>
-        </div>
+        <Link href="/" className="bg-black text-white px-12 py-4 uppercase tracking-widest text-xs font-bold hover:bg-[#AF9164] transition-colors">
+          Ana Sayfaya Dön
+        </Link>
       </div>
     </div>
   )

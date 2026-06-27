@@ -153,6 +153,36 @@ export default function CuratorView({ myProducts, totalEarnings, activeSales, pe
         )}
       </div>
 
+      {/* ÖDEME VE KOMİSYON BİLGİLENDİRMESİ */}
+      <div className="bg-zinc-900 text-white rounded-3xl p-8 shadow-sm relative overflow-hidden mt-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#AF9164]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+          <div>
+            <h3 className="text-xl serif-display mb-4 italic text-[#AF9164]">Ödeme Süreci</h3>
+            <p className="text-sm font-light text-zinc-300 leading-relaxed mb-6">
+              Satılan ürünlerinizin ödemesi, alıcının yasal 14 günlük iade süresi dolduktan sonraki ilk iş günü hesabınıza aktarılır. Ödemeleriniz, <span className="text-white font-medium">Peony Güvencesi</span> altında BDDK lisanslı ödeme kuruluşları üzerinden yapılır.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Link href="/settings" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#AF9164] hover:text-white transition-colors">
+                <span>IBAN Bilgilerimi Güncelle</span>
+                <ArrowUpRight size={14} />
+              </Link>
+            </div>
+          </div>
+          
+          <div className="border-t md:border-t-0 md:border-l border-white/10 pt-8 md:pt-0 md:pl-16 flex flex-col justify-center">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Hizmet Bedeli</p>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="text-4xl serif-display">%15</span>
+            </div>
+            <p className="text-xs text-zinc-400 font-light leading-relaxed">
+              Sabit komisyon oranımız, laboratuvar ekspertiz ücretini, yüksek güvenlikli sigortalı kargolamayı ve tüm pazarlama faaliyetlerini kapsar. Sürpriz kesintiler yoktur.
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
   )
 }

@@ -17,14 +17,14 @@ export default async function AdminPendingPage() {
 
   return (
     <div className="p-8 min-h-full">
-      {/* Başlık */}
+      {/* Header Section: Component Title and Context */}
       <div className="mb-10">
         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Admin Panel</p>
         <h1 className="text-3xl font-bold text-white tracking-tight">Onay Kuyruğu</h1>
         <p className="text-white/40 text-sm mt-1">Satıcıların yüklediği, ekspertiz bekleyen ürünler.</p>
       </div>
 
-      {/* Sayaç */}
+      {/* Metrics Section: Dynamic Pending Item Counter */}
       <div className="mb-8 flex items-center gap-3">
         <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest ${
           pendingProducts.length > 0
@@ -62,7 +62,7 @@ export default async function AdminPendingPage() {
                 key={product.id}
                 className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300 flex flex-col"
               >
-                {/* Fotoğraf Galeri Şeridi */}
+                {/* Visual Representation: Image Carousel */}
                 <div className="relative h-56 bg-black overflow-hidden">
                   {images[0] ? (
                     <Image
@@ -78,7 +78,7 @@ export default async function AdminPendingPage() {
                     </div>
                   )}
 
-                  {/* Fotoğraf miniatureleri */}
+                  {/* Secondary Images: Miniature Preview Strip */}
                   {images.length > 1 && (
                     <div className="absolute bottom-3 left-3 flex gap-1.5">
                       {images.slice(0, 5).map((img, i) => (
@@ -94,7 +94,7 @@ export default async function AdminPendingPage() {
                     </div>
                   )}
 
-                  {/* Rozetler */}
+                  {/* Status Badges */}
                   <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
                     <span className="bg-amber-500/90 backdrop-blur text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
                       Onay Bekliyor
@@ -104,7 +104,7 @@ export default async function AdminPendingPage() {
                     </span>
                   </div>
 
-                  {/* Detay Linki */}
+                  {/* Interaction Overlay: Link to Detailed Product View */}
                   <Link
                     href={`/admin/product/${product.id}`}
                     className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 backdrop-blur-sm transition-all duration-300"
@@ -115,7 +115,7 @@ export default async function AdminPendingPage() {
                   </Link>
                 </div>
 
-                {/* Ürün Bilgileri */}
+                {/* Product Metadata and Action Area */}
                 <div className="p-6 flex-1 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div>
@@ -134,7 +134,7 @@ export default async function AdminPendingPage() {
                     </p>
                   )}
 
-                  {/* Satıcı */}
+                  {/* Seller Context Information */}
                   <div className="flex items-center justify-between border-t border-white/5 pt-4">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
@@ -150,15 +150,21 @@ export default async function AdminPendingPage() {
                     </p>
                   </div>
 
-                  {/* Aksiyonlar */}
-                  <div className="grid grid-cols-2 gap-3 pt-2">
+                  {/* Administrative Action Controls (Approve / Reject) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
                     <form action={approveAction}>
-                      <button className="w-full py-3 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 hover:border-emerald-500 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer">
-                        ✓ Onayla
+                      <button className="w-full py-3 h-full bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 hover:border-emerald-500 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer">
+                        ✓ Onayla ve Satışa Çıkar
                       </button>
                     </form>
-                    <form action={rejectAction}>
-                      <button className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer">
+                    <form action={rejectAction} className="flex flex-col gap-2">
+                      <input 
+                        type="text" 
+                        name="reason" 
+                        placeholder="Reddetme sebebi (opsiyonel)" 
+                        className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 focus:outline-none focus:border-red-500/50 transition-colors"
+                      />
+                      <button className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer">
                         ✕ Reddet
                       </button>
                     </form>

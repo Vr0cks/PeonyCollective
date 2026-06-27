@@ -16,7 +16,16 @@ export default function ConciergeWidget() {
   const [loading, setLoading] = useState(false)
   const [newRequests, setNewRequests] = useState<any[]>([])
 
-  // Admin modunda realtime bildirim dinleyici
+  // Checkout (ödeme) ekranında dikkat dağıtmamak için widget'ı gizle
+  if (pathname?.startsWith('/checkout')) {
+    return null;
+  }
+
+  /**
+   * Supabase Realtime Subscription
+   * Subscribes to INSERT events on the 'concierge_requests' table.
+   * This ensures administrators receive live updates for VIP offers without polling.
+   */
   useEffect(() => {
     if (isAdmin) {
       const supabase = createClient()
@@ -36,7 +45,10 @@ export default function ConciergeWidget() {
     }
   }, [isAdmin])
 
-  // Widget her açıldığında role göre doğru sayfaya sıfırla
+  /**
+   * State Initialization
+   * Resets the chat interface to the appropriate root view based on the user's role authorization.
+   */
   useEffect(() => {
     if (isOpen) {
       setChatStep(isAdmin ? 'admin_welcome' : 'welcome')
@@ -75,7 +87,7 @@ export default function ConciergeWidget() {
     }
   }
 
-  // Tematik renkler
+  // Dynamic Theming: Applies administrative styling conventions if the user possesses the 'admin' role.
   const themeColor = isAdmin ? 'emerald-500' : '#AF9164'
   const ThemeIcon = isAdmin ? Terminal : Crown
 
