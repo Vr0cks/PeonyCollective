@@ -7,15 +7,15 @@ const validCategories = mainCategories.map(c => c.value) as [string, ...string[]
 const validConditions = conditions as [string, ...string[]];
 
 export const productSchema = z.object({
-  gender: z.enum(validGenders, { required_error: 'Bölüm (Cinsiyet) seçimi zorunludur.' }),
-  category: z.enum(validCategories, { required_error: 'Kategori seçimi zorunludur.' }),
+  gender: z.enum(validGenders, { message: 'Bölüm (Cinsiyet) seçimi zorunludur.' }),
+  category: z.enum(validCategories, { message: 'Kategori seçimi zorunludur.' }),
   subcategory: z.string().min(1, 'Alt kategori seçimi zorunludur.'),
   size: z.string().optional().nullable(),
   brand: z.string().min(1, 'Marka seçimi zorunludur.'),
   model_name: z.string().min(1, 'Model adı zorunludur.'),
   description: z.string().min(20, 'Ürün hikayesi ve açıklaması çok kısa.'),
   price: z.coerce.number().min(1, 'Geçerli bir satış fiyatı belirleyin.'),
-  condition: z.enum(validConditions, { required_error: 'Kondisyon seçimi zorunludur.' }),
+  condition: z.enum(validConditions, { message: 'Kondisyon seçimi zorunludur.' }),
   material: z.string().optional().nullable(),
   dimensions: z.string().optional().nullable(),
   purchase_year: z.coerce.number().min(1900, 'Geçerli bir yıl giriniz.').max(new Date().getFullYear(), 'Gelecekteki bir yıl girilemez.').optional().nullable(),
