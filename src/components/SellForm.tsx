@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { addProductAction, saveCloudDraft, loadCloudDraft } from '@/src/app/sell/actions'
+import { createClient } from '@/src/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, ChevronDown, UploadCloud, Video, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react'
 import {
@@ -24,7 +25,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 
 // ─── Accordion Komponenti ───
-const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveStep }: { stepNum: number, title: string, desc: string, children: React.ReactNode, activeStep: number, setActiveStep: (n: number) => void }) => {
+const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveStep, onNext }: { stepNum: number, title: string, desc: string, children: React.ReactNode, activeStep: number, setActiveStep: (n: number) => void, onNext?: () => void }) => {
   const isActive = activeStep === stepNum
   const isCompleted = activeStep > stepNum
 
@@ -63,7 +64,7 @@ const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveSt
                 <div className="mt-10 flex justify-end">
                   <button 
                     type="button" 
-                    onClick={() => setActiveStep(stepNum + 1)}
+                    onClick={() => onNext ? onNext() : setActiveStep(stepNum + 1)}
                     className="bg-black text-white px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#AF9164] transition-colors cursor-pointer"
                   >
                     İleri: Adım 0{stepNum + 1}
@@ -189,6 +190,38 @@ export default function SellForm() {
 
   const allGeneratedUrls = useRef<string[]>([])
 
+  // ─── İleri Adım Validasyonu (Client-Side) ───
+  const handleNextStep = (step: number) => {
+    setMessage('')
+    if (step === 1) {
+      if (!selectedGender || !selectedCategory) {
+        setMessage('Lütfen cinsiyet ve kategori seçimini yapın.')
+        return
+      }
+      if (availableSubcategories.length > 0 && !selectedSubcategory) {
+        setMessage('Lütfen alt kategori seçin.')
+        return
+      }
+      if (selectedSubcategory && availableSizes.length > 0 && !selectedSize) {
+        setMessage('Lütfen beden/numara seçin.')
+        return
+      }
+    } else if (step === 2) {
+      const b = selectedBrand === '__other__' ? customBrand : selectedBrand
+      const m = selectedModel === '__other__' ? customModel : selectedModel
+      if (!b || !m || !formCondition || !formDescription) {
+        setMessage('Lütfen marka, model, kondisyon ve açıklama alanlarını eksiksiz doldurun.')
+        return
+      }
+    } else if (step === 3) {
+      if (publicFiles.length === 0) {
+        setMessage('Lütfen en az 1 adet vitrin fotoğrafı yükleyin.')
+        return
+      }
+    }
+    setActiveStep(step + 1)
+  }
+
   // ─── Cloud Draft Yükleme ───
   useEffect(() => {
     async function load() {
@@ -295,43 +328,70 @@ export default function SellForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setMessage('Dosyalar şifreleniyor ve Peony Lab\'a iletiliyor...')
+    setMessage('Dosyalar şifreleniyor ve yükleniyor...')
 
     try {
-      const formData = new FormData()
-      formData.append('gender', selectedGender)
-      formData.append('category', selectedCategory)
-      formData.append('subcategory', selectedSubcategory)
-      if (selectedSize) formData.append('size', selectedSize)
-      formData.append('brand', currentBrand)
-      formData.append('model_name', currentModel)
-      formData.append('description', formDescription)
-      formData.append('price', formPrice)
-      formData.append('condition', formCondition)
-      if (currentMaterial) formData.append('material', currentMaterial)
-      if (formDimensions) formData.append('dimensions', formDimensions)
-      if (formPurchaseYear) formData.append('purchase_year', formPurchaseYear)
-      if (serialNumber) formData.append('serial_number', serialNumber)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error("Oturum açmanız gerekiyor.")
+
+      const uploadFile = async (file: File, bucket: string) => {
+        const ext = file.name.split('.').pop()
+        const fileName = `${user.id}/${bucket}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
+        const { error } = await supabase.storage.from('product-images').upload(fileName, file)
+        if (error) throw error
+        const { data } = supabase.storage.from('product-images').getPublicUrl(fileName)
+        return data.publicUrl
+      }
+
+      setMessage('Vitrin fotoğrafları yükleniyor...')
+      const publicUrls = await Promise.all(publicFiles.map(f => uploadFile(f, 'public')))
       
-      formData.append('odor_score', odorScore)
-      formData.append('has_spa_treatment', hasSpaTreatment.toString())
-      formData.append('is_peony_vip', isPeonyVip.toString())
-      fullSetItems.forEach(item => formData.append('full_set_items', item))
+      setMessage('Kusur fotoğrafları yükleniyor...')
+      const flawUrls = await Promise.all(flawFiles.map(f => uploadFile(f, 'flaws')))
+      
+      setMessage('Doğrulama belgeleri yükleniyor...')
+      const authDocs = Object.values(verificationFiles).flat()
+      const authUrls = await Promise.all(authDocs.map(f => uploadFile(f, 'verification')))
+      
+      let videoUrl = null
+      if (videoFile) {
+        setMessage('Video yükleniyor...')
+        videoUrl = await uploadFile(videoFile, 'videos')
+      }
 
-      publicFiles.forEach(f => formData.append('public_images', f))
-      flawFiles.forEach(f => formData.append('flaw_images', f))
-      if (videoFile) formData.append('video', videoFile)
+      setMessage('Veriler işleniyor...')
+      const payload = {
+        gender: selectedGender,
+        category: selectedCategory,
+        subcategory: selectedSubcategory,
+        size: selectedSize || undefined,
+        brand: currentBrand,
+        model_name: currentModel,
+        description: formDescription,
+        price: parseFloat(formPrice) || 0,
+        condition: formCondition,
+        material: currentMaterial || undefined,
+        dimensions: formDimensions || undefined,
+        purchase_year: formPurchaseYear ? parseInt(formPurchaseYear) : undefined,
+        serial_number: serialNumber || undefined,
+        odor_score: odorScore ? parseInt(odorScore) : undefined,
+        has_spa_treatment: hasSpaTreatment,
+        is_peony_vip: isPeonyVip,
+        full_set_items: fullSetItems,
+        public_images: publicUrls,
+        authenticity_docs: authUrls,
+        flaw_images: flawUrls,
+        video_url: videoUrl || undefined
+      }
 
-      Object.values(verificationFiles).forEach(files => {
-        files.forEach(f => formData.append('authenticity_docs', f))
-      })
-
-      const result = await addProductAction(formData)
+      const result = await addProductAction(payload as any)
 
       if (result.success) {
         saveCloudDraft({}) 
         router.push('/sell?message=Ürün başarıyla onaya gönderildi.')
       } else {
+        console.error("Validation Errors:", result.validationErrors)
         setMessage(`Hata: ${result.error}`)
         setIsSubmitting(false)
       }
@@ -364,7 +424,7 @@ export default function SellForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         
         {/* ADIM 1: KİMLİK */}
-        <StepAccordion stepNum={1} title="Ürün Kimliği" desc="Kategori, Marka ve Model Bilgileri" activeStep={activeStep} setActiveStep={setActiveStep}>
+        <StepAccordion stepNum={1} title="Ürün Kimliği" desc="Kategori, Marka ve Model Bilgileri" activeStep={activeStep} setActiveStep={setActiveStep} onNext={() => handleNextStep(1)}>
           <div className="space-y-10">
             {/* Cinsiyet & Kategori */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -452,7 +512,7 @@ export default function SellForm() {
         </StepAccordion>
 
         {/* ADIM 2: KONDİSYON */}
-        <StepAccordion stepNum={2} title="Kondisyon & Hikaye" desc="Ürünün Geçmişi ve Kusurları" activeStep={activeStep} setActiveStep={setActiveStep}>
+        <StepAccordion stepNum={2} title="Kondisyon & Hikaye" desc="Ürünün Geçmişi ve Kusurları" activeStep={activeStep} setActiveStep={setActiveStep} onNext={() => handleNextStep(2)}>
           <div className="space-y-10">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -550,7 +610,7 @@ export default function SellForm() {
         </StepAccordion>
 
         {/* ADIM 3: MEDYA */}
-        <StepAccordion stepNum={3} title="Medya Galerisi" desc="Vitrin Fotoğrafları ve Video" activeStep={activeStep} setActiveStep={setActiveStep}>
+        <StepAccordion stepNum={3} title="Medya Galerisi" desc="Vitrin Fotoğrafları ve Video" activeStep={activeStep} setActiveStep={setActiveStep} onNext={() => handleNextStep(3)}>
           <div className="space-y-8">
             <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
               Platformumuzda yayınlanacak görseller. Lütfen doğal ışıkta ve net fotoğraflar yüklemeye özen gösterin. Tüm medyalardaki konum verileri (EXIF) sistemimiz tarafından otomatik olarak silinecektir.
@@ -670,6 +730,21 @@ export default function SellForm() {
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl font-light text-gray-400">₺</span>
                   </div>
+                  
+                  {formPrice && !isNaN(Number(formPrice)) && Number(formPrice) > 0 && (
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <div className={`p-4 rounded-xl border ${!isPeonyVip ? 'border-black bg-black text-white' : 'border-gray-200 bg-gray-50'}`}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Standart Kazanç</p>
+                        <p className="text-xl serif-display">{(Number(formPrice) * 0.8).toLocaleString('tr-TR')} ₺</p>
+                        <p className="text-[9px] opacity-50 mt-1">%20 Komisyon</p>
+                      </div>
+                      <div className={`p-4 rounded-xl border ${isPeonyVip ? 'border-[#AF9164] bg-[#AF9164] text-white' : 'border-[#AF9164]/20 bg-[#AF9164]/5'}`}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">VIP Kazanç</p>
+                        <p className="text-xl serif-display">{(Number(formPrice) * 0.7).toLocaleString('tr-TR')} ₺</p>
+                        <p className="text-[9px] opacity-70 mt-1">%30 Komisyon (Kargo Bizden)</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button 

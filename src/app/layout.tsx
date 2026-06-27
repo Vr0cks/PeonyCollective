@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import ConciergeWidget from "@/src/components/ConciergeWidget";
+import { CartProvider } from "@/src/context/CartContext";
+import CartDrawer from "@/src/components/CartDrawer";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: '--font-playfair' });
@@ -86,10 +88,13 @@ export default function RootLayout({
             })
           }}
         />
-        <Navbar />
-        <div className="flex-grow">{children}</div>
-        <Footer />
-        <ConciergeWidget />
+        <CartProvider>
+          <Navbar />
+          <CartDrawer />
+          <div className="flex-grow">{children}</div>
+          <Footer />
+          <ConciergeWidget />
+        </CartProvider>
       </body>
     </html>
   );

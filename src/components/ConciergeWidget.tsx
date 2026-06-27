@@ -14,6 +14,27 @@ export default function ConciergeWidget() {
   const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success' | 'admin_welcome' | 'admin_status'>('welcome')
   const [offerData, setOfferData] = useState({ name: '', product: '', price: '' })
   const [loading, setLoading] = useState(false)
+  const [newRequests, setNewRequests] = useState<any[]>([])
+
+  // Admin modunda realtime bildirim dinleyici
+  useEffect(() => {
+    if (isAdmin) {
+      const supabase = createClient()
+      const channel = supabase.channel('concierge_requests_channel')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'concierge_requests' },
+          (payload) => {
+            setNewRequests(prev => [payload.new, ...prev])
+          }
+        )
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [isAdmin])
 
   // Widget her açıldığında role göre doğru sayfaya sıfırla
   useEffect(() => {
@@ -105,6 +126,20 @@ export default function ConciergeWidget() {
                       <p className="opacity-50 mb-2">{'> root@peony-core:~#'}</p>
                       Sistem bağlantısı stabil. Veritabanı sekronize. IT Destek Merkezine hoş geldiniz. Nasıl yardımcı olabilirim?
                     </div>
+
+                    {newRequests.length > 0 && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl max-h-[100px] overflow-y-auto">
+                        <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Yeni Gelen VIP Teklifler ({newRequests.length})
+                        </p>
+                        {newRequests.map((req, i) => (
+                          <div key={i} className="text-[11px] text-white mb-2 pb-2 border-b border-emerald-500/10 last:border-0 last:mb-0 last:pb-0 font-mono">
+                            <span className="text-emerald-400 font-bold">{req.name}</span>: {req.product_interest} <br/>
+                            <span className="text-zinc-400">Teklif:</span> {req.max_price} ₺
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-3 pt-6">

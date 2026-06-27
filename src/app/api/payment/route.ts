@@ -47,6 +47,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Ürün bulunamadı' }, { status: 404 })
     }
 
+    // 3.5 Fetch seller profile for marketplace submerchant info
+    const { data: sellerProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', product.seller_id)
+      .single()
+
     // 4. Validate product status (approved, not sold)
     if (product.status !== 'approved') {
       return NextResponse.json(
@@ -152,6 +159,17 @@ export async function POST(request: Request) {
       merchantOkUrl: `${siteUrl}/orders/success?order_id=${merchantOid}&productId=${productId}`,
       merchantFailUrl: `${siteUrl}/checkout/${productId}?payment_error=true`,
     })
+
+    // --- PAYTR PAZARYERİ (SPLIT PAYMENT) ENTEGRASYONU İÇİN EKLENECEK ALANLAR ---
+    // Müşterinin isteği olan "Sadece komisyon bana gelsin" özelliği için, PayTR token
+    // oluşturulurken tedarikçi bilgilerinin gönderilmesi zorunludur. Gerçek API entegrasyonu
+    // başladığında aşağıdaki alanlar PayTR'a (paytrParams içine) dahil edilmelidir:
+    // 
+    // paytrParams.non3d_test_failed = "0"; // Pazaryeri testi için
+    // paytrParams.submerchant_price = sellerAmount.toString(); // Satıcıya gidecek net tutar
+    // paytrParams.submerchant_id = sellerProfile?.submerchant_id || "henuz_yok"; // PayTR Alt Üye İşyeri Kodu
+    // (veya submerchant objesi ile IBAN, TCKN, İsim vb. anlık olarak gönderilebilir)
+    // -----------------------------------------------------------------------------
 
     // Call PayTR to get the token
     const response = await fetch('https://www.paytr.com/odeme/api/get-token', {

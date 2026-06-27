@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import ProductCard from '@/src/components/ProductCard'
+import SellPopup from '@/src/components/SellPopup'
 import { Product } from '@/src/types'
 
 // Kategori kartları için veri
@@ -57,6 +58,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
 
   return (
     <main className="relative overflow-hidden bg-[#F9F9F8]">
+      <SellPopup />
       
       {/* FULL BLEED HERO - CELINE / BOTTEGA VIBE */}
       <section className="relative h-screen w-full overflow-hidden flex flex-col justify-end">
@@ -134,6 +136,43 @@ export default function HomeClient({ products, brands, brand, category, gender }
             </div>
           </div>
           
+        </div>
+      </section>
+
+      {/* PEONY VIP - CONCIERGE / WHITE GLOVE SERVICE */}
+      <section className="py-24 bg-[#1A1A1A] text-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8">
+            <div className="flex items-center gap-3 text-[#AF9164]">
+              <span className="w-2 h-2 rounded-full bg-[#AF9164] animate-pulse"></span>
+              <p className="sans-detail uppercase tracking-widest">White Glove Service</p>
+            </div>
+            <h2 className="text-4xl md:text-6xl serif-display leading-tight">
+              Peony VIP ile <br /> <span className="italic font-light">Zahmetsiz Satış</span>
+            </h2>
+            <p className="text-gray-400 font-light leading-relaxed max-w-md text-lg">
+              Siz lüksün tadını çıkarın, geri kalan her şeyi biz halledelim. Ürünlerinizi evinizden teslim alıyoruz; profesyonel fotoğraf çekimi, fiyatlandırma, ekspertiz ve alıcı ile olan tüm iletişimi biz yönetiyoruz. Ürün satıldığında tutar doğrudan hesabınıza yatıyor.
+            </p>
+            
+            <a 
+              href="https://wa.me/905555555555?text=Merhaba, Peony VIP satış hizmetiniz hakkında bilgi almak istiyorum." 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 border border-[#AF9164] text-[#AF9164] px-8 py-4 hover:bg-[#AF9164] hover:text-white transition-all duration-500 sans-detail group mt-4"
+            >
+              WhatsApp'tan İletişime Geçin
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+          </div>
+          <div className="relative aspect-video lg:aspect-square overflow-hidden luxury-img-wrapper">
+             <Image 
+                src="https://images.unsplash.com/photo-1575203091586-611ffa505bfc?auto=format&fit=crop&q=80&w=1000" 
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
+                alt="Peony VIP Delivery"
+              />
+          </div>
         </div>
       </section>
 

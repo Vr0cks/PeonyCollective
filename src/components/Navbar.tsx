@@ -4,6 +4,7 @@ import { logout } from '@/src/app/login/actions'
 import NotificationBell from './NotificationBell'
 import MobileMenu from './MobileMenu'
 import SearchTrigger from './SearchTrigger'
+import CartTrigger from './CartTrigger'
 import { User } from 'lucide-react'
 import { Profile } from '@/src/types'
 
@@ -46,7 +47,7 @@ export default async function Navbar() {
                 Panelim
               </Link>
             ) : (
-              <Link href="/sell" className="hover:text-black transition-colors">
+              <Link href="/sell-with-us" className="hover:text-black transition-colors">
                 Satış Yap
               </Link>
             )}
@@ -61,6 +62,7 @@ export default async function Navbar() {
         {/* Sağ: İkonlar, Arama ve Profil */}
         <div className="flex items-center gap-4 sm:gap-8">
           <SearchTrigger />
+          <CartTrigger />
           
           {user ? (
             <div className="flex items-center gap-4 sm:gap-6">

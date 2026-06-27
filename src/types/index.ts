@@ -6,6 +6,11 @@ export interface Profile {
   phone_number: string | null;
   iban: string | null;
   address: string | null;
+  submerchant_type?: 'bireysel' | 'kurumsal' | null;
+  tckn?: string | null;
+  vkn?: string | null;
+  company_title?: string | null;
+  submerchant_id?: string | null;
   rating: number | null;
   sales_count: number;
   avatar_url: string | null;
@@ -38,6 +43,8 @@ export interface Product {
   status: 'pending' | 'approved' | 'rejected' | 'sold';
   locked_until?: string | null;
   is_peony_vip?: boolean | null;
+  entrupy_status?: 'pending' | 'analyzing' | 'verified' | 'rejected' | null;
+  entrupy_certificate_url?: string | null;
   created_at: string;
   profiles?: Partial<Profile>;
 }
