@@ -23,13 +23,20 @@ export default async function Home({ searchParams }: PageProps) {
     .order('created_at', { ascending: false })
 
   if (brand) {
-    query = query.ilike('brand', brand)
+    const uppercaseBrand = brand.toLocaleUpperCase('tr-TR')
+    const uppercaseEn = brand.toUpperCase()
+    query = query.in('brand', [brand, uppercaseBrand, uppercaseEn])
   }
   if (category) {
-    query = query.ilike('category', category)
+    const uppercaseCat = category.toLocaleUpperCase('tr-TR')
+    const uppercaseEn = category.toUpperCase()
+    query = query.in('category', [category, uppercaseCat, uppercaseEn])
   }
   if (gender) {
-    query = query.ilike('gender', gender)
+    // Handle Turkish character case matching manually
+    const uppercaseGender = gender.toLocaleUpperCase('tr-TR')
+    const uppercaseEn = gender.toUpperCase()
+    query = query.in('gender', [gender, uppercaseGender, uppercaseEn])
   }
 
   const { data: productsData } = await query.returns<Product[]>()
