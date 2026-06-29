@@ -28,8 +28,8 @@ export default async function Navbar() {
   }
 
   return (
-    <nav className="w-full bg-white/70 backdrop-blur-xl border-b border-gray-50 sticky top-0 z-50">
-      <div className="max-w-[1800px] mx-auto px-6 sm:px-8 h-24 flex items-center justify-between relative">
+    <nav className="w-full bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between relative">
         
         {/* Sol: Hamburger Mobil Menü ve Masaüstü Linkleri */}
         <div className="flex items-center">
@@ -37,58 +37,58 @@ export default async function Navbar() {
           <MobileMenu user={user} profile={profile} />
 
           {/* Masaüstü Menü Linkleri */}
-          <div className="hidden lg:flex items-center gap-10 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-900">
-            <Link href="/?brand=Hermès#collection" className="hover:text-[#AF9164] transition-colors">Hermès</Link>
-            <Link href="/?brand=Chanel#collection" className="hover:text-[#AF9164] transition-colors">Chanel</Link>
-            <Link href="/?brand=Dior#collection" className="hover:text-[#AF9164] transition-colors">Dior</Link>
+          <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]">
+            <Link href="/?brand=Hermès#collection" className="hover:text-[#AF9164] transition-colors duration-300">HERMÈS</Link>
+            <Link href="/?brand=Chanel#collection" className="hover:text-[#AF9164] transition-colors duration-300">CHANEL</Link>
+            <Link href="/?brand=Dior#collection" className="hover:text-[#AF9164] transition-colors duration-300">DIOR</Link>
             
             {user ? (
-              <Link href="/dashboard" className="bg-black text-white px-6 py-2.5 rounded-full hover:bg-[#AF9164] transition-all text-[10px] font-bold uppercase tracking-widest">
-                Panelim
+              <Link href="/dashboard" className="bg-black text-white px-8 py-3 rounded-none hover:bg-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-widest border border-black hover:border-[#AF9164]">
+                PANELİM
               </Link>
             ) : (
-              <Link href="/sell-with-us" className="hover:text-black transition-colors">
-                Satış Yap
+              <Link href="/sell-with-us" className="text-[#AF9164] hover:text-black transition-colors duration-300 relative after:content-[''] after:absolute after:w-full after:h-[1px] after:bg-[#AF9164] after:-bottom-1 after:left-0 after:scale-x-100 hover:after:scale-x-0 after:transition-transform after:duration-300">
+                SATIŞ YAP
               </Link>
             )}
           </div>
         </div>
 
         {/* Orta: Logo (Masaüstü ve Mobilde Mükemmel Ortalı) */}
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-xl sm:text-2xl font-playfair tracking-[0.3em] uppercase whitespace-nowrap">
-          Peony<span className="italic font-light">Collective</span>
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-2xl lg:text-3xl font-playfair tracking-[0.35em] uppercase whitespace-nowrap text-[#1A1A1A]">
+          PEONY<span className="italic font-light lowercase text-3xl lg:text-4xl">collective</span>
         </Link>
 
         {/* Sağ: İkonlar, Arama ve Profil */}
-        <div className="flex items-center gap-4 sm:gap-8">
+        <div className="flex items-center gap-6 lg:gap-10">
           <SearchTrigger />
           <CartTrigger />
           
           {user ? (
-            <div className="flex items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-6 lg:gap-8">
               <NotificationBell userId={user.id} />
               
-              <Link href="/dashboard" className="flex items-center gap-3 group">
+              <Link href="/dashboard" className="flex items-center gap-4 group">
                 <div className="text-right hidden sm:block">
-                  <p className="text-[9px] font-bold uppercase tracking-widest leading-none mb-1">Hesabım</p>
-                  <p className="text-xs font-playfair italic text-gray-500">{profile?.first_name}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] leading-none mb-1.5 text-[#1A1A1A]">HESABIM</p>
+                  <p className="text-sm font-playfair italic text-gray-500 group-hover:text-[#AF9164] transition-colors duration-300">{profile?.first_name}</p>
                 </div>
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-100 flex items-center justify-center bg-gray-50 group-hover:border-black transition-all">
-                  <User size={16} strokeWidth={1.5} />
+                <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent group-hover:border-[#AF9164] group-hover:bg-[#F9F9F8] transition-all duration-300 text-[#1A1A1A] group-hover:text-[#AF9164]">
+                  <User size={16} strokeWidth={1} />
                 </div>
               </Link>
 
-              {/* Masaüstünde Çıkış Butonu (Mobil Çekmecede mevcuttur) */}
+              {/* Masaüstünde Çıkış Butonu */}
               <form action={logout} className="hidden md:block">
-                <button className="text-[10px] font-bold uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors cursor-pointer">
-                  Çıkış
+                <button className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-[#1A1A1A] transition-colors duration-300 cursor-pointer">
+                  ÇIKIŞ
                 </button>
               </form>
             </div>
           ) : (
-            /* Masaüstünde Giriş Butonu (Mobil Çekmecede mevcuttur) */
-            <Link href="/login" className="hidden sm:block text-[10px] font-bold uppercase tracking-[0.2em] border-b border-black pb-1 hover:text-gray-400 hover:border-gray-400 transition-all">
-              Giriş
+            /* Masaüstünde Giriş Butonu */
+            <Link href="/login" className="hidden sm:block text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A] hover:text-[#AF9164] transition-colors duration-300">
+              GİRİŞ
             </Link>
           )}
         </div>

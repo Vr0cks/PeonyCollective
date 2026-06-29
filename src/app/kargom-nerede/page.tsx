@@ -1,4 +1,4 @@
-'use client'
+  'use client'
 
 import { useState } from 'react'
 import { Package, Search, Truck } from 'lucide-react'
