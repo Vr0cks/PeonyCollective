@@ -23,13 +23,13 @@ export default async function Home({ searchParams }: PageProps) {
     .order('created_at', { ascending: false })
 
   if (brand) {
-    query = query.eq('brand', brand)
+    query = query.ilike('brand', brand)
   }
   if (category) {
-    query = query.eq('category', category)
+    query = query.ilike('category', category)
   }
   if (gender) {
-    query = query.eq('gender', gender)
+    query = query.ilike('gender', gender)
   }
 
   const { data: productsData } = await query.returns<Product[]>()

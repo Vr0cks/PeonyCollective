@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import ProductCard from '@/src/components/ProductCard'
 import SellPopup from '@/src/components/SellPopup'
+import CustomSelect from '@/src/components/CustomSelect'
 import { Product } from '@/src/types'
 
 // Kategori kartları için veri
@@ -218,53 +219,33 @@ export default function HomeClient({ products, brands, brand, category, gender }
                </h2>
              </div>
              
-             {/* Filtreler Sağda - Yeni Select Tasarımı */}
-             <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
-                <div className="relative">
-                  <select 
-                    value={gender || ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if(val) {
-                        router.push(`/?gender=${val}${brand ? `&brand=${brand}` : ''}#collection`)
-                      } else {
-                        router.push(`/?${brand ? `brand=${brand}` : ''}#collection`)
-                      }
-                    }}
-                    className="appearance-none bg-transparent border border-gray-300 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A] py-3 pl-4 pr-10 focus:outline-none focus:border-[#AF9164] transition-colors cursor-pointer"
-                  >
-                    <option value="">Tüm Cinsiyetler</option>
-                    {genderFilters.map(g => (
-                      <option key={g.value} value={g.value}>{g.label}</option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                    <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                  </div>
-                </div>
+             {/* Filtreler Sağda - Yeni Lüks Select Tasarımı */}
+             <div className="flex flex-col sm:flex-row items-end sm:items-center gap-6">
+                <CustomSelect
+                  value={gender || ''}
+                  placeholder="Tüm Cinsiyetler"
+                  options={genderFilters.map(g => ({ value: g.value, label: g.label }))}
+                  onChange={(val) => {
+                    if (val) {
+                      router.push(`/?gender=${val}${brand ? `&brand=${brand}` : ''}#collection`)
+                    } else {
+                      router.push(`/?${brand ? `brand=${brand}` : ''}#collection`)
+                    }
+                  }}
+                />
                 
-                <div className="relative">
-                  <select 
-                    value={brand || ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if(val) {
-                        router.push(`/?brand=${encodeURIComponent(val)}${gender ? `&gender=${gender}` : ''}#collection`)
-                      } else {
-                        router.push(`/?${gender ? `gender=${gender}` : ''}#collection`)
-                      }
-                    }}
-                    className="appearance-none bg-transparent border border-gray-300 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A] py-3 pl-4 pr-10 focus:outline-none focus:border-[#AF9164] transition-colors cursor-pointer"
-                  >
-                    <option value="">Tüm Markalar</option>
-                    {brands.map((b) => (
-                      <option key={b} value={b}>{b}</option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#AF9164]">
-                    <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                  </div>
-                </div>
+                <CustomSelect
+                  value={brand || ''}
+                  placeholder="Tüm Markalar"
+                  options={brands.map(b => ({ value: b, label: b }))}
+                  onChange={(val) => {
+                    if (val) {
+                      router.push(`/?brand=${encodeURIComponent(val)}${gender ? `&gender=${gender}` : ''}#collection`)
+                    } else {
+                      router.push(`/?${gender ? `gender=${gender}` : ''}#collection`)
+                    }
+                  }}
+                />
              </div>
           </div>
 
