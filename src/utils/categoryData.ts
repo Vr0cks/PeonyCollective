@@ -1,7 +1,7 @@
 // Peony Collective — Kategori Ağacı ve Marka/Model Verileri
 // Dolap benzeri hiyerarşik kategori sistemi
 
-export type Gender = 'Kadın' | 'Erkek' | 'Çocuk'
+export type Gender = 'Kadın' | 'Erkek' | 'Kız Çocuk' | 'Erkek Çocuk'
 
 export type MainCategory = 'Çanta' | 'Kıyafet' | 'Ayakkabı' | 'Aksesuar'
 
@@ -19,7 +19,8 @@ export interface CategoryNode {
 export const genders: { value: Gender; label: string; icon: string }[] = [
   { value: 'Kadın', label: 'Kadın', icon: '👩' },
   { value: 'Erkek', label: 'Erkek', icon: '👨' },
-  { value: 'Çocuk', label: 'Çocuk', icon: '👶' },
+  { value: 'Kız Çocuk', label: 'Kız Çocuk', icon: '👧' },
+  { value: 'Erkek Çocuk', label: 'Erkek Çocuk', icon: '👦' },
 ]
 
 // ─── Ana Kategori Seçenekleri ───

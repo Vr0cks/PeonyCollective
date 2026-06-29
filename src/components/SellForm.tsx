@@ -191,36 +191,40 @@ export default function SellForm() {
 
   const allGeneratedUrls = useRef<string[]>([])
 
-  // ─── İleri Adım Validasyonu (Client-Side) ───
-  const handleNextStep = (step: number) => {
-    setMessage('')
+  // ─── İleri Adım Validasyonu & Hata Gösterimi ───
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  const validateStep = (step: number) => {
+    const errors: Record<string, string> = {}
+    
     if (step === 1) {
-      if (!selectedGender || !selectedCategory) {
-        setMessage('Lütfen cinsiyet ve kategori seçimini yapın.')
-        return
-      }
-      if (availableSubcategories.length > 0 && !selectedSubcategory) {
-        setMessage('Lütfen alt kategori seçin.')
-        return
-      }
-      if (selectedSubcategory && availableSizes.length > 0 && !selectedSize) {
-        setMessage('Lütfen beden/numara seçin.')
-        return
-      }
+      if (!selectedGender) errors.gender = 'Lütfen cinsiyet seçin'
+      if (!selectedCategory) errors.category = 'Lütfen kategori seçin'
+      if (availableSubcategories.length > 0 && !selectedSubcategory) errors.subcategory = 'Lütfen alt kategori seçin'
+      if (selectedSubcategory && availableSizes.length > 0 && !selectedSize) errors.size = 'Lütfen beden seçin'
     } else if (step === 2) {
       const b = selectedBrand === '__other__' ? customBrand : selectedBrand
       const m = selectedModel === '__other__' ? customModel : selectedModel
-      if (!b || !m || !formCondition || !formDescription) {
-        setMessage('Lütfen marka, model, kondisyon ve açıklama alanlarını eksiksiz doldurun.')
-        return
-      }
+      
+      if (!b) errors.brand = 'Marka zorunludur'
+      if (!m) errors.model = 'Model zorunludur'
+      if (!formCondition) errors.condition = 'Kondisyon zorunludur'
+      if (!formDescription || formDescription.length < 20) errors.description = 'Açıklama çok kısa (en az 20 karakter)'
     } else if (step === 3) {
-      if (publicFiles.length === 0) {
-        setMessage('Lütfen en az 1 adet vitrin fotoğrafı yükleyin.')
-        return
-      }
+      if (publicFiles.length === 0) errors.publicFiles = 'En az 1 adet vitrin fotoğrafı yükleyin'
     }
-    setActiveStep(step + 1)
+    
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const handleNextStep = (step: number) => {
+    setMessage('')
+    if (validateStep(step)) {
+      setActiveStep(step + 1)
+    } else {
+      setMessage('Lütfen kırmızı ile işaretlenmiş eksik alanları doldurun.')
+    }
   }
 
   // ─── Cloud Draft Yükleme ───
@@ -318,9 +322,17 @@ export default function SellForm() {
   const availableSubcategories = useMemo(() => selectedCategory ? getSubcategories(selectedCategory as MainCategory) : [], [selectedCategory])
   const availableSizes = useMemo(() => selectedCategory && selectedSubcategory ? getSizesForSubcategory(selectedCategory as MainCategory, selectedSubcategory) : [], [selectedCategory, selectedSubcategory])
 
-  // ─── UI Sınıfları ───
-  const inputClasses = "w-full px-4 py-3.5 bg-transparent border-b border-gray-200 focus:border-black text-sm text-black placeholder-gray-300 focus:outline-none transition-colors rounded-none"
-  const labelClasses = "text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 block"
+  const labelClasses = "block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3"
+  
+  const getInputClasses = (field: string) => {
+    const isError = !!fieldErrors[field]
+    return `w-full px-4 py-3.5 bg-transparent border-b ${isError ? 'border-red-500 text-red-900 placeholder-red-300' : 'border-gray-200 focus:border-black text-black placeholder-gray-300'} text-sm focus:outline-none transition-colors rounded-none`
+  }
+  
+  const ErrorMsg = ({ field }: { field: string }) => {
+    if (!fieldErrors[field]) return null
+    return <span className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-2 block">{fieldErrors[field]}</span>
+  }
   const pillClasses = "px-5 py-3 border border-gray-200 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer hover:border-black"
   const activePillClasses = "bg-black text-white border-black"
 
@@ -391,7 +403,7 @@ export default function SellForm() {
 
       if (result.success) {
         saveCloudDraft({}) 
-        router.push('/sell?message=Ürün başarıyla onaya gönderildi.')
+        router.push('/dashboard?message=Ürün başarıyla onaya gönderildi.')
       } else {
         console.error("Validation Errors:", result.validationErrors)
         if (result.validationErrors) {
@@ -443,6 +455,7 @@ export default function SellForm() {
                       {g.label}
                     </button>
                   ))}
+                  <ErrorMsg field="gender" />
                 </div>
               </div>
               {selectedGender && (
@@ -455,6 +468,7 @@ export default function SellForm() {
                       </button>
                     ))}
                   </div>
+                  <ErrorMsg field="category" />
                 </div>
               )}
             </div>
@@ -482,6 +496,7 @@ export default function SellForm() {
                         </button>
                       ))}
                     </div>
+                    <ErrorMsg field="size" />
                   </div>
                 )}
               </div>
@@ -491,28 +506,30 @@ export default function SellForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-gray-50">
               <div>
                 <label className={labelClasses}>Marka</label>
-                <select className={inputClasses} value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} required>
+                <select className={getInputClasses('brand')} value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} required>
                   <option value="" disabled>Seçiniz</option>
                   {brands.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                   <option value="__other__">Diğer</option>
                 </select>
-                {selectedBrand === '__other__' && <input className={`${inputClasses} mt-4`} value={customBrand} onChange={(e) => setCustomBrand(e.target.value)} placeholder="Marka adını yazın" required />}
+                {selectedBrand === '__other__' && <input className={`${getInputClasses('brand')} mt-4`} value={customBrand} onChange={(e) => setCustomBrand(e.target.value)} placeholder="Marka adını yazın" required />}
+                <ErrorMsg field="brand" />
               </div>
               
               <div>
                 <label className={labelClasses}>Model Adı</label>
                 {availableModels.length > 0 ? (
                   <>
-                    <select className={inputClasses} value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} required>
+                    <select className={getInputClasses('model')} value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} required>
                       <option value="" disabled>Seçiniz</option>
                       {availableModels.map(m => <option key={m} value={m}>{m}</option>)}
                       <option value="__other__">Diğer</option>
                     </select>
-                    {selectedModel === '__other__' && <input className={`${inputClasses} mt-4`} value={customModel} onChange={(e) => setCustomModel(e.target.value)} placeholder="Örn: Birkin 30" required />}
+                    {selectedModel === '__other__' && <input className={`${getInputClasses('model')} mt-4`} value={customModel} onChange={(e) => setCustomModel(e.target.value)} placeholder="Örn: Birkin 30" required />}
                   </>
                 ) : (
-                  <input className={inputClasses} value={customModel} onChange={(e) => setCustomModel(e.target.value)} placeholder="Örn: Classic Flap Bag" required />
+                  <input className={getInputClasses('model')} value={customModel} onChange={(e) => setCustomModel(e.target.value)} placeholder="Örn: Classic Flap Bag" required />
                 )}
+                <ErrorMsg field="model" />
               </div>
             </div>
           </div>
@@ -525,25 +542,27 @@ export default function SellForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <label className={labelClasses}>Kondisyon Seviyesi</label>
-                <select className={inputClasses} value={formCondition} onChange={(e) => setFormCondition(e.target.value)} required>
+                <select className={getInputClasses('condition')} value={formCondition} onChange={(e) => setFormCondition(e.target.value)} required>
                   <option value="" disabled>Seçiniz</option>
                   {conditions.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
+                <ErrorMsg field="condition" />
               </div>
               <div>
                 <label className={labelClasses}>Materyal</label>
-                <select className={inputClasses} value={selectedMaterial} onChange={(e) => setSelectedMaterial(e.target.value)}>
+                <select className={getInputClasses('material')} value={selectedMaterial} onChange={(e) => setSelectedMaterial(e.target.value)}>
                   <option value="" disabled>Seçiniz</option>
                   {availableMaterials.map(m => <option key={m} value={m}>{m}</option>)}
                   <option value="__other__">Diğer</option>
                 </select>
-                {selectedMaterial === '__other__' && <input className={`${inputClasses} mt-4`} value={customMaterial} onChange={(e) => setCustomMaterial(e.target.value)} placeholder="Örn: Togo Deri" />}
+                {selectedMaterial === '__other__' && <input className={`${getInputClasses('material')} mt-4`} value={customMaterial} onChange={(e) => setCustomMaterial(e.target.value)} placeholder="Örn: Togo Deri" />}
               </div>
             </div>
 
             <div>
               <label className={labelClasses}>Ürün Hikayesi / Açıklama</label>
-              <textarea className={`${inputClasses} resize-none h-32 leading-relaxed`} value={formDescription} onChange={(e) => setFormDescription(e.target.value)} placeholder="Ürününüzün hikayesini, ne sıklıkla kullanıldığını ve göze çarpan detaylarını buraya yazın..." required />
+              <textarea className={`${getInputClasses('description')} resize-none h-32 leading-relaxed`} value={formDescription} onChange={(e) => setFormDescription(e.target.value)} placeholder="Ürününüzün hikayesini, ne sıklıkla kullanıldığını ve göze çarpan detaylarını buraya yazın..." required />
+              <ErrorMsg field="description" />
             </div>
 
             {/* Görünmez Kusurlar */}
@@ -605,11 +624,11 @@ export default function SellForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-gray-50">
               <div>
                 <label className={labelClasses}>Boyutlar (cm)</label>
-                <input className={inputClasses} value={formDimensions} onChange={(e) => setFormDimensions(e.target.value)} placeholder="Örn: 30 x 22 x 16" />
+                <input className={getInputClasses('dimensions')} value={formDimensions} onChange={(e) => setFormDimensions(e.target.value)} placeholder="Örn: 30 x 22 x 16" />
               </div>
               <div>
                 <label className={labelClasses}>Satın Alındığı Yıl</label>
-                <select className={inputClasses} value={formPurchaseYear} onChange={(e) => setFormPurchaseYear(e.target.value)}>
+                <select className={getInputClasses('purchase_year')} value={formPurchaseYear} onChange={(e) => setFormPurchaseYear(e.target.value)}>
                   <option value="" disabled>Seçiniz</option>
                   <option value="hatirlamiyorum">Hatırlamıyorum</option>
                   {Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i).map(year => (
@@ -704,7 +723,7 @@ export default function SellForm() {
                   
                   {cat.key === 'serial' && (
                     <div className="mb-4">
-                      <input className={`${inputClasses} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." required />
+                      <input className={`${getInputClasses('serial')} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." required />
                       <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız 'none' yazabilirsiniz.</p>
                     </div>
                   )}

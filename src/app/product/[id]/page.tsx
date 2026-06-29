@@ -7,6 +7,7 @@ import { Product, Profile } from '@/src/types'
 import MagnifierImage from '@/src/components/MagnifierImage'
 import EntrupyModal from '@/src/components/EntrupyModal'
 import VirtualTryOnButton from '@/src/components/VirtualTryOnButton'
+import ProductGallery from '@/src/components/ProductGallery'
 
 export async function generateMetadata({
   params,
@@ -85,34 +86,12 @@ export default async function ProductDetailPage({
           
           {/* SOL: GÖRSEL GALERİSİ */}
           <div className="lg:col-span-7 flex flex-col gap-2">
-            {/* VİDEO OYNATICI */}
-            {product.video_url && (
-              <div className="relative w-full aspect-[4/5] bg-black overflow-hidden group mb-2">
-                <video 
-                  src={product.video_url} 
-                  className="w-full h-full object-cover"
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline 
-                />
-                <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-md text-white text-[9px] uppercase font-bold px-4 py-2 tracking-[0.2em] z-10 border border-white/20">
-                  <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse mr-2"></span>
-                  LIVE PREVIEW
-                </div>
-              </div>
-            )}
-
-            {/* FOTOĞRAFLAR */}
-            {product.public_images?.map((img: string, idx: number) => (
-              <div key={idx} className="w-full">
-                <MagnifierImage
-                  src={img}
-                  alt={`${product.brand} ${idx + 1}`}
-                  priority={idx === 0}
-                />
-              </div>
-            ))}
+            {/* FOTOĞRAF GALERİSİ */}
+            <ProductGallery 
+              images={product.public_images || []} 
+              brand={product.brand}
+              videoUrl={product.video_url}
+            />
 
             {/* KUSUR VE DEFO GALERİSİ (Varsa) */}
             {product.flaw_images && product.flaw_images.length > 0 && (
