@@ -212,8 +212,8 @@ export default async function ProductDetailPage({
                       SATIN AL
                     </Link>
                     
-                    {/* AR Deneyimi Butonu (Client Component) */}
-                    <VirtualTryOnButton productName={product.model_name} />
+                    {/* AR Deneyimi Butonu (Client Component) */}                    {/* 3D Model özelliği ileride ekleneceği için şimdilik gizlendi */}
+                    {/* <VirtualTryOnButton productName={product.model_name} /> */}
                   </>
                 )}
               </div>
