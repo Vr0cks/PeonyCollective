@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ProductCard from '@/src/components/ProductCard'
 import SellPopup from '@/src/components/SellPopup'
@@ -59,6 +60,11 @@ interface HomeClientProps {
 export default function HomeClient({ products, brands, brand, category, gender }: HomeClientProps) {
   const router = useRouter()
   const hasFilter = brand || category || gender
+  const [visibleCount, setVisibleCount] = useState(24)
+
+  useEffect(() => {
+    setVisibleCount(24)
+  }, [brand, category, gender])
 
   return (
     <main className="relative overflow-hidden bg-[#F9F9F8]">
@@ -267,19 +273,32 @@ export default function HomeClient({ products, brands, brand, category, gender }
               <p className="text-gray-400 italic serif-display text-3xl">Bu seçki için parça bulunmuyor.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-12 gap-y-24">
-              {products.map((p, i) => (
-                <motion.div 
-                  key={p.id}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, delay: i % 4 * 0.1 }}
-                >
-                  <ProductCard product={p} />
-                </motion.div>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-12 gap-y-24">
+                {products.slice(0, visibleCount).map((p, i) => (
+                  <motion.div 
+                    key={p.id}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.8, delay: i % 4 * 0.1 }}
+                  >
+                    <ProductCard product={p} />
+                  </motion.div>
+                ))}
+              </div>
+              
+              {products.length > visibleCount && (
+                <div className="mt-24 flex justify-center">
+                  <button 
+                    onClick={() => setVisibleCount(prev => prev + 24)}
+                    className="sans-detail px-12 py-4 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors duration-500 text-sm tracking-[0.2em] uppercase font-bold"
+                  >
+                    Daha Fazla Ürün Göster
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
