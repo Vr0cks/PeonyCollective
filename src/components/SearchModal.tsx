@@ -94,34 +94,35 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           variants={overlayVariants}
           className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[999] flex items-start justify-center pt-24 md:pt-36 px-6 overflow-y-auto pb-12"
         >
-          {/* Kapat Butonu */}
-          <button
-            onClick={onClose}
-            className="absolute top-8 right-8 text-zinc-400 hover:text-white transition-colors cursor-pointer p-2"
-            aria-label="Kapat"
-          >
-            <X size={28} strokeWidth={1.5} />
-          </button>
-
-          {/* Modal Container */}
           <motion.div
             variants={modalVariants}
-            transition={{ type: 'spring' as const, stiffness: 300, damping: 30 }}
-            className="w-full max-w-3xl flex flex-col gap-12"
+            transition={{ type: 'tween', duration: 0.3 }}
+            className="w-full bg-[#111111] border-y border-zinc-800/50 absolute top-[80px] left-0 shadow-2xl"
           >
-            
-            {/* Büyük Arama Satırı */}
-            <div className="relative border-b border-zinc-700 pb-4 group">
-              <Search className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#AF9164] transition-colors" size={24} strokeWidth={1.5} />
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="ARAMAYA BAŞLAYIN..."
-                className="w-full pl-10 pr-4 bg-transparent text-xl md:text-3xl font-playfair tracking-[0.1em] text-white placeholder-zinc-600 focus:outline-none uppercase"
-              />
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+              <div className="flex items-center h-24 relative">
+                <Search className="text-[#AF9164] flex-shrink-0" size={24} strokeWidth={1.5} />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="ARAMAYA BAŞLAYIN..."
+                  className="w-full pl-6 pr-12 bg-transparent text-xl md:text-3xl font-playfair tracking-[0.15em] text-white placeholder-zinc-500 focus:outline-none uppercase"
+                />
+                
+                <button
+                  onClick={onClose}
+                  className="absolute right-0 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Kapat"
+                >
+                  <X size={28} strokeWidth={1} />
+                </button>
+              </div>
             </div>
+          </motion.div>
+
+          <div className="w-full max-w-[1600px] mx-auto mt-40 px-6 lg:px-12 flex flex-col gap-12">
 
             {/* Arama Sonuçları */}
             <div className="min-h-[200px]">
@@ -184,7 +185,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               )}
             </div>
 
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
