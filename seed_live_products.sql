@@ -1,5 +1,5 @@
 -- Live Shopify Seed Data
--- Fetched at 2026-06-29T11:41:48.027Z
+-- Fetched at 2026-06-29T12:07:13.632Z
 
 
 INSERT INTO products (
@@ -206,7 +206,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Ermenegildo Zegna', 'Ermenegildo Zegna Lacivert Sneaker - 42', '', 14500, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Ermenegildo Zegna', 'Ermenegildo Zegna Lacivert Sneaker - 42', '', 14500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212554_aba24248-64f8-43a9-8f42-dd22e1e57562.png?v=1778448796', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212554_3987e945-8367-4b5c-9ec3-50aeecf47d78.png?v=1778448704', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212554_af2bc87d-2bf9-41ea-b38e-a16541438dbd.png?v=1778448773']::text[],
   ARRAY[]::text[],
   'approved'
@@ -216,7 +216,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Ermenegildo Zegna', 'Ermenegildo Zegna Beyaz Sneaker - 42', '', 11000, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Ermenegildo Zegna', 'Ermenegildo Zegna Beyaz Sneaker - 42', '', 11000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_911c5ef5-64ca-40e1-82e9-5c8377485974.png?v=1778449025', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_09e7b266-346e-45a8-8a7a-acb01c06f3c1.png?v=1778449116', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_5d6e7177-85ed-47c8-94a3-7f5aa049e31b.png?v=1778449144', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_01a11442-e602-4cb6-955a-f38055769f9d.png?v=1778449175']::text[],
   ARRAY[]::text[],
   'approved'
@@ -226,7 +226,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Giuseppe Zanotti', 'Giuseppe Zanotti Frankie Crocodile Effect Sneaker - 42', '', 9250, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Giuseppe Zanotti', 'Giuseppe Zanotti Frankie Crocodile Effect Sneaker - 42', '', 9250, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_89bf9565-60e4-4797-9044-701af858b64e.png?v=1778449623', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_0fc671b8-da16-4ec4-aad1-31b23c686f7a.png?v=1778449543', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_5c18c403-197c-44db-a02d-48501ece66ff.png?v=1778449573', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_98367f95-47a3-4309-baf7-8b462061673c.png?v=1778449601']::text[],
   ARRAY[]::text[],
   'approved'
@@ -236,7 +236,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Valentino', 'Valentino Garavani Renkli Sneaker - 41', '', 6000, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Valentino', 'Valentino Garavani Renkli Sneaker - 41', '', 6000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_88a9aa80-b566-475f-8c93-34e091304dcd.png?v=1778475051', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_01b7d13c-5782-438b-b165-2a97bee50731.png?v=1778475080', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_c1d24b3c-adfb-45d7-9eec-49ae4534e723.png?v=1778475105', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_c108403d-caf4-4e40-88aa-cb7f7d24e35b.png?v=1778475131']::text[],
   ARRAY[]::text[],
   'approved'
@@ -246,7 +246,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Prada', 'Prada Sneaker Siyah - 41', '', 8500, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Prada', 'Prada Sneaker Siyah - 41', '', 8500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215457_60171606-0f5f-46ba-aba0-cbda0c59b470.png?v=1778475388', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215457_fcd113a0-e09c-4592-98cb-728051967bd9.png?v=1778475411', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215457_9fdef6a5-3597-44b9-a5bc-5dc69892cda8.png?v=1778475439']::text[],
   ARRAY[]::text[],
   'approved'
@@ -256,7 +256,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Prada', 'Prada Sneaker Lacivert - 41', '', 11000, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Prada', 'Prada Sneaker Lacivert - 41', '', 11000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215727_32b16e4b-7f3a-4327-9812-e4e3ddb74b94.png?v=1778475629', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215727_a89cb0b0-a031-40c0-a4ff-4a39a6a9a26c.png?v=1778475655', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215727_b65845ef-ae2c-41e9-a3e1-3bcd010b9df3.png?v=1778475681']::text[],
   ARRAY[]::text[],
   'approved'
@@ -266,7 +266,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Prada', 'Prada Sneaker Lacivert - Gri - Beyaz 41', '', 17000, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Prada', 'Prada Sneaker Lacivert - Gri - Beyaz 41', '', 17000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_36251595-9231-47b0-b859-78f227609e6d.png?v=1778475937', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_13d7a21e-46f3-4656-a70a-c9ffbc45aec9.png?v=1778475974', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_10bacbd4-d78f-4111-a926-7b4351860597.png?v=1778476016', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_858b76c1-0ac3-4146-953d-155fc6de9413.png?v=1778476037']::text[],
   ARRAY[]::text[],
   'approved'
@@ -276,7 +276,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Axel Arigato', 'Axel Arigato Marathon R-Trail Sneaker - 42', '', 6000, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Axel Arigato', 'Axel Arigato Marathon R-Trail Sneaker - 42', '', 6000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_c7b29f0d-cf99-4bf2-9e3a-1bfbb34434c4.png?v=1778476228', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_eb835895-27f1-4666-bc1d-0a7ee42b1c9d.png?v=1778476248', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_ce763a42-e3e4-4c85-8a07-1e5e1ee198fa.png?v=1778476266', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_0184ec59-842b-41a4-ae4f-f2ee5720ce2d.png?v=1778476301']::text[],
   ARRAY[]::text[],
   'approved'
@@ -686,7 +686,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Salvatore Ferragamo', 'Salvatore Ferragamo Loafer - 43.5', 'Ürün Bilgisi    Renk: Siyah  Numara: 43.5/44   Editör Notları:  Salvatore Ferragamo’nun zamansız klasiklerinden biri olan bu loafer modeli, markanın ikonik Gancini toka detayıyla öne çıkar. Yumuşak deri yapısı ve sade silueti sayesinde hem konforlu hem de şık bir kullanım sunarken, üst kısmındaki metal aksesuar modele sofistike bir karakter kazandırır. Günlük kombinlerden daha klasik görünümlere kadar geniş bir kullanım alanı sunan bu model, Ferragamo’nun zarif ve modern İtalyan stilini yansıtan', 43000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Salvatore Ferragamo', 'Salvatore Ferragamo Loafer - 43.5', 'Ürün Bilgisi    Renk: Siyah  Numara: 43.5/44   Editör Notları:  Salvatore Ferragamo’nun zamansız klasiklerinden biri olan bu loafer modeli, markanın ikonik Gancini toka detayıyla öne çıkar. Yumuşak deri yapısı ve sade silueti sayesinde hem konforlu hem de şık bir kullanım sunarken, üst kısmındaki metal aksesuar modele sofistike bir karakter kazandırır. Günlük kombinlerden daha klasik görünümlere kadar geniş bir kullanım alanı sunan bu model, Ferragamo’nun zarif ve modern İtalyan stilini yansıtan', 43000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ferragamo-1.jpg?v=1774859532', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ferragamo-2.jpg?v=1774859532', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ferragamo-3.jpg?v=1774859532']::text[],
   ARRAY[]::text[],
   'approved'
@@ -706,7 +706,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Louis Vuitton', 'Louis Vuitton Loafer - 43', 'Ürün Bilgisi    Renk: Siyah - Gri  Numara: 43   Editör Notları:  Louis Vuitton’un zamansız tasarım anlayışını yansıtan bu loafer modeli, markanın ikonik Damier Graphite kanvas deseni ile siyah deri detayları bir araya getirir. Üst kısmındaki metal LV logo tokası modele sofistike bir imza katarken, klasik loafer silueti sayesinde hem günlük hem de daha şık kombinlerde rahatlıkla kullanılabilir. Konforlu yapısı ve güçlü duruşuyla, modern ve rafine bir stil arayanlar için öne çıkan, uzun ömürlü bir', 57500, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Louis Vuitton', 'Louis Vuitton Loafer - 43', 'Ürün Bilgisi    Renk: Siyah - Gri  Numara: 43   Editör Notları:  Louis Vuitton’un zamansız tasarım anlayışını yansıtan bu loafer modeli, markanın ikonik Damier Graphite kanvas deseni ile siyah deri detayları bir araya getirir. Üst kısmındaki metal LV logo tokası modele sofistike bir imza katarken, klasik loafer silueti sayesinde hem günlük hem de daha şık kombinlerde rahatlıkla kullanılabilir. Konforlu yapısı ve güçlü duruşuyla, modern ve rafine bir stil arayanlar için öne çıkan, uzun ömürlü bir', 57500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv1_f700423f-bc01-43af-98f1-cc28c28de63d.jpg?v=1774861703', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv2_93e9337a-f63a-400d-9725-3b43c70dba65.jpg?v=1774861703', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv3_676d8a12-dabd-4f6d-81cb-e2fb0072abb0.jpg?v=1774861703', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv-4.jpg?v=1774861703']::text[],
   ARRAY[]::text[],
   'approved'
@@ -726,7 +726,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Gucci', 'Gucci Jordaan Loafer - 42', 'Ürün Bilgisi    Renk: Siyah  Numara: 42   Editör Notları:  Gucci’nin ikonik modellerinden biri olan Jordaan loafer, markanın klasik çizgisini modern bir zarafetle birleştirir. Yumuşak deri yapısı ve ince, zarif formu sayesinde ayağa daha oturan ve şık bir siluet sunarken, üst kısmındaki altın tonlu Horsebit (at tokası) detayı modele karakteristik Gucci imzasını kazandırır. Hem günlük hem de daha klasik kombinlerde rahatlıkla kullanılabilen bu model, zamansız tasarımıyla uzun yıllar gardırobun va', 29000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Gucci', 'Gucci Jordaan Loafer - 42', 'Ürün Bilgisi    Renk: Siyah  Numara: 42   Editör Notları:  Gucci’nin ikonik modellerinden biri olan Jordaan loafer, markanın klasik çizgisini modern bir zarafetle birleştirir. Yumuşak deri yapısı ve ince, zarif formu sayesinde ayağa daha oturan ve şık bir siluet sunarken, üst kısmındaki altın tonlu Horsebit (at tokası) detayı modele karakteristik Gucci imzasını kazandırır. Hem günlük hem de daha klasik kombinlerde rahatlıkla kullanılabilen bu model, zamansız tasarımıyla uzun yıllar gardırobun va', 29000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-1.jpg?v=1774859951', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-2.jpg?v=1774859951', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-3.jpg?v=1774859951']::text[],
   ARRAY[]::text[],
   'approved'
@@ -926,7 +926,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Gucci', 'Gucci Kravat Kahve- Beyaz', 'Ürün Bilgisi    Renk: Kahve - Beyaz  Materyal: %100 İpek  Editör Notları:  Bu Gucci kravat, markanın ikonik GG monogram desenini modern ve zarif bir yorumla sunan klasik bir tasarımdır. Kahverengi zemin üzerine düzenli şekilde yerleştirilen mikro GG motifleri, modele sofistike bir derinlik kazandırırken ipek dokusu sayesinde yumuşak, hafif parlak ve akıcı bir duruş sağlar. Zamansız çizgisiyle hem iş stiline hem de özel davet kombinlerine kolayca uyum sağlayan, Gucci’nin imza estetiğini yansıtan', 3000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Gucci', 'Gucci Kravat Kahve- Beyaz', 'Ürün Bilgisi    Renk: Kahve - Beyaz  Materyal: %100 İpek  Editör Notları:  Bu Gucci kravat, markanın ikonik GG monogram desenini modern ve zarif bir yorumla sunan klasik bir tasarımdır. Kahverengi zemin üzerine düzenli şekilde yerleştirilen mikro GG motifleri, modele sofistike bir derinlik kazandırırken ipek dokusu sayesinde yumuşak, hafif parlak ve akıcı bir duruş sağlar. Zamansız çizgisiyle hem iş stiline hem de özel davet kombinlerine kolayca uyum sağlayan, Gucci’nin imza estetiğini yansıtan', 3000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/GUCCI-SON1.jpg?v=1770890568', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-son2.jpg?v=1770890568', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-son3.jpg?v=1770890568']::text[],
   ARRAY[]::text[],
   'approved'
@@ -936,7 +936,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Gucci', 'Gucci Kravat Gri', 'Ürün Bilgisi    Renk: Gri  Materyal: %100 İpek  Editör Notları:  Bu Gucci kravat, markanın zamansız ve rafine stil anlayışını yansıtan klasik bir tasarıma sahiptir. Antrasit gri zemin üzerine işlenmiş mikro geometrik motifler, modele sade ama sofistike bir hareket kazandırırken %100 ipek dokusu sayesinde hafif parlak ve akıcı bir duruş sunar. Minimal desen yapısı, hem iş kombinlerinde hem de resmi davetlerde kolayca uyum sağlayan, modern ve şık bir Gucci aksesuarı olarak öne çıkar.   Orijinallik', 3000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Gucci', 'Gucci Kravat Gri', 'Ürün Bilgisi    Renk: Gri  Materyal: %100 İpek  Editör Notları:  Bu Gucci kravat, markanın zamansız ve rafine stil anlayışını yansıtan klasik bir tasarıma sahiptir. Antrasit gri zemin üzerine işlenmiş mikro geometrik motifler, modele sade ama sofistike bir hareket kazandırırken %100 ipek dokusu sayesinde hafif parlak ve akıcı bir duruş sunar. Minimal desen yapısı, hem iş kombinlerinde hem de resmi davetlerde kolayca uyum sağlayan, modern ve şık bir Gucci aksesuarı olarak öne çıkar.   Orijinallik', 3000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-gri1.jpg?v=1770890231', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-grii2.jpg?v=1770890230', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-gri3.jpg?v=1770890230']::text[],
   ARRAY[]::text[],
   'approved'
@@ -946,7 +946,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Christian Dior', 'Christian Dior Kravat Kahverengi - Krem - Mavi', 'Ürün Bilgisi    Renk: Kahverengi - Krem - Mavi   Materyal: %100 İpek  Editör Notları:  Bu Dior kravat, markanın klasik İtalyan terzilik anlayışını yansıtan zarif ve zamansız bir tasarıma sahiptir. Kahverengi zemin üzerine işlenen mikro geometrik desenler ve ince mavi vurgular, modele derinlik kazandırarak sade takım elbiselerle kolayca uyum sağlayan sofistike bir görünüm sunar. %100 ipek dokusu sayesinde hafif parlak ve akıcı bir duruşa sahip olan bu model, hem iş stilinde hem de özel davetlerde', 3299, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Christian Dior', 'Christian Dior Kravat Kahverengi - Krem - Mavi', 'Ürün Bilgisi    Renk: Kahverengi - Krem - Mavi   Materyal: %100 İpek  Editör Notları:  Bu Dior kravat, markanın klasik İtalyan terzilik anlayışını yansıtan zarif ve zamansız bir tasarıma sahiptir. Kahverengi zemin üzerine işlenen mikro geometrik desenler ve ince mavi vurgular, modele derinlik kazandırarak sade takım elbiselerle kolayca uyum sağlayan sofistike bir görünüm sunar. %100 ipek dokusu sayesinde hafif parlak ve akıcı bir duruşa sahip olan bu model, hem iş stilinde hem de özel davetlerde', 3299, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-mavili-1.jpg?v=1770888511', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-mavili-3.jpg?v=1770888511', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-mavili-2.jpg?v=1770888511']::text[],
   ARRAY[]::text[],
   'approved'
@@ -956,7 +956,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Gucci', 'Gucci Karavat Siyah - Turuncu', 'Ürün Bilgisi    Renk: Siyah - Turuncu  Materyal: %100 İpek  Editör Notları:  Bu Gucci kravat, markanın köklü binicilik mirasından ilham alan ikonik horsebit (at gemi) motifleriyle tasarlanmış karakterli ve zamansız bir aksesuardır. Siyah zemin üzerine altın tonlarında tekrarlayan desen, klasik Gucci kodlarını güçlü bir şekilde yansıtırken %100 ipek dokusu sayesinde parlak, akıcı ve sofistike bir duruş sunar. Hem iş stilinde hem de özel davet kombinlerinde sade bir takım elbiseye hareket ve prest', 3000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Gucci', 'Gucci Karavat Siyah - Turuncu', 'Ürün Bilgisi    Renk: Siyah - Turuncu  Materyal: %100 İpek  Editör Notları:  Bu Gucci kravat, markanın köklü binicilik mirasından ilham alan ikonik horsebit (at gemi) motifleriyle tasarlanmış karakterli ve zamansız bir aksesuardır. Siyah zemin üzerine altın tonlarında tekrarlayan desen, klasik Gucci kodlarını güçlü bir şekilde yansıtırken %100 ipek dokusu sayesinde parlak, akıcı ve sofistike bir duruş sunar. Hem iş stilinde hem de özel davet kombinlerinde sade bir takım elbiseye hareket ve prest', 3000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-turuncu-1.jpg?v=1770887396', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-turuncu-2.jpg?v=1770887396', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-turuncu-3.jpg?v=1770887396']::text[],
   ARRAY[]::text[],
   'approved'
@@ -966,7 +966,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Versace', 'Versace Kravat', 'Ürün Bilgisi    Renk: Siyah - Altın  Materyal: %100 İpek  Editör Notları:  Bu Versace Classique kravat, markanın ikonik barok estetiğini modern bir geometrik düzenle buluşturan güçlü ve karakterli bir tasarıma sahiptir. Siyah zemin üzerine yerleştirilen altın tonlu Medusa ve barok motifler, dama formundaki kompozisyonla birleşerek Versace’nin gösterişli ama rafine stil kodlarını yansıtır. %100 ipek yapısı sayesinde akıcı ve parlak bir yüzeye sahip olan model, özellikle klasik takım elbiselerle v', 3799, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Versace', 'Versace Kravat', 'Ürün Bilgisi    Renk: Siyah - Altın  Materyal: %100 İpek  Editör Notları:  Bu Versace Classique kravat, markanın ikonik barok estetiğini modern bir geometrik düzenle buluşturan güçlü ve karakterli bir tasarıma sahiptir. Siyah zemin üzerine yerleştirilen altın tonlu Medusa ve barok motifler, dama formundaki kompozisyonla birleşerek Versace’nin gösterişli ama rafine stil kodlarını yansıtır. %100 ipek yapısı sayesinde akıcı ve parlak bir yüzeye sahip olan model, özellikle klasik takım elbiselerle v', 3799, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/versace-kravat-1.jpg?v=1770886484', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/versace-kravat-2.jpg?v=1770886483', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/versace-kravat-3.jpg?v=1770886483', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/versace-kravat-4.jpg?v=1770886484']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1166,7 +1166,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Moncler', 'Moncler Mont - 3', 'Ürün Bilgisi    Renk:  Lacivert   Beden:  3   Editör Notları:  Bu parça Moncler’in şehir şıklığına odaklanan, blazer formunda tasarlanmış şişme mont modellerinden biridir. Lacivert tonlu, yatay kapitone yapısı sayesinde hem sıcak tutar hem de klasik ceket siluetiyle smart-casual kombinlere rahatça uyum sağlar. Hakim yaka detayı, düğmeli ön kapama ve kapaklı cepleriyle ofis stilinden günlük kullanıma kadar geniş bir alanda tercih edilebilen, Moncler’in teknik konforunu zamansız erkek şıklığıyla b', 32299, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Moncler', 'Moncler Mont - 3', 'Ürün Bilgisi    Renk:  Lacivert   Beden:  3   Editör Notları:  Bu parça Moncler’in şehir şıklığına odaklanan, blazer formunda tasarlanmış şişme mont modellerinden biridir. Lacivert tonlu, yatay kapitone yapısı sayesinde hem sıcak tutar hem de klasik ceket siluetiyle smart-casual kombinlere rahatça uyum sağlar. Hakim yaka detayı, düğmeli ön kapama ve kapaklı cepleriyle ofis stilinden günlük kullanıma kadar geniş bir alanda tercih edilebilen, Moncler’in teknik konforunu zamansız erkek şıklığıyla b', 32299, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/moncler1.jpg?v=1770294667', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/moncler2.jpg?v=1770294667', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/moncler3.jpg?v=1770294667', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/moncler4.jpg?v=1770294667']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1516,7 +1516,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Louis Vuitton', 'Louis Vuitton Sneaker - 41', 'Ürün Bilgisi    Renk: Beyaz  Beden: 41   Editör Notları:  Bu Louis Vuitton sneaker, markanın LV Trainer Sneaker modelinin özel ve playful bir versiyonudur. Beyaz deri zemin üzerinde yer alan renkli grafik/illustrasyon detayları ve kabartmalı LV logosu, tasarıma enerjik ve koleksiyonluk bir karakter kazandırır. Kalın kauçuk tabanı ve bağcıklı spor silüetiyle konforlu bir kullanım sunarken, Virgil Abloh döneminin genç, sanatsal ve sokak stiline göz kırpan estetiğini yansıtan dikkat çekici bir LV s', 27000, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Louis Vuitton', 'Louis Vuitton Sneaker - 41', 'Ürün Bilgisi    Renk: Beyaz  Beden: 41   Editör Notları:  Bu Louis Vuitton sneaker, markanın LV Trainer Sneaker modelinin özel ve playful bir versiyonudur. Beyaz deri zemin üzerinde yer alan renkli grafik/illustrasyon detayları ve kabartmalı LV logosu, tasarıma enerjik ve koleksiyonluk bir karakter kazandırır. Kalın kauçuk tabanı ve bağcıklı spor silüetiyle konforlu bir kullanım sunarken, Virgil Abloh döneminin genç, sanatsal ve sokak stiline göz kırpan estetiğini yansıtan dikkat çekici bir LV s', 27000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv10.jpg?v=1768486025', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv11.jpg?v=1768486025', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv12.jpg?v=1768486025', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv13.jpg?v=1768486025', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/IMG_1727.jpg?v=1768486041']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1526,7 +1526,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Louis Vuitton', 'Louis Vuitton Sneaker - 40', 'Ürün Bilgisi    Renk: Kırmızı  Beden: 40 Made in Italy  Editör Notları:  Bu Louis Vuitton sneaker, markanın ikonik LV Trainer Sneaker modelidir. Kırmızı tonlarda Monogram desenli kadife/velour yüzeyi, beyaz deri detaylar ve katmanlı kauçuk tabanla birleşerek güçlü ve dikkat çekici bir silüet sunar. Virgil Abloh döneminin imza tasarımlarından olan bu model, sportif sneaker formunu lüks materyallerle buluşturur; şehir stilinde statement parça olarak öne çıkan, koleksiyon değeri yüksek bir LV sneak', 21500, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Louis Vuitton', 'Louis Vuitton Sneaker - 40', 'Ürün Bilgisi    Renk: Kırmızı  Beden: 40 Made in Italy  Editör Notları:  Bu Louis Vuitton sneaker, markanın ikonik LV Trainer Sneaker modelidir. Kırmızı tonlarda Monogram desenli kadife/velour yüzeyi, beyaz deri detaylar ve katmanlı kauçuk tabanla birleşerek güçlü ve dikkat çekici bir silüet sunar. Virgil Abloh döneminin imza tasarımlarından olan bu model, sportif sneaker formunu lüks materyallerle buluşturur; şehir stilinde statement parça olarak öne çıkan, koleksiyon değeri yüksek bir LV sneak', 21500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv1_951eecbb-1a1e-458c-ad15-0adf27bccccc.jpg?v=1768484664', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv2_1b8b60d7-e2b6-4c17-b987-a9ee6c3484c4.jpg?v=1768484664', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/lv3_36ece4c5-4fd6-4418-8ef4-3112bebc5d9f.jpg?v=1768484664', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/IMG_1690.jpg?v=1768484664', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/IMG_1686.jpg?v=1768485169']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1606,7 +1606,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Burberry', 'Burberry Mont - L Beden', 'Ürün Bilgisi    Renk: Mavi  Beden: Large  Editör Notları:  Burberry mont markanın zamansız stiliyle spor şıklığını birleştiren oldukça dengeli bir parça. Uzun yıllar giyilebilecek modern bir klasik.   Orijinallik ve Kalite Kontrolü Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.', 19599, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Burberry', 'Burberry Mont - L Beden', 'Ürün Bilgisi    Renk: Mavi  Beden: Large  Editör Notları:  Burberry mont markanın zamansız stiliyle spor şıklığını birleştiren oldukça dengeli bir parça. Uzun yıllar giyilebilecek modern bir klasik.   Orijinallik ve Kalite Kontrolü Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.', 19599, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/l-beden-on.jpg?v=1769629367', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/Burberry-mavi-mont-yan_d4a74184-73b4-4e81-81ee-9081e4eb138c.jpg?v=1769629367', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-mon-mavi-arka.jpg?v=1769629367', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/l-beden2.jpg?v=1769629352']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1616,7 +1616,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Balmain', 'Balmain Sweatshirt - M Beden', 'Ürün Bilgisi    Renk: Kırmızı - Siyah  Beden: Medium  Editör Notları: Balmain sweatshirt, markanın klasik çizgisiyle modern spor detayları birleştiren oldukça şık ve dengeli bir parça. Göğüs kısmındaki tasarım "üks bir hava sunarken, omuz kısmındaki detaylar tasarıma dinamik bir karakter katıyor. Siyah ve kırmızının zamansız kontrastı sayesinde hem jeanlerle günlük hem de kumaş pantolonlarla daha seçkin kombinlere rahatlıkla uyum sağlar; uzun yıllar giyilebilecek modern bir klasik.  Orijinallik', 16000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Sweatshirt - M Beden', 'Ürün Bilgisi    Renk: Kırmızı - Siyah  Beden: Medium  Editör Notları: Balmain sweatshirt, markanın klasik çizgisiyle modern spor detayları birleştiren oldukça şık ve dengeli bir parça. Göğüs kısmındaki tasarım "üks bir hava sunarken, omuz kısmındaki detaylar tasarıma dinamik bir karakter katıyor. Siyah ve kırmızının zamansız kontrastı sayesinde hem jeanlerle günlük hem de kumaş pantolonlarla daha seçkin kombinlere rahatlıkla uyum sağlar; uzun yıllar giyilebilecek modern bir klasik.  Orijinallik', 16000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/Balmain-Sweatshirt-On.jpg?v=1767333599', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/Balmain-Sweatshirt-yan.jpg?v=1767333599', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/Balmain-Sweatshirt-arka.jpg?v=1767333599']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1716,7 +1716,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Emporio Armani', 'Emporio & Armani Siyah T-shirt - Large', 'Ürün Bilgisi    Renk: Siyah  Beden: Large  Kumaş İçeriği: %70 Liyosel ve %30 Pamuk  Made in Vietnam  Editör Notları:  Emporio Armani’nin bu tişörtü, markanın klasik çizgisiyle modern spor detayları birleştiren oldukça şık ve dengeli bir parça. Göğüs kısmındaki sade tasarım "sessiz lüks" bir hava sunarken, alt kısımdaki ikonik logo bandı tasarıma dinamik bir karakter katıyor. Siyah ve beyazın zamansız kontrastı sayesinde hem jeanlerle günlük hem de kumaş pantolonlarla daha seçkin kombinlere rahat', 6000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Emporio Armani', 'Emporio & Armani Siyah T-shirt - Large', 'Ürün Bilgisi    Renk: Siyah  Beden: Large  Kumaş İçeriği: %70 Liyosel ve %30 Pamuk  Made in Vietnam  Editör Notları:  Emporio Armani’nin bu tişörtü, markanın klasik çizgisiyle modern spor detayları birleştiren oldukça şık ve dengeli bir parça. Göğüs kısmındaki sade tasarım "sessiz lüks" bir hava sunarken, alt kısımdaki ikonik logo bandı tasarıma dinamik bir karakter katıyor. Siyah ve beyazın zamansız kontrastı sayesinde hem jeanlerle günlük hem de kumaş pantolonlarla daha seçkin kombinlere rahat', 6000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ChatGPTImage16Ara202510_38_42.png?v=1765870764']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1956,7 +1956,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Balmain', 'Balmain Siyah Deri Ceket', 'Ürün Bilgisi    Renk: Siyah  Editör Notları:  Balmain’in ikonik bomber ceket yorumunu yansıtan bu model, hakiki deri yapısı ve göğüste yer alan kabartmalı logo detayıyla güçlü ve modern bir duruş sunar. Spor detaylarla lüksü bir araya getiren tasarımı sayesinde hem günlük hem de iddialı kombinlerde rahatlıkla kullanılabilir.   Orijinallik ve Kalite Kontrolü Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi', 52999, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Siyah Deri Ceket', 'Ürün Bilgisi    Renk: Siyah  Editör Notları:  Balmain’in ikonik bomber ceket yorumunu yansıtan bu model, hakiki deri yapısı ve göğüste yer alan kabartmalı logo detayıyla güçlü ve modern bir duruş sunar. Spor detaylarla lüksü bir araya getiren tasarımı sayesinde hem günlük hem de iddialı kombinlerde rahatlıkla kullanılabilir.   Orijinallik ve Kalite Kontrolü Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi', 52999, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/balmain2.jpg?v=1769801060', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/balmain1.jpg?v=1769801070', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/balmain-deri-ceket-arka.jpg?v=1769801070']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1976,7 +1976,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Giuseppe Zanotti', 'Giuseppe Zanotti Siyah Loafer 42', 'Ürün Bilgisi    Renk: Siyah  Beden: 42  Materyal: Deri  Editör Notları:  Bu Giuseppe Zanotti erkek loafer modeli, markanın sofistike ve iddialı tasarım çizgisini yansıtır. Parlak siyah deri üst yüzeyi, ön kısımda yer alan altın tonlu metal detay ile klasik loafer formuna modern ve lüks bir vurgu katar. Yuvarlatılmış burun yapısı ve temiz dikişleri sayesinde hem konforlu hem de şık bir kullanım sunar. Takım elbiselerle, kumaş pantolonlarla veya smart-casual kombinlerde tercih edilebilecek zamansı', 25000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Giuseppe Zanotti', 'Giuseppe Zanotti Siyah Loafer 42', 'Ürün Bilgisi    Renk: Siyah  Beden: 42  Materyal: Deri  Editör Notları:  Bu Giuseppe Zanotti erkek loafer modeli, markanın sofistike ve iddialı tasarım çizgisini yansıtır. Parlak siyah deri üst yüzeyi, ön kısımda yer alan altın tonlu metal detay ile klasik loafer formuna modern ve lüks bir vurgu katar. Yuvarlatılmış burun yapısı ve temiz dikişleri sayesinde hem konforlu hem de şık bir kullanım sunar. Takım elbiselerle, kumaş pantolonlarla veya smart-casual kombinlerde tercih edilebilecek zamansı', 25000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/giuseppe-zanotti-on.jpg?v=1761124187', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/giuseppe-yan.jpg?v=1761124187']::text[],
   ARRAY[]::text[],
   'approved'
@@ -1986,7 +1986,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Gucci', 'Gucci Monogram Espadril 41', 'Ürün Bilgisi    Renk: Kahverengi  Beden: 41  Materyal: Kanvas Erkek   Editör Notları:  Bu Gucci espadril modeli, markanın ikonik GG monogram desenini rahat ve yazlık bir siluetle birleştiren casual-lüks bir tasarımdır. Kanvas üst yüzeyi ve klasik hasır (jüt) tabanı sayesinde hafif, nefes alabilir ve konforlu bir kullanım sunar. Slip-on formu pratiklik sağlarken, kauçuk taban detayı günlük şehir kullanımına da uygun dayanıklılık kazandırır. Yaz aylarında keten pantolon, chino veya şortlarla rahat', 19999, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Gucci', 'Gucci Monogram Espadril 41', 'Ürün Bilgisi    Renk: Kahverengi  Beden: 41  Materyal: Kanvas Erkek   Editör Notları:  Bu Gucci espadril modeli, markanın ikonik GG monogram desenini rahat ve yazlık bir siluetle birleştiren casual-lüks bir tasarımdır. Kanvas üst yüzeyi ve klasik hasır (jüt) tabanı sayesinde hafif, nefes alabilir ve konforlu bir kullanım sunar. Slip-on formu pratiklik sağlarken, kauçuk taban detayı günlük şehir kullanımına da uygun dayanıklılık kazandırır. Yaz aylarında keten pantolon, chino veya şortlarla rahat', 19999, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-yan.jpg?v=1761124132']::text[],
   ARRAY[]::text[],
   'approved'
@@ -2446,7 +2446,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Fendi', 'Fendi Pudra Renk 12+  Kazak', 'Ürün Bilgisi  Renk:Pudra Beden:12+ Tasarım:Kapişon monogram detaylı Kumaş İçeriği:88% YÜN Editör Notları:Pudra tonunun yumuşak etkisini modern bir kesimle buluşturan bu üst, kısa formu ve kapüşon detayıyla güncel bir görünüm sunuyor. Düz örgü yapısı konforlu bir hissiyat sağlarken, kol ucu ve kapüşondaki ince desen detayları tasarıma sakin ama karakterli bir dokunuş ekliyor. Eksper Puanı:Ürünün tüm incelemesi tarafımızca yapılmıştır.kondisyon durumu 10%10    Orijinallik ve Kalite KontrolüPeony C', 6999, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Fendi', 'Fendi Pudra Renk 12+  Kazak', 'Ürün Bilgisi  Renk:Pudra Beden:12+ Tasarım:Kapişon monogram detaylı Kumaş İçeriği:88% YÜN Editör Notları:Pudra tonunun yumuşak etkisini modern bir kesimle buluşturan bu üst, kısa formu ve kapüşon detayıyla güncel bir görünüm sunuyor. Düz örgü yapısı konforlu bir hissiyat sağlarken, kol ucu ve kapüşondaki ince desen detayları tasarıma sakin ama karakterli bir dokunuş ekliyor. Eksper Puanı:Ürünün tüm incelemesi tarafımızca yapılmıştır.kondisyon durumu 10%10    Orijinallik ve Kalite KontrolüPeony C', 6999, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/fendi-kazak-on_d9fa7eb6-862e-4c7e-b7a0-7bc94e4f31c7.jpg?v=1759243055']::text[],
   ARRAY[]::text[],
   'approved'
@@ -2976,7 +2976,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Prada', 'Prada Loafer -41', 'Ürün Bilgisi   Koyu Kahverengi (espresso tonlarında) Süet 41 Numara  Taban açık (renk bej tonlu ) kauçuk taban Vamp kısmında Prada ikonik üçgen metal logosu mevcut. 1980''lerden itibaren sadece klasik bir ''''erkek ayakkabası'''' değil, aynı zamanda lüks ve günlük şıklığın birleşimi  Orijinallik ve Kalite Kontrolü Peony Collective''de tüm ürünler, uzmanlarımız tarafından incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur.', 17999, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Prada', 'Prada Loafer -41', 'Ürün Bilgisi   Koyu Kahverengi (espresso tonlarında) Süet 41 Numara  Taban açık (renk bej tonlu ) kauçuk taban Vamp kısmında Prada ikonik üçgen metal logosu mevcut. 1980''lerden itibaren sadece klasik bir ''''erkek ayakkabası'''' değil, aynı zamanda lüks ve günlük şıklığın birleşimi  Orijinallik ve Kalite Kontrolü Peony Collective''de tüm ürünler, uzmanlarımız tarafından incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur.', 17999, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/prada-kahve-loafer-on.jpg?v=1755679596']::text[],
   ARRAY[]::text[],
   'approved'
@@ -2986,7 +2986,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Prada', 'Prada Loafer -41', 'Ürün Bilgisi   Lacivert Süet 41 Numara  Taban açık (renk bej tonlu ) kauçuk taban Vamp kısmında Prada ikonik üçgen metal logosu mevcut. 1980''lerden itibaren sadece klasik bir ''''erkek ayakkabası'''' değil, aynı zamanda lüks ve günlük şıklığın birleşimi  Orijinallik ve Kalite Kontrolü Peony Collective''de tüm ürünler, uzmanlarımız tarafından incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur.', 17999, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Prada', 'Prada Loafer -41', 'Ürün Bilgisi   Lacivert Süet 41 Numara  Taban açık (renk bej tonlu ) kauçuk taban Vamp kısmında Prada ikonik üçgen metal logosu mevcut. 1980''lerden itibaren sadece klasik bir ''''erkek ayakkabası'''' değil, aynı zamanda lüks ve günlük şıklığın birleşimi  Orijinallik ve Kalite Kontrolü Peony Collective''de tüm ürünler, uzmanlarımız tarafından incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur.', 17999, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/prada-loafer-lacivert-ust.jpg?v=1755677555']::text[],
   ARRAY[]::text[],
   'approved'
@@ -3466,7 +3466,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Moncler', 'Moncler Bordo Mont - 3', 'Ürün Bilgisi    Renk: Bordo  Beden: 3/ L  Editör Notları:          Markanın fonksiyonellik ve şıklığı bir araya getiren ikonik tasarım anlayışını yansıtır. Bordo tonlu kapitone yapısı hem modern hem zamansız bir görünüm sunarken, hafif ama yüksek ısı yalıtımı sağlayan dolgu yapısı soğuk havalarda üstün konfor sağlar. Çıtçıt ve fermuar detaylı önü, pratik kullanım sunarken göğüs cepleri tasarıma sportif bir karakter katar. Günlük şehir yaşamından hafta sonu kombinlerine kadar geniş bir kullanım a', 25000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Moncler', 'Moncler Bordo Mont - 3', 'Ürün Bilgisi    Renk: Bordo  Beden: 3/ L  Editör Notları:          Markanın fonksiyonellik ve şıklığı bir araya getiren ikonik tasarım anlayışını yansıtır. Bordo tonlu kapitone yapısı hem modern hem zamansız bir görünüm sunarken, hafif ama yüksek ısı yalıtımı sağlayan dolgu yapısı soğuk havalarda üstün konfor sağlar. Çıtçıt ve fermuar detaylı önü, pratik kullanım sunarken göğüs cepleri tasarıma sportif bir karakter katar. Günlük şehir yaşamından hafta sonu kombinlerine kadar geniş bir kullanım a', 25000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bordo1_09ec5cbd-9c60-42db-868a-6a051375a4fc.jpg?v=1769672391', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bordo2_15966785-854e-4dbc-bb1e-453c2cc8fa1d.jpg?v=1769672391', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bordo3_375dc598-0d19-4691-a799-4d2ef6da33e1.jpg?v=1769672391']::text[],
   ARRAY[]::text[],
   'approved'
@@ -4326,7 +4326,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Sonia Rykiel', 'Sonia Rykiel Kapüşonlu Bebek Mont Renkli̇ - 2 yaş', 'Öne Çıkan Özellikler   Tasarım: İki ön cepli, kürk detay kapüşonlu.   Malzeme: Polyamid .   Renk: Renkli.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 2000, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Sonia Rykiel', 'Sonia Rykiel Kapüşonlu Bebek Mont Renkli̇ - 2 yaş', 'Öne Çıkan Özellikler   Tasarım: İki ön cepli, kürk detay kapüşonlu.   Malzeme: Polyamid .   Renk: Renkli.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 2000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/kiz-cocuk-polyamid-mont-da-059.jpg?v=1735930294']::text[],
   ARRAY[]::text[],
   'approved'
@@ -4446,7 +4446,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Ralph Lauren', 'Ralph Lauren Desenli Pantolon Krem - 16-17y', 'Ürün Bilgisi    Beden:  16-17 Yaş   Renk:Krem/Bej  Editör Notları:   Ralph Lauren’in zamansız Amerikan şıklığını yansıtan bu bej chino pantolon, tüm yüzeyine işlenmiş küçük arma/nakış detaylarıyla klasik stile sofistike bir dokunuş ekler. Temiz kesimi ve slim fit formu sayesinde hem gündelik hem de smart-casual kombinlerde rahatlıkla kullanılabilir. Minimal ama karakterli tasarımıyla gardırobun çok yönlü parçalarından biridir.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, u', 750, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Ralph Lauren', 'Ralph Lauren Desenli Pantolon Krem - 16-17y', 'Ürün Bilgisi    Beden:  16-17 Yaş   Renk:Krem/Bej  Editör Notları:   Ralph Lauren’in zamansız Amerikan şıklığını yansıtan bu bej chino pantolon, tüm yüzeyine işlenmiş küçük arma/nakış detaylarıyla klasik stile sofistike bir dokunuş ekler. Temiz kesimi ve slim fit formu sayesinde hem gündelik hem de smart-casual kombinlerde rahatlıkla kullanılabilir. Minimal ama karakterli tasarımıyla gardırobun çok yönlü parçalarından biridir.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, u', 750, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/erkek-cocuk-koton-pantalon-c233d1.jpg?v=1735930115']::text[],
   ARRAY[]::text[],
   'approved'
@@ -4566,7 +4566,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Marc Jacobs', 'Marc Jacobs Çocuk Eşofman Gri̇ - 6 yaş', 'Öne Çıkan Özellikler:   Tasarım: Yazı ve renkli fermuar detaylı.   Malzeme: Koton.   Renk: Gri.   Beden: 6Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 650, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Marc Jacobs', 'Marc Jacobs Çocuk Eşofman Gri̇ - 6 yaş', 'Öne Çıkan Özellikler:   Tasarım: Yazı ve renkli fermuar detaylı.   Malzeme: Koton.   Renk: Gri.   Beden: 6Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 650, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/pacasi-lastikli-klasik-esofman--a173.jpg?v=1735929938']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5046,7 +5046,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Burberry', 'Burberry Bebek Şort Gri̇ - 1 yaş', 'Öne Çıkan Özellikler:   Tasarım: Yazı detaylı.   Malzeme: Pamuk .   Renk: Gri.   Beden: 1Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 550, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Burberry', 'Burberry Bebek Şort Gri̇ - 1 yaş', 'Öne Çıkan Özellikler:   Tasarım: Yazı detaylı.   Malzeme: Pamuk .   Renk: Gri.   Beden: 1Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 550, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/beli-baglamali-kiz-cocuk-sort--09d2.jpg?v=1735929126']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5056,7 +5056,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Burberry', 'Burberry Çizgili Bebek Şort Açik mavi̇ - 2 yaş', 'Öne Çıkan Özellikler:   Tasarım: Çizgili.   Malzeme: Koton .   Renk: Mavi.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1000, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Burberry', 'Burberry Çizgili Bebek Şort Açik mavi̇ - 2 yaş', 'Öne Çıkan Özellikler:   Tasarım: Çizgili.   Malzeme: Koton .   Renk: Mavi.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/kiz-cocuk-cizgili-sort-996-3c.jpg?v=1735929119']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5076,7 +5076,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Burberry', 'Burberry Fiyonklu Rugan Babet Si̇yah - 34', 'BEDEN&amp;KALIP •NUMARA : TR: 34 DETAYLAR •Siyah renkli rugan •fiyonk detayı •Siyah deri iç astar ÜRETİM YERİ: İTALYA', 4500, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Burberry', 'Burberry Fiyonklu Rugan Babet Si̇yah - 34', 'BEDEN&amp;KALIP •NUMARA : TR: 34 DETAYLAR •Siyah renkli rugan •fiyonk detayı •Siyah deri iç astar ÜRETİM YERİ: İTALYA', 4500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/fiyonklu-rugan-babet-91-80a.jpg?v=1735929085']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5126,7 +5126,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Blumarine', 'Miss Blumarine İşlemeli Bebek Etek Gri̇ - 2Y', 'Öne Çıkan Özellikler:   Tasarım: İşleme detaylı.   Malzeme: Asetat,polyester .   Renk: Gri.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 350, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Blumarine', 'Miss Blumarine İşlemeli Bebek Etek Gri̇ - 2Y', 'Öne Çıkan Özellikler:   Tasarım: İşleme detaylı.   Malzeme: Asetat,polyester .   Renk: Gri.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 350, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/kiz-cocuk-mini-etek-da8688.jpg?v=1735928992']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5146,7 +5146,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Bikkembergs', 'Bikkembergs Koton Çocuk Gömlek Beyaz - 16-17y', 'Öne Çıkan Özellikler:   Tasarım: Uzun kollu, yaka yazı detaylı.   Malzeme: Koton .   Renk:Beyaz .   Beden: 16-17Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1000, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Bikkembergs', 'Bikkembergs Koton Çocuk Gömlek Beyaz - 16-17y', 'Öne Çıkan Özellikler:   Tasarım: Uzun kollu, yaka yazı detaylı.   Malzeme: Koton .   Renk:Beyaz .   Beden: 16-17Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/erkek-cocuk-koton-gomlek-c03be1.jpg?v=1735928969']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5316,7 +5316,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Ralph Lauren', 'Ralph Lauren Polo Yaka Çocuk Tişört Mavi̇ - 6yas', 'Öne Çıkan Özellikler:   Malzeme: Koton .   Renk: Mavi.   Beden: 6Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 500, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Ralph Lauren', 'Ralph Lauren Polo Yaka Çocuk Tişört Mavi̇ - 6yas', 'Öne Çıkan Özellikler:   Malzeme: Koton .   Renk: Mavi.   Beden: 6Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/klasik-bisiklet-yaka-erkek-cocuk-t-shi-dc51fd.jpg?v=1735928769']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5476,7 +5476,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Kapüşonlu Çocuk Eşofman Üstü - 10', 'Siyah kumaş, kol kısımlarında beyaz detay, fermuarlı açma kapama, kapüşonlu.', 1200, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Kapüşonlu Çocuk Eşofman Üstü - 10', 'Siyah kumaş, kol kısımlarında beyaz detay, fermuarlı açma kapama, kapüşonlu.', 1200, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/marka-logolu-fermuarli-sweatshirts-siy-43bb-a.jpg?v=1735928582']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5486,7 +5486,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Çocuk Eşofman Gri̇ - 10 y', 'Öne Çıkan Özellikler   Malzeme: Koton.   Renk: Gri.   Beden: 10Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1100, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Çocuk Eşofman Gri̇ - 10 y', 'Öne Çıkan Özellikler   Malzeme: Koton.   Renk: Gri.   Beden: 10Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1100, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/erkek-cocuk-bilek-lastikli-tek-renk-es-707-00.jpg?v=1735928574', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/erkek-cocuk-bilek-lastikli-tek-renk-es-501-4a.jpg?v=1735928574', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/erkek-cocuk-bilek-lastikli-tek-renk-es-b9216a.jpg?v=1735928574']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5496,7 +5496,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Detaylı Çocuk Eşofman Siyah - 8', '', 1100, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Detaylı Çocuk Eşofman Siyah - 8', '', 1100, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/erkek-cocuk-ayarlanabilir-lastikli-eso-4d35-b.jpg?v=1735928568']::text[],
   ARRAY[]::text[],
   'approved'
@@ -5846,7 +5846,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Burberry', 'Burberry Çocuk Hırka Lacivert - 10y', 'Öne Çıkan Özellikler:   Tasarım: Düğme detaylı.   Malzeme: Yün.   Renk: Lacivert.   Beden: 10Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 2500, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Burberry', 'Burberry Çocuk Hırka Lacivert - 10y', 'Öne Çıkan Özellikler:   Tasarım: Düğme detaylı.   Malzeme: Yün.   Renk: Lacivert.   Beden: 10Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 2500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-cocuk-hirka-552f1d.jpg?v=1735928118']::text[],
   ARRAY[]::text[],
   'approved'
@@ -6196,7 +6196,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Monalisa', 'Monnalisa Kürklü Süet Mont Krem - 2 yaş', 'Öne Çıkan Özellikler   Tasarım: İçi kürklü, cep detaylı.   Malzeme: %44 polyester, %56 akrilik .   Renk: Krem.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1100, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Monalisa', 'Monnalisa Kürklü Süet Mont Krem - 2 yaş', 'Öne Çıkan Özellikler   Tasarım: İçi kürklü, cep detaylı.   Malzeme: %44 polyester, %56 akrilik .   Renk: Krem.   Beden: 2Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1100, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/monnalisa-krem-renk-2-beden-kiz-cocuk--9f238b.jpg?v=1735927661']::text[],
   ARRAY[]::text[],
   'approved'
@@ -6216,7 +6216,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Bisiklet Yaka Çocuk Sweatshirt Gri - 10 y', 'Ürün Bilgisi   Tasarım: Omuz,Kol Detaylı  Kumaş İçeriği: Pamuk  Renk: Gri  Beden: 10 Yaş   Eksper Notları: Omuz ve kol detaylarındaki beyaz paneller parçaya spor bir hava katarken, yumuşak pamuk dokusu gün boyu rahatlık sağlıyor.   Eksper Puanları: Ürünün tüm incelemesi tarafımızca yapılmıştır. Kullanım emaresi ve deformasyon barındırmamaktadır. 10/10   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi i', 2000, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Bisiklet Yaka Çocuk Sweatshirt Gri - 10 y', 'Ürün Bilgisi   Tasarım: Omuz,Kol Detaylı  Kumaş İçeriği: Pamuk  Renk: Gri  Beden: 10 Yaş   Eksper Notları: Omuz ve kol detaylarındaki beyaz paneller parçaya spor bir hava katarken, yumuşak pamuk dokusu gün boyu rahatlık sağlıyor.   Eksper Puanları: Ürünün tüm incelemesi tarafımızca yapılmıştır. Kullanım emaresi ve deformasyon barındırmamaktadır. 10/10   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi i', 2000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/balmain-gri-renk-10-beden-erkek-cocuk--0-ba43.jpg?v=1735927629']::text[],
   ARRAY[]::text[],
   'approved'
@@ -6816,7 +6816,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Stella Mccartney', 'Stella McCartney Denim Elbise Somon - 14 yaş', 'Öne Çıkan Özellikler:   Malzeme: Koton .   Renk: Somon.   Beden: 14Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 650, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Stella Mccartney', 'Stella McCartney Denim Elbise Somon - 14 yaş', 'Öne Çıkan Özellikler:   Malzeme: Koton .   Renk: Somon.   Beden: 14Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 650, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/stella-mccartney-somon-renk-14-yas-bed-b6b068.jpg?v=1735925837']::text[],
   ARRAY[]::text[],
   'approved'
@@ -6846,7 +6846,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Il Gufo', 'Il Gufo Elbise Turuncu - 14 yaş', 'Öne Çıkan Özellikler:   Tasarım: Etekleri volanlı.   Malzeme: Viskos .   Renk: Turuncu.   Beden: 14Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 750, 'Çok İyi',
+  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Il Gufo', 'Il Gufo Elbise Turuncu - 14 yaş', 'Öne Çıkan Özellikler:   Tasarım: Etekleri volanlı.   Malzeme: Viskos .   Renk: Turuncu.   Beden: 14Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 750, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/il-gufo-turuncu-renk-14-yas-beden-elbi-02f-fd.jpg?v=1735925800']::text[],
   ARRAY[]::text[],
   'approved'
@@ -6896,7 +6896,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Giuseppe Zanotti', 'Giuseppe Zanotti Frankie Sneaker Siyah - 43', '', 9850, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Giuseppe Zanotti', 'Giuseppe Zanotti Frankie Sneaker Siyah - 43', '', 9850, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/giuseppe-zanotti-siyah-renk-43-beden-s-4cf8fb.jpg?v=1735925742']::text[],
   ARRAY[]::text[],
   'approved'
@@ -7096,7 +7096,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Tod''S', 'Tod''s Deri Sneaker Haki - 42.5', 'Ürün Bilgisi    Renk: Haki  Numara: 42.5  Editör Notları:  Bu Tod’s sneaker, markanın spor-şık DNA’sını yansıtan modern low-top bir modeldir. Süet ve deri karışımı üst yüzeyi, perforasyon detaylarıyla nefes alabilirlik sunarken; kontrast turuncu ve yeşil tonları ayakkabıya dinamik bir görünüm kazandırır. Hafif tabanı ve ergonomik yapısı sayesinde gün boyu konfor sağlayan bu Tod’s sneaker, günlük şehir stilinden hafta sonu kombinlerine kadar rahatlıkla kullanılabilecek sofistike bir seçenektir.', 9300, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Tod''S', 'Tod''s Deri Sneaker Haki - 42.5', 'Ürün Bilgisi    Renk: Haki  Numara: 42.5  Editör Notları:  Bu Tod’s sneaker, markanın spor-şık DNA’sını yansıtan modern low-top bir modeldir. Süet ve deri karışımı üst yüzeyi, perforasyon detaylarıyla nefes alabilirlik sunarken; kontrast turuncu ve yeşil tonları ayakkabıya dinamik bir görünüm kazandırır. Hafif tabanı ve ergonomik yapısı sayesinde gün boyu konfor sağlayan bu Tod’s sneaker, günlük şehir stilinden hafta sonu kombinlerine kadar rahatlıkla kullanılabilecek sofistike bir seçenektir.', 9300, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/tods-haki-turuncu-renk-425-beden-sneak-f7f2-8.jpg?v=1735925405']::text[],
   ARRAY[]::text[],
   'approved'
@@ -7176,7 +7176,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Gucci', 'Gucci GG Sneaker Lacivert - 45', '', 7100, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Gucci', 'Gucci GG Sneaker Lacivert - 45', '', 7100, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-lacivert-renk-45-beden-sneaker-0583-4.jpg?v=1735925201']::text[],
   ARRAY[]::text[],
   'approved'
@@ -7906,7 +7906,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KIZ ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Çocuk Eşofman Altı Siyah - 12 y', 'Öne Çıkan Özellikler:   Tasarım: Yazı detaylı.   Malzeme: Koton .   Renk: Siyah.   Beden: 12Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1800, 'Çok İyi',
+  'ERKEK ÇOCUK', 'Diğer', 'Diğer', 'Balmain', 'Balmain Çocuk Eşofman Altı Siyah - 12 y', 'Öne Çıkan Özellikler:   Tasarım: Yazı detaylı.   Malzeme: Koton .   Renk: Siyah.   Beden: 12Y.   Orijinallik ve Kalite Kontrolü Peony Collective''deki tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinal olarak sunulur. Güvenle alışveriş yapabilirsiniz.', 1800, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/balmain-siyah-renk-12-beden-esofman-a0bc99.jpg?v=1735923735', 'https://cdn.shopify.com/s/files/1/0572/4097/7480/files/balmain-siyah-renk-12-beden-esofman-f3625d.jpg?v=1735923735']::text[],
   ARRAY[]::text[],
   'approved'
@@ -8126,7 +8126,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Ayakkabı', 'Topuklu Ayakkabı', 'Giuseppe Zanotti', 'Giuseppe Zanotti Gail Deri Sneaker Beyaz - 43', '', 5500, 'Çok İyi',
+  'ERKEK', 'Ayakkabı', 'Topuklu Ayakkabı', 'Giuseppe Zanotti', 'Giuseppe Zanotti Gail Deri Sneaker Beyaz - 43', '', 5500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/giuseppe-zanotti-beyaz-renk-43-beden-s-b8-bbb.jpg?v=1735923247']::text[],
   ARRAY[]::text[],
   'approved'
@@ -8136,7 +8136,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Celine', 'Celine Klasik Loafer Siyah - 43', 'Ürün Bilgisi    Renk: Siyah  Numara: 43   Orijinallik ve Kalite Kontrolü Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.', 5000, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Celine', 'Celine Klasik Loafer Siyah - 43', 'Ürün Bilgisi    Renk: Siyah  Numara: 43   Orijinallik ve Kalite Kontrolü Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.', 5000, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/celine-siyah-renk-43-beden-loafer-64405f.jpg?v=1735923221']::text[],
   ARRAY[]::text[],
   'approved'
@@ -8176,7 +8176,7 @@ INSERT INTO products (
   seller_id, gender, category, subcategory, brand, model_name, description, price, condition, public_images, authenticity_docs, status
 ) VALUES (
   (SELECT id FROM auth.users LIMIT 1),
-  'KADIN', 'Diğer', 'Diğer', 'Louis Vuitton', 'Louis Vuitton Hockenheim Bileklik Kahverengi - Standart', 'Açıklama: Louis Vuitton Hockenheim erkek bilekliği, şık ve modern tasarımıyla dikkat çeker. Monogram desenli kanvas ve deri materyalin birleşimi, markanın zarif estetiğini yansıtır.     Öne Çıkan Detaylar:     Malzeme: Monogram desenli kanvas ve deri.   Süsleme: Gümüş tonlu logo detayı.   Kapanış: Pratik ve güvenli kullanım için çıtçıtlı kapanış.   Tasarım: Zamansız bir aksesuar olarak hem günlük hem özel kullanıma uygun.', 4500, 'Çok İyi',
+  'ERKEK', 'Diğer', 'Diğer', 'Louis Vuitton', 'Louis Vuitton Hockenheim Bileklik Kahverengi - Standart', 'Açıklama: Louis Vuitton Hockenheim erkek bilekliği, şık ve modern tasarımıyla dikkat çeker. Monogram desenli kanvas ve deri materyalin birleşimi, markanın zarif estetiğini yansıtır.     Öne Çıkan Detaylar:     Malzeme: Monogram desenli kanvas ve deri.   Süsleme: Gümüş tonlu logo detayı.   Kapanış: Pratik ve güvenli kullanım için çıtçıtlı kapanış.   Tasarım: Zamansız bir aksesuar olarak hem günlük hem özel kullanıma uygun.', 4500, 'Çok İyi',
   ARRAY['https://cdn.shopify.com/s/files/1/0572/4097/7480/files/louis-vuitton-bileklik-4b-439.jpg?v=1735923134']::text[],
   ARRAY[]::text[],
   'approved'

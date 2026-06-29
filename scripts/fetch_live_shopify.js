@@ -5,6 +5,36 @@ const url = 'https://peonycollective.com/products.json?limit=250';
 
 async function run() {
   try {
+    // 1. Fetch Gender Collections First
+    const erkekHandles = new Set();
+    const kizCocukHandles = new Set();
+    const erkekCocukHandles = new Set();
+
+    console.log('Fetching collections to map genders...');
+    
+    // Erkek
+    const erkekRes = await fetch('https://peonycollective.com/collections/erkek/products.json?limit=250');
+    if (erkekRes.ok) {
+      const data = await erkekRes.json();
+      data.products.forEach(p => erkekHandles.add(p.handle));
+    }
+
+    // Kız Çocuk
+    const kizRes = await fetch('https://peonycollective.com/collections/kiz-cocuk/products.json?limit=250');
+    if (kizRes.ok) {
+      const data = await kizRes.json();
+      data.products.forEach(p => kizCocukHandles.add(p.handle));
+    }
+
+    // Erkek Çocuk
+    const erkekCocukRes = await fetch('https://peonycollective.com/collections/erkek-cocuk/products.json?limit=250');
+    if (erkekCocukRes.ok) {
+      const data = await erkekCocukRes.json();
+      data.products.forEach(p => erkekCocukHandles.add(p.handle));
+    }
+
+    console.log(`Mapped ${erkekHandles.size} Erkek, ${kizCocukHandles.size} Kız Çocuk, ${erkekCocukHandles.size} Erkek Çocuk products.`);
+
     let allProducts = [];
     let page = 1;
     let hasMore = true;
@@ -21,8 +51,8 @@ async function run() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       
-      const json = await res.json();
-      const products = json.products;
+      const data = await res.json();
+      const products = data.products || [];
       
       if (products.length === 0) {
         hasMore = false;
@@ -48,14 +78,24 @@ async function run() {
       else if (productType.includes('kıyafet') || productType.includes('bluz') || productType.includes('elbise')) { category = 'Kıyafet'; subcategory = 'Elbise'; }
       else if (productType.includes('aksesuar') || productType.includes('gözlük') || productType.includes('kemer') || productType.includes('eşarp')) { category = 'Aksesuar'; subcategory = 'Aksesuar'; }
 
-      let gender = 'KADIN';
-      const titleLower = p.title.toLowerCase();
-      const tags = (p.tags || []).map(t => t.toLowerCase());
-      
-      if (titleLower.includes('erkek') || tags.includes('erkek') || tags.includes('men')) gender = 'ERKEK';
-      if (titleLower.includes('kız çocuk') || tags.includes('kız çocuk') || tags.includes('girl')) gender = 'KIZ ÇOCUK';
-      if (titleLower.includes('erkek çocuk') || tags.includes('erkek çocuk') || tags.includes('boy')) gender = 'ERKEK ÇOCUK';
-      if (titleLower.includes('çocuk') && gender === 'KADIN') gender = 'KIZ ÇOCUK';
+      let gender = 'KADIN'; // default
+      if (erkekCocukHandles.has(p.handle)) {
+        gender = 'ERKEK ÇOCUK';
+      } else if (kizCocukHandles.has(p.handle)) {
+        gender = 'KIZ ÇOCUK';
+      } else if (erkekHandles.has(p.handle)) {
+        gender = 'ERKEK';
+      } else {
+        // Fallback checks just in case it missed the collection
+        const titleLower = p.title.toLowerCase();
+        const tags = (p.tags || []).map(t => t.toLowerCase());
+        const bodyLower = (p.body_html || '').toLowerCase();
+        
+        if (titleLower.includes('erkek') || tags.some(t => t.includes('erkek')) || tags.some(t => t.includes('men')) || /\berkek\b/.test(bodyLower)) gender = 'ERKEK';
+        if (titleLower.includes('kız çocuk') || tags.some(t => t.includes('kız çocuk')) || tags.some(t => t.includes('girl')) || /\bkız çocuk\b/.test(bodyLower)) gender = 'KIZ ÇOCUK';
+        if (titleLower.includes('erkek çocuk') || tags.some(t => t.includes('erkek çocuk')) || tags.some(t => t.includes('boy')) || /\berkek çocuk\b/.test(bodyLower)) gender = 'ERKEK ÇOCUK';
+        if (titleLower.includes('çocuk') && gender === 'KADIN') gender = 'KIZ ÇOCUK';
+      }
 
       let price = 0;
       if (p.variants && p.variants.length > 0) {
