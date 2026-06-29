@@ -34,9 +34,9 @@ const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveSt
       <button 
         type="button"
         onClick={() => setActiveStep(stepNum)}
-        className="w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none cursor-pointer"
+        className="w-full px-5 py-5 md:px-8 md:py-6 flex items-center justify-between text-left focus:outline-none cursor-pointer"
       >
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
           <span className={`text-2xl font-light ${isActive ? 'text-black' : isCompleted ? 'text-[#AF9164]' : 'text-gray-300'}`}>
             {isCompleted ? <Check size={28} /> : `0${stepNum}`}
           </span>
@@ -56,7 +56,7 @@ const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveSt
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
           >
-            <div className="px-8 pb-8 pt-2 border-t border-gray-50">
+            <div className="px-5 pb-6 pt-2 md:px-8 md:pb-8 border-t border-gray-50">
               {children}
               
               {/* Sonraki Adım Butonu */}
@@ -160,6 +160,7 @@ export default function SellForm() {
   const [formDescription, setFormDescription] = useState('')
   const [formDimensions, setFormDimensions] = useState('')
   const [formPurchaseYear, setFormPurchaseYear] = useState('')
+  const [isFirstOwner, setIsFirstOwner] = useState<boolean>(false)
   const [formPrice, setFormPrice] = useState('')
   const [serialNumber, setSerialNumber] = useState('')
 
@@ -241,6 +242,7 @@ export default function SellForm() {
         if (draft.formDescription) setFormDescription(draft.formDescription)
         if (draft.formDimensions) setFormDimensions(draft.formDimensions)
         if (draft.formPurchaseYear) setFormPurchaseYear(draft.formPurchaseYear)
+        if (draft.isFirstOwner !== undefined) setIsFirstOwner(draft.isFirstOwner)
         if (draft.formPrice) setFormPrice(draft.formPrice)
         if (draft.serialNumber) setSerialNumber(draft.serialNumber)
         if (draft.odorScore) setOdorScore(draft.odorScore)
@@ -259,7 +261,7 @@ export default function SellForm() {
       selectedGender, selectedCategory, selectedSubcategory, selectedSize,
       selectedBrand, customBrand, selectedModel, customModel,
       selectedMaterial, customMaterial, formCondition, formDescription,
-      formDimensions, formPurchaseYear, formPrice, serialNumber,
+      formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
       odorScore, hasSpaTreatment, fullSetItems, isPeonyVip
     })
     setIsSavingDraft(false)
@@ -368,12 +370,12 @@ export default function SellForm() {
         size: selectedSize || undefined,
         brand: currentBrand,
         model_name: currentModel,
-        description: formDescription,
+        description: formDescription + (isFirstOwner ? '\n\nNot: Ürünün ilk sahibiyim.' : ''),
         price: parseFloat(formPrice) || 0,
         condition: formCondition,
         material: currentMaterial || undefined,
         dimensions: formDimensions || undefined,
-        purchase_year: formPurchaseYear ? parseInt(formPurchaseYear) : undefined,
+        purchase_year: formPurchaseYear && formPurchaseYear !== 'hatirlamiyorum' ? parseInt(formPurchaseYear) : undefined,
         serial_number: serialNumber || undefined,
         odor_score: odorScore ? parseInt(odorScore) : undefined,
         has_spa_treatment: hasSpaTreatment,
@@ -392,7 +394,12 @@ export default function SellForm() {
         router.push('/sell?message=Ürün başarıyla onaya gönderildi.')
       } else {
         console.error("Validation Errors:", result.validationErrors)
-        setMessage(`Hata: ${result.error}`)
+        if (result.validationErrors) {
+          const errors = Object.values(result.validationErrors).flat().join(' | ')
+          setMessage(`Eksik/Hatalı Bilgi: ${errors}`)
+        } else {
+          setMessage(`Hata: ${result.error}`)
+        }
         setIsSubmitting(false)
       }
     } catch (error: any) {
@@ -602,8 +609,27 @@ export default function SellForm() {
               </div>
               <div>
                 <label className={labelClasses}>Satın Alındığı Yıl</label>
-                <input type="number" className={inputClasses} value={formPurchaseYear} onChange={(e) => setFormPurchaseYear(e.target.value)} placeholder="Örn: 2022" />
+                <select className={inputClasses} value={formPurchaseYear} onChange={(e) => setFormPurchaseYear(e.target.value)}>
+                  <option value="" disabled>Seçiniz</option>
+                  <option value="hatirlamiyorum">Hatırlamıyorum</option>
+                  {Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                    <option key={year} value={year.toString()}>{year}</option>
+                  ))}
+                </select>
               </div>
+            </div>
+
+            <div className="pt-8">
+              <label className="flex items-start gap-4 cursor-pointer group">
+                <input type="checkbox" className="hidden" checked={isFirstOwner} onChange={(e) => setIsFirstOwner(e.target.checked)} />
+                <div className={`w-6 h-6 shrink-0 rounded border flex items-center justify-center transition-colors mt-0.5 ${isFirstOwner ? 'bg-black border-black text-white' : 'border-gray-300 group-hover:border-black text-transparent'}`}>
+                  <Check size={14} strokeWidth={3} />
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-900 block">Ürünün ilk sahibiyim</span>
+                  <span className="text-xs text-gray-500">Ürünü mağazadan sıfır olarak kendim satın aldım.</span>
+                </div>
+              </label>
             </div>
 
           </div>
@@ -677,7 +703,10 @@ export default function SellForm() {
                   </div>
                   
                   {cat.key === 'serial' && (
-                    <input className={`${inputClasses} mb-4 px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." required />
+                    <div className="mb-4">
+                      <input className={`${inputClasses} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." required />
+                      <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız 'none' yazabilirsiniz.</p>
+                    </div>
                   )}
 
                   <label className="flex items-center justify-center gap-2 border border-gray-200 hover:border-black text-gray-500 hover:text-black py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-colors">

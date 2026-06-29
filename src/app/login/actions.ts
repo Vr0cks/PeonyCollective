@@ -93,8 +93,8 @@ export async function signup(formData: FormData) {
   }
 }
 
-// ─── Sosyal Giriş (Google / Facebook) ───
-export async function signInWithProvider(provider: 'google' | 'facebook') {
+// ─── Sosyal Giriş (Google / Apple) ───
+export async function signInWithProvider(provider: 'google' | 'apple') {
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -105,10 +105,11 @@ export async function signInWithProvider(provider: 'google' | 'facebook') {
   })
 
   if (error) {
-    throw new Error('Sosyal giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.')
+    return { error: 'Sosyal giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.' }
   }
 
   if (data.url) {
-    redirect(data.url)
+    return { url: data.url }
   }
+  return { error: 'Yönlendirme adresi alınamadı.' }
 }

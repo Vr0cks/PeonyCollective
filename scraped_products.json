@@ -1,0 +1,2537 @@
+{
+  "products": [
+    {
+      "id": 7073263583304,
+      "title": "Salvatore Ferragamo Sneaker - 40.5",
+      "handle": "salvatore-ferragamo-sneaker-40-5",
+      "body_html": "",
+      "published_at": "2026-06-26T10:49:59+03:00",
+      "created_at": "2026-06-26T10:49:58+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Salvatore Ferragamo",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41171186516040,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2251.72.262.7008",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "5000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7073263583304,
+          "created_at": "2026-06-26T10:49:58+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32782774173768,
+          "created_at": "2026-06-26T10:48:42+03:00",
+          "position": 1,
+          "updated_at": "2026-06-26T10:50:09+03:00",
+          "product_id": 7073263583304,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ferragamo-1_733797ae-43bb-4f7b-87bb-75780f61c7d6.jpg?v=1782460209",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32782774206536,
+          "created_at": "2026-06-26T10:48:42+03:00",
+          "position": 2,
+          "updated_at": "2026-06-26T10:49:56+03:00",
+          "product_id": 7073263583304,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ferragamo-2_a9a5c45c-2fb8-4182-a34f-3d4bb0a4bb5a.jpg?v=1782460196",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32782774239304,
+          "created_at": "2026-06-26T10:48:42+03:00",
+          "position": 3,
+          "updated_at": "2026-06-26T10:50:09+03:00",
+          "product_id": 7073263583304,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ferragamo-3_9499898a-db0a-4849-8514-f0e761729dd6.jpg?v=1782460209",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32782774272072,
+          "created_at": "2026-06-26T10:48:42+03:00",
+          "position": 4,
+          "updated_at": "2026-06-26T10:50:09+03:00",
+          "product_id": 7073263583304,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ferragamo-4.jpg?v=1782460209",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7069960077384,
+      "title": "Sergio Rossi Topuklu Ayakkabı 39.5",
+      "handle": "sergio-rossi-topuklu-ayakkabi-39-5",
+      "body_html": "",
+      "published_at": "2026-06-16T14:17:22+03:00",
+      "created_at": "2026-06-16T14:17:21+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Sergio Rossi",
+      "product_type": "Topuklu Ayakkabı",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41161650864200,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2258.91.339.6095",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "3000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7069960077384,
+          "created_at": "2026-06-16T14:17:21+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32762082033736,
+          "created_at": "2026-06-16T14:16:58+03:00",
+          "position": 1,
+          "updated_at": "2026-06-16T14:20:08+03:00",
+          "product_id": 7069960077384,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/rossi-1_231b583d-4a2d-4377-8ca5-6aae5e0946c7.jpg?v=1781608808",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32762082066504,
+          "created_at": "2026-06-16T14:16:58+03:00",
+          "position": 2,
+          "updated_at": "2026-06-16T14:20:46+03:00",
+          "product_id": 7069960077384,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/rossi-2_412221a9-e288-41c6-a418-e08948729c5f.jpg?v=1781608846",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32762082099272,
+          "created_at": "2026-06-16T14:16:58+03:00",
+          "position": 3,
+          "updated_at": "2026-06-16T14:20:47+03:00",
+          "product_id": 7069960077384,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/rossi-3_ac1f2464-fd89-4224-bdd3-f6e25b36608c.jpg?v=1781608847",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7069675454536,
+      "title": "Bottega Veneta Andiamo Süet Small",
+      "handle": "bottega-veneta-andiamo-suet-small",
+      "body_html": "<p><strong>Ürün Bilgisi </strong></p>\n<ul>\n<li>\n<strong>Materyal: </strong>Süet<strong></strong>\n</li>\n<li>\n<strong>Boyut: </strong>Small</li>\n<li>\n<strong>Renk:</strong> Yeşil</li>\n<li>\n<strong>Editör Notları: </strong>\n<p><meta charset=\"utf-8\">Bottega Veneta Andiamo, markanın ikonik intrecciato örgü işçiliğini modern çizgilerle buluşturan zamansız bir tasarımdır. Süet deri dokusu ve altın tonlu düğüm detayıyla öne çıkan bu model, elde veya omuzda taşınabilen kullanışlı yapısıyla günlük kullanımdan özel davetlere kadar geniş bir kullanım alanı sunar. Haki tonunun doğal ve sofistike görünümü, çantaya dikkat çekici fakat abartısız bir duruş kazandırır.<br><br></p>\n</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><strong></strong></p>\n<p><meta charset=\"utf-8\"><span>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</span></p>",
+      "published_at": "2026-06-15T14:46:19+03:00",
+      "created_at": "2026-06-15T14:46:17+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Bottega Veneta",
+      "product_type": "Çanta",
+      "tags": [
+        "Yeni"
+      ],
+      "variants": [
+        {
+          "id": 41161052094536,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2047.20.339.7007",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "163000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7069675454536,
+          "created_at": "2026-06-15T14:46:17+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32760674287688,
+          "created_at": "2026-06-15T14:39:28+03:00",
+          "position": 1,
+          "updated_at": "2026-06-15T14:43:00+03:00",
+          "product_id": 7069675454536,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/andiamo1.png?v=1781523780",
+          "width": 1023,
+          "height": 1537
+        },
+        {
+          "id": 32760674320456,
+          "created_at": "2026-06-15T14:39:28+03:00",
+          "position": 2,
+          "updated_at": "2026-06-15T14:39:32+03:00",
+          "product_id": 7069675454536,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/andiamo2.png?v=1781523572",
+          "width": 1023,
+          "height": 1537
+        },
+        {
+          "id": 32760674353224,
+          "created_at": "2026-06-15T14:39:28+03:00",
+          "position": 3,
+          "updated_at": "2026-06-15T14:39:35+03:00",
+          "product_id": 7069675454536,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/andiamo4.png?v=1781523575",
+          "width": 1023,
+          "height": 1537
+        },
+        {
+          "id": 32760674385992,
+          "created_at": "2026-06-15T14:39:28+03:00",
+          "position": 4,
+          "updated_at": "2026-06-15T14:39:37+03:00",
+          "product_id": 7069675454536,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/andiamo3.png?v=1781523577",
+          "width": 1023,
+          "height": 1537
+        },
+        {
+          "id": 32760674418760,
+          "created_at": "2026-06-15T14:39:28+03:00",
+          "position": 5,
+          "updated_at": "2026-06-15T14:39:32+03:00",
+          "product_id": 7069675454536,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/IMG_4094.jpg?v=1781523572",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7021574225992,
+      "title": "Casadei Topuklu Ayakkabı Kırmızı - 39",
+      "handle": "casadei-topuklu-ayakkabi-kirmizi-39",
+      "body_html": "<p><strong>Ürün Bilgisi </strong></p>\n<ul>\n<li>\n<strong>Renk: </strong>Kırmızı </li>\n<li>\n<strong>Numara: </strong>39</li>\n<li>\n<strong>Kusur Açıklaması: </strong>Sol çiftinin üstünde bir dikiş hatası mevcut.</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong></p>\n<p><meta charset=\"utf-8\"><span>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</span></p>",
+      "published_at": "2026-06-15T11:26:56+03:00",
+      "created_at": "2026-01-07T10:52:58+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Casadei",
+      "product_type": "Topuklu Ayakkabı",
+      "tags": [],
+      "variants": [
+        {
+          "id": 40991083069512,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2058.79.369.6838",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "5000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7021574225992,
+          "created_at": "2026-01-07T10:52:58+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32760512020552,
+          "created_at": "2026-06-15T11:26:16+03:00",
+          "position": 1,
+          "updated_at": "2026-06-15T11:26:17+03:00",
+          "product_id": 7021574225992,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/casadei-1.jpg?v=1781511977",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32760512053320,
+          "created_at": "2026-06-15T11:26:16+03:00",
+          "position": 2,
+          "updated_at": "2026-06-15T11:26:18+03:00",
+          "product_id": 7021574225992,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/casadei-2.jpg?v=1781511978",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32760512086088,
+          "created_at": "2026-06-15T11:26:16+03:00",
+          "position": 3,
+          "updated_at": "2026-06-15T11:26:17+03:00",
+          "product_id": 7021574225992,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/casadei-3.jpg?v=1781511977",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32760512118856,
+          "created_at": "2026-06-15T11:26:16+03:00",
+          "position": 4,
+          "updated_at": "2026-06-15T11:26:17+03:00",
+          "product_id": 7021574225992,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/casadei-4.jpg?v=1781511977",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6934925836360,
+      "title": "Alice + Olivia Bluz Mavi - Xs",
+      "handle": "alice-olivia-bluz-mavi-xs",
+      "body_html": "<p><strong>Açıklama</strong><br>Kayık yaka, dantel detaylı Alice + Olivia bluz, zamansız bir şıklık ve farklı bir görünüm sağlar.</p>\n<p> </p>\n<p><strong>Öne Çıkan Özellikler</strong></p>\n<ul>\n<li>\n<strong>Tasarım:</strong> Dantel detaylı.</li>\n<li>\n<strong>Malzeme:</strong> Polyester.</li>\n<li>\n<strong>Renk:</strong> Mavi.</li>\n<li>\n<strong>Beden:</strong> Xs. </li>\n<li>\n<strong style=\"font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;\">Ölçü: </strong><span style=\"font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;\">En:42 cm Koldan Boy: 55 cm</span>\n</li>\n</ul>\n<p> </p>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><br>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</p>",
+      "published_at": "2026-06-10T15:47:55+03:00",
+      "created_at": "2025-01-03T19:51:03+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Alice And Olivia",
+      "product_type": "Bluz",
+      "tags": [],
+      "variants": [
+        {
+          "id": 40504053366856,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2362.15.447.6266",
+          "requires_shipping": true,
+          "taxable": true,
+          "featured_image": null,
+          "available": true,
+          "price": "2000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 6934925836360,
+          "created_at": "2025-01-03T19:51:03+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 31801787809864,
+          "created_at": "2025-07-28T16:37:49+03:00",
+          "position": 1,
+          "updated_at": "2025-07-28T16:37:51+03:00",
+          "product_id": 6934925836360,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/alice-olivia-bluz-on.jpg?v=1753709871",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 31801787842632,
+          "created_at": "2025-07-28T16:37:49+03:00",
+          "position": 2,
+          "updated_at": "2025-07-28T16:37:51+03:00",
+          "product_id": 6934925836360,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/alice-olivia-bluz-yan.jpg?v=1753709871",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7067176403016,
+      "title": "Hermes Steve Light Junior Çanta",
+      "handle": "hermes-steve-light-junior-canta",
+      "body_html": "<p><strong>Ürün Bilgisi </strong></p>\n<ul>\n<li>\n<strong>Editör Notları: </strong>\n<p>Hermès Sac Steve Junior, markanın işlevselliği zarafetle buluşturan ikonik evrak ve omuz çantalarından biridir. Yumuşak ve dayanıklı deri yapısı, geniş iç hacmi ve sade tasarımıyla günlük kullanım, iş hayatı ve seyahatlerde konforlu bir kullanım sunar. Ayarlanabilir omuz askısı sayesinde çapraz veya omuzda taşınabilen model, Hermès’in kusursuz deri işçiliğini ve zamansız stil anlayışını yansıtır. Minimal görünümü, kaliteli materyalleri ve fonksiyonel yapısıyla uzun yıllar keyifle kullanılabilecek seçkin bir parçadır.</p>\n</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><strong></strong></p>\n<p><meta charset=\"utf-8\"><span>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</span></p>",
+      "published_at": "2026-06-08T15:22:49+03:00",
+      "created_at": "2026-06-08T10:16:29+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Hermes",
+      "product_type": "",
+      "tags": [
+        "Yeni"
+      ],
+      "variants": [
+        {
+          "id": 41152966328392,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2127.20.496.7006",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "217000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7067176403016,
+          "created_at": "2026-06-08T10:16:29+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32742882508872,
+          "created_at": "2026-06-08T10:12:07+03:00",
+          "position": 1,
+          "updated_at": "2026-06-08T10:12:09+03:00",
+          "product_id": 7067176403016,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hermes-4_9f33985c-a7ad-4195-9e25-1ac2576bf277.jpg?v=1780902729",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32742882541640,
+          "created_at": "2026-06-08T10:12:07+03:00",
+          "position": 2,
+          "updated_at": "2026-06-08T10:12:09+03:00",
+          "product_id": 7067176403016,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hermes-5_df82a525-1dc8-4322-ad92-66a745dafc74.jpg?v=1780902729",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32742882574408,
+          "created_at": "2026-06-08T10:12:07+03:00",
+          "position": 3,
+          "updated_at": "2026-06-08T10:12:09+03:00",
+          "product_id": 7067176403016,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hermes-6_bd9aaae1-3369-4c36-920c-f83920680749.jpg?v=1780902729",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32742882607176,
+          "created_at": "2026-06-08T10:12:07+03:00",
+          "position": 4,
+          "updated_at": "2026-06-08T10:12:09+03:00",
+          "product_id": 7067176403016,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hermes2.jpg?v=1780902729",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32742882639944,
+          "created_at": "2026-06-08T10:12:07+03:00",
+          "position": 5,
+          "updated_at": "2026-06-08T10:12:09+03:00",
+          "product_id": 7067176403016,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hermes-3_711c37e4-b86d-438b-b6df-4eeadfa34d91.jpg?v=1780902729",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32742882672712,
+          "created_at": "2026-06-08T10:12:07+03:00",
+          "position": 6,
+          "updated_at": "2026-06-08T10:12:09+03:00",
+          "product_id": 7067176403016,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hermes-7.jpg?v=1780902729",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7067175518280,
+      "title": "Christian Dior Oblique Lock Çanta",
+      "handle": "christian-dior-oblique-lock-canta",
+      "body_html": "<p><strong>Ürün Bilgisi </strong></p>\n<ul>\n<li>\n<strong>Ölçü: </strong>12 x 8 x 3 cm<strong></strong>\n</li>\n<li>\n<strong>Renk:</strong> Lacivert</li>\n<li>\n<strong>Editör Notları: </strong>\n<p><meta charset=\"utf-8\">Bu Dior çanta, markanın ikonik Oblique jacquard desenini siyah deri detaylarla bir araya getiren kompakt ve zarif bir tasarıma sahiptir. Ön yüzündeki metal kilit detayı modern bir görünüm sunarken, ayarlanabilir askısı sayesinde omuzda veya çapraz kullanılabilir. Günlük kullanım için ideal boyuta sahip olan bu model, telefon, kartlık ve küçük kişisel eşyaları rahatlıkla taşırken kombinlere sofistike bir dokunuş katar. Lacivert ve bej tonlarındaki Dior Oblique deseni sayesinde zamansız ve kolay kombinlenebilen bir parçadır.</p>\n</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><strong></strong></p>\n<p><meta charset=\"utf-8\"><span>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</span></p>",
+      "published_at": "2026-06-08T09:33:08+03:00",
+      "created_at": "2026-06-08T09:33:07+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Christian Dior",
+      "product_type": "Çanta",
+      "tags": [
+        "Yeni"
+      ],
+      "variants": [
+        {
+          "id": 41152964067400,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2068.20.496.7005",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "35000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7067175518280,
+          "created_at": "2026-06-08T09:33:07+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32742870548552,
+          "created_at": "2026-06-08T09:38:11+03:00",
+          "position": 1,
+          "updated_at": "2026-06-08T09:38:13+03:00",
+          "product_id": 7067175518280,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/dior4_6e01c5d6-c9ee-461d-a1a0-8d6079d799e8.jpg?v=1780900693",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32742868254792,
+          "created_at": "2026-06-08T09:24:25+03:00",
+          "position": 2,
+          "updated_at": "2026-06-08T09:24:27+03:00",
+          "product_id": 7067175518280,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/dior2_9b1331ab-d6b1-42aa-95a5-89d61f118a9d.jpg?v=1780899867",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32742868648008,
+          "created_at": "2026-06-08T09:25:32+03:00",
+          "position": 3,
+          "updated_at": "2026-06-08T09:25:34+03:00",
+          "product_id": 7067175518280,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/dior3_b92b1ad1-72fe-4a41-8e27-fa39c4fc7d21.jpg?v=1780899934",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7065113395272,
+      "title": "Proenza Schouler Clutch",
+      "handle": "proenza-schouler-clutch",
+      "body_html": "",
+      "published_at": "2026-06-03T16:05:14+03:00",
+      "created_at": "2026-06-03T16:05:13+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Proenza Schouler",
+      "product_type": "Clutch",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41146401587272,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": null,
+          "requires_shipping": true,
+          "taxable": true,
+          "featured_image": null,
+          "available": true,
+          "price": "3000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7065113395272,
+          "created_at": "2026-06-03T16:05:13+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32725688123464,
+          "created_at": "2026-06-03T16:04:50+03:00",
+          "position": 1,
+          "updated_at": "2026-06-03T16:04:52+03:00",
+          "product_id": 7065113395272,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ChatGPTImage3Haz202616_04_42.png?v=1780491892",
+          "width": 1023,
+          "height": 1537
+        },
+        {
+          "id": 32725688582216,
+          "created_at": "2026-06-03T16:07:34+03:00",
+          "position": 2,
+          "updated_at": "2026-06-03T16:07:36+03:00",
+          "product_id": 7065113395272,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ChatGPT_Image_3_Haz_2026_16_07_24.png?v=1780492056",
+          "width": 1023,
+          "height": 1537
+        },
+        {
+          "id": 32725688352840,
+          "created_at": "2026-06-03T16:05:55+03:00",
+          "position": 3,
+          "updated_at": "2026-06-03T16:05:57+03:00",
+          "product_id": 7065113395272,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/ChatGPT_Image_3_Haz_2026_16_05_46.png?v=1780491957",
+          "width": 1023,
+          "height": 1537
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7060669923400,
+      "title": "Bvlgari Güneş Gözlüğü",
+      "handle": "bvlgari-gunes-gozlugu",
+      "body_html": "",
+      "published_at": "2026-05-22T12:12:43+03:00",
+      "created_at": "2026-05-22T12:12:41+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Bvlgari",
+      "product_type": "Gözlük",
+      "tags": [
+        "Yeni"
+      ],
+      "variants": [
+        {
+          "id": 41121504690248,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2053.41.337.7004",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "8000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7060669923400,
+          "created_at": "2026-05-22T12:12:41+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32687264235592,
+          "created_at": "2026-05-22T12:10:34+03:00",
+          "position": 1,
+          "updated_at": "2026-05-22T12:10:36+03:00",
+          "product_id": 7060669923400,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bvlgari-3.jpg?v=1779441036",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32687264268360,
+          "created_at": "2026-05-22T12:10:34+03:00",
+          "position": 2,
+          "updated_at": "2026-05-22T12:10:36+03:00",
+          "product_id": 7060669923400,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bvlgari-2.jpg?v=1779441036",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32687264301128,
+          "created_at": "2026-05-22T12:10:34+03:00",
+          "position": 3,
+          "updated_at": "2026-05-22T12:10:36+03:00",
+          "product_id": 7060669923400,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bvlgari-1.jpg?v=1779441036",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32687264333896,
+          "created_at": "2026-05-22T12:10:34+03:00",
+          "position": 4,
+          "updated_at": "2026-05-22T12:10:37+03:00",
+          "product_id": 7060669923400,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bvlgari-4.jpg?v=1779441037",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32687264366664,
+          "created_at": "2026-05-22T12:10:34+03:00",
+          "position": 5,
+          "updated_at": "2026-05-22T12:10:36+03:00",
+          "product_id": 7060669923400,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/bvlgari-5.jpg?v=1779441036",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059351896136,
+      "title": "Gucci Topuklu Ayakkabı - 38",
+      "handle": "gucci-topuklu-ayakkabi-38",
+      "body_html": "",
+      "published_at": "2026-05-20T16:30:02+03:00",
+      "created_at": "2026-05-20T16:30:00+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Gucci",
+      "product_type": "Topuklu Ayakkabı",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119317753928,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2120.91.320.7003",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "6000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059351896136,
+          "created_at": "2026-05-20T16:30:00+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32681029763144,
+          "created_at": "2026-05-20T16:28:06+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T16:28:08+03:00",
+          "product_id": 7059351896136,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-ayakkabi-1.jpg?v=1779283688",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32681029795912,
+          "created_at": "2026-05-20T16:28:06+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T16:28:08+03:00",
+          "product_id": 7059351896136,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-ayakkabi-2.jpg?v=1779283688",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32681029828680,
+          "created_at": "2026-05-20T16:28:06+03:00",
+          "position": 3,
+          "updated_at": "2026-05-20T16:28:08+03:00",
+          "product_id": 7059351896136,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-ayakkabi-3.jpg?v=1779283688",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059344326728,
+      "title": "Gucci Güneş Gözlüğü",
+      "handle": "gucci-gunes-gozlugu",
+      "body_html": "",
+      "published_at": "2026-05-20T16:25:11+03:00",
+      "created_at": "2026-05-20T16:25:09+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Gucci",
+      "product_type": "Gözlük",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119306711112,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2120.41.320.7002",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "10000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059344326728,
+          "created_at": "2026-05-20T16:25:09+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32681002336328,
+          "created_at": "2026-05-20T16:24:16+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T16:24:19+03:00",
+          "product_id": 7059344326728,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gozluk-1.jpg?v=1779283459",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32681002369096,
+          "created_at": "2026-05-20T16:24:16+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T16:24:18+03:00",
+          "product_id": 7059344326728,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gozluk-4.jpg?v=1779283458",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32681002401864,
+          "created_at": "2026-05-20T16:24:16+03:00",
+          "position": 3,
+          "updated_at": "2026-05-20T16:24:18+03:00",
+          "product_id": 7059344326728,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gozluk-3.jpg?v=1779283458",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32681002434632,
+          "created_at": "2026-05-20T16:24:16+03:00",
+          "position": 4,
+          "updated_at": "2026-05-20T16:24:18+03:00",
+          "product_id": 7059344326728,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gozluk-2.jpg?v=1779283458",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32681002467400,
+          "created_at": "2026-05-20T16:24:16+03:00",
+          "position": 5,
+          "updated_at": "2026-05-20T16:24:18+03:00",
+          "product_id": 7059344326728,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gozluk-5.jpg?v=1779283458",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059329908808,
+      "title": "Gucci Bluz - S",
+      "handle": "gucci-bluz-s-1",
+      "body_html": "<p><strong>Öne Çıkan Özellikler</strong></p>\n<ul>\n<li>\n<strong>Malzeme:</strong> %100 Koton.</li>\n<li>\n<strong>Renk:</strong> Kahverengi.</li>\n<li>\n<strong>Beden:</strong> S.</li>\n<li>\n<strong>Boy:</strong>60 cm<strong> </strong>\n</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><br>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</p>",
+      "published_at": "2026-05-20T16:14:14+03:00",
+      "created_at": "2026-05-20T16:14:12+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Gucci",
+      "product_type": "Bluz",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119292031048,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2120.15.320.6997",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "3000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059329908808,
+          "created_at": "2026-05-20T16:14:12+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32680946663496,
+          "created_at": "2026-05-20T16:12:31+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T16:15:48+03:00",
+          "product_id": 7059329908808,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-3_63808d14-4bc8-4a26-aab6-e67361bc0c1b.jpg?v=1779282948",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680946696264,
+          "created_at": "2026-05-20T16:12:31+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T16:16:00+03:00",
+          "product_id": 7059329908808,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-1_2ef6a0ce-8b38-4f6f-9712-33a38d017744.jpg?v=1779282960",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680946729032,
+          "created_at": "2026-05-20T16:12:31+03:00",
+          "position": 3,
+          "updated_at": "2026-05-20T16:15:48+03:00",
+          "product_id": 7059329908808,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/gucci-2_5627c82a-1f2a-44d9-9ea5-32fd3c214d32.jpg?v=1779282948",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059311329352,
+      "title": "Isabel Marant Bluz - 40",
+      "handle": "isabel-marant-bluz-40",
+      "body_html": "<p><strong>Öne Çıkan Özellikler</strong></p>\n<ul>\n<li>\n<strong>Malzeme:</strong> %100 Koton.</li>\n<li>\n<strong>Beden:</strong> 40.</li>\n<li>\n<strong>Boy:</strong>70 cm<strong> </strong>\n</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><br>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</p>",
+      "published_at": "2026-05-20T15:52:04+03:00",
+      "created_at": "2026-05-20T15:52:03+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Isabel Marant",
+      "product_type": "Bluz",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119259623496,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2134.15.320.6996",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "2000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059311329352,
+          "created_at": "2026-05-20T15:52:03+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32680853831752,
+          "created_at": "2026-05-20T15:49:11+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T15:51:45+03:00",
+          "product_id": 7059311329352,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/isabel-marant-1.jpg?v=1779281505",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680853864520,
+          "created_at": "2026-05-20T15:49:11+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T15:51:45+03:00",
+          "product_id": 7059311329352,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/isabel-marant-2.jpg?v=1779281505",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059310149704,
+      "title": "Carmen Marc Valvo Elbise - S",
+      "handle": "carmen-marc-valvo-elbise-s",
+      "body_html": "",
+      "published_at": "2026-05-20T15:36:24+03:00",
+      "created_at": "2026-05-20T15:36:23+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Carmen Marc Valvo",
+      "product_type": "Elbise",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119246975048,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2433.25.320.7001",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "10000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059310149704,
+          "created_at": "2026-05-20T15:36:23+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32680842035272,
+          "created_at": "2026-05-20T15:33:56+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T15:38:27+03:00",
+          "product_id": 7059310149704,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/carmen-1.jpg?v=1779280707",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680842068040,
+          "created_at": "2026-05-20T15:33:56+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T15:38:27+03:00",
+          "product_id": 7059310149704,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/carmen-2.jpg?v=1779280707",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680842100808,
+          "created_at": "2026-05-20T15:33:56+03:00",
+          "position": 3,
+          "updated_at": "2026-05-20T15:38:30+03:00",
+          "product_id": 7059310149704,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/carmen-3.jpg?v=1779280710",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680842133576,
+          "created_at": "2026-05-20T15:33:56+03:00",
+          "position": 4,
+          "updated_at": "2026-05-20T15:38:27+03:00",
+          "product_id": 7059310149704,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/carmen-4.jpg?v=1779280707",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059307823176,
+      "title": "Burberry Elbise - 42",
+      "handle": "burberry-elbise-42",
+      "body_html": "",
+      "published_at": "2026-05-20T15:23:17+03:00",
+      "created_at": "2026-05-20T15:23:15+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Burberry",
+      "product_type": "Elbise",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119238258760,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2052.25.320.7000",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "6000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059307823176,
+          "created_at": "2026-05-20T15:23:15+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32680833908808,
+          "created_at": "2026-05-20T15:21:55+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T15:21:57+03:00",
+          "product_id": 7059307823176,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-1_61091938-50eb-4b96-84e5-5d18d625e716.jpg?v=1779279717",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680833941576,
+          "created_at": "2026-05-20T15:21:55+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T15:21:57+03:00",
+          "product_id": 7059307823176,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-2_4406c453-0b4b-48fd-b3e0-3239dc8fe2e5.jpg?v=1779279717",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680833974344,
+          "created_at": "2026-05-20T15:21:55+03:00",
+          "position": 3,
+          "updated_at": "2026-05-20T15:21:57+03:00",
+          "product_id": 7059307823176,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-3_aaad9171-7d41-4bfd-928d-e1159168363f.jpg?v=1779279717",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680834007112,
+          "created_at": "2026-05-20T15:21:55+03:00",
+          "position": 4,
+          "updated_at": "2026-05-20T15:21:57+03:00",
+          "product_id": 7059307823176,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-4_8a9266be-8460-4b0c-9a90-87e8c8b37b26.jpg?v=1779279717",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059304939592,
+      "title": "Escada Etek Lacivert - 42",
+      "handle": "escada-etek-lacivert-42",
+      "body_html": "<p><strong>Öne Çıkan Özellikler</strong></p>\n<ul>\n<li>\n<strong>Malzeme:</strong> %100 Koton.</li>\n<li>\n<strong>Renk:</strong> Lacivert.</li>\n<li>\n<strong>Beden:</strong> 42.</li>\n<li>\n<strong>Ölçü:</strong>Bel:40 cm Boy:68 cm</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><br>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</p>",
+      "published_at": "2026-05-20T15:08:10+03:00",
+      "created_at": "2026-05-20T15:08:08+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Escada",
+      "product_type": "Etek",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119230132296,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2097.36.320.6998",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "4000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059304939592,
+          "created_at": "2026-05-20T15:08:08+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32680832237640,
+          "created_at": "2026-05-20T15:04:37+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T15:04:39+03:00",
+          "product_id": 7059304939592,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/escada-1_3d64959a-8ac5-4266-b94a-f855a74fcd39.jpg?v=1779278679",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680832270408,
+          "created_at": "2026-05-20T15:04:37+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T15:04:39+03:00",
+          "product_id": 7059304939592,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/escada-2_484284ba-4a26-4351-bc6b-682e52b10648.jpg?v=1779278679",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680832303176,
+          "created_at": "2026-05-20T15:04:37+03:00",
+          "position": 3,
+          "updated_at": "2026-05-20T15:04:39+03:00",
+          "product_id": 7059304939592,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/escada-3_c9c8f8b3-41ac-4fc8-b9dc-dfccf4118fa5.jpg?v=1779278679",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7059291701320,
+      "title": "Philosophy Di Lorenzo Serafini Bluz - M",
+      "handle": "philosophy-di-lorenzo-serafini-bluz-m",
+      "body_html": "",
+      "published_at": "2026-05-20T14:52:51+03:00",
+      "created_at": "2026-05-20T14:52:49+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Philosophy Di Lorenzo Serafini",
+      "product_type": "Bluz",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41119211585608,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2432.15.320.6999",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "3500.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7059291701320,
+          "created_at": "2026-05-20T14:52:49+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32680805072968,
+          "created_at": "2026-05-20T14:44:30+03:00",
+          "position": 1,
+          "updated_at": "2026-05-20T14:44:32+03:00",
+          "product_id": 7059291701320,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/philosophy-1.jpg?v=1779277472",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680805105736,
+          "created_at": "2026-05-20T14:44:30+03:00",
+          "position": 2,
+          "updated_at": "2026-05-20T14:44:32+03:00",
+          "product_id": 7059291701320,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/philosophy-2.jpg?v=1779277472",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680805138504,
+          "created_at": "2026-05-20T14:44:30+03:00",
+          "position": 3,
+          "updated_at": "2026-05-20T14:44:32+03:00",
+          "product_id": 7059291701320,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/philosophy-3.jpg?v=1779277472",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32680805171272,
+          "created_at": "2026-05-20T14:44:30+03:00",
+          "position": 4,
+          "updated_at": "2026-05-20T14:44:32+03:00",
+          "product_id": 7059291701320,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/philosophy-4.jpg?v=1779277472",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051803918408,
+      "title": "Maje Elbise - 1",
+      "handle": "maje-elbise-1",
+      "body_html": "<div class=\"flex max-w-full flex-col gap-4 grow\">\n<div class=\"min-h-8 text-message relative flex w-full flex-col items-end gap-2 text-start break-words whitespace-normal outline-none keyboard-focused:focus-ring [.text-message+&amp;]:mt-1\" data-message-model-slug=\"gpt-5-5\" dir=\"auto\" data-turn-start-message=\"true\" data-message-id=\"f2bb83b6-95a0-44ac-bbd5-2aa6b8b625da\" data-message-author-role=\"assistant\" tabindex=\"0\"><br></div>\n</div>\n<div class=\"z-0 flex min-h-[46px] justify-start\">\n<meta charset=\"utf-8\">\n<p><strong>Ürün Bilgisi </strong></p>\n<ul>\n<li>\n<strong>Renk: </strong>Siyah<strong></strong>\n</li>\n<li>\n<strong>Beden: </strong>1</li>\n<li>\n<strong>Ürün İçeriği: </strong>Dış Kumaş %100 Polyester - İç Kumaş %100 Viskos - Kurdele %100 Poliamid<strong></strong>\n</li>\n<li>\n<strong>Ölçü: </strong>Boy 85 cm En 43 cm</li>\n<li><strong>Editör Notları: </strong></li>\n<li>Bu <span class=\"hover:entity-accent entity-underline inline cursor-pointer align-baseline\" style=\"font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;\"><span class=\"whitespace-normal\">Maje</span></span><span style=\"font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 0.875rem;\"> elbise, markanın feminen ve modern Paris stilini yansıtan zarif bir tasarımdır. Hafif transparan görünümlü dokulu kumaşı elbiseye sofistike bir hareket kazandırırken, akışkan yapısı sayesinde vücutta zarif bir duruş sağlar. Hakim yaka detayı ve metal görünümlü düğmeleri klasik bir şıklık sunarken, bel kısmındaki hafif oturan kesim ve dökümlü etek formu feminen silueti ön plana çıkarır. Transparan kol ve üst panel detayları tasarıma modern bir dokunuş katarken, gündüzden akşam davetlerine uzanan çok yönlü bir kullanım sunar. Zarif ve romantik stil çizgisini bir araya getiren zamansız bir parçadır.</span>\n</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><strong></strong></p>\n<p><meta charset=\"utf-8\"><span>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</span></p>\n</div>",
+      "published_at": "2026-05-11T10:55:25+03:00",
+      "created_at": "2026-05-11T10:55:23+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Maje",
+      "product_type": "Elbise",
+      "tags": [
+        "Yeni"
+      ],
+      "variants": [
+        {
+          "id": 41104101277768,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2172.25.506.6991",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "5750.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7051803918408,
+          "created_at": "2026-05-11T10:55:23+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641612251208,
+          "created_at": "2026-05-11T10:54:28+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T10:54:30+03:00",
+          "product_id": 7051803918408,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/maje-elbise-1.jpg?v=1778486070",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32641612283976,
+          "created_at": "2026-05-11T10:54:28+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T10:54:30+03:00",
+          "product_id": 7051803918408,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/maje-elbise-2.jpg?v=1778486070",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32641612316744,
+          "created_at": "2026-05-11T10:54:28+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T10:54:30+03:00",
+          "product_id": 7051803918408,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/maje-elbise-3.jpg?v=1778486070",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32641612349512,
+          "created_at": "2026-05-11T10:54:28+03:00",
+          "position": 4,
+          "updated_at": "2026-05-11T10:54:30+03:00",
+          "product_id": 7051803918408,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/IMG_3415.jpg?v=1778486070",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051801722952,
+      "title": "Escada Krem Çanta",
+      "handle": "escada-krem-canta",
+      "body_html": "",
+      "published_at": "2026-05-11T10:20:53+03:00",
+      "created_at": "2026-05-11T10:20:52+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Escada",
+      "product_type": "Çanta",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41104097837128,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2097.20.262.6990",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "8000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7051801722952,
+          "created_at": "2026-05-11T10:20:52+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641595768904,
+          "created_at": "2026-05-11T10:18:58+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T10:19:47+03:00",
+          "product_id": 7051801722952,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_071601_12bd1b80-8de6-4747-adc6-1068c961a2d2.png?v=1778483987",
+          "width": 639,
+          "height": 636
+        },
+        {
+          "id": 32641596096584,
+          "created_at": "2026-05-11T10:19:21+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T10:20:04+03:00",
+          "product_id": 7051801722952,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_071601_f924d9df-a636-45ba-9409-73e7fc0051bc.png?v=1778484004",
+          "width": 516,
+          "height": 602
+        },
+        {
+          "id": 32641596063816,
+          "created_at": "2026-05-11T10:19:19+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T10:20:25+03:00",
+          "product_id": 7051801722952,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_071601_9eecc7e4-7f39-4c8a-badc-4d8119ea13a8.png?v=1778484025",
+          "width": 393,
+          "height": 614
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051801690184,
+      "title": "Escada Mavi Çanta",
+      "handle": "escada-mavi-canta",
+      "body_html": "",
+      "published_at": "2026-05-11T10:17:29+03:00",
+      "created_at": "2026-05-11T10:17:28+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Escada",
+      "product_type": "Çanta",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41104097804360,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2097.20.262.6989",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "5000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7051801690184,
+          "created_at": "2026-05-11T10:17:28+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641593049160,
+          "created_at": "2026-05-11T10:12:26+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T10:13:38+03:00",
+          "product_id": 7051801690184,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_071039_1a3fd38d-952f-4075-9abf-e7136d2e0998.png?v=1778483618",
+          "width": 442,
+          "height": 588
+        },
+        {
+          "id": 32641593540680,
+          "created_at": "2026-05-11T10:13:05+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T10:14:49+03:00",
+          "product_id": 7051801690184,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_071039_811f4292-6c1c-468a-9d66-6c629ab1d913.png?v=1778483689",
+          "width": 432,
+          "height": 586
+        },
+        {
+          "id": 32641593278536,
+          "created_at": "2026-05-11T10:13:03+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T10:14:22+03:00",
+          "product_id": 7051801690184,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_071039_d8a558c6-d031-4cbe-be13-7a9d941d6f94.png?v=1778483662",
+          "width": 439,
+          "height": 588
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051760566344,
+      "title": "Ermenegildo Zegna Lacivert Sneaker - 42",
+      "handle": "ermenegildo-zegna-lacivert-sneaker-42",
+      "body_html": "",
+      "published_at": "2026-05-11T10:05:30+03:00",
+      "created_at": "2026-05-11T00:34:42+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Ermenegildo Zegna",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41103843459144,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2096.72.511.6977",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "14500.00",
+          "grams": 0,
+          "compare_at_price": "32000.00",
+          "position": 1,
+          "product_id": 7051760566344,
+          "created_at": "2026-05-11T00:34:43+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641344012360,
+          "created_at": "2026-05-11T00:32:07+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T00:33:16+03:00",
+          "product_id": 7051760566344,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212554_aba24248-64f8-43a9-8f42-dd22e1e57562.png?v=1778448796",
+          "width": 435,
+          "height": 584
+        },
+        {
+          "id": 32641343651912,
+          "created_at": "2026-05-11T00:30:41+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T00:31:44+03:00",
+          "product_id": 7051760566344,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212554_3987e945-8367-4b5c-9ec3-50aeecf47d78.png?v=1778448704",
+          "width": 896,
+          "height": 585
+        },
+        {
+          "id": 32641343979592,
+          "created_at": "2026-05-11T00:32:00+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T00:32:53+03:00",
+          "product_id": 7051760566344,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212554_af2bc87d-2bf9-41ea-b38e-a16541438dbd.png?v=1778448773",
+          "width": 435,
+          "height": 595
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051760795720,
+      "title": "Ermenegildo Zegna Beyaz Sneaker - 42",
+      "handle": "ermenegildo-zegna-beyaz-sneaker-42",
+      "body_html": "",
+      "published_at": "2026-05-11T10:05:01+03:00",
+      "created_at": "2026-05-11T00:41:05+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Ermenegildo Zegna",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41103846080584,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2096.72.511.6978",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "11000.00",
+          "grams": 0,
+          "compare_at_price": "25000.00",
+          "position": 1,
+          "product_id": 7051760795720,
+          "created_at": "2026-05-11T00:41:05+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641344929864,
+          "created_at": "2026-05-11T00:35:51+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T00:37:05+03:00",
+          "product_id": 7051760795720,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_911c5ef5-64ca-40e1-82e9-5c8377485974.png?v=1778449025",
+          "width": 440,
+          "height": 588
+        },
+        {
+          "id": 32641344962632,
+          "created_at": "2026-05-11T00:35:58+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T00:38:36+03:00",
+          "product_id": 7051760795720,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_09e7b266-346e-45a8-8a7a-acb01c06f3c1.png?v=1778449116",
+          "width": 439,
+          "height": 591
+        },
+        {
+          "id": 32641345028168,
+          "created_at": "2026-05-11T00:36:03+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T00:39:04+03:00",
+          "product_id": 7051760795720,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_5d6e7177-85ed-47c8-94a3-7f5aa049e31b.png?v=1778449144",
+          "width": 434,
+          "height": 591
+        },
+        {
+          "id": 32641344995400,
+          "created_at": "2026-05-11T00:36:00+03:00",
+          "position": 4,
+          "updated_at": "2026-05-11T00:39:35+03:00",
+          "product_id": 7051760795720,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_212749_01a11442-e602-4cb6-955a-f38055769f9d.png?v=1778449175",
+          "width": 439,
+          "height": 589
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051761025096,
+      "title": "Giuseppe Zanotti Frankie Crocodile Effect Sneaker - 42",
+      "handle": "giuseppe-zanotti-frankie-crocodile-effect-sneaker-42",
+      "body_html": "",
+      "published_at": "2026-05-11T10:04:46+03:00",
+      "created_at": "2026-05-11T00:48:44+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Giuseppe Zanotti",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41103850963016,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2117.72.511.6979",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "9250.00",
+          "grams": 0,
+          "compare_at_price": "22520.00",
+          "position": 1,
+          "product_id": 7051761025096,
+          "created_at": "2026-05-11T00:48:45+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641347387464,
+          "created_at": "2026-05-11T00:44:58+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T00:47:03+03:00",
+          "product_id": 7051761025096,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_89bf9565-60e4-4797-9044-701af858b64e.png?v=1778449623",
+          "width": 447,
+          "height": 597
+        },
+        {
+          "id": 32641347289160,
+          "created_at": "2026-05-11T00:44:44+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T00:45:43+03:00",
+          "product_id": 7051761025096,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_0fc671b8-da16-4ec4-aad1-31b23c686f7a.png?v=1778449543",
+          "width": 447,
+          "height": 588
+        },
+        {
+          "id": 32641347321928,
+          "created_at": "2026-05-11T00:44:53+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T00:46:13+03:00",
+          "product_id": 7051761025096,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_5c18c403-197c-44db-a02d-48501ece66ff.png?v=1778449573",
+          "width": 448,
+          "height": 587
+        },
+        {
+          "id": 32641347354696,
+          "created_at": "2026-05-11T00:44:56+03:00",
+          "position": 4,
+          "updated_at": "2026-05-11T00:46:41+03:00",
+          "product_id": 7051761025096,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_213808_98367f95-47a3-4309-baf7-8b462061673c.png?v=1778449601",
+          "width": 443,
+          "height": 592
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051792416840,
+      "title": "Valentino Garavani Renkli Sneaker - 41",
+      "handle": "valentino-garavani-renkli-sneaker-41-5",
+      "body_html": "",
+      "published_at": "2026-05-11T10:04:19+03:00",
+      "created_at": "2026-05-11T07:54:14+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Valentino",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41104064544840,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2288.72.511.6980",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "6000.00",
+          "grams": 0,
+          "compare_at_price": "15000.00",
+          "position": 1,
+          "product_id": 7051792416840,
+          "created_at": "2026-05-11T07:54:14+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641500151880,
+          "created_at": "2026-05-11T07:49:59+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T07:50:51+03:00",
+          "product_id": 7051792416840,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_88a9aa80-b566-475f-8c93-34e091304dcd.png?v=1778475051",
+          "width": 436,
+          "height": 611
+        },
+        {
+          "id": 32641500512328,
+          "created_at": "2026-05-11T07:50:09+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T07:51:20+03:00",
+          "product_id": 7051792416840,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_01b7d13c-5782-438b-b165-2a97bee50731.png?v=1778475080",
+          "width": 444,
+          "height": 572
+        },
+        {
+          "id": 32641500545096,
+          "created_at": "2026-05-11T07:50:14+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T07:51:45+03:00",
+          "product_id": 7051792416840,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_c1d24b3c-adfb-45d7-9eec-49ae4534e723.png?v=1778475105",
+          "width": 422,
+          "height": 580
+        },
+        {
+          "id": 32641500577864,
+          "created_at": "2026-05-11T07:50:18+03:00",
+          "position": 4,
+          "updated_at": "2026-05-11T07:52:11+03:00",
+          "product_id": 7051792416840,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215109_c108403d-caf4-4e40-88aa-cb7f7d24e35b.png?v=1778475131",
+          "width": 478,
+          "height": 582
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051792646216,
+      "title": "Prada Sneaker Siyah - 41",
+      "handle": "prada-sneaker-siyah-41-5",
+      "body_html": "",
+      "published_at": "2026-05-11T10:04:06+03:00",
+      "created_at": "2026-05-11T07:58:42+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Prada",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41104066641992,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2229.72.511.6981",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "8500.00",
+          "grams": 0,
+          "compare_at_price": "20000.00",
+          "position": 1,
+          "product_id": 7051792646216,
+          "created_at": "2026-05-11T07:58:42+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641517125704,
+          "created_at": "2026-05-11T07:55:34+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T07:56:28+03:00",
+          "product_id": 7051792646216,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215457_60171606-0f5f-46ba-aba0-cbda0c59b470.png?v=1778475388",
+          "width": 438,
+          "height": 602
+        },
+        {
+          "id": 32641517191240,
+          "created_at": "2026-05-11T07:55:42+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T07:56:51+03:00",
+          "product_id": 7051792646216,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215457_fcd113a0-e09c-4592-98cb-728051967bd9.png?v=1778475411",
+          "width": 427,
+          "height": 588
+        },
+        {
+          "id": 32641517224008,
+          "created_at": "2026-05-11T07:55:45+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T07:57:19+03:00",
+          "product_id": 7051792646216,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215457_9fdef6a5-3597-44b9-a5bc-5dc69892cda8.png?v=1778475439",
+          "width": 434,
+          "height": 586
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051792744520,
+      "title": "Prada Sneaker Lacivert - 41",
+      "handle": "prada-sneaker-lacivert-41-5",
+      "body_html": "",
+      "published_at": "2026-05-11T10:03:52+03:00",
+      "created_at": "2026-05-11T08:02:18+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Prada",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41104066773064,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2229.72.511.6982",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "11000.00",
+          "grams": 0,
+          "compare_at_price": "25000.00",
+          "position": 1,
+          "product_id": 7051792744520,
+          "created_at": "2026-05-11T08:02:18+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641519321160,
+          "created_at": "2026-05-11T07:59:49+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T08:00:29+03:00",
+          "product_id": 7051792744520,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215727_32b16e4b-7f3a-4327-9812-e4e3ddb74b94.png?v=1778475629",
+          "width": 438,
+          "height": 597
+        },
+        {
+          "id": 32641519353928,
+          "created_at": "2026-05-11T08:00:03+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T08:00:55+03:00",
+          "product_id": 7051792744520,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215727_a89cb0b0-a031-40c0-a4ff-4a39a6a9a26c.png?v=1778475655",
+          "width": 444,
+          "height": 539
+        },
+        {
+          "id": 32641519386696,
+          "created_at": "2026-05-11T08:00:06+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T08:01:21+03:00",
+          "product_id": 7051792744520,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215727_b65845ef-ae2c-41e9-a3e1-3bcd010b9df3.png?v=1778475681",
+          "width": 425,
+          "height": 491
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051792777288,
+      "title": "Prada Sneaker Lacivert - Gri - Beyaz 41",
+      "handle": "prada-sneaker-laciver-gri-beyaz-41-5",
+      "body_html": "",
+      "published_at": "2026-05-11T10:03:36+03:00",
+      "created_at": "2026-05-11T08:07:28+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Prada",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41104066805832,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2229.72.511.6983",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "17000.00",
+          "grams": 0,
+          "compare_at_price": "20000.00",
+          "position": 1,
+          "product_id": 7051792777288,
+          "created_at": "2026-05-11T08:07:28+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641520369736,
+          "created_at": "2026-05-11T08:04:57+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T08:05:37+03:00",
+          "product_id": 7051792777288,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_36251595-9231-47b0-b859-78f227609e6d.png?v=1778475937",
+          "width": 438,
+          "height": 587
+        },
+        {
+          "id": 32641520500808,
+          "created_at": "2026-05-11T08:05:03+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T08:06:14+03:00",
+          "product_id": 7051792777288,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_13d7a21e-46f3-4656-a70a-c9ffbc45aec9.png?v=1778475974",
+          "width": 446,
+          "height": 593
+        },
+        {
+          "id": 32641520599112,
+          "created_at": "2026-05-11T08:05:08+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T08:06:56+03:00",
+          "product_id": 7051792777288,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_10bacbd4-d78f-4111-a926-7b4351860597.png?v=1778476016",
+          "width": 430,
+          "height": 592
+        },
+        {
+          "id": 32641520631880,
+          "created_at": "2026-05-11T08:05:11+03:00",
+          "position": 4,
+          "updated_at": "2026-05-11T08:07:17+03:00",
+          "product_id": 7051792777288,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_215915_858b76c1-0ac3-4146-953d-155fc6de9413.png?v=1778476037",
+          "width": 447,
+          "height": 586
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051792908360,
+      "title": "Axel Arigato Marathon R-Trail Sneaker - 42",
+      "handle": "axel-arigato-marathon-r-trail-sneaker-42-5",
+      "body_html": "",
+      "published_at": "2026-05-11T10:03:21+03:00",
+      "created_at": "2026-05-11T08:12:15+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Axel Arigato",
+      "product_type": "Sneaker",
+      "tags": [],
+      "variants": [
+        {
+          "id": 41104066969672,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2431.72.511.6984",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": false,
+          "price": "6000.00",
+          "grams": 0,
+          "compare_at_price": "15000.00",
+          "position": 1,
+          "product_id": 7051792908360,
+          "created_at": "2026-05-11T08:12:15+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641522303048,
+          "created_at": "2026-05-11T08:09:27+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T08:10:28+03:00",
+          "product_id": 7051792908360,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_c7b29f0d-cf99-4bf2-9e3a-1bfbb34434c4.png?v=1778476228",
+          "width": 441,
+          "height": 593
+        },
+        {
+          "id": 32641522368584,
+          "created_at": "2026-05-11T08:09:43+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T08:10:48+03:00",
+          "product_id": 7051792908360,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_eb835895-27f1-4666-bc1d-0a7ee42b1c9d.png?v=1778476248",
+          "width": 438,
+          "height": 602
+        },
+        {
+          "id": 32641522401352,
+          "created_at": "2026-05-11T08:09:47+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T08:11:06+03:00",
+          "product_id": 7051792908360,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_ce763a42-e3e4-4c85-8a07-1e5e1ee198fa.png?v=1778476266",
+          "width": 440,
+          "height": 589
+        },
+        {
+          "id": 32641522532424,
+          "created_at": "2026-05-11T08:11:16+03:00",
+          "position": 4,
+          "updated_at": "2026-05-11T08:11:41+03:00",
+          "product_id": 7051792908360,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260510_220010_0184ec59-842b-41a4-ae4f-f2ee5720ce2d.png?v=1778476301",
+          "width": 431,
+          "height": 587
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7051796676680,
+      "title": "Chanel 25 Mini Çanta",
+      "handle": "chanel-25-mini",
+      "body_html": "<div class=\"qMYqUG_convSearchResultHighlightRoot\">\n<div class=\"relative w-full overflow-visible\">\n<section class=\"text-token-text-primary w-full focus:outline-none [--shadow-height:45px] has-data-writing-block:pointer-events-none has-data-writing-block:-mt-(--shadow-height) has-data-writing-block:pt-(--shadow-height) [&amp;:has([data-writing-block])&gt;*]:pointer-events-auto [content-visibility:auto] supports-[content-visibility:auto]:[contain-intrinsic-size:auto_100lvh] R6Vx5W_threadScrollVars scroll-mb-[calc(var(--scroll-root-safe-area-inset-bottom,0px)+var(--thread-response-height))] scroll-mt-[calc(var(--header-height)+min(200px,max(70px,20svh)))]\" dir=\"auto\" data-turn-id=\"request-6960a0ae-76ec-8329-b66a-6e5d5440ab71-2\" data-turn-id-container=\"request-6960a0ae-76ec-8329-b66a-6e5d5440ab71-2\" data-testid=\"conversation-turn-144\" data-scroll-anchor=\"false\" data-turn=\"assistant\">\n<div class=\"text-base my-auto mx-auto pb-10 [--thread-content-margin:var(--thread-content-margin-xs,calc(var(--spacing)*4))] @w-sm/main:[--thread-content-margin:var(--thread-content-margin-sm,calc(var(--spacing)*6))] @w-lg/main:[--thread-content-margin:var(--thread-content-margin-lg,calc(var(--spacing)*16))] px-(--thread-content-margin)\">\n<div class=\"[--thread-content-max-width:40rem] @w-lg/main:[--thread-content-max-width:48rem] mx-auto max-w-(--thread-content-max-width) flex-1 group/turn-messages focus-visible:outline-hidden relative flex w-full min-w-0 flex-col agent-turn\">\n<div class=\"flex max-w-full flex-col gap-4 grow\">\n<div data-message-author-role=\"assistant\" data-message-id=\"f2bb83b6-95a0-44ac-bbd5-2aa6b8b625da\" data-turn-start-message=\"true\" dir=\"auto\" data-message-model-slug=\"gpt-5-5\" class=\"min-h-8 text-message relative flex w-full flex-col items-end gap-2 text-start break-words whitespace-normal outline-none keyboard-focused:focus-ring [.text-message+&amp;]:mt-1\" tabindex=\"0\">\n<div class=\"flex w-full flex-col gap-1 empty:hidden\">\n<div class=\"markdown prose dark:prose-invert wrap-break-word w-full light markdown-new-styling\"></div>\n</div>\n</div>\n</div>\n<div class=\"z-0 flex min-h-[46px] justify-start\">\n<meta charset=\"utf-8\">\n<p><strong>Ürün Bilgisi </strong></p>\n<ul>\n<li>\n<strong>Renk: </strong>Siyah<strong></strong>\n</li>\n<li>\n<strong>Durum: </strong>Sıfır - Full Set - Faturalı</li>\n<li>\n<strong>Editör Notları: </strong>\n<p data-path-to-node=\"0\"><meta charset=\"utf-8\"><meta charset=\"utf-8\">Bu model, <span class=\"hover:entity-accent entity-underline inline cursor-pointer align-baseline\"><span class=\"whitespace-normal\">Chanel</span></span>’ın son dönemde öne çıkan tasarımlarından biri olan Chanel 25 modelidir. İkonik kapitone deri yapıyı daha modern ve relaxed bir siluetle yorumlayan bu çanta, geniş hacmi ve büzgülü yapısıyla günlük kullanımda yüksek konfor sunar. Kalın gold zincir askı detayları ve CC charm aksesuarı tasarıma güçlü bir karakter kazandırırken, klasik Chanel estetiğini daha çağdaş bir formda yansıtır. Özellikle oversized ve yumuşak yapılı çanta trendinin Chanel yorumlarından biri olarak dikkat çeken model, hem günlük şehir kullanımına hem seyahat stiline uyum sağlayan statement bir parçadır.<br></p>\n</li>\n</ul>\n<p><strong>Orijinallik ve Kalite Kontrolü</strong><strong></strong></p>\n<p><meta charset=\"utf-8\"><span>Peony Collective’de tüm ürünler, uzmanlarımız tarafından detaylı bir şekilde incelenir ve Entrupy teknolojisi ile %100 orijinallik garantisi sunulur. Güvenle alışveriş yapabilirsiniz.</span></p>\n</div>\n<div class=\"mt-3 w-full empty:hidden\">\n<div class=\"text-center\"><br></div>\n</div>\n</div>\n</div>\n</section>\n<div class=\"contents\"><br></div>\n</div>\n</div>",
+      "published_at": "2026-05-11T09:23:12+03:00",
+      "created_at": "2026-05-11T09:23:10+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Chanel",
+      "product_type": "Çanta",
+      "tags": [
+        "Yeni"
+      ],
+      "variants": [
+        {
+          "id": 41104077029448,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2062.20.512.6985",
+          "requires_shipping": true,
+          "taxable": true,
+          "featured_image": null,
+          "available": true,
+          "price": "352000.00",
+          "grams": 0,
+          "compare_at_price": "375000.00",
+          "position": 1,
+          "product_id": 7051796676680,
+          "created_at": "2026-05-11T09:23:11+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32641561231432,
+          "created_at": "2026-05-11T09:19:57+03:00",
+          "position": 1,
+          "updated_at": "2026-05-11T09:19:59+03:00",
+          "product_id": 7051796676680,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_061537_64feec75-a398-43c3-87cf-b2bed25f3827.png?v=1778480399",
+          "width": 896,
+          "height": 1200
+        },
+        {
+          "id": 32641561264200,
+          "created_at": "2026-05-11T09:19:57+03:00",
+          "position": 2,
+          "updated_at": "2026-05-11T09:19:59+03:00",
+          "product_id": 7051796676680,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_061626_fa8a867a-7a2d-4c90-b2cf-c59b0a3a0075.png?v=1778480399",
+          "width": 896,
+          "height": 1200
+        },
+        {
+          "id": 32641561296968,
+          "created_at": "2026-05-11T09:19:57+03:00",
+          "position": 3,
+          "updated_at": "2026-05-11T09:19:59+03:00",
+          "product_id": 7051796676680,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/hf_20260511_061729_21f91756-fbce-486b-aaaa-ffb7aa81d6b8.png?v=1778480399",
+          "width": 896,
+          "height": 1200
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7050443751496,
+      "title": "Burberry Trençkot Mavi - M",
+      "handle": "burberry-trenckot-mavi-m",
+      "body_html": "",
+      "published_at": "2026-05-04T16:01:54+03:00",
+      "created_at": "2026-05-04T16:01:52+03:00",
+      "updated_at": "2026-06-29T12:04:50+03:00",
+      "vendor": "Burberry",
+      "product_type": "Trençkot",
+      "tags": [
+        "Yeni"
+      ],
+      "variants": [
+        {
+          "id": 41096466759752,
+          "title": "Default Title",
+          "option1": "Default Title",
+          "option2": null,
+          "option3": null,
+          "sku": "P.2052.80.321.6976",
+          "requires_shipping": true,
+          "taxable": false,
+          "featured_image": null,
+          "available": true,
+          "price": "16000.00",
+          "grams": 0,
+          "compare_at_price": null,
+          "position": 1,
+          "product_id": 7050443751496,
+          "created_at": "2026-05-04T16:01:53+03:00",
+          "updated_at": "2026-06-29T12:04:50+03:00"
+        }
+      ],
+      "images": [
+        {
+          "id": 32592992436296,
+          "created_at": "2026-05-04T16:00:46+03:00",
+          "position": 1,
+          "updated_at": "2026-05-04T16:00:48+03:00",
+          "product_id": 7050443751496,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-1.jpg?v=1777899648",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32592992469064,
+          "created_at": "2026-05-04T16:00:46+03:00",
+          "position": 2,
+          "updated_at": "2026-05-04T16:00:48+03:00",
+          "product_id": 7050443751496,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-2.jpg?v=1777899648",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32592992501832,
+          "created_at": "2026-05-04T16:00:46+03:00",
+          "position": 3,
+          "updated_at": "2026-05-04T16:00:48+03:00",
+          "product_id": 7050443751496,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-3.jpg?v=1777899648",
+          "width": 4000,
+          "height": 6000
+        },
+        {
+          "id": 32592992534600,
+          "created_at": "2026-05-04T16:00:46+03:00",
+          "position": 4,
+          "updated_at": "2026-05-04T16:00:48+03:00",
+          "product_id": 7050443751496,
+          "variant_ids": [],
+          "src": "https://cdn.shopify.com/s/files/1/0572/4097/7480/files/burberry-4.jpg?v=1777899648",
+          "width": 4000,
+          "height": 6000
+        }
+      ],
+      "options": [
+        {
+          "name": "Title",
+          "position": 1,
+          "values": [
+            "Default Title"
+          ]
+        }
+      ]
+    }
+  ]
+}
