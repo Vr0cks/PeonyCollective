@@ -5,6 +5,7 @@ import NotificationBell from './NotificationBell'
 import MobileMenu from './MobileMenu'
 import SearchTrigger from './SearchTrigger'
 import CartTrigger from './CartTrigger'
+import CategoryNav from './CategoryNav'
 import { User } from 'lucide-react'
 import { Profile } from '@/src/types'
 
@@ -36,11 +37,9 @@ export default async function Navbar() {
           {/* Mobil Hamburger Çekmecesi */}
           <MobileMenu user={user} profile={profile} />
 
-          {/* Masaüstü Menü Linkleri */}
-          <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]">
-            <Link href="/?brand=Hermès#collection" className="hover:text-[#AF9164] transition-colors duration-300">HERMÈS</Link>
-            <Link href="/?brand=Chanel#collection" className="hover:text-[#AF9164] transition-colors duration-300">CHANEL</Link>
-            <Link href="/?brand=Dior#collection" className="hover:text-[#AF9164] transition-colors duration-300">DIOR</Link>
+          {/* Masaüstü Ekstra Linkler */}
+          <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A] ml-6">
+            <Link href="/how-it-works" className="hover:text-[#AF9164] transition-colors duration-300">NASIL ÇALIŞIR?</Link>
             
             {user ? (
               <Link href="/dashboard" className="bg-black text-white px-8 py-3 rounded-none hover:bg-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-widest border border-black hover:border-[#AF9164]">
@@ -93,6 +92,7 @@ export default async function Navbar() {
           )}
         </div>
       </div>
+      <CategoryNav />
     </nav>
   )
 }
