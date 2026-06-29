@@ -75,7 +75,8 @@ export default function AuthPage() {
   const handleSocialLogin = async (provider: 'google' | 'apple') => {
     try {
       setSocialLoading(provider)
-      const result = await signInWithProvider(provider)
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+      const result = await signInWithProvider(provider, origin)
       if (result?.error) {
         setMessage(result.error)
         setSocialLoading(null)

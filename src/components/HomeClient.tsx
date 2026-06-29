@@ -42,9 +42,10 @@ const categoryCards = [
 ]
 
 const genderFilters = [
-  { label: 'Kadın', value: 'Kadın' },
-  { label: 'Erkek', value: 'Erkek' },
-  { label: 'Çocuk', value: 'Çocuk' },
+  { label: 'Kadın', value: 'KADIN' },
+  { label: 'Erkek', value: 'ERKEK' },
+  { label: 'Kız Çocuk', value: 'KIZ ÇOCUK' },
+  { label: 'Erkek Çocuk', value: 'ERKEK ÇOCUK' },
 ]
 
 interface HomeClientProps {
@@ -172,7 +173,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
           </div>
           <div className="relative aspect-video lg:aspect-square overflow-hidden luxury-img-wrapper">
              <Image 
-                src="https://images.unsplash.com/photo-1575203091586-611ffa505bfc?auto=format&fit=crop&q=80&w=1000" 
+                src="/vip_delivery_box.png" 
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
@@ -599,7 +600,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
       {/* MASSIVE FINAL SELL CTA */}
       <section className="relative py-40 bg-black flex flex-col items-center text-center justify-center overflow-hidden">
         <Image 
-          src="https://images.unsplash.com/photo-1596854273338-cbf078ec7071?auto=format&fit=crop&q=80&w=2000" 
+          src="/luxury_wardrobe_bg.png" 
           fill
           sizes="100vw"
           className="object-cover opacity-40 grayscale-[50%]"
