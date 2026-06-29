@@ -34,7 +34,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const supabase = createClient()
     const { data } = await supabase
       .from('products')
-      .select('id, brand, model_name, price, public_images, category, subcategory')
+      .select('id, brand, model_name, price, public_images, category, subcategory, gender')
       .eq('status', 'approved')
     
     if (data) {
@@ -56,13 +56,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   }, [isOpen])
 
   // Arama filtresi (derived state)
-  const lowerQuery = query.toLowerCase()
+  const lowerQuery = query.toLocaleLowerCase('tr-TR')
   const filtered = query.trim()
     ? products.filter(p => 
-        (p.brand?.toLowerCase() || '').includes(lowerQuery) ||
-        (p.model_name?.toLowerCase() || '').includes(lowerQuery) ||
-        (p.category?.toLowerCase() || '').includes(lowerQuery) ||
-        (p.subcategory?.toLowerCase() || '').includes(lowerQuery)
+        (p.brand?.toLocaleLowerCase('tr-TR') || '').includes(lowerQuery) ||
+        (p.model_name?.toLocaleLowerCase('tr-TR') || '').includes(lowerQuery) ||
+        (p.category?.toLocaleLowerCase('tr-TR') || '').includes(lowerQuery) ||
+        (p.subcategory?.toLocaleLowerCase('tr-TR') || '').includes(lowerQuery) ||
+        (p.gender?.toLocaleLowerCase('tr-TR') || '').includes(lowerQuery)
       )
     : []
 
