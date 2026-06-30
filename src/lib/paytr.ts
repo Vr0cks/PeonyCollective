@@ -72,9 +72,9 @@ export function createPaymentToken(params: PayTRTokenParams) {
   }
 
   if (params.submerchantId && params.submerchantPrice) {
-    (postData as any).non3d_test_failed = testMode === '1' ? '0' : '0'
-    (postData as any).submerchant_id = params.submerchantId
-    (postData as any).submerchant_price = params.submerchantPrice.toString()
+    ;(postData as any).non3d_test_failed = testMode === '1' ? '0' : '0';
+    ;(postData as any).submerchant_id = params.submerchantId;
+    ;(postData as any).submerchant_price = params.submerchantPrice.toString();
   }
 
   return postData
