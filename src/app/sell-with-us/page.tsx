@@ -103,9 +103,9 @@ export default function SellWithUsPage() {
             <div className="bg-white/5 border border-white/10 p-8 hover:bg-white/10 transition-colors">
               <div className="text-4xl font-light text-[#AF9164] mb-6">02</div>
               <ShieldCheck size={24} className="mb-4 text-gray-400" strokeWidth={1.5}/>
-              <h4 className="text-lg font-bold mb-3">Orijinallik Onayı (Entrupy)</h4>
+              <h4 className="text-lg font-bold mb-3">Orijinallik Onayı</h4>
               <p className="text-sm text-gray-400 font-light leading-relaxed">
-                Uzmanlarımız ve Yapay Zeka destekli Entrupy cihazımız ile ürünün doğrulaması yapılır ve vitrine alınır.
+                Uzmanlarımız ve Peony Lab mikroskobik görüntüleme cihazımız ile ürünün doğrulaması yapılır ve vitrine alınır.
               </p>
             </div>
 

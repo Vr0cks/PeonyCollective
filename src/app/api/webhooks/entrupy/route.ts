@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { createClient } from '@/src/utils/supabase/server';
+import { createAdminClient } from '@/src/utils/supabase/admin';
 
 const WEBHOOK_SECRET = process.env.ENTRUPY_WEBHOOK_SECRET;
 
@@ -31,12 +31,13 @@ export async function POST(req: Request) {
       console.warn('[ENTRUPY WEBHOOK] WEBHOOK_SECRET eksik, imza atlandı! Lütfen yapılandırın.');
     }
 
+    const supabase = createAdminClient();
+
     const payload = JSON.parse(rawBody);
     console.log('[ENTRUPY WEBHOOK] Gelen olay:', payload.event);
 
     // Olay tipi: 'session.completed' vb.
     if (payload.event === 'session.completed' || payload.event === 'status_changed') { // Entrupy API'ye göre değişebilir
-      const supabase = await createClient();
       
       const entrupyId = payload.data?.id; // veya customer_item_id
       const customerItemId = payload.data?.customer_item_id; // Bizim product.id'miz
@@ -44,15 +45,32 @@ export async function POST(req: Request) {
       const certificateUrl = payload.data?.certificate_url; 
 
       if (customerItemId) {
-        // Ürün durumunu güncelle
+        // Ürün durumunu otomatik onayla
+        const productStatus = status === 'verified' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending';
+        
         const { error } = await supabase.from('products').update({
           entrupy_status: status,
-          entrupy_certificate_url: certificateUrl
+          entrupy_certificate_url: certificateUrl,
+          ...(productStatus !== 'pending' && { status: productStatus }) // Durum belli ise otomatik yayınla veya reddet
         }).eq('id', customerItemId);
 
         if (error) {
           console.error('[ENTRUPY WEBHOOK] Veritabanı güncelleme hatası:', error);
+          await supabase.from('system_logs').insert({
+            level: 'error',
+            source: 'entrupy_webhook',
+            message: 'Ürün Entrupy durumu güncellenemedi',
+            metadata: { error: String(error), customerItemId, payload }
+          });
           return NextResponse.json({ error: 'DB Update Failed' }, { status: 500 });
+        } else {
+          // Başarı logu
+          await supabase.from('system_logs').insert({
+            level: 'info',
+            source: 'entrupy_webhook',
+            message: `Ürün Entrupy analizi tamamlandı: ${status}`,
+            metadata: { customerItemId, entrupyId, status }
+          });
         }
       }
     }
@@ -61,6 +79,15 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error('[ENTRUPY WEBHOOK] Hata:', error);
+    try {
+       const supabase = createAdminClient();
+       await supabase.from('system_logs').insert({
+          level: 'error',
+          source: 'entrupy_webhook',
+          message: 'Webhook işlem hatası',
+          metadata: { error: String(error) }
+       });
+    } catch (e) {} // Ignore secondary errors
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

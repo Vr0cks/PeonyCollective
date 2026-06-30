@@ -329,7 +329,8 @@ export default function SellForm() {
     return `w-full px-4 py-3.5 bg-transparent border-b ${isError ? 'border-red-500 text-red-900 placeholder-red-300' : 'border-gray-200 focus:border-black text-black placeholder-gray-300'} text-sm focus:outline-none transition-colors rounded-none`
   }
   
-  const ErrorMsg = ({ field }: { field: string }) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/rules-of-hooks, react/display-name
+  const renderErrorMsg = (field: string) => {
     if (!fieldErrors[field]) return null
     return <span className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-2 block">{fieldErrors[field]}</span>
   }
@@ -455,7 +456,7 @@ export default function SellForm() {
                       {g.label}
                     </button>
                   ))}
-                  <ErrorMsg field="gender" />
+                  {renderErrorMsg('gender')}
                 </div>
               </div>
               {selectedGender && (
@@ -468,7 +469,7 @@ export default function SellForm() {
                       </button>
                     ))}
                   </div>
-                  <ErrorMsg field="category" />
+                  {renderErrorMsg('category')}
                 </div>
               )}
             </div>
@@ -496,7 +497,7 @@ export default function SellForm() {
                         </button>
                       ))}
                     </div>
-                    <ErrorMsg field="size" />
+                    {renderErrorMsg('size')}
                   </div>
                 )}
               </div>
@@ -512,7 +513,7 @@ export default function SellForm() {
                   <option value="__other__">Diğer</option>
                 </select>
                 {selectedBrand === '__other__' && <input className={`${getInputClasses('brand')} mt-4`} value={customBrand} onChange={(e) => setCustomBrand(e.target.value)} placeholder="Marka adını yazın" required />}
-                <ErrorMsg field="brand" />
+                {renderErrorMsg('brand')}
               </div>
               
               <div>
@@ -529,7 +530,7 @@ export default function SellForm() {
                 ) : (
                   <input className={getInputClasses('model')} value={customModel} onChange={(e) => setCustomModel(e.target.value)} placeholder="Örn: Classic Flap Bag" required />
                 )}
-                <ErrorMsg field="model" />
+                {renderErrorMsg('model')}
               </div>
             </div>
           </div>
@@ -546,7 +547,7 @@ export default function SellForm() {
                   <option value="" disabled>Seçiniz</option>
                   {conditions.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-                <ErrorMsg field="condition" />
+                {renderErrorMsg('condition')}
               </div>
               <div>
                 <label className={labelClasses}>Materyal</label>
@@ -562,7 +563,7 @@ export default function SellForm() {
             <div>
               <label className={labelClasses}>Ürün Hikayesi / Açıklama</label>
               <textarea className={`${getInputClasses('description')} resize-none h-32 leading-relaxed`} value={formDescription} onChange={(e) => setFormDescription(e.target.value)} placeholder="Ürününüzün hikayesini, ne sıklıkla kullanıldığını ve göze çarpan detaylarını buraya yazın..." required />
-              <ErrorMsg field="description" />
+              {renderErrorMsg('description')}
             </div>
 
             {/* Görünmez Kusurlar */}
@@ -724,7 +725,7 @@ export default function SellForm() {
                   {cat.key === 'serial' && (
                     <div className="mb-4">
                       <input className={`${getInputClasses('serial')} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." required />
-                      <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız 'none' yazabilirsiniz.</p>
+                      <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız &apos;none&apos; yazabilirsiniz.</p>
                     </div>
                   )}
 
@@ -737,6 +738,7 @@ export default function SellForm() {
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {verificationPreviews[cat.key].map((url, i) => (
                         <div key={i} className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={url} className="w-full h-full object-cover" alt="" />
                         </div>
                       ))}

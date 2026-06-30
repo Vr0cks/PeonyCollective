@@ -8,6 +8,7 @@ import MagnifierImage from '@/src/components/MagnifierImage'
 import EntrupyModal from '@/src/components/EntrupyModal'
 import VirtualTryOnButton from '@/src/components/VirtualTryOnButton'
 import ProductGallery from '@/src/components/ProductGallery'
+import FadeIn from '@/src/components/animations/FadeIn'
 
 export async function generateMetadata({
   params,
@@ -87,15 +88,17 @@ export default async function ProductDetailPage({
           {/* SOL: GÖRSEL GALERİSİ */}
           <div className="lg:col-span-7 flex flex-col gap-2">
             {/* FOTOĞRAF GALERİSİ */}
-            <ProductGallery 
-              images={product.public_images || []} 
-              brand={product.brand}
-              videoUrl={product.video_url}
-            />
+            <FadeIn delay={0.1}>
+              <ProductGallery 
+                images={product.public_images || []} 
+                brand={product.brand}
+                videoUrl={product.video_url}
+              />
+            </FadeIn>
 
             {/* KUSUR VE DEFO GALERİSİ (Varsa) */}
             {product.flaw_images && product.flaw_images.length > 0 && (
-              <div className="mt-20 p-8 border border-gray-200">
+              <FadeIn delay={0.2} className="mt-20 p-8 border border-gray-200">
                 <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-black mb-4">CONDITION REPORT: IMPERFECTIONS</h3>
                 <p className="text-[11px] text-gray-500 mb-8 font-light uppercase tracking-widest leading-loose">
                   Transparent review of confirmed wear and tear by Peony Lab.
@@ -107,7 +110,7 @@ export default async function ProductDetailPage({
                     </div>
                   ))}
                 </div>
-              </div>
+              </FadeIn>
             )}
           </div>
 
@@ -116,20 +119,20 @@ export default async function ProductDetailPage({
             <div className="sticky top-32 space-y-10 pb-20">
               
               {/* Başlık ve Fiyat */}
-              <div className="border-b border-gray-200 pb-10">
+              <FadeIn delay={0.2} direction="left" className="border-b border-gray-200 pb-10">
                 <h1 className="text-4xl lg:text-5xl font-playfair tracking-[0.1em] uppercase mb-4">
                   {product.brand}
                 </h1>
                 <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-8">
                   {product.model_name}
                 </h2>
-                <div className="text-3xl font-light tracking-widest">
+                <div className="text-3xl font-light tracking-widest text-[#AF9164]">
                   {product.price.toLocaleString('tr-TR')} ₺
                 </div>
-              </div>
+              </FadeIn>
 
               {/* Teknik Detaylar Özeti */}
-              <div className="grid grid-cols-2 gap-y-8 pt-4">
+              <FadeIn delay={0.3} direction="left" className="grid grid-cols-2 gap-y-8 pt-4">
                 <div>
                   <h4 className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-2">KONDİSYON</h4>
                   <p className="text-[11px] font-bold uppercase tracking-widest text-black">{product.condition}</p>
@@ -144,10 +147,10 @@ export default async function ProductDetailPage({
                     <p className="text-[11px] font-bold uppercase tracking-widest text-black">{product.dimensions}</p>
                   </div>
                 )}
-              </div>
+              </FadeIn>
 
               {/* UZMAN RAPORU */}
-              <div className="border border-gray-200 p-8">
+              <FadeIn delay={0.4} direction="left" className="border border-gray-200 p-8 glass">
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black mb-6">
                   PEONY UZMAN RAPORU
                 </h4>
@@ -193,15 +196,15 @@ export default async function ProductDetailPage({
                     </div>
                   </div>
                 </div>
-              </div>
+              </FadeIn>
 
               {/* Açıklama */}
-              <div className="text-[12px] leading-loose text-gray-600 font-light italic font-playfair border-l border-gray-200 pl-6 my-10">
+              <FadeIn delay={0.5} direction="left" className="text-[12px] leading-loose text-gray-600 font-light italic font-playfair border-l-2 border-[#AF9164] pl-6 my-10">
                 "{product.description}"
-              </div>
+              </FadeIn>
 
               {/* Butonlar & AR */}
-              <div className="flex flex-col gap-3 pt-6 border-t border-gray-200">
+              <FadeIn delay={0.6} direction="left" className="flex flex-col gap-3 pt-6 border-t border-gray-200">
                 {product.status === 'sold' ? (
                   <button disabled className="w-full bg-gray-100 text-gray-400 py-4 font-bold uppercase tracking-[0.2em] text-[11px] text-center cursor-not-allowed border border-gray-200">
                     BU PARÇA SATILMIŞTIR
@@ -216,14 +219,16 @@ export default async function ProductDetailPage({
                     {/* <VirtualTryOnButton productName={product.model_name} /> */}
                   </>
                 )}
-              </div>
+              </FadeIn>
 
               {/* Lüks Güvenlik Detayları */}
-              <div className="pt-10">
-                <p className="text-[9px] text-center text-gray-400 uppercase tracking-[0.2em]">
+              <FadeIn delay={0.7} direction="up" className="pt-10">
+                <p className="text-[9px] text-center text-gray-400 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                  <span className="w-8 h-[1px] bg-gray-200"></span>
                   COMPLIMENTARY SECURE SHIPPING & AUTHENTICITY GUARANTEED
+                  <span className="w-8 h-[1px] bg-gray-200"></span>
                 </p>
-              </div>
+              </FadeIn>
 
             </div>
           </div>

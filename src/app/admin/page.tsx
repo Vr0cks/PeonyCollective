@@ -2,6 +2,7 @@ import { createClient } from '@/src/utils/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Product, Profile } from '@/src/types'
+import FadeIn from '@/src/components/animations/FadeIn'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -49,21 +50,21 @@ export default async function AdminDashboardPage() {
     <div className="p-8 min-h-full">
 
       {/* Başlık */}
-      <div className="mb-10">
+      <FadeIn delay={0.1} direction="down" className="mb-10">
         <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Admin Panel</p>
         <h1 className="text-3xl font-bold text-white tracking-tight">Genel Bakış</h1>
         <p className="text-white/40 text-sm mt-1">
           {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
-      </div>
+      </FadeIn>
 
       {/* İSTATİSTİK KARTLARI */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className={`relative ${s.bg} border ${s.border} rounded-2xl p-6 ${s.href ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''}`}
-          >
+        {stats.map((s, idx) => (
+          <FadeIn key={s.label} delay={0.2 + (idx * 0.1)} direction="up">
+            <div
+              className={`relative h-full ${s.bg} border ${s.border} rounded-2xl p-6 backdrop-blur-md ${s.href ? 'cursor-pointer hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300' : ''}`}
+            >
             {s.href ? (
               <Link href={s.href} className="absolute inset-0 rounded-2xl" />
             ) : null}
@@ -74,7 +75,8 @@ export default async function AdminDashboardPage() {
             )}
             <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-3">{s.label}</p>
             <p className={`text-4xl font-bold ${s.color}`}>{s.value}</p>
-          </div>
+            </div>
+          </FadeIn>
         ))}
       </div>
 
@@ -84,26 +86,27 @@ export default async function AdminDashboardPage() {
           { href: '/admin/pending', label: 'Onay Kuyruğu', desc: 'Bekleyen ürünleri incele ve onayla', count: pendingCount ?? 0, accent: 'amber' },
           { href: '/admin/products', label: 'Tüm Ürünler', desc: 'Tüm statüslerdeki ürünleri listele', count: totalCount ?? 0, accent: 'blue' },
           { href: '/admin/lab', label: 'Lab — A/B', desc: 'Orijinallik karşılaştırma ekranı', count: null, accent: 'purple' },
-        ].map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="block bg-white/5 hover:bg-white/8 border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-200 group"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className={`w-2 h-2 rounded-full ${item.accent === 'amber' ? 'bg-amber-400' : item.accent === 'blue' ? 'bg-blue-400' : 'bg-purple-400'}`} />
-              {item.count !== null && (
-                <span className="text-xs font-bold text-white/20">{item.count}</span>
-              )}
-            </div>
-            <h3 className="text-sm font-bold text-white mb-1 group-hover:text-white transition-colors">{item.label}</h3>
-            <p className="text-xs text-white/30">{item.desc}</p>
-          </Link>
+        ].map((item, idx) => (
+          <FadeIn key={item.href} delay={0.4 + (idx * 0.1)} direction="left">
+            <Link
+              href={item.href}
+              className="block h-full bg-white/5 hover:bg-white/8 backdrop-blur-sm border border-white/10 hover:border-white/20 rounded-2xl p-6 transition-all duration-300 group"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className={`w-2 h-2 rounded-full ${item.accent === 'amber' ? 'bg-amber-400' : item.accent === 'blue' ? 'bg-blue-400' : 'bg-purple-400'}`} />
+                {item.count !== null && (
+                  <span className="text-xs font-bold text-white/20">{item.count}</span>
+                )}
+              </div>
+              <h3 className="text-sm font-bold text-white mb-1 group-hover:text-white transition-colors">{item.label}</h3>
+              <p className="text-xs text-white/30">{item.desc}</p>
+            </Link>
+          </FadeIn>
         ))}
       </div>
 
       {/* SON ÜRÜNLER */}
-      <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden">
+      <FadeIn delay={0.6} direction="up" className="bg-white/3 backdrop-blur-xl border border-white/8 rounded-2xl overflow-hidden">
         <div className="px-6 py-5 border-b border-white/8 flex justify-between items-center">
           <h2 className="text-sm font-bold text-white">Son Eklenen Ürünler</h2>
           <Link href="/admin/products" className="text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white transition-colors">
@@ -166,7 +169,7 @@ export default async function AdminDashboardPage() {
             )
           })}
         </div>
-      </div>
+      </FadeIn>
 
     </div>
   )

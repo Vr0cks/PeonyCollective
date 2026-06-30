@@ -5,6 +5,8 @@
 const ENTRUPY_API_URL = process.env.ENTRUPY_API_URL || 'https://api.entrupy.com/v2';
 const ENTRUPY_API_KEY = process.env.ENTRUPY_API_KEY;
 
+import { createAdminClient } from '@/src/utils/supabase/admin';
+
 export interface EntrupyAnalysisRequest {
   productId: string;
   brand: string;
@@ -61,12 +63,21 @@ export async function startEntrupyAnalysis(data: EntrupyAnalysisRequest): Promis
       entrupy_id: result.id || 'unknown',
       status: result.status || 'analyzing'
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[ENTRUPY ERROR]', error);
+    try {
+      const supabase = createAdminClient();
+      await supabase.from('system_logs').insert({
+        level: 'error',
+        source: 'entrupy_api',
+        message: 'Entrupy analiz talebi başarısız oldu',
+        metadata: { error: error instanceof Error ? error.message : String(error), productId: data.productId }
+      });
+    } catch (e) {}
     return {
       entrupy_id: '',
       status: 'error',
-      error_message: error.message
+      error_message: error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu'
     };
   }
 }

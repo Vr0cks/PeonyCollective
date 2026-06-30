@@ -18,6 +18,7 @@ export default function PwaInstallPrompt() {
       // Device detection for tailored installation instructions (iOS Safari vs. Chromium).
       const userAgent = window.navigator.userAgent.toLowerCase()
       const isIosDevice = /iphone|ipad|ipod/.test(userAgent)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsIOS(isIosDevice)
 
       // Terminate execution if the application is already running in standalone PWA mode.

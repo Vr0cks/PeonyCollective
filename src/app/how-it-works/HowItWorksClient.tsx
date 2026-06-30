@@ -18,8 +18,8 @@ const steps = [
     color: "bg-zinc-50"
   },
   {
-    title: "32 Noktalı Ekspertiz & AI Tarama",
-    desc: "Uzmanlarımız derinin dikişinden, donanım ağırlığına kadar ürünü fiziksel olarak inceler ve AI veritabanımızla karşılaştırır.",
+    title: "32 Noktalı Ekspertiz & Makroskobik Tarama",
+    desc: "Uzmanlarımız derinin dikişinden, donanım ağırlığına kadar ürünü fiziksel olarak inceler ve global referans veritabanımızla karşılaştırır.",
     icon: <Search className="w-8 h-8" strokeWidth={1} />,
     color: "bg-orange-50"
   },

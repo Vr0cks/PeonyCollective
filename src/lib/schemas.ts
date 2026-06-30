@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { genders, mainCategories, brands, conditions } from '@/src/utils/categoryData';
+import { genders, mainCategories, conditions } from '@/src/utils/categoryData';
 
 // Kategori verilerindeki değerleri union tiplerine çeviriyoruz
 const validGenders = genders.map(g => g.value) as [string, ...string[]];

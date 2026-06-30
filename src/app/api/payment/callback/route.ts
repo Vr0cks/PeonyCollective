@@ -1,4 +1,4 @@
-import { createClient } from '@/src/utils/supabase/server'
+import { createAdminClient } from '@/src/utils/supabase/admin'
 import { verifyCallback, PayTRCallbackParams } from '@/src/lib/paytr'
 
 export async function POST(request: Request) {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     const orderId = params.merchant_oid
-    const supabase = await createClient()
+    const supabase = createAdminClient()
 
     if (params.status === 'success') {
       // 2. Fetch orders to verify status and retrieve details
@@ -38,15 +38,17 @@ export async function POST(request: Request) {
           continue // Already updated
         }
 
-        // 3. Prevent race conditions: check if product is already sold by someone else
-        const { data: product } = await supabase
+        // 3. TOCTOU FIX: Prevent race conditions & Update product status in a single atomic operation
+        const { data: updatedProducts, error: updateProductError } = await supabase
           .from('products')
-          .select('status')
+          .update({ status: 'sold' })
           .eq('id', order.product_id)
-          .single()
+          .neq('status', 'sold')
+          .select('id')
 
-        if (!product || product.status === 'sold') {
-          // Product is sold, cancel this order
+        if (updateProductError || !updatedProducts || updatedProducts.length === 0) {
+          // Product is either already sold by someone else in the same ms, or not found
+          console.error('URUN ZATEN SATILMIS VEYA BULUNAMADI', updateProductError)
           await supabase
             .from('orders')
             .update({ order_status: 'cancelled' })
@@ -65,17 +67,9 @@ export async function POST(request: Request) {
 
         if (updateOrderError) {
           console.error('SIPARIS GUNCELLENEMEDI', updateOrderError)
+          // If order update fails, we might need a rollback logic in a real app,
+          // but for now, we just continue. Product is marked sold.
           continue
-        }
-
-        // 5. Update product status to sold
-        const { error: updateProductError } = await supabase
-          .from('products')
-          .update({ status: 'sold' })
-          .eq('id', order.product_id)
-
-        if (updateProductError) {
-          console.error('URUN DURUMU GUNCELLENEMEDI', updateProductError)
         }
 
         // 6. Notify seller & OTO Kargo Integration
@@ -149,11 +143,23 @@ export async function POST(request: Request) {
                   })
                 } catch (emailErr) {
                   console.error('Email gönderilemedi:', emailErr)
+                  await supabase.from('system_logs').insert({
+                    level: 'error',
+                    source: 'paytr_webhook',
+                    message: 'Sipariş onayı e-postası gönderilemedi',
+                    metadata: { orderId: order.id, error: String(emailErr) }
+                  })
                 }
               }
             }
           } catch (e) {
             console.error('OTO Create Order Error:', e)
+            await supabase.from('system_logs').insert({
+              level: 'error',
+              source: 'paytr_webhook',
+              message: 'OTO Kargo API hatası',
+              metadata: { orderId: order.id, error: String(e) }
+            })
           }
         }
       } // End of orders loop

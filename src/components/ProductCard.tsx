@@ -56,7 +56,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <button 
               onClick={(e) => {
                 e.preventDefault()
-                addToCart(product as any)
+                addToCart(product)
               }}
               className="text-[10px] font-bold uppercase tracking-[0.2em] border-b border-black pb-0.5 hover:text-[#AF9164] hover:border-[#AF9164] transition-colors"
             >

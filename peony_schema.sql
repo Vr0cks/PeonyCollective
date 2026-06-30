@@ -90,3 +90,13 @@ CREATE TABLE IF NOT EXISTS public.product_drafts (
 
 -- Realtime için concierge_requests tablosunu etkinleştir
 ALTER PUBLICATION supabase_realtime ADD TABLE public.concierge_requests;
+
+-- 6. System Logs Tablosu
+CREATE TABLE IF NOT EXISTS public.system_logs (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    level TEXT CHECK (level IN ('info', 'warn', 'error')) DEFAULT 'info',
+    source TEXT NOT NULL,
+    message TEXT NOT NULL,
+    metadata JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);

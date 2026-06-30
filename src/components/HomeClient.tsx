@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import ProductCard from '@/src/components/ProductCard'
 import SellPopup from '@/src/components/SellPopup'
 import CustomSelect from '@/src/components/CustomSelect'
+import FadeIn from '@/src/components/animations/FadeIn'
 import { Product } from '@/src/types'
 
 // Kategori kartları için veri
@@ -83,24 +84,20 @@ export default function HomeClient({ products, brands, brand, category, gender }
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
         
         <div className="relative z-20 w-full px-6 md:px-12 pb-24 md:pb-32 flex flex-col items-center text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-          >
+          <FadeIn delay={0.2} direction="up">
             <p className="sans-detail text-white/70 mb-6 tracking-[0.4em]">MİRASIN YENİ SAHİBİ</p>
             <h1 className="text-[clamp(3rem,12vw,10rem)] leading-[0.8] text-white serif-display tracking-tight">
               Arzunun <br /> <span className="italic font-light">Objeleri</span>
             </h1>
             <div className="mt-12 md:mt-16 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 w-full max-w-sm md:max-w-none mx-auto">
-              <Link href="#collection" className="w-full md:w-auto text-center sans-detail border border-white/30 px-6 md:px-10 py-4 text-white hover:bg-white hover:text-black transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs">
+              <Link href="#collection" className="w-full md:w-auto text-center sans-detail border border-white/30 px-6 md:px-10 py-4 text-white hover:bg-white hover:text-black transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs backdrop-blur-sm">
                 Koleksiyonu Keşfet
               </Link>
               <Link href="/sell" className="w-full md:w-auto text-center sans-detail bg-[#AF9164] border border-[#AF9164] px-6 md:px-10 py-4 text-white hover:bg-transparent hover:text-[#AF9164] transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs">
                 Lüksü Nakde Çevir
               </Link>
             </div>
-          </motion.div>
+          </FadeIn>
         </div>
       </section>
 
@@ -137,7 +134,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
           </div>
 
           {/* Sağ: Editorial Görsel */}
-          <div className="order-1 lg:order-2">
+          <FadeIn delay={0.4} direction="left" className="order-1 lg:order-2">
             <div className="relative aspect-[4/5] md:aspect-square lg:aspect-[4/5] overflow-hidden luxury-img-wrapper">
               <Image 
                 src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=1000" 
@@ -147,7 +144,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 alt="Editorial Details"
               />
             </div>
-          </div>
+          </FadeIn>
           
         </div>
       </section>
@@ -276,15 +273,9 @@ export default function HomeClient({ products, brands, brand, category, gender }
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-12 gap-y-24">
                 {products.slice(0, visibleCount).map((p, i) => (
-                  <motion.div 
-                    key={p.id}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.8, delay: i % 4 * 0.1 }}
-                  >
+                  <FadeIn key={p.id} delay={i % 4 * 0.1} direction="up">
                     <ProductCard product={p} />
-                  </motion.div>
+                  </FadeIn>
                 ))}
               </div>
               
@@ -413,15 +404,8 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 { value: '%0', unit: '', label: 'Sahte Ürün Teslimatı', sub: 'Kuruluşumuzdan Bugüne' },
                 { value: '32', unit: '', label: 'Fiziksel Kontrol Noktası', sub: 'Her Ürün İçin' },
                 { value: '72', unit: 'SA', label: 'Ortalama Onay Süresi', sub: 'Teslimat Dahil' },
-              ].map((m) => (
-                <motion.div
-                  key={m.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className="bg-white p-10 md:p-12 flex flex-col justify-between min-h-[200px]"
-                >
+              ].map((m, i) => (
+                <FadeIn key={m.label} delay={i * 0.1} direction="up" className="bg-white p-10 md:p-12 flex flex-col justify-between min-h-[200px]">
                   <div>
                     <p className="text-5xl md:text-6xl serif-display text-[#1A1A1A] leading-none">
                       {m.value}<span className="text-[#AF9164] text-3xl ml-1">{m.unit}</span>
@@ -431,7 +415,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                     <p className="text-sm font-medium text-[#1A1A1A] mt-4 leading-snug">{m.label}</p>
                     <p className="sans-detail text-gray-400 mt-1">{m.sub}</p>
                   </div>
-                </motion.div>
+                </FadeIn>
               ))}
             </div>
 
@@ -516,14 +500,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=600',
               },
             ].map((story, i) => (
-              <motion.div
-                key={story.item}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: i * 0.15 }}
-                className="group border border-white/10 hover:border-[#AF9164]/50 transition-all duration-700 overflow-hidden"
-              >
+              <FadeIn key={story.item} delay={i * 0.15} direction="up" className="group border border-white/10 bg-white/5 backdrop-blur-sm hover:border-[#AF9164]/50 transition-all duration-700 overflow-hidden">
                 {/* Görsel */}
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
@@ -561,7 +538,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                     <span className="text-xl serif-display text-white">{story.price}</span>
                   </div>
                 </div>
-              </motion.div>
+              </FadeIn>
             ))}
           </div>
         </div>
@@ -588,21 +565,14 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 { step: '03', title: 'Lab Ekspertizi', desc: '32 nokta fiziksel + Entrupy teknoloji doğrulaması yapılır.', icon: '⊕' },
                 { step: '04', title: 'Teslimat & Ödeme', desc: 'Onaylı ürün alıcıya gider, satıcı ödemesini alır.', icon: '✓' },
               ].map((item, i) => (
-                <motion.div
-                  key={item.step}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.6 }}
-                  className="text-center group"
-                >
+                <FadeIn key={item.step} delay={i * 0.1} direction="up" className="text-center group">
                   <div className="w-20 h-20 rounded-full border border-gray-200 flex items-center justify-center mx-auto mb-6 group-hover:border-[#AF9164] group-hover:bg-[#AF9164]/5 transition-all duration-500">
                     <span className="text-2xl text-gray-400 group-hover:text-[#AF9164] transition-colors">{item.icon}</span>
                   </div>
                   <p className="sans-detail text-[#AF9164] mb-3">{item.step}</p>
                   <h3 className="text-lg serif-display text-[#1A1A1A] mb-3">{item.title}</h3>
                   <p className="text-sm text-gray-400 font-light leading-relaxed max-w-[200px] mx-auto">{item.desc}</p>
-                </motion.div>
+                </FadeIn>
               ))}
             </div>
           </div>
@@ -628,12 +598,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         
         <div className="relative z-10 max-w-4xl px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-          >
+          <FadeIn delay={0.2} direction="up">
             <p className="sans-detail text-[#AF9164] mb-6 tracking-[0.4em]">UNLOCK YOUR WARDROBE'S VALUE</p>
             <h2 className="text-5xl md:text-7xl lg:text-8xl serif-display text-white leading-[1.1] mb-8">
               Kullanmadığınız lüks, <br/> <span className="italic font-light">başkası için bir hazine.</span>
@@ -644,7 +609,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
             <Link href="/sell" className="inline-flex items-center justify-center px-14 py-6 bg-white text-black hover:bg-[#AF9164] hover:text-white transition-all duration-500 sans-detail tracking-[0.3em] uppercase text-sm font-bold shadow-2xl hover:scale-105">
               HEMEN SATIŞ YAP
             </Link>
-          </motion.div>
+          </FadeIn>
         </div>
       </section>
 

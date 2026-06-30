@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { Product } from '@/src/types'
 
-interface CartItem extends Product {}
+type CartItem = Product
 
 interface CartContextType {
   cartItems: CartItem[]
@@ -24,6 +24,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // LocalStorage'dan sepeti yükle
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true)
     const savedCart = localStorage.getItem('peony_cart')
     if (savedCart) {

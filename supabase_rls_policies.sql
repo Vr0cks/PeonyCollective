@@ -44,9 +44,8 @@ CREATE POLICY "Buyers can insert orders"
   ON public.orders FOR INSERT
   WITH CHECK (auth.uid() = buyer_id);
 
-CREATE POLICY "Users can update their orders or admin"
-  ON public.orders FOR UPDATE
-  USING (auth.uid() = buyer_id OR auth.uid() = seller_id OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
+-- SİPARİŞ GÜNCELLEMELERİ SADECE BACKEND (SERVICE_ROLE) ÜZERİNDEN YAPILABİLİR!
+-- Bu nedenle Frontend için UPDATE politikası kasten verilmemiştir. (Güvenlik Önlemi)
 
 -- 4. CONCIERGE REQUESTS Tablosu
 ALTER TABLE public.concierge_requests ENABLE ROW LEVEL SECURITY;
@@ -68,7 +67,14 @@ CREATE POLICY "Users can manage their own drafts"
   ON public.product_drafts FOR ALL
   USING (auth.uid() = seller_id);
 
--- 6. NOTIFICATIONS Tablosu (Varsa)
+-- 6. SYSTEM LOGS Tablosu
+ALTER TABLE public.system_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Only admins can view system logs"
+  ON public.system_logs FOR SELECT
+  USING ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
+
+-- 7. NOTIFICATIONS Tablosu (Varsa)
 -- ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 -- CREATE POLICY "Users can view their own notifications"
 --   ON public.notifications FOR SELECT USING (auth.uid() = user_id);

@@ -33,7 +33,7 @@ export default function EntrupyModal() {
               </div>
               <h2 className="text-3xl serif-display mb-4">Entrupy™ Doğrulaması</h2>
               <p className="text-gray-500 font-light leading-relaxed max-w-lg mx-auto">
-                Yapay zeka ve mikroskobik görüntüleme teknolojisiyle lüks ürünlerin orijinalliğini %99.1 oranında garantileyen dünya standardı.
+                Gelişmiş optik lensler ve mikroskobik görüntüleme teknolojisiyle lüks ürünlerin orijinal formunu %99.1 oranında doğrulayan dünya standardı.
               </p>
             </div>
 
@@ -60,7 +60,7 @@ export default function EntrupyModal() {
                 Sitemizdeki her ürün satıldıktan sonra Peony Lab'a gönderilir. Burada uzman küratörlerimiz ve Entrupy cihazlarımızla incelenir. Sadece sertifika alabilen ürünler alıcıya kargolanır.
               </p>
               <p className="text-[9px] text-gray-400 leading-relaxed font-medium bg-white p-3 rounded border border-gray-100 text-left">
-                <strong>Hukuki Uyarı:</strong> Peony Collective, bağımsız bir pazar yeri olup markaların yetkili satıcısı değildir. Entrupy™ doğrulaması, yapay zeka destekli yüksek isabetli bir orijinallik tahmini sunar. Peony Collective, satıcı tarafından kasıtlı manipüle edilen ve teknolojiyi aşan çok spesifik ("super fake") sahtecilik durumlarında doğrudan sorumluluk kabul etmez; ancak Entrupy'nin sunduğu finansal garanti koşulları dahilinde alıcı haklarını savunmayı taahhüt eder.
+                <strong>Hukuki Uyarı:</strong> Peony Collective, bağımsız bir pazar yeri olup markaların yetkili satıcısı değildir. Entrupy doğrulaması, mikroskobik veri analizi destekli yüksek isabetli bir orijinallik tahmini sunar. Peony Collective, satıcı tarafından kasıtlı manipüle edilen ve teknolojiyi aşan çok spesifik ("super fake") sahtecilik durumlarında doğrudan sorumluluk kabul etmez; ancak Entrupy'nin sunduğu finansal garanti koşulları dahilinde alıcı haklarını savunmayı taahhüt eder.
               </p>
             </div>
             

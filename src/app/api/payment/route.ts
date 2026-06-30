@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/src/utils/supabase/server'
-import { createPaymentToken } from '@/src/lib/paytr'
+import { createAdminClient } from '@/src/utils/supabase/admin'
+import { createPaymentToken, addSubmerchant } from '@/src/lib/paytr'
 
 // Basit In-Memory Rate Limiting (Üretim ortamında Redis / Upstash önerilir)
 const rateLimitCache = new Map<string, number>()
@@ -140,6 +141,53 @@ export async function POST(request: Request) {
 
     const merchantOid = newOrder.id
 
+    // PAYTR PAZARYERİ (SPLIT PAYMENT) MANTIGI
+    let submerchantId = sellerProfile?.submerchant_id
+
+    if (!submerchantId) {
+      // Satıcının IBAN ve TCKN/VKN kontrolü
+      if (!sellerProfile?.iban || (!sellerProfile?.tckn && !sellerProfile?.vkn)) {
+        return NextResponse.json(
+          { error: 'Satıcı ödeme bilgilerini tamamlamadığı için bu ürün şu an satın alınamaz.' },
+          { status: 400 }
+        )
+      }
+
+      // Alt Üye İşyeri Kaydı (PayTR)
+      try {
+        const subResult = await addSubmerchant({
+          name: `${sellerProfile.first_name || ''} ${sellerProfile.last_name || ''}`.trim(),
+          address: sellerProfile.address || 'Adres belirtilmemiş',
+          email: 'satici_' + sellerProfile.id + '@peonycollective.com', // Gerçek DB'de satıcının email'i users tablosunda. Veya mock.
+          iban: sellerProfile.iban,
+          tckn: sellerProfile.tckn,
+          vkn: sellerProfile.vkn,
+          companyTitle: sellerProfile.company_title,
+          submerchantType: sellerProfile.submerchant_type || 'bireysel'
+        })
+        
+        submerchantId = subResult.submerchant_id
+
+        // Kaydedilen submerchantId'yi DB'ye yaz (Admin client kullanarak RLS'i aş)
+        const adminClient = createAdminClient()
+        await adminClient.from('profiles').update({ submerchant_id: submerchantId }).eq('id', sellerProfile.id)
+        
+      } catch (err: any) {
+        console.error('[PAYTR SUBMERCHANT ERROR]', err)
+        const adminClient = createAdminClient()
+        await adminClient.from('system_logs').insert({
+          level: 'error',
+          source: 'paytr_submerchant',
+          message: 'Satıcı PayTR alt-üye kaydı başarısız',
+          metadata: { error: err.message, sellerId: sellerProfile.id }
+        })
+        return NextResponse.json(
+          { error: 'Satıcının hesap bilgileri doğrulanamadı, işlem iptal edildi.' },
+          { status: 400 }
+        )
+      }
+    }
+
     // Amount in kuruş (price * 100)
     const paymentAmount = Math.round(finalPrice * 100)
 
@@ -158,18 +206,9 @@ export async function POST(request: Request) {
       itemPrice: paymentAmount,
       merchantOkUrl: `${siteUrl}/orders/success?order_id=${merchantOid}&productId=${productId}`,
       merchantFailUrl: `${siteUrl}/checkout/${productId}?payment_error=true`,
+      submerchantId: submerchantId,
+      submerchantPrice: Math.round(sellerAmount * 100) // Satıcının hakkedişi (kuruş)
     })
-
-    // --- PAYTR PAZARYERİ (SPLIT PAYMENT) ENTEGRASYONU İÇİN EKLENECEK ALANLAR ---
-    // Müşterinin isteği olan "Sadece komisyon bana gelsin" özelliği için, PayTR token
-    // oluşturulurken tedarikçi bilgilerinin gönderilmesi zorunludur. Gerçek API entegrasyonu
-    // başladığında aşağıdaki alanlar PayTR'a (paytrParams içine) dahil edilmelidir:
-    // 
-    // paytrParams.non3d_test_failed = "0"; // Pazaryeri testi için
-    // paytrParams.submerchant_price = sellerAmount.toString(); // Satıcıya gidecek net tutar
-    // paytrParams.submerchant_id = sellerProfile?.submerchant_id || "henuz_yok"; // PayTR Alt Üye İşyeri Kodu
-    // (veya submerchant objesi ile IBAN, TCKN, İsim vb. anlık olarak gönderilebilir)
-    // -----------------------------------------------------------------------------
 
     // Call PayTR to get the token
     const response = await fetch('https://www.paytr.com/odeme/api/get-token', {
