@@ -83,15 +83,26 @@ export async function POST(req: Request) {
             metadata: { error: String(error), customerItemId, payload }
           });
           return NextResponse.json({ error: 'DB Update Failed' }, { status: 500 });
-        } else {
-          // Başarı logu
-          await supabase.from('system_logs').insert({
-            level: 'info',
-            source: 'entrupy_webhook',
-            message: `Ürün Entrupy analizi tamamlandı: ${status}`,
-            metadata: { customerItemId, entrupyId, status }
-          });
         }
+
+        // Update associated order status based on Entrupy result
+        if (status === 'verified') {
+          await supabase.from('orders').update({
+            order_status: 'inspecting'
+          }).eq('product_id', customerItemId);
+        } else if (status === 'rejected') {
+          await supabase.from('orders').update({
+            order_status: 'cancelled'
+          }).eq('product_id', customerItemId);
+        }
+
+        // Başarı logu
+        await supabase.from('system_logs').insert({
+          level: 'info',
+          source: 'entrupy_webhook',
+          message: `Ürün Entrupy analizi tamamlandı: ${status}, Sipariş durumu güncellendi.`,
+          metadata: { customerItemId, entrupyId, status }
+        });
       }
     }
 
