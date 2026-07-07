@@ -29,11 +29,12 @@ export default function MessageThread({
   onSend,
   sending,
 }: MessageThreadProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  // Scroll to bottom on new messages
+  // Scroll to bottom of message box container only (not body window scroll)
+  const scrollRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
   }, [messages])
 
   const other = conversation?.other_profile || {}
@@ -87,7 +88,7 @@ export default function MessageThread({
       )}
 
       {/* Messages list */}
-      <div className="flex-grow overflow-y-auto p-6 space-y-4 bg-gray-50/20">
+      <div ref={scrollRef} className="flex-grow overflow-y-auto p-6 space-y-4 bg-gray-50/20">
         {loading ? (
           <div className="h-full flex items-center justify-center">
             <Loader2 className="w-6 h-6 animate-spin text-[#AF9164]" />
@@ -120,14 +121,13 @@ export default function MessageThread({
                     {new Date(msg.created_at).toLocaleTimeString('tr-TR', {
                       hour: '2-digit',
                       minute: '2-digit',
-                    })}
+                      })}
                   </span>
                 </div>
               </div>
             )
           })
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input box */}

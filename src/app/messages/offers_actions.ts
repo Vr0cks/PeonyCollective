@@ -147,14 +147,53 @@ export async function acceptOffer(offerId: string) {
       .eq('status', 'pending')
       .neq('id', offerId)
 
-    // Sohbet penceresine sistem bildirimi gönder
-    const { createConversation, sendMessage } = await import('./actions')
-    const convResult = await createConversation(offer.buyer_id, product.id)
-    if (convResult.success && convResult.conversationId) {
-      await sendMessage(
-        convResult.conversationId,
-        `[SİSTEM MESAJI] Teklifiniz satıcı tarafından kabul edildi! Ürün 24 saat boyunca sizin için rezerve edilmiştir.`
-      )
+    // Sohbet penceresine sistem bildirimini doğrudan DB sorgusu ile gönder (Circular Import'u önlemek için)
+    try {
+      // Önce mevcut konuşmayı ara
+      const { data: existingConv } = await adminClient
+        .from('conversations')
+        .select('id')
+        .or(`and(participant_1.eq.${offer.buyer_id},participant_2.eq.${user.id}),and(participant_1.eq.${user.id},participant_2.eq.${offer.buyer_id})`)
+        .eq('product_id', product.id)
+        .limit(1)
+
+      let conversationId = existingConv?.[0]?.id
+
+      if (!conversationId) {
+        // Konuşma yoksa oluştur
+        const { data: newConv } = await adminClient
+          .from('conversations')
+          .insert({
+            participant_1: user.id,
+            participant_2: offer.buyer_id,
+            product_id: product.id,
+            last_message: 'Sohbet başlatıldı',
+            last_message_at: new Date().toISOString()
+          })
+          .select('id')
+          .single()
+        conversationId = newConv?.id
+      }
+
+      if (conversationId) {
+        const sysMsg = `[SİSTEM MESAJI] Teklifiniz satıcı tarafından kabul edildi! Ürün 24 saat boyunca sizin için rezerve edilmiştir.`
+        
+        // Mesajı ekle
+        await adminClient.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: sysMsg,
+          is_read: false
+        })
+
+        // Konuşmayı güncelle
+        await adminClient.from('conversations').update({
+          last_message: sysMsg,
+          last_message_at: new Date().toISOString()
+        }).eq('id', conversationId)
+      }
+    } catch (msgErr) {
+      console.error('Kabul bildirim mesajı gönderilemedi:', msgErr)
     }
 
     return { success: true }
@@ -201,14 +240,49 @@ export async function rejectOffer(offerId: string) {
       return { success: false, error: 'Teklif güncellenemedi.' }
     }
 
-    // Sohbet penceresine sistem bildirimi gönder
-    const { createConversation, sendMessage } = await import('./actions')
-    const convResult = await createConversation(offer.buyer_id, product.id)
-    if (convResult.success && convResult.conversationId) {
-      await sendMessage(
-        convResult.conversationId,
-        `[SİSTEM MESAJI] Teklifiniz satıcı tarafından reddedildi.`
-      )
+    // Sohbet penceresine sistem bildirimini doğrudan DB sorgusu ile gönder (Circular Import'u önlemek için)
+    try {
+      const { data: existingConv } = await supabase
+        .from('conversations')
+        .select('id')
+        .or(`and(participant_1.eq.${offer.buyer_id},participant_2.eq.${user.id}),and(participant_1.eq.${user.id},participant_2.eq.${offer.buyer_id})`)
+        .eq('product_id', product.id)
+        .limit(1)
+
+      let conversationId = existingConv?.[0]?.id
+
+      if (!conversationId) {
+        const { data: newConv } = await supabase
+          .from('conversations')
+          .insert({
+            participant_1: user.id,
+            participant_2: offer.buyer_id,
+            product_id: product.id,
+            last_message: 'Sohbet başlatıldı',
+            last_message_at: new Date().toISOString()
+          })
+          .select('id')
+          .single()
+        conversationId = newConv?.id
+      }
+
+      if (conversationId) {
+        const sysMsg = `[SİSTEM MESAJI] Teklifiniz satıcı tarafından reddedildi.`
+        
+        await supabase.from('messages').insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: sysMsg,
+          is_read: false
+        })
+
+        await supabase.from('conversations').update({
+          last_message: sysMsg,
+          last_message_at: new Date().toISOString()
+        }).eq('id', conversationId)
+      }
+    } catch (msgErr) {
+      console.error('Ret bildirim mesajı gönderilemedi:', msgErr)
     }
 
     return { success: true }
