@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, User, LogOut } from 'lucide-react'
+import { Menu, X, User, LogOut, MessageSquare } from 'lucide-react'
 import { logout } from '@/src/app/login/actions'
 
 import type { User as SupabaseUser } from '@supabase/supabase-js'
@@ -126,10 +126,16 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Kullanıcı Servisleri</p>
                   <div className="flex flex-col gap-4 text-sm font-medium uppercase tracking-[0.15em] text-gray-800">
                     {user ? (
-                      <Link href="/dashboard" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
-                        <User size={16} strokeWidth={1.5} />
-                        Panelim
-                      </Link>
+                      <>
+                        <Link href="/dashboard" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
+                          <User size={16} strokeWidth={1.5} />
+                          Panelim
+                        </Link>
+                        <Link href="/messages" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
+                          <MessageSquare size={16} strokeWidth={1.5} />
+                          Mesajlarım
+                        </Link>
+                      </>
                     ) : (
                       <Link href="/sell" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">Satış Yap</Link>
                     )}

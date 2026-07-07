@@ -6,7 +6,7 @@ import MobileMenu from './MobileMenu'
 import SearchTrigger from './SearchTrigger'
 import CartTrigger from './CartTrigger'
 import CategoryNav from './CategoryNav'
-import { User } from 'lucide-react'
+import { User, MessageSquare } from 'lucide-react'
 import { Profile } from '@/src/types'
 
 export default async function Navbar() {
@@ -65,6 +65,9 @@ export default async function Navbar() {
           
           {user ? (
             <div className="flex items-center gap-6 lg:gap-8">
+              <Link href="/messages" className="text-[#1A1A1A] hover:text-[#AF9164] transition-colors relative" title="Mesajlarım">
+                <MessageSquare size={18} strokeWidth={1.5} />
+              </Link>
               <NotificationBell userId={user.id} />
               
               <Link href="/dashboard" className="flex items-center gap-4 group">
