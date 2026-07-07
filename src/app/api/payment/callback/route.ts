@@ -20,13 +20,17 @@ export async function POST(request: Request) {
 
     const orderId = params.merchant_oid
     const supabase = createAdminClient()
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId)
 
     if (params.status === 'success') {
       // 2. Fetch orders to verify status and retrieve details
-      const { data: orders, error: orderError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('payment_id', orderId)
+      const query = supabase.from('orders').select('*')
+      if (isUuid) {
+        query.eq('id', orderId)
+      } else {
+        query.eq('payment_id', orderId)
+      }
+      const { data: orders, error: orderError } = await query
 
       if (orderError || !orders || orders.length === 0) {
         return new Response('SIPARIS BULUNAMADI', { status: 404 })
@@ -165,10 +169,14 @@ export async function POST(request: Request) {
       } // End of orders loop
     } else {
       // Payment failed
-      await supabase
+      const query = supabase
         .from('orders')
         .update({ order_status: 'cancelled' })
-        .eq('payment_id', orderId)
+      if (isUuid) {
+        await query.eq('id', orderId)
+      } else {
+        await query.eq('payment_id', orderId)
+      }
     }
 
     // PayTR callback expects "OK"

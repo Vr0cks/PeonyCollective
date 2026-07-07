@@ -7,12 +7,22 @@ const WEBHOOK_SECRET = process.env.ENTRUPY_WEBHOOK_SECRET;
 function verifySignature(payload: string, signature: string | null): boolean {
   if (!WEBHOOK_SECRET || !signature) return false;
 
-  const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
-  const digest = hmac.update(payload).digest('hex');
-  
-  // Entrupy-Signature genellikle 'hex' formatında gönderilir. 
-  // Gerçek API ile test edildiğinde karşılaştırma mantığı (timingSafeEqual vs) gerekebilir.
-  return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
+  try {
+    const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
+    const digest = hmac.update(payload).digest('hex');
+    
+    const digestBuffer = Buffer.from(digest);
+    const signatureBuffer = Buffer.from(signature);
+    
+    if (digestBuffer.length !== signatureBuffer.length) {
+      return false;
+    }
+    
+    return crypto.timingSafeEqual(digestBuffer, signatureBuffer);
+  } catch (error) {
+    console.error('[ENTRUPY WEBHOOK] İmza doğrulama hatası:', error);
+    return false;
+  }
 }
 
 export async function POST(req: Request) {
@@ -41,10 +51,20 @@ export async function POST(req: Request) {
       
       const entrupyId = payload.data?.id; // veya customer_item_id
       const customerItemId = payload.data?.customer_item_id; // Bizim product.id'miz
-      const status = payload.data?.status; // 'verified', 'rejected' vs.
+      const rawStatus = payload.data?.status; // 'verified', 'rejected' vs.
       const certificateUrl = payload.data?.certificate_url; 
 
       if (customerItemId) {
+        // SQL CHECK constraint: CHECK (entrupy_status IN ('pending', 'analyzing', 'verified', 'rejected'))
+        const allowedStatuses = ['pending', 'analyzing', 'verified', 'rejected'];
+        let status = 'pending';
+        
+        if (allowedStatuses.includes(rawStatus)) {
+          status = rawStatus;
+        } else {
+          console.warn(`[ENTRUPY WEBHOOK] Beklenmeyen status değeri alındı: "${rawStatus}". "pending" olarak kaydediliyor.`);
+        }
+
         // Ürün durumunu otomatik onayla
         const productStatus = status === 'verified' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending';
         

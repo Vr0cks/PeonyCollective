@@ -70,8 +70,11 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
 
       // Entrupy status güncelle
       if (entrupyResponse.entrupy_id) {
+        const allowedStatuses = ['pending', 'analyzing', 'verified', 'rejected'];
+        const dbStatus = allowedStatuses.includes(entrupyResponse.status) ? entrupyResponse.status : 'pending';
+        
         await supabase.from('products').update({
-          entrupy_status: entrupyResponse.status
+          entrupy_status: dbStatus
         }).eq('id', insertedProduct.id);
       }
     }
