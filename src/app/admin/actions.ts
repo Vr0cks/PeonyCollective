@@ -74,11 +74,6 @@ export async function updateProductStatus(
 
   // 4. Satıcı e-posta bilgisini al ve e-posta gönder
   try {
-    // Auth user'ı bulmak zor (admin API olmadığı sürece), ama seller_id Auth tablosu ile ilişkili.
-    // Şimdilik profil tablosundan isim bilgilerini, auth'dan email alamıyoruz RLS nedeniyle doğrudan (eğer adminsek alabiliriz).
-    // Daha basit bir çözüm olarak Auth admin apisi ile veya eğer profilde email tutuyorsak oradan.
-    // Şema kontrolünde profile'da email yok.
-    // Supabase Admin client kullanarak e-posta adresini alalım:
     const { createClient: createAdminClient } = await import('@supabase/supabase-js')
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const adminAuthClient = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
@@ -92,18 +87,22 @@ export async function updateProductStatus(
       const { data: sellerProfile } = await supabase.from('profiles').select('first_name, last_name').eq('id', product.seller_id).single()
       
       if (userObj.user?.email) {
-        const { sendProductStatusEmail } = await import('@/src/lib/resend')
-        await sendProductStatusEmail({
-          sellerEmail: userObj.user.email,
-          sellerName: `${sellerProfile?.first_name || ''} ${sellerProfile?.last_name || ''}`.trim() || 'Satıcı',
-          productName: `${product.brand} ${product.model_name}`,
-          status: newStatus,
-          reason: actualReason
-        })
+        try {
+          const { sendProductStatusEmail } = await import('@/src/lib/resend')
+          await sendProductStatusEmail({
+            sellerEmail: userObj.user.email,
+            sellerName: `${sellerProfile?.first_name || ''} ${sellerProfile?.last_name || ''}`.trim() || 'Satıcı',
+            productName: `${product.brand} ${product.model_name}`,
+            status: newStatus,
+            reason: actualReason
+          })
+        } catch (emailSendErr) {
+          console.error('Resend e-posta gönderme hatası:', emailSendErr)
+        }
       }
     }
   } catch (emailErr) {
-    console.error('Bildirim e-postası gönderilemedi:', emailErr)
+    console.error('Bildirim e-postası hazırlama hatası:', emailErr)
   }
 
   // Sayfaları yenile ki değişiklikler anında ekrana yansısın
