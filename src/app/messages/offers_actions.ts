@@ -85,8 +85,11 @@ export async function acceptOffer(offerId: string) {
     } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Oturum açmanız gerekiyor.' }
 
-    // Fetch the offer and details
-    const { data: offer, error: offerError } = await supabase
+    // Use admin client to perform atomic updates and bypass strict policies
+    const adminClient = createAdminClient()
+
+    // Fetch the offer and details using admin client to bypass RLS relation errors
+    const { data: offer, error: offerError } = await adminClient
       .from('offers')
       .select(`
         *,
@@ -111,9 +114,6 @@ export async function acceptOffer(offerId: string) {
     if (offer.status !== 'pending') {
       return { success: false, error: `Bu teklif zaten '${offer.status}' durumunda.` }
     }
-
-    // Use admin client to perform atomic updates and bypass strict policies
-    const adminClient = createAdminClient()
 
     // Update the accepted offer status
     const { error: updateOfferError } = await adminClient
@@ -212,7 +212,9 @@ export async function rejectOffer(offerId: string) {
     } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Oturum açmanız gerekiyor.' }
 
-    const { data: offer, error: offerError } = await supabase
+    const adminClient = createAdminClient()
+
+    const { data: offer, error: offerError } = await adminClient
       .from('offers')
       .select('*, product:products(*)')
       .eq('id', offerId)
@@ -223,6 +225,10 @@ export async function rejectOffer(offerId: string) {
     }
 
     const product = offer.product
+    if (!product) {
+      return { success: false, error: 'İlgili ürün bulunamadı.' }
+    }
+    
     if (product.seller_id !== user.id) {
       return { success: false, error: 'Bu teklifi reddetme yetkiniz bulunmuyor.' }
     }
@@ -231,7 +237,7 @@ export async function rejectOffer(offerId: string) {
       return { success: false, error: 'Bu teklif aktif değil.' }
     }
 
-    const { error: updateOfferError } = await supabase
+    const { error: updateOfferError } = await adminClient
       .from('offers')
       .update({ status: 'rejected' })
       .eq('id', offerId)
@@ -242,7 +248,7 @@ export async function rejectOffer(offerId: string) {
 
     // Sohbet penceresine sistem bildirimini doğrudan DB sorgusu ile gönder (Circular Import'u önlemek için)
     try {
-      const { data: existingConv } = await supabase
+      const { data: existingConv } = await adminClient
         .from('conversations')
         .select('id')
         .or(`and(participant_1.eq.${offer.buyer_id},participant_2.eq.${user.id}),and(participant_1.eq.${user.id},participant_2.eq.${offer.buyer_id})`)
@@ -252,7 +258,7 @@ export async function rejectOffer(offerId: string) {
       let conversationId = existingConv?.[0]?.id
 
       if (!conversationId) {
-        const { data: newConv } = await supabase
+        const { data: newConv } = await adminClient
           .from('conversations')
           .insert({
             participant_1: user.id,
@@ -269,14 +275,14 @@ export async function rejectOffer(offerId: string) {
       if (conversationId) {
         const sysMsg = `[SİSTEM MESAJI] Teklifiniz satıcı tarafından reddedildi.`
         
-        await supabase.from('messages').insert({
+        await adminClient.from('messages').insert({
           conversation_id: conversationId,
           sender_id: user.id,
           content: sysMsg,
           is_read: false
         })
 
-        await supabase.from('conversations').update({
+        await adminClient.from('conversations').update({
           last_message: sysMsg,
           last_message_at: new Date().toISOString()
         }).eq('id', conversationId)
