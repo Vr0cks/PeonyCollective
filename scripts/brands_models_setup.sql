@@ -1,11 +1,15 @@
--- 1. Brands Table
+-- ═══════════════════════════════════════════════════════════════
+-- 1. BRANDS TABLE
+-- ═══════════════════════════════════════════════════════════════
 CREATE TABLE IF NOT EXISTS public.brands (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. Models Table
+-- ═══════════════════════════════════════════════════════════════
+-- 2. MODELS TABLE
+-- ═══════════════════════════════════════════════════════════════
 CREATE TABLE IF NOT EXISTS public.models (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     brand_id UUID REFERENCES public.brands(id) ON DELETE CASCADE,
@@ -18,14 +22,20 @@ CREATE TABLE IF NOT EXISTS public.models (
 ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.models ENABLE ROW LEVEL SECURITY;
 
--- Select policies (Allow read for everyone)
+-- Mevcut politikaları temizle (idempotent çalışması için)
+DROP POLICY IF EXISTS "Allow public read access to brands" ON public.brands;
+DROP POLICY IF EXISTS "Allow public read access to models" ON public.models;
+DROP POLICY IF EXISTS "Allow admin write access to brands" ON public.brands;
+DROP POLICY IF EXISTS "Allow admin write access to models" ON public.models;
+
+-- Herkes okuyabilir
 CREATE POLICY "Allow public read access to brands" ON public.brands
     FOR SELECT USING (true);
 
 CREATE POLICY "Allow public read access to models" ON public.models
     FOR SELECT USING (true);
 
--- Insert/Update/Delete policies (Only admin can modify)
+-- Sadece admin yazabilir
 CREATE POLICY "Allow admin write access to brands" ON public.brands
     FOR ALL USING (
         (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
@@ -36,7 +46,9 @@ CREATE POLICY "Allow admin write access to models" ON public.models
         (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
     );
 
--- Seed Brands and Models
+-- ═══════════════════════════════════════════════════════════════
+-- SEED: Brands ve Models
+-- ═══════════════════════════════════════════════════════════════
 DO $$
 DECLARE
     brand_id_hermes UUID;
@@ -57,7 +69,7 @@ DECLARE
 BEGIN
     -- Hermès
     INSERT INTO public.brands (name) VALUES ('Hermès') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_hermes;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_hermes, 'Birkin 25'), (brand_id_hermes, 'Birkin 30'), (brand_id_hermes, 'Birkin 35'),
         (brand_id_hermes, 'Kelly 25'), (brand_id_hermes, 'Kelly 28'), (brand_id_hermes, 'Kelly 32'),
         (brand_id_hermes, 'Constance'), (brand_id_hermes, 'Lindy'), (brand_id_hermes, 'Picotin'),
@@ -66,7 +78,7 @@ BEGIN
 
     -- Chanel
     INSERT INTO public.brands (name) VALUES ('Chanel') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_chanel;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_chanel, 'Classic Flap Small'), (brand_id_chanel, 'Classic Flap Medium'), (brand_id_chanel, 'Classic Flap Jumbo'),
         (brand_id_chanel, 'Boy Bag'), (brand_id_chanel, '2.55 Reissue'), (brand_id_chanel, 'Gabrielle'),
         (brand_id_chanel, 'Deauville'), (brand_id_chanel, 'Grand Shopping Tote'), (brand_id_chanel, 'WOC (Wallet on Chain)'),
@@ -74,7 +86,7 @@ BEGIN
 
     -- Louis Vuitton
     INSERT INTO public.brands (name) VALUES ('Louis Vuitton') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_lv;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_lv, 'Neverfull MM'), (brand_id_lv, 'Neverfull GM'), (brand_id_lv, 'Speedy 25'),
         (brand_id_lv, 'Speedy 30'), (brand_id_lv, 'Alma BB'), (brand_id_lv, 'Alma PM'),
         (brand_id_lv, 'Pochette Métis'), (brand_id_lv, 'Capucines'), (brand_id_lv, 'Twist'),
@@ -83,7 +95,7 @@ BEGIN
 
     -- Dior
     INSERT INTO public.brands (name) VALUES ('Dior') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_dior;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_dior, 'Lady Dior Mini'), (brand_id_dior, 'Lady Dior Medium'), (brand_id_dior, 'Lady Dior Large'),
         (brand_id_dior, 'Saddle Bag'), (brand_id_dior, 'Book Tote Small'), (brand_id_dior, 'Book Tote Medium'),
         (brand_id_dior, 'Bobby Bag'), (brand_id_dior, '30 Montaigne'), (brand_id_dior, 'Dior Caro'),
@@ -91,75 +103,75 @@ BEGIN
 
     -- Gucci
     INSERT INTO public.brands (name) VALUES ('Gucci') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_gucci;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_gucci, 'Dionysus'), (brand_id_gucci, 'Marmont Small'), (brand_id_gucci, 'Marmont Medium'),
         (brand_id_gucci, 'Jackie 1961'), (brand_id_gucci, 'Bamboo'), (brand_id_gucci, 'Horsebit 1955'),
         (brand_id_gucci, 'GG Supreme Tote'), (brand_id_gucci, 'Ophidia'), (brand_id_gucci, 'Blondie') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Prada
     INSERT INTO public.brands (name) VALUES ('Prada') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_prada;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_prada, 'Re-Edition 2005'), (brand_id_prada, 'Re-Edition 2000'), (brand_id_prada, 'Galleria'),
         (brand_id_prada, 'Cleo'), (brand_id_prada, 'Cahier'), (brand_id_prada, 'Saffiano Tote'),
         (brand_id_prada, 'Nylon Backpack') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Bottega Veneta
     INSERT INTO public.brands (name) VALUES ('Bottega Veneta') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_bottega;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_bottega, 'Cassette'), (brand_id_bottega, 'Jodie'), (brand_id_bottega, 'Pouch'),
         (brand_id_bottega, 'Arco'), (brand_id_bottega, 'Padded Cassette'), (brand_id_bottega, 'Point'),
         (brand_id_bottega, 'Teen Jodie'), (brand_id_bottega, 'Andiamo') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Celine
     INSERT INTO public.brands (name) VALUES ('Celine') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_celine;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_celine, 'Luggage Nano'), (brand_id_celine, 'Luggage Micro'), (brand_id_celine, 'Belt Bag'),
         (brand_id_celine, 'Classic Box'), (brand_id_celine, 'Sangle'), (brand_id_celine, 'Triomphe'),
         (brand_id_celine, 'Ava'), (brand_id_celine, '16 Bag') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Saint Laurent
     INSERT INTO public.brands (name) VALUES ('Saint Laurent') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_ysl;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_ysl, 'Sac de Jour'), (brand_id_ysl, 'Loulou'), (brand_id_ysl, 'Kate'),
         (brand_id_ysl, 'Sunset'), (brand_id_ysl, 'College'), (brand_id_ysl, 'Niki'),
         (brand_id_ysl, 'Le 5 à 7'), (brand_id_ysl, 'Solferino') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Balenciaga
     INSERT INTO public.brands (name) VALUES ('Balenciaga') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_balenciaga;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_balenciaga, 'City'), (brand_id_balenciaga, 'Le Cagole'), (brand_id_balenciaga, 'Hourglass'),
         (brand_id_balenciaga, 'Neo Classic'), (brand_id_balenciaga, 'Everyday Tote'), (brand_id_balenciaga, 'Track'),
         (brand_id_balenciaga, 'Triple S') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Fendi
     INSERT INTO public.brands (name) VALUES ('Fendi') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_fendi;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_fendi, 'Baguette'), (brand_id_fendi, 'Peekaboo'), (brand_id_fendi, 'Kan I'),
         (brand_id_fendi, 'Mon Trésor'), (brand_id_fendi, 'First'), (brand_id_fendi, 'Sunshine Shopper'),
         (brand_id_fendi, 'By The Way') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Loewe
     INSERT INTO public.brands (name) VALUES ('Loewe') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_loewe;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_loewe, 'Puzzle'), (brand_id_loewe, 'Gate'), (brand_id_loewe, 'Hammock'),
         (brand_id_loewe, 'Balloon'), (brand_id_loewe, 'Flamenco'), (brand_id_loewe, 'Basket'),
         (brand_id_loewe, 'Amazona') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Burberry
     INSERT INTO public.brands (name) VALUES ('Burberry') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_burberry;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_burberry, 'TB Bag'), (brand_id_burberry, 'Lola'), (brand_id_burberry, 'Note'),
         (brand_id_burberry, 'Pocket'), (brand_id_burberry, 'Frances'), (brand_id_burberry, 'Knight') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Valentino
     INSERT INTO public.brands (name) VALUES ('Valentino') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_valentino;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_valentino, 'Rockstud'), (brand_id_valentino, 'VSLING'), (brand_id_valentino, 'One Stud'),
         (brand_id_valentino, 'Roman Stud'), (brand_id_valentino, 'Supervee') ON CONFLICT (brand_id, name) DO NOTHING;
 
     -- Miu Miu
     INSERT INTO public.brands (name) VALUES ('Miu Miu') ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id INTO brand_id_miumiu;
-    INSERT INTO public.models (brand_id, name) VALUES 
+    INSERT INTO public.models (brand_id, name) VALUES
         (brand_id_miumiu, 'Wander'), (brand_id_miumiu, 'Arcadie'), (brand_id_miumiu, 'Matelassé'),
         (brand_id_miumiu, 'Madras') ON CONFLICT (brand_id, name) DO NOTHING;
 END $$;
@@ -168,8 +180,12 @@ END $$;
 -- ═══════════════════════════════════════════════════════════════
 -- 3. STORAGE BUCKET KURULUMU
 -- ═══════════════════════════════════════════════════════════════
+-- Dosya yolu yapısı: {user_id}/{folder}/{filename}
+--   split_part(name, '/', 1) → user_id
+--   split_part(name, '/', 2) → klasör adı (public, flaws, videos, logo, serial...)
+-- ═══════════════════════════════════════════════════════════════
 
--- Enable RLS on storage.objects (eğer henüz aktif değilse)
+-- Enable RLS on storage.objects
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- ───────────────────────────────────────────────────────────────
@@ -179,71 +195,72 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('product-images', 'product-images', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
--- Mevcut çakışan politikaları temizle
+-- Mevcut politikaları temizle
 DROP POLICY IF EXISTS "Allow public read access to product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow authenticated users to upload product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow owners to update or delete their product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Secure verification folder in product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow public read access to non-sensitive product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow owners and admins to manage verification product-images" ON storage.objects;
+DROP POLICY IF EXISTS "product-images: public read" ON storage.objects;
+DROP POLICY IF EXISTS "product-images: owner upload" ON storage.objects;
+DROP POLICY IF EXISTS "product-images: owner or admin modify" ON storage.objects;
 
 -- Herkes public/, flaws/, videos/ klasörlerini okuyabilir
 CREATE POLICY "product-images: public read" ON storage.objects
     FOR SELECT TO public
     USING (
         bucket_id = 'product-images'
-        AND (
-            storage.foldername(name)[2] IN ('public', 'flaws', 'videos')
-        )
+        AND split_part(name, '/', 2) IN ('public', 'flaws', 'videos')
     );
 
--- Kimliği doğrulanan kullanıcılar kendi klasörlerine yükleyebilir
+-- Kimliği doğrulanmış kullanıcılar kendi klasörüne yükleyebilir
 CREATE POLICY "product-images: owner upload" ON storage.objects
     FOR INSERT TO authenticated
     WITH CHECK (
         bucket_id = 'product-images'
-        AND auth.uid()::text = storage.foldername(name)[1]
+        AND split_part(name, '/', 1) = auth.uid()::text
     );
 
--- Sahip veya admin silme/güncelleme yapabilir
+-- Sahip veya admin dosya güncelleyebilir / silebilir
 CREATE POLICY "product-images: owner or admin modify" ON storage.objects
     FOR ALL TO authenticated
     USING (
         bucket_id = 'product-images'
         AND (
-            auth.uid()::text = storage.foldername(name)[1]
+            split_part(name, '/', 1) = auth.uid()::text
             OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     )
     WITH CHECK (
         bucket_id = 'product-images'
         AND (
-            auth.uid()::text = storage.foldername(name)[1]
+            split_part(name, '/', 1) = auth.uid()::text
             OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     );
 
 -- ───────────────────────────────────────────────────────────────
 -- BUCKET B: product-docs  (PRIVATE — doğrulama belgeleri)
---   logo/, stitching/, hardware/, serial/, receipt/ klasörleri
---   Sadece dosyanın sahibi ve adminler erişebilir.
+--   Klasörler: logo/, stitching/, hardware/, serial/, receipt/
+--   Sadece dosya sahibi ve adminler erişebilir (signed URL).
 -- ───────────────────────────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('product-docs', 'product-docs', false)
 ON CONFLICT (id) DO UPDATE SET public = false;
 
--- Mevcut çakışan politikaları temizle
+-- Mevcut politikaları temizle
 DROP POLICY IF EXISTS "product-docs: owner read" ON storage.objects;
 DROP POLICY IF EXISTS "product-docs: owner upload" ON storage.objects;
 DROP POLICY IF EXISTS "product-docs: owner or admin modify" ON storage.objects;
 
--- Sadece sahibi ve admin okuyabilir (signed URL ile)
+-- Sadece sahibi ve admin okuyabilir
 CREATE POLICY "product-docs: owner read" ON storage.objects
     FOR SELECT TO authenticated
     USING (
         bucket_id = 'product-docs'
         AND (
-            auth.uid()::text = storage.foldername(name)[1]
+            split_part(name, '/', 1) = auth.uid()::text
             OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     );
@@ -253,23 +270,23 @@ CREATE POLICY "product-docs: owner upload" ON storage.objects
     FOR INSERT TO authenticated
     WITH CHECK (
         bucket_id = 'product-docs'
-        AND auth.uid()::text = storage.foldername(name)[1]
+        AND split_part(name, '/', 1) = auth.uid()::text
     );
 
--- Sahip veya admin silme/güncelleme
+-- Sahip veya admin silme / güncelleme
 CREATE POLICY "product-docs: owner or admin modify" ON storage.objects
     FOR ALL TO authenticated
     USING (
         bucket_id = 'product-docs'
         AND (
-            auth.uid()::text = storage.foldername(name)[1]
+            split_part(name, '/', 1) = auth.uid()::text
             OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     )
     WITH CHECK (
         bucket_id = 'product-docs'
         AND (
-            auth.uid()::text = storage.foldername(name)[1]
+            split_part(name, '/', 1) = auth.uid()::text
             OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     );
