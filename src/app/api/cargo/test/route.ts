@@ -134,16 +134,16 @@ export async function POST(request: Request) {
         description: `${fullProduct?.brand || 'Luxury Bag'} ${fullProduct?.model_name || ''}`,
         senderInformation: {
           firstName: isShippedByPeony ? 'Peony' : (seller?.first_name || 'Satıcı'),
-          lastName: isShippedByPeony ? 'Collective' : (seller?.last_name || ''),
-          phone: isShippedByPeony ? '+902123536000' : (seller?.phone_number || '+905550000000'),
-          city: 'Istanbul',
-          address: isShippedByPeony ? 'Zorlu Center, Istanbul' : (seller?.address || 'Zorlu Center, Istanbul')
+          lastName: isShippedByPeony ? 'Collective' : (seller?.last_name || 'Küratör'),
+          phone: isShippedByPeony ? '02123536000' : (seller?.phone_number || '05550000000'),
+          city: 'İstanbul',
+          address: isShippedByPeony ? 'Zorlu Center, Levent, Beşiktaş' : (seller?.address || 'Zorlu Center, Levent, Beşiktaş')
         },
         customerInformation: {
-          firstName: isShippedByPeony ? (buyer.first_name || 'Musteri') : 'Peony Lab',
-          lastName: isShippedByPeony ? (buyer.last_name || '') : '(Uzman Ofisi)',
-          phone: isShippedByPeony ? (buyer.phone_number || '+905550000000') : '+902123536000',
-          city: 'Istanbul',
+          firstName: isShippedByPeony ? (buyer.first_name || 'Müşteri') : 'Peony Lab',
+          lastName: isShippedByPeony ? (buyer.last_name || 'Alıcı') : '(Uzman Ofisi)',
+          phone: isShippedByPeony ? (buyer.phone_number || '05550000000') : '02123536000',
+          city: 'İstanbul',
           address: isShippedByPeony ? (buyer.address || 'Adres bilgisi yok') : 'Zorlu Center, Kule 3, Kat 4, Beşiktaş, İstanbul'
         }
       })
