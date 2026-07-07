@@ -1,15 +1,16 @@
 -- ═══════════════════════════════════════════════════════════════
--- 1. BRANDS TABLE
+-- ADIM 1: Brands & Models tabloları + seed data
+-- Bunu Supabase SQL Editor'da çalıştır.
 -- ═══════════════════════════════════════════════════════════════
+
+-- 1. Brands Table
 CREATE TABLE IF NOT EXISTS public.brands (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- ═══════════════════════════════════════════════════════════════
--- 2. MODELS TABLE
--- ═══════════════════════════════════════════════════════════════
+-- 2. Models Table
 CREATE TABLE IF NOT EXISTS public.models (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     brand_id UUID REFERENCES public.brands(id) ON DELETE CASCADE,
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS public.models (
 ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.models ENABLE ROW LEVEL SECURITY;
 
--- Mevcut politikaları temizle (idempotent çalışması için)
+-- Mevcut politikaları temizle
 DROP POLICY IF EXISTS "Allow public read access to brands" ON public.brands;
 DROP POLICY IF EXISTS "Allow public read access to models" ON public.models;
 DROP POLICY IF EXISTS "Allow admin write access to brands" ON public.brands;
@@ -175,118 +176,3 @@ BEGIN
         (brand_id_miumiu, 'Wander'), (brand_id_miumiu, 'Arcadie'), (brand_id_miumiu, 'Matelassé'),
         (brand_id_miumiu, 'Madras') ON CONFLICT (brand_id, name) DO NOTHING;
 END $$;
-
-
--- ═══════════════════════════════════════════════════════════════
--- 3. STORAGE BUCKET KURULUMU
--- ═══════════════════════════════════════════════════════════════
--- Dosya yolu yapısı: {user_id}/{folder}/{filename}
---   split_part(name, '/', 1) → user_id
---   split_part(name, '/', 2) → klasör adı (public, flaws, videos, logo, serial...)
--- ═══════════════════════════════════════════════════════════════
-
--- Enable RLS on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
--- ───────────────────────────────────────────────────────────────
--- BUCKET A: product-images  (PUBLIC — vitrin, kusur, video görselleri)
--- ───────────────────────────────────────────────────────────────
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('product-images', 'product-images', true)
-ON CONFLICT (id) DO UPDATE SET public = true;
-
--- Mevcut politikaları temizle
-DROP POLICY IF EXISTS "Allow public read access to product-images" ON storage.objects;
-DROP POLICY IF EXISTS "Allow authenticated users to upload product-images" ON storage.objects;
-DROP POLICY IF EXISTS "Allow owners to update or delete their product-images" ON storage.objects;
-DROP POLICY IF EXISTS "Secure verification folder in product-images" ON storage.objects;
-DROP POLICY IF EXISTS "Allow public read access to non-sensitive product-images" ON storage.objects;
-DROP POLICY IF EXISTS "Allow owners and admins to manage verification product-images" ON storage.objects;
-DROP POLICY IF EXISTS "product-images: public read" ON storage.objects;
-DROP POLICY IF EXISTS "product-images: owner upload" ON storage.objects;
-DROP POLICY IF EXISTS "product-images: owner or admin modify" ON storage.objects;
-
--- Herkes public/, flaws/, videos/ klasörlerini okuyabilir
-CREATE POLICY "product-images: public read" ON storage.objects
-    FOR SELECT TO public
-    USING (
-        bucket_id = 'product-images'
-        AND split_part(name, '/', 2) IN ('public', 'flaws', 'videos')
-    );
-
--- Kimliği doğrulanmış kullanıcılar kendi klasörüne yükleyebilir
-CREATE POLICY "product-images: owner upload" ON storage.objects
-    FOR INSERT TO authenticated
-    WITH CHECK (
-        bucket_id = 'product-images'
-        AND split_part(name, '/', 1) = auth.uid()::text
-    );
-
--- Sahip veya admin dosya güncelleyebilir / silebilir
-CREATE POLICY "product-images: owner or admin modify" ON storage.objects
-    FOR ALL TO authenticated
-    USING (
-        bucket_id = 'product-images'
-        AND (
-            split_part(name, '/', 1) = auth.uid()::text
-            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
-        )
-    )
-    WITH CHECK (
-        bucket_id = 'product-images'
-        AND (
-            split_part(name, '/', 1) = auth.uid()::text
-            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
-        )
-    );
-
--- ───────────────────────────────────────────────────────────────
--- BUCKET B: product-docs  (PRIVATE — doğrulama belgeleri)
---   Klasörler: logo/, stitching/, hardware/, serial/, receipt/
---   Sadece dosya sahibi ve adminler erişebilir (signed URL).
--- ───────────────────────────────────────────────────────────────
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('product-docs', 'product-docs', false)
-ON CONFLICT (id) DO UPDATE SET public = false;
-
--- Mevcut politikaları temizle
-DROP POLICY IF EXISTS "product-docs: owner read" ON storage.objects;
-DROP POLICY IF EXISTS "product-docs: owner upload" ON storage.objects;
-DROP POLICY IF EXISTS "product-docs: owner or admin modify" ON storage.objects;
-
--- Sadece sahibi ve admin okuyabilir
-CREATE POLICY "product-docs: owner read" ON storage.objects
-    FOR SELECT TO authenticated
-    USING (
-        bucket_id = 'product-docs'
-        AND (
-            split_part(name, '/', 1) = auth.uid()::text
-            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
-        )
-    );
-
--- Kendi klasörüne yükleme
-CREATE POLICY "product-docs: owner upload" ON storage.objects
-    FOR INSERT TO authenticated
-    WITH CHECK (
-        bucket_id = 'product-docs'
-        AND split_part(name, '/', 1) = auth.uid()::text
-    );
-
--- Sahip veya admin silme / güncelleme
-CREATE POLICY "product-docs: owner or admin modify" ON storage.objects
-    FOR ALL TO authenticated
-    USING (
-        bucket_id = 'product-docs'
-        AND (
-            split_part(name, '/', 1) = auth.uid()::text
-            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
-        )
-    )
-    WITH CHECK (
-        bucket_id = 'product-docs'
-        AND (
-            split_part(name, '/', 1) = auth.uid()::text
-            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
-        )
-    );
