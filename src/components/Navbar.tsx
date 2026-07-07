@@ -42,9 +42,14 @@ export default async function Navbar() {
             <Link href="/how-it-works" className="hover:text-[#AF9164] transition-colors duration-300">NASIL ÇALIŞIR?</Link>
             
             {user ? (
-              <Link href="/dashboard" className="bg-black text-white px-8 py-3 rounded-none hover:bg-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-widest border border-black hover:border-[#AF9164]">
-                PANELİM
-              </Link>
+              <div className="flex items-center gap-6">
+                <Link href="/dashboard" className="bg-black text-white px-8 py-3 rounded-none hover:bg-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-widest border border-black hover:border-[#AF9164]">
+                  PANELİM
+                </Link>
+                <Link href="/orders" className="hover:text-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]">
+                  SİPARİŞLERİM
+                </Link>
+              </div>
             ) : (
               <Link href="/sell-with-us" className="text-[#AF9164] hover:text-black transition-colors duration-300 relative after:content-[''] after:absolute after:w-full after:h-[1px] after:bg-[#AF9164] after:-bottom-1 after:left-0 after:scale-x-100 hover:after:scale-x-0 after:transition-transform after:duration-300">
                 SATIŞ YAP
