@@ -38,6 +38,46 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({ error: 'Geçersiz action' }, { status: 400 })
+import { NextResponse } from 'next/server'
+import { getOtoAccessToken, createOtoOrder } from '@/src/lib/oto'
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const action = searchParams.get('action') || 'token'
+
+  try {
+    const accessToken = await getOtoAccessToken()
+
+    if (action === 'token') {
+      return NextResponse.json({ success: true, tokenPreview: accessToken.substring(0, 40) + '...' })
+    }
+
+    if (action === 'create_test_order') {
+      const otoResponse = await createOtoOrder({
+        orderId: `TEST-${Date.now()}`,
+        description: 'Test Luxury Bag',
+        weightGrams: 500,
+        createShipment: true,
+        senderInformation: {
+          firstName: 'Test Seller',
+          lastName: 'Test',
+          phone: '+905554443322',
+          address: 'Test Mah. Test Sok. No:1',
+          city: 'Istanbul',
+        },
+        customerInformation: {
+          firstName: 'Test Buyer',
+          lastName: 'Test',
+          phone: '+905554443311',
+          address: 'Test Mah. Test Sok. No:2',
+          city: 'Istanbul',
+        }
+      })
+      
+      return NextResponse.json({ success: true, response: otoResponse })
+    }
+
+    return NextResponse.json({ error: 'Geçersiz action' }, { status: 400 })
 
   } catch (error) {
     const err = error as Error
@@ -54,7 +94,6 @@ export async function POST(request: Request) {
     const supabase = createAdminClient()
 
     if (action === 'reset_order' && orderId) {
-      // Reset order back to pending_payment, remove tracking numbers and delivered_at
       const { error: resetErr } = await supabase
         .from('orders')
         .update({
@@ -73,7 +112,6 @@ export async function POST(request: Request) {
     }
 
     if (action === 'simulate_entrupy' && productId) {
-      // Compute HMAC signature on the server using ENTRUPY_WEBHOOK_SECRET
       const webhookPayload = JSON.stringify({
         event: 'session.completed',
         data: {
@@ -87,7 +125,6 @@ export async function POST(request: Request) {
       const hmac = crypto.createHmac('sha256', process.env.ENTRUPY_WEBHOOK_SECRET || 'peony_ent_sec_9x8a7b6c5d4e3f2g1h');
       const signature = hmac.update(webhookPayload).digest('hex');
 
-      // Make a local fetch request to the webhook route
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://peony-collective.vercel.app';
       const response = await fetch(`${siteUrl}/api/webhooks/entrupy`, {
         method: 'POST',
@@ -103,7 +140,6 @@ export async function POST(request: Request) {
     }
 
     if (action === 'mark_as_paid' && orderId) {
-      // 1. Fetch order details
       const { data: order, error: orderErr } = await supabase
         .from('orders')
         .select('*, products(*)')
@@ -116,7 +152,6 @@ export async function POST(request: Request) {
 
       const fullProduct = order.products
 
-      // 2. Fetch profiles
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, phone_number, address, role')
@@ -129,12 +164,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Alıcı veya Satıcı profili bulunamadı.' }, { status: 404 })
       }
 
-      // 3. Mark as paid
       await supabase.from('orders').update({
         order_status: 'paid'
       }).eq('id', orderId)
 
-      // 4. Create OTO cargo shipment
       const isShippedByPeony = seller?.role === 'admin' || fullProduct?.is_peony_vip
       const otoResult = await createOtoOrder({
         orderId: isShippedByPeony ? `${order.id}_FINAL` : order.id,
@@ -156,12 +189,11 @@ export async function POST(request: Request) {
       })
 
       let trackingNumber = 'MOCK-TRACKING-' + Math.floor(100000 + Math.random() * 900000)
-      
-      if (otoResult && (otoResult.trackingNumber || otoResult.shipmentNumber)) {
-        trackingNumber = otoResult.trackingNumber || otoResult.shipmentNumber
+      const resultTracking = otoResult ? (otoResult.trackingNumber || otoResult.shipmentNumber) : null
+      if (resultTracking) {
+        trackingNumber = resultTracking
       }
 
-      // 5. Update with OTO tracking
       if (isShippedByPeony) {
         await supabase.from('orders').update({
           shipping_tracking_buyer: trackingNumber,
