@@ -1,12 +1,9 @@
 -- ═══════════════════════════════════════════════════════════════
 -- STORAGE BUCKET & POLICY KURULUMU
 -- ═══════════════════════════════════════════════════════════════
-
--- postgres yetki hatasını aşmak için supabase_storage_admin rolüne geçiyoruz
-SET ROLE supabase_storage_admin;
-
--- Enable RLS on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- NOT: ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY komutu
+-- yetki hatası verdiği için kaldırılmıştır. RLS zaten varsayılan olarak açıktır.
+-- ═══════════════════════════════════════════════════════════════
 
 -- ───────────────────────────────────────────────────────────────
 -- BUCKET A: product-images  (PUBLIC)
@@ -110,6 +107,3 @@ CREATE POLICY "product-docs: owner or admin modify" ON storage.objects
             OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     );
-
--- Rolü varsayılana geri çekiyoruz
-RESET ROLE;
