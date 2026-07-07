@@ -255,7 +255,7 @@ export default function CollectorView({ orders, reservedOffers }: CollectorViewP
                           )}
                           {hasPassport && (
                             <Link
-                              href="/passport"
+                              href={`/passport/${order.product_id}`}
                               className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-[#AF9164] text-[#AF9164] px-5 py-2 rounded-full hover:bg-[#AF9164] hover:text-white transition-all duration-300"
                             >
                               ✦ Dijital Pasaportu Görüntüle
