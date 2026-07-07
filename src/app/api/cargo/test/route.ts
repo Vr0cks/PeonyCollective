@@ -111,8 +111,9 @@ export async function POST(request: Request) {
 
     let trackingNumber = 'MOCK-TRACKING-' + Math.floor(100000 + Math.random() * 900000)
     
-    if (otoResult && (otoResult.trackingNumber || otoResult.shipmentNumber)) {
-      trackingNumber = otoResult.trackingNumber || otoResult.shipmentNumber
+    const resultTracking = otoResult ? (otoResult.trackingNumber || otoResult.shipmentNumber) : null
+    if (resultTracking) {
+      trackingNumber = resultTracking
     }
 
     // 5. Update with OTO tracking
