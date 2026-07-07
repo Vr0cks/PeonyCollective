@@ -2,12 +2,7 @@
 
 import { createClient } from '@/src/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 
-'use server'
-
-import { createClient } from '@/src/utils/supabase/server'
-import { revalidatePath } from 'next/cache'
 
 export async function updateProfile(prevState: any, formData: FormData) {
   try {
