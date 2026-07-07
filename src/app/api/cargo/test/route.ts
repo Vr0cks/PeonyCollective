@@ -48,92 +48,140 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { orderId, action } = body
-
-    if (action !== 'mark_as_paid' || !orderId) {
-      return NextResponse.json({ error: 'Geçersiz parametreler' }, { status: 400 })
-    }
+    const { orderId, productId, action, isAuthentic } = body
 
     const { createAdminClient } = await import('@/src/utils/supabase/admin')
     const supabase = createAdminClient()
 
-    // 1. Fetch order details
-    const { data: order, error: orderErr } = await supabase
-      .from('orders')
-      .select('*, products(*)')
-      .eq('id', orderId)
-      .single()
+    if (action === 'reset_order' && orderId) {
+      // Reset order back to pending_payment, remove tracking numbers and delivered_at
+      const { error: resetErr } = await supabase
+        .from('orders')
+        .update({
+          order_status: 'pending_payment',
+          shipping_tracking_seller: null,
+          shipping_tracking_buyer: null,
+          delivered_at: null
+        })
+        .eq('id', orderId)
 
-    if (orderErr || !order) {
-      return NextResponse.json({ error: 'Sipariş bulunamadı: ' + (orderErr?.message || '') }, { status: 404 })
-    }
-
-    const fullProduct = order.products
-
-    // 2. Fetch profiles
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, first_name, last_name, phone_number, address, role')
-      .in('id', [order.buyer_id, order.seller_id])
-    
-    const buyer = profiles?.find((p: any) => p.id === order.buyer_id)
-    const seller = profiles?.find((p: any) => p.id === order.seller_id)
-
-    if (!buyer || !seller) {
-      return NextResponse.json({ error: 'Alıcı veya Satıcı profili bulunamadı.' }, { status: 404 })
-    }
-
-    // 3. Mark as paid
-    await supabase.from('orders').update({
-      order_status: 'paid'
-    }).eq('id', orderId)
-
-    // 4. Create OTO cargo shipment
-    const isShippedByPeony = seller?.role === 'admin' || fullProduct?.is_peony_vip
-    const otoResult = await createOtoOrder({
-      orderId: isShippedByPeony ? `${order.id}_FINAL` : order.id,
-      description: `${fullProduct?.brand || 'Luxury Bag'} ${fullProduct?.model_name || ''}`,
-      senderInformation: {
-        firstName: isShippedByPeony ? 'Peony' : (seller?.first_name || 'Satıcı'),
-        lastName: isShippedByPeony ? 'Collective' : (seller?.last_name || ''),
-        phone: isShippedByPeony ? '+902123536000' : (seller?.phone_number || '+905550000000'),
-        city: 'Istanbul',
-        address: isShippedByPeony ? 'Zorlu Center, Istanbul' : (seller?.address || 'Zorlu Center, Istanbul')
-      },
-      customerInformation: {
-        firstName: isShippedByPeony ? (buyer.first_name || 'Musteri') : 'Peony Lab',
-        lastName: isShippedByPeony ? (buyer.last_name || '') : '(Uzman Ofisi)',
-        phone: isShippedByPeony ? (buyer.phone_number || '+905550000000') : '+902123536000',
-        city: 'Istanbul',
-        address: isShippedByPeony ? (buyer.address || 'Adres bilgisi yok') : 'Zorlu Center, Kule 3, Kat 4, Beşiktaş, İstanbul'
+      if (resetErr) {
+        return NextResponse.json({ error: 'Sipariş sıfırlanamadı: ' + resetErr.message }, { status: 500 })
       }
-    })
 
-    let trackingNumber = 'MOCK-TRACKING-' + Math.floor(100000 + Math.random() * 900000)
-    
-    const resultTracking = otoResult ? (otoResult.trackingNumber || otoResult.shipmentNumber) : null
-    if (resultTracking) {
-      trackingNumber = resultTracking
+      return NextResponse.json({ success: true, message: 'Sipariş başarıyla sıfırlandı (Ödeme Bekleniyor).' })
     }
 
-    // 5. Update with OTO tracking
-    if (isShippedByPeony) {
-      await supabase.from('orders').update({
-        shipping_tracking_buyer: trackingNumber,
-        order_status: 'shipped_to_buyer'
-      }).eq('id', orderId)
-    } else {
-      await supabase.from('orders').update({
-        shipping_tracking_seller: trackingNumber,
-        order_status: 'shipped_to_lab'
-      }).eq('id', orderId)
+    if (action === 'simulate_entrupy' && productId) {
+      // Compute HMAC signature on the server using ENTRUPY_WEBHOOK_SECRET
+      const webhookPayload = JSON.stringify({
+        event: 'session.completed',
+        data: {
+          customer_item_id: productId,
+          status: isAuthentic ? 'verified' : 'rejected',
+          certificate_url: isAuthentic ? 'https://example.com/mock-certificate.pdf' : null,
+        },
+      });
+
+      const crypto = await import('crypto');
+      const hmac = crypto.createHmac('sha256', process.env.ENTRUPY_WEBHOOK_SECRET || 'peony_ent_sec_9x8a7b6c5d4e3f2g1h');
+      const signature = hmac.update(webhookPayload).digest('hex');
+
+      // Make a local fetch request to the webhook route
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://peony-collective.vercel.app';
+      const response = await fetch(`${siteUrl}/api/webhooks/entrupy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'entrupy-signature': signature,
+        },
+        body: webhookPayload,
+      });
+
+      const resText = await response.text();
+      return NextResponse.json({ success: response.ok, response: resText });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Sipariş ödemesi simüle edildi ve OTO Kargo barkodu başarıyla oluşturuldu.', 
-      trackingNumber 
-    })
+    if (action === 'mark_as_paid' && orderId) {
+      // 1. Fetch order details
+      const { data: order, error: orderErr } = await supabase
+        .from('orders')
+        .select('*, products(*)')
+        .eq('id', orderId)
+        .single()
+
+      if (orderErr || !order) {
+        return NextResponse.json({ error: 'Sipariş bulunamadı: ' + (orderErr?.message || '') }, { status: 404 })
+      }
+
+      const fullProduct = order.products
+
+      // 2. Fetch profiles
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, phone_number, address, role')
+        .in('id', [order.buyer_id, order.seller_id])
+      
+      const buyer = profiles?.find((p: any) => p.id === order.buyer_id)
+      const seller = profiles?.find((p: any) => p.id === order.seller_id)
+
+      if (!buyer || !seller) {
+        return NextResponse.json({ error: 'Alıcı veya Satıcı profili bulunamadı.' }, { status: 404 })
+      }
+
+      // 3. Mark as paid
+      await supabase.from('orders').update({
+        order_status: 'paid'
+      }).eq('id', orderId)
+
+      // 4. Create OTO cargo shipment
+      const isShippedByPeony = seller?.role === 'admin' || fullProduct?.is_peony_vip
+      const otoResult = await createOtoOrder({
+        orderId: isShippedByPeony ? `${order.id}_FINAL` : order.id,
+        description: `${fullProduct?.brand || 'Luxury Bag'} ${fullProduct?.model_name || ''}`,
+        senderInformation: {
+          firstName: isShippedByPeony ? 'Peony' : (seller?.first_name || 'Satıcı'),
+          lastName: isShippedByPeony ? 'Collective' : (seller?.last_name || ''),
+          phone: isShippedByPeony ? '+902123536000' : (seller?.phone_number || '+905550000000'),
+          city: 'Istanbul',
+          address: isShippedByPeony ? 'Zorlu Center, Istanbul' : (seller?.address || 'Zorlu Center, Istanbul')
+        },
+        customerInformation: {
+          firstName: isShippedByPeony ? (buyer.first_name || 'Musteri') : 'Peony Lab',
+          lastName: isShippedByPeony ? (buyer.last_name || '') : '(Uzman Ofisi)',
+          phone: isShippedByPeony ? (buyer.phone_number || '+905550000000') : '+902123536000',
+          city: 'Istanbul',
+          address: isShippedByPeony ? (buyer.address || 'Adres bilgisi yok') : 'Zorlu Center, Kule 3, Kat 4, Beşiktaş, İstanbul'
+        }
+      })
+
+      let trackingNumber = 'MOCK-TRACKING-' + Math.floor(100000 + Math.random() * 900000)
+      
+      if (otoResult && (otoResult.trackingNumber || otoResult.shipmentNumber)) {
+        trackingNumber = otoResult.trackingNumber || otoResult.shipmentNumber
+      }
+
+      // 5. Update with OTO tracking
+      if (isShippedByPeony) {
+        await supabase.from('orders').update({
+          shipping_tracking_buyer: trackingNumber,
+          order_status: 'shipped_to_buyer'
+        }).eq('id', orderId)
+      } else {
+        await supabase.from('orders').update({
+          shipping_tracking_seller: trackingNumber,
+          order_status: 'shipped_to_lab'
+        }).eq('id', orderId)
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Sipariş ödemesi simüle edildi ve OTO Kargo barkodu başarıyla oluşturuldu.', 
+        trackingNumber 
+      })
+    }
+
+    return NextResponse.json({ error: 'Geçersiz parametreler' }, { status: 400 })
 
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

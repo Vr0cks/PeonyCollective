@@ -46,31 +46,27 @@ export default function TestSuiteClient({ initialOrders }: TestSuiteClientProps)
     try {
       setLoadingOrderId(productId)
       setStatusMessage(null)
-      const response = await fetch('/api/webhooks/entrupy', {
+      const response = await fetch('/api/cargo/test', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'entrupy-signature': 'peony_ent_sec_9x8a7b6c5d4e3f2g1h',
         },
         body: JSON.stringify({
-          event: 'session.completed',
-          data: {
-            customer_item_id: productId,
-            status: isAuthentic ? 'verified' : 'rejected',
-            certificate_url: isAuthentic ? 'https://example.com/mock-certificate.pdf' : null,
-          },
+          action: 'simulate_entrupy',
+          productId,
+          isAuthentic,
         }),
       })
 
       const data = await response.json()
-      if (response.ok) {
+      if (response.ok && data.success) {
         setStatusMessage({ 
           type: 'success', 
           text: `Entrupy Webhook Başarılı! Ürün doğrulama durumu: ${isAuthentic ? 'Orijinal (verified)' : 'Sahte (rejected)'}.` 
         })
         router.refresh()
       } else {
-        setStatusMessage({ type: 'error', text: `Hata: ${data.error || 'Webhook başarısız oldu.'}` })
+        setStatusMessage({ type: 'error', text: `Hata: ${data.error || data.response || 'Webhook başarısız oldu.'}` })
       }
     } catch (err: any) {
       setStatusMessage({ type: 'error', text: `Bağlantı hatası: ${err.message}` })
@@ -96,6 +92,34 @@ export default function TestSuiteClient({ initialOrders }: TestSuiteClientProps)
       const data = await response.json()
       if (response.ok) {
         setStatusMessage({ type: 'success', text: `Sipariş ödemesi manuel olarak tamamlandı (Paid durumuna geçirildi) ve OTO kargosu tetiklendi!` })
+        router.refresh()
+      } else {
+        setStatusMessage({ type: 'error', text: `Hata: ${data.error || 'İşlem başarısız.'}` })
+      }
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: `Bağlantı hatası: ${err.message}` })
+    } finally {
+      setLoadingOrderId(null)
+    }
+  }
+
+  // Reset order to pending_payment for retesting
+  async function resetOrder(orderId: string) {
+    try {
+      setLoadingOrderId(orderId)
+      setStatusMessage(null)
+      
+      const response = await fetch('/api/cargo/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId, action: 'reset_order' }),
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setStatusMessage({ type: 'success', text: `Sipariş başarıyla sıfırlandı! Durumu 'Ödeme Bekleniyor' olarak güncellendi ve kargo takip numaraları silindi.` })
         router.refresh()
       } else {
         setStatusMessage({ type: 'error', text: `Hata: ${data.error || 'İşlem başarısız.'}` })
@@ -138,6 +162,7 @@ export default function TestSuiteClient({ initialOrders }: TestSuiteClientProps)
                 <th className="p-4">Sipariş ID / Ürün</th>
                 <th className="p-4">Alıcı Detayları</th>
                 <th className="p-4">Tutar</th>
+                <th className="p-4">Kargo Takip</th>
                 <th className="p-4">Mevcut Durum</th>
                 <th className="p-4 text-right">Simülasyon İşlemleri</th>
               </tr>
@@ -158,6 +183,16 @@ export default function TestSuiteClient({ initialOrders }: TestSuiteClientProps)
                     <td className="p-4 font-bold text-[#AF9164]">
                       {order.total_price.toLocaleString('tr-TR')} ₺
                     </td>
+                    <td className="p-4 space-y-1 text-[10px]">
+                      <div>
+                        <span className="text-zinc-500">Satıcı:</span>{' '}
+                        <span className="font-mono text-zinc-300">{order.shipping_tracking_seller || 'Yok'}</span>
+                      </div>
+                      <div>
+                        <span className="text-zinc-500">Alıcı:</span>{' '}
+                        <span className="font-mono text-zinc-300">{order.shipping_tracking_buyer || 'Yok'}</span>
+                      </div>
+                    </td>
                     <td className="p-4">
                       <span className={`px-2.5 py-1 rounded-full text-[9px] uppercase font-bold border ${
                         order.order_status === 'pending_payment' 
@@ -172,13 +207,21 @@ export default function TestSuiteClient({ initialOrders }: TestSuiteClientProps)
                       </span>
                     </td>
                     <td className="p-4 text-right space-x-2 space-y-2">
+                      <button
+                        disabled={!!loadingOrderId}
+                        onClick={() => resetOrder(order.id)}
+                        className="inline-flex items-center gap-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[9px] uppercase tracking-wider font-bold px-2 py-1.5 rounded-lg transition-all"
+                      >
+                        Sıfırla
+                      </button>
+
                       {order.order_status === 'pending_payment' && (
                         <button
                           disabled={!!loadingOrderId}
                           onClick={() => forcePayOrder(order.id)}
                           className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[9px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-lg transition-all"
                         >
-                          <Play size={10} /> Ödendi Yap (PayTR Simüle Et)
+                          <Play size={10} /> Ödendi Yap (PayTR Simüle)
                         </button>
                       )}
 
