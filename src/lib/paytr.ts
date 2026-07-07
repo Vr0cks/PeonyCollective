@@ -134,15 +134,22 @@ export async function addSubmerchant(params: PayTRSubmerchantParams) {
     return { status: 'success', submerchant_id: submerchantId }
   }
 
-  const response = await fetch('https://www.paytr.com/odeme/api/submerchant-add', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams(postData).toString(),
-  })
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 saniye timeout
 
-  const resultText = await response.text()
-  
+  let resultText = '';
   try {
+    const response = await fetch('https://www.paytr.com/odeme/api/submerchant-add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(postData).toString(),
+      signal: controller.signal,
+    })
+
+    clearTimeout(timeoutId);
+
+    resultText = await response.text()
+    
     const resultJson = JSON.parse(resultText)
     if (resultJson.status === 'success') {
       return { status: 'success', submerchant_id: submerchantId }
@@ -150,7 +157,28 @@ export async function addSubmerchant(params: PayTRSubmerchantParams) {
       throw new Error(resultJson.err_msg || resultJson.reason || 'Bilinmeyen Hata')
     }
   } catch (error: any) {
-    throw new Error(`PayTR Submerchant API Hatası: ${error.message} - API Yanıtı: ${resultText}`)
+    clearTimeout(timeoutId);
+    console.error('[PAYTR SUBMERCHANT ERROR]', error);
+
+    let errorMsg = error.message || 'Bilinmeyen Hata';
+    if (error.name === 'AbortError') {
+      errorMsg = 'PayTR API isteği zaman aşımına uğradı (Timeout - 8000ms)';
+    } else if (error.code === 'ENOTFOUND' || error.message?.includes('fetch failed')) {
+      errorMsg = 'İnternet veya DNS bağlantısı kurulamadı (Ağ hatası)';
+    }
+
+    try {
+      const { createAdminClient } = await import('@/src/utils/supabase/admin');
+      const supabase = createAdminClient();
+      await supabase.from('system_logs').insert({
+        level: 'error',
+        source: 'paytr_submerchant',
+        message: 'PayTR alt işyeri ekleme başarısız oldu',
+        metadata: { error: errorMsg, submerchantId, apiResponse: resultText || null }
+      });
+    } catch (e) {}
+
+    throw new Error(`PayTR Submerchant API Hatası: ${errorMsg}${resultText ? ` - API Yanıtı: ${resultText}` : ''}`)
   }
 }
 

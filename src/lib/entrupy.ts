@@ -43,14 +43,21 @@ export async function startEntrupyAnalysis(data: EntrupyAnalysisRequest): Promis
       images: data.imageUrls
     };
 
+    // 5 saniye Timeout tanımlayalım
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const response = await fetch(`${ENTRUPY_API_URL}/items`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${ENTRUPY_API_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -63,21 +70,30 @@ export async function startEntrupyAnalysis(data: EntrupyAnalysisRequest): Promis
       entrupy_id: result.id || 'unknown',
       status: result.status || 'analyzing'
     };
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('[ENTRUPY ERROR]', error);
+    
+    let errorMsg = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
+    if (error.name === 'AbortError') {
+      errorMsg = 'Entrupy API isteği zaman aşımına uğradı (Timeout - 5000ms)';
+    } else if (error.code === 'ENOTFOUND' || error.message?.includes('fetch failed')) {
+      errorMsg = 'İnternet veya DNS bağlantısı kurulamadı (Ağ hatası)';
+    }
+
     try {
       const supabase = createAdminClient();
       await supabase.from('system_logs').insert({
         level: 'error',
         source: 'entrupy_api',
         message: 'Entrupy analiz talebi başarısız oldu',
-        metadata: { error: error instanceof Error ? error.message : String(error), productId: data.productId }
+        metadata: { error: errorMsg, productId: data.productId }
       });
     } catch (e) {}
+    
     return {
       entrupy_id: '',
       status: 'error',
-      error_message: error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu'
+      error_message: errorMsg
     };
   }
 }

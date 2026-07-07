@@ -38,28 +38,45 @@ export async function getOtoAccessToken(): Promise<string> {
     throw new Error('OTO_REFRESH_TOKEN tanımlı değil. .env.local dosyasını kontrol edin.')
   }
 
-  const response = await fetch(`${OTO_BASE_URL}/refreshToken`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh_token: refreshToken }),
-  })
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 saniye timeout
 
-  if (!response.ok) {
-    const text = await response.text()
-    throw new Error(`OTO token alınamadı (${response.status}): ${text}`)
+  try {
+    const response = await fetch(`${OTO_BASE_URL}/refreshToken`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+      signal: controller.signal,
+    })
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`OTO token alınamadı (${response.status}): ${text}`)
+    }
+
+    const data = await response.json()
+    const accessToken: string = data.access_token || data.token || data.accessToken
+
+    if (!accessToken) {
+      throw new Error(`OTO token yanıtında access_token bulunamadı: ${JSON.stringify(data)}`)
+    }
+
+    cachedAccessToken = accessToken
+    tokenExpiresAt = now + 55 * 60 * 1000
+
+    return accessToken
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    let errorMsg = error.message || 'Bilinmeyen Hata';
+    if (error.name === 'AbortError') {
+      errorMsg = 'OTO Refresh Token isteği zaman aşımına uğradı (Timeout - 6000ms)';
+    } else if (error.code === 'ENOTFOUND' || error.message?.includes('fetch failed')) {
+      errorMsg = 'İnternet veya DNS bağlantısı kurulamadı (Ağ hatası)';
+    }
+    throw new Error(`OTO Auth Hatası: ${errorMsg}`);
   }
-
-  const data = await response.json()
-  const accessToken: string = data.access_token || data.token || data.accessToken
-
-  if (!accessToken) {
-    throw new Error(`OTO token yanıtında access_token bulunamadı: ${JSON.stringify(data)}`)
-  }
-
-  cachedAccessToken = accessToken
-  tokenExpiresAt = now + 55 * 60 * 1000
-
-  return accessToken
 }
 
 /**
@@ -68,29 +85,60 @@ export async function getOtoAccessToken(): Promise<string> {
 async function otoFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
   const accessToken = await getOtoAccessToken()
 
-  const response = await fetch(`${OTO_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-      ...options.headers,
-    },
-  })
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 saniye timeout
 
-  const text = await response.text()
-  let json: T
-
+  let text = '';
   try {
-    json = JSON.parse(text) as T
-  } catch {
-    throw new Error(`OTO API yanıtı JSON değil (${response.status}): ${text}`)
-  }
+    const response = await fetch(`${OTO_BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+        ...options.headers,
+      },
+      signal: controller.signal,
+    })
 
-  if (!response.ok) {
-    throw new Error(`OTO API hatası (${response.status}): ${JSON.stringify(json)}`)
-  }
+    clearTimeout(timeoutId);
 
-  return json
+    text = await response.text()
+    let json: T
+
+    try {
+      json = JSON.parse(text) as T
+    } catch {
+      throw new Error(`OTO API yanıtı JSON değil (${response.status}): ${text}`)
+    }
+
+    if (!response.ok) {
+      throw new Error(`OTO API hatası (${response.status}): ${JSON.stringify(json)}`)
+    }
+
+    return json
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    let errorMsg = error.message || 'Bilinmeyen Hata';
+    if (error.name === 'AbortError') {
+      errorMsg = `OTO API isteği zaman aşımına uğradı (Timeout - 8000ms, Path: ${path})`;
+    } else if (error.code === 'ENOTFOUND' || error.message?.includes('fetch failed')) {
+      errorMsg = `İnternet veya DNS bağlantısı kurulamadı (Ağ hatası, Path: ${path})`;
+    }
+
+    // Sistem loglarına yazmaya çalışalım
+    try {
+      const { createAdminClient } = await import('@/src/utils/supabase/admin');
+      const supabase = createAdminClient();
+      await supabase.from('system_logs').insert({
+        level: 'error',
+        source: 'oto_cargo_api',
+        message: `OTO Kargo API isteği başarısız oldu: ${path}`,
+        metadata: { error: errorMsg, responseText: text || null }
+      });
+    } catch (e) {}
+
+    throw new Error(`OTO Kargo Hatası: ${errorMsg}${text ? ` - Yanıt: ${text}` : ''}`);
+  }
 }
 
 // ─── Tipler ─────────────────────────────────────────────────────────────────
