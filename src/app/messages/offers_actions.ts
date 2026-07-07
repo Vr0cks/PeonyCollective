@@ -197,9 +197,9 @@ export async function acceptOffer(offerId: string) {
     }
 
     return { success: true }
-  } catch (error) {
+  } catch (error: any) {
     console.error('AcceptOffer error:', error)
-    return { success: false, error: 'İşlem gerçekleştirilirken bir hata oluştu.' }
+    return { success: false, error: 'İşlem gerçekleştirilirken bir hata oluştu: ' + (error?.message || error) }
   }
 }
 
@@ -292,8 +292,8 @@ export async function rejectOffer(offerId: string) {
     }
 
     return { success: true }
-  } catch (error) {
+  } catch (error: any) {
     console.error('RejectOffer error:', error)
-    return { success: false, error: 'İşlem gerçekleştirilirken bir hata oluştu.' }
+    return { success: false, error: 'İşlem gerçekleştirilirken bir hata oluştu: ' + (error?.message || error) }
   }
 }

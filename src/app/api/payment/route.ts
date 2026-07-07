@@ -121,14 +121,27 @@ export async function POST(request: Request) {
       )
     }
 
+    // Check if there is an active accepted offer for this buyer and product
+    const { data: activeOffer } = await supabase
+      .from('offers')
+      .select('*')
+      .eq('product_id', productId)
+      .eq('buyer_id', user.id)
+      .eq('status', 'accepted')
+      .limit(1)
+      .maybeSingle()
+
+    const isReserved = product.locked_by === user.id && product.locked_until && new Date(product.locked_until) > now
+    const productPrice = (isReserved && activeOffer) ? activeOffer.offered_price : product.price
+
     // Toplam Fiyat Hesaplama
     const deliveryFee = deliveryMethod === 'private_viewing' ? 15000 : deliveryMethod === 'vip' ? 2500 : 0
-    const finalPrice = product.price + deliveryFee
+    const finalPrice = productPrice + deliveryFee
 
     // Komisyon Hesaplama (Split Payment Hazırlığı)
     const commissionRate = product.is_peony_vip ? 0.30 : 0.20
-    const commissionAmount = product.price * commissionRate
-    const sellerAmount = product.price - commissionAmount
+    const commissionAmount = productPrice * commissionRate
+    const sellerAmount = productPrice - commissionAmount
 
     // Generate order draft in database first to get unique order ID
     const { data: newOrder, error: orderInsertError } = await supabase

@@ -35,6 +35,19 @@ export default async function CheckoutPage({
 
   if (!product) return notFound()
 
+  // 2.5 Check if there is an active accepted offer for this buyer and product
+  const { data: activeOffer } = await supabase
+    .from('offers')
+    .select('*')
+    .eq('product_id', productId)
+    .eq('buyer_id', user.id)
+    .eq('status', 'accepted')
+    .limit(1)
+    .maybeSingle()
+
+  const isReserved = product.locked_by === user.id && product.locked_until && new Date(product.locked_until) > new Date()
+  const currentPrice = (isReserved && activeOffer) ? activeOffer.offered_price : product.price
+
   // 3. Fetch buyer profile
   const { data: profile } = await supabase
     .from('profiles')
@@ -149,7 +162,7 @@ export default async function CheckoutPage({
                     </p>
                   </div>
                   <div className="text-sm font-semibold tracking-tight text-gray-900 mt-2">
-                    {product.price.toLocaleString('tr-TR')} ₺
+                    {currentPrice.toLocaleString('tr-TR')} ₺
                   </div>
                 </div>
               </div>
@@ -157,7 +170,7 @@ export default async function CheckoutPage({
               <div className="border-t border-gray-100 pt-4 space-y-2 text-xs">
                 <div className="flex justify-between text-gray-500">
                   <span>Ara Toplam</span>
-                  <span>{product.price.toLocaleString('tr-TR')} ₺</span>
+                  <span>{currentPrice.toLocaleString('tr-TR')} ₺</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Sigortalı Lüks Kargo</span>
@@ -169,7 +182,7 @@ export default async function CheckoutPage({
                 </div>
                 <div className="flex justify-between text-sm font-bold text-black pt-2 border-t border-gray-100">
                   <span>Toplam</span>
-                  <span>{product.price.toLocaleString('tr-TR')} ₺</span>
+                  <span>{currentPrice.toLocaleString('tr-TR')} ₺</span>
                 </div>
               </div>
             </div>

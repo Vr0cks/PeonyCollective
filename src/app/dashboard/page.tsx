@@ -23,6 +23,7 @@ export default async function Dashboard({ searchParams }: PageProps) {
   let pendingApproval = 0
   let activeSales = 0
   let myOrders: Order[] = []
+  let reservedOffers: any[] = []
 
   if (currentView === 'curator') {
     // Satıcı Verileri (Küratör) - Sadece küratör görünümünde çekilir
@@ -45,6 +46,22 @@ export default async function Dashboard({ searchParams }: PageProps) {
       .select('*, products(*)')
       .eq('buyer_id', user.id)
     myOrders = data || []
+
+    const { data: offersData } = await supabase
+      .from('offers')
+      .select('*, product:products(*)')
+      .eq('buyer_id', user.id)
+      .eq('status', 'accepted')
+      .order('created_at', { ascending: false })
+
+    const now = new Date()
+    reservedOffers = (offersData || []).filter(off => 
+      off.product && 
+      off.product.status === 'approved' &&
+      off.product.locked_by === user.id &&
+      off.product.locked_until && 
+      new Date(off.product.locked_until) > now
+    )
   }
 
   return (
@@ -61,7 +78,7 @@ export default async function Dashboard({ searchParams }: PageProps) {
             pendingApproval={pendingApproval} 
           />
         ) : (
-          <CollectorView orders={myOrders || []} />
+          <CollectorView orders={myOrders || []} reservedOffers={reservedOffers} />
         )}
       </div>
     </main>

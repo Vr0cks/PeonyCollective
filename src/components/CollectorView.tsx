@@ -9,6 +9,7 @@ import { approveOrder } from '@/src/app/orders/actions'
 
 interface CollectorViewProps {
   orders: Order[]
+  reservedOffers?: any[]
 }
 
 // Sipariş adımları
@@ -29,7 +30,7 @@ function getCurrentStepIndex(status: string): number {
   return idx < 0 ? 0 : idx
 }
 
-export default function CollectorView({ orders }: CollectorViewProps) {
+export default function CollectorView({ orders, reservedOffers }: CollectorViewProps) {
   const totalSpend = orders.reduce((s, o) => s + (o.total_price || 0), 0)
   const activeOrders = orders.filter(o => !['completed', 'delivered', 'cancelled', 'refunded'].includes(o.order_status))
   const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null)
@@ -93,6 +94,57 @@ export default function CollectorView({ orders }: CollectorViewProps) {
           </div>
         ))}
       </div>
+
+      {/* REZERVE PARÇALAR */}
+      {reservedOffers && reservedOffers.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400">REZERVE EDİLEN PARÇALARIM</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {reservedOffers.map((off) => {
+              const product = off.product
+              const imageUrl = product?.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=200'
+              
+              const diffMs = new Date(product.locked_until).getTime() - Date.now()
+              const diffHours = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60)))
+              const diffMins = Math.max(0, Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)))
+              const remainingText = `${diffHours} sa ${diffMins} dk kaldı`
+
+              return (
+                <div key={off.id} className="bg-white rounded-3xl border border-[#AF9164]/30 shadow-sm overflow-hidden p-6 flex flex-col sm:flex-row items-center justify-between gap-5">
+                  <div className="flex items-center gap-5 w-full sm:w-auto">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0 relative border border-gray-100">
+                      <Image src={imageUrl} alt="" fill sizes="80px" className="object-cover" />
+                    </div>
+                    <div>
+                      <span className="inline-block bg-[#AF9164]/10 text-[#AF9164] text-[8px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-1">
+                        SİZE ÖZEL REZERVE
+                      </span>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1">{product?.brand || '—'}</p>
+                      <h3 className="text-base font-semibold text-gray-900">{product?.model_name || 'Ürün'}</h3>
+                      <p className="text-xs text-gray-400 font-light mt-0.5">
+                        Rezervasyon Süresi: <span className="text-amber-600 font-semibold">{remainingText}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto gap-4 border-t sm:border-t-0 pt-4 sm:pt-0 border-gray-100">
+                    <div className="text-left sm:text-right">
+                      <p className="text-xs text-gray-400 line-through">{(product.price ?? 0).toLocaleString('tr-TR')} ₺</p>
+                      <p className="text-xl font-bold text-emerald-600">{(off.offered_price ?? 0).toLocaleString('tr-TR')} ₺</p>
+                    </div>
+                    <Link
+                      href={`/checkout/${product.id}`}
+                      className="bg-black hover:bg-[#AF9164] text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-md shadow-black/10 hover:shadow-none"
+                    >
+                      Satın Al
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* SİPARİŞ LİSTESİ */}
       <div>
