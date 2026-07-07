@@ -165,63 +165,111 @@ BEGIN
 END $$;
 
 
--- 3. Storage Security RLS Policies (For 'product-images' bucket)
--- Make sure the bucket 'product-images' exists
+-- ═══════════════════════════════════════════════════════════════
+-- 3. STORAGE BUCKET KURULUMU
+-- ═══════════════════════════════════════════════════════════════
+
+-- Enable RLS on storage.objects (eğer henüz aktif değilse)
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- ───────────────────────────────────────────────────────────────
+-- BUCKET A: product-images  (PUBLIC — vitrin, kusur, video görselleri)
+-- ───────────────────────────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('product-images', 'product-images', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
--- Storage object policies for 'product-images'
--- Enable RLS on storage.objects if not already enabled
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies on storage.objects for product-images to prevent conflicts
+-- Mevcut çakışan politikaları temizle
 DROP POLICY IF EXISTS "Allow public read access to product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow authenticated users to upload product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Allow owners to update or delete their product-images" ON storage.objects;
 DROP POLICY IF EXISTS "Secure verification folder in product-images" ON storage.objects;
+DROP POLICY IF EXISTS "Allow public read access to non-sensitive product-images" ON storage.objects;
+DROP POLICY IF EXISTS "Allow owners and admins to manage verification product-images" ON storage.objects;
 
--- Policy A: Everyone can read public/ and flaws/ folders (and video folder)
-CREATE POLICY "Allow public read access to non-sensitive product-images" ON storage.objects
+-- Herkes public/, flaws/, videos/ klasörlerini okuyabilir
+CREATE POLICY "product-images: public read" ON storage.objects
     FOR SELECT TO public
-    USING (
-        bucket_id = 'product-images' 
-        AND (
-            storage.foldername(name)[1] = 'public' 
-            OR storage.foldername(name)[1] = 'flaws' 
-            OR storage.foldername(name)[1] = 'videos'
-            OR storage.foldername(name)[2] = 'public'
-            OR storage.foldername(name)[2] = 'flaws'
-            OR storage.foldername(name)[2] = 'videos'
-        )
-    );
-
--- Policy B: Only the owner (the directory name equals their user ID) or an Admin can read/write 'verification' folder
-CREATE POLICY "Allow owners and admins to manage verification product-images" ON storage.objects
-    FOR ALL TO authenticated
     USING (
         bucket_id = 'product-images'
         AND (
             storage.foldername(name)[2] IN ('public', 'flaws', 'videos')
-            OR (
-                storage.foldername(name)[2] = 'verification'
-                AND (
-                    auth.uid()::text = storage.foldername(name)[1]
-                    OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
-                )
-            )
+        )
+    );
+
+-- Kimliği doğrulanan kullanıcılar kendi klasörlerine yükleyebilir
+CREATE POLICY "product-images: owner upload" ON storage.objects
+    FOR INSERT TO authenticated
+    WITH CHECK (
+        bucket_id = 'product-images'
+        AND auth.uid()::text = storage.foldername(name)[1]
+    );
+
+-- Sahip veya admin silme/güncelleme yapabilir
+CREATE POLICY "product-images: owner or admin modify" ON storage.objects
+    FOR ALL TO authenticated
+    USING (
+        bucket_id = 'product-images'
+        AND (
+            auth.uid()::text = storage.foldername(name)[1]
+            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     )
     WITH CHECK (
         bucket_id = 'product-images'
         AND (
-            storage.foldername(name)[2] IN ('public', 'flaws', 'videos')
-            OR (
-                storage.foldername(name)[2] = 'verification'
-                AND (
-                    auth.uid()::text = storage.foldername(name)[1]
-                    OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
-                )
-            )
+            auth.uid()::text = storage.foldername(name)[1]
+            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+        )
+    );
+
+-- ───────────────────────────────────────────────────────────────
+-- BUCKET B: product-docs  (PRIVATE — doğrulama belgeleri)
+--   logo/, stitching/, hardware/, serial/, receipt/ klasörleri
+--   Sadece dosyanın sahibi ve adminler erişebilir.
+-- ───────────────────────────────────────────────────────────────
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('product-docs', 'product-docs', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
+
+-- Mevcut çakışan politikaları temizle
+DROP POLICY IF EXISTS "product-docs: owner read" ON storage.objects;
+DROP POLICY IF EXISTS "product-docs: owner upload" ON storage.objects;
+DROP POLICY IF EXISTS "product-docs: owner or admin modify" ON storage.objects;
+
+-- Sadece sahibi ve admin okuyabilir (signed URL ile)
+CREATE POLICY "product-docs: owner read" ON storage.objects
+    FOR SELECT TO authenticated
+    USING (
+        bucket_id = 'product-docs'
+        AND (
+            auth.uid()::text = storage.foldername(name)[1]
+            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+        )
+    );
+
+-- Kendi klasörüne yükleme
+CREATE POLICY "product-docs: owner upload" ON storage.objects
+    FOR INSERT TO authenticated
+    WITH CHECK (
+        bucket_id = 'product-docs'
+        AND auth.uid()::text = storage.foldername(name)[1]
+    );
+
+-- Sahip veya admin silme/güncelleme
+CREATE POLICY "product-docs: owner or admin modify" ON storage.objects
+    FOR ALL TO authenticated
+    USING (
+        bucket_id = 'product-docs'
+        AND (
+            auth.uid()::text = storage.foldername(name)[1]
+            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+        )
+    )
+    WITH CHECK (
+        bucket_id = 'product-docs'
+        AND (
+            auth.uid()::text = storage.foldername(name)[1]
+            OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     );

@@ -397,13 +397,25 @@ export default function SellForm() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error("Oturum açmanız gerekiyor.")
 
-      const uploadFile = async (file: File, bucket: string) => {
+      // Ürün görselleri (public, flaws, videos) → product-images bucket
+      const uploadFile = async (file: File, folder: string) => {
         const ext = file.name.split('.').pop()
-        const fileName = `${user.id}/${bucket}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
+        const fileName = `${user.id}/${folder}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
         const { error } = await supabase.storage.from('product-images').upload(fileName, file)
         if (error) throw error
         const { data } = supabase.storage.from('product-images').getPublicUrl(fileName)
         return data.publicUrl
+      }
+
+      // Doğrulama belgeleri (logo, stitching, serial, receipt vb.) → product-docs bucket (private)
+      const uploadVerificationFile = async (file: File, category: string) => {
+        const ext = file.name.split('.').pop()
+        const fileName = `${user.id}/${category}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
+        const { error } = await supabase.storage.from('product-docs').upload(fileName, file)
+        if (error) throw error
+        // product-docs private bucket — sadece signed URL ile erişilebilir
+        const { data } = await supabase.storage.from('product-docs').createSignedUrl(fileName, 60 * 60 * 24 * 365 * 5) // 5 yıl
+        return data?.signedUrl || fileName // fallback: path
       }
 
       setMessage('Vitrin fotoğrafları yükleniyor...')
@@ -413,8 +425,13 @@ export default function SellForm() {
       const flawUrls = await Promise.all(flawFiles.map(f => uploadFile(f, 'flaws')))
       
       setMessage('Doğrulama belgeleri yükleniyor...')
-      const authDocs = Object.values(verificationFiles).flat()
-      const authUrls = await Promise.all(authDocs.map(f => uploadFile(f, 'verification')))
+      const authUrls: string[] = []
+      for (const [category, files] of Object.entries(verificationFiles)) {
+        for (const file of files) {
+          const url = await uploadVerificationFile(file, category)
+          authUrls.push(url)
+        }
+      }
       
       let videoUrl = null
       if (videoFile) {
