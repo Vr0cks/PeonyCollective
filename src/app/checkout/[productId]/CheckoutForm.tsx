@@ -157,11 +157,10 @@ export default function CheckoutForm({ productId, product, currentPrice, profile
             <span>🔒 PAYTR 256-Bit SSL GÜVENLİ ÖDEME</span>
             <span className="hidden sm:inline">3D Secure</span>
           </div>
-          <div className="w-full overflow-hidden border border-gray-200 rounded-b-xl min-h-[540px] bg-white relative">
+          <div className="w-full border border-gray-200 rounded-b-xl min-h-[680px] bg-white relative">
             <iframe
               src={iframeUrl}
-              className="w-full min-h-[540px] border-none"
-              scrolling="no"
+              className="w-full min-h-[680px] border-none"
             />
           </div>
         </div>
