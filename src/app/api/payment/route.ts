@@ -71,18 +71,30 @@ export async function POST(request: Request) {
       )
     }
 
-    // 5.5 Concurrency Lock Check (Race Condition Önlemi)
+    // 5.5 Concurrency Lock Check (Race Condition Önlemi & Teklif Rezerve Sistemi)
     const now = new Date()
     if (product.locked_until && new Date(product.locked_until) > now) {
-      return NextResponse.json(
-        { error: 'Bu ürün şu an başka bir koleksiyoner tarafından satın alınıyor. Lütfen 15 dakika sonra tekrar deneyin.' },
-        { status: 409 }
-      )
+      // Eğer kilit bu kullanıcıya (locked_by) ait değilse satın almayı engelle
+      if (product.locked_by && product.locked_by !== user.id) {
+        return NextResponse.json(
+          { error: 'Bu ürün bir teklif kabulü sebebiyle başka bir alıcıya rezerve edilmiştir.' },
+          { status: 409 }
+        )
+      } else if (!product.locked_by) {
+        // Normal 15 dakikalık sepet kilidi ise diğerlerine kapat
+        return NextResponse.json(
+          { error: 'Bu ürün şu an başka bir koleksiyoner tarafından satın alınıyor. Lütfen 15 dakika sonra tekrar deneyin.' },
+          { status: 409 }
+        )
+      }
     }
 
-    // Ürünü kilitle (15 dakika)
+    // Ürünü kilitle (Eğer teklif kilidi yoksa veya kendisi kilitlediyse 15 dakika uzat/güncelle)
     const lockTime = new Date(now.getTime() + 15 * 60000).toISOString()
-    await supabase.from('products').update({ locked_until: lockTime }).eq('id', productId)
+    await supabase.from('products').update({ 
+      locked_until: lockTime,
+      locked_by: user.id
+    }).eq('id', productId)
 
     // 6. Get buyer profile to retrieve address, name, phone, etc.
     const { data: buyerProfile } = await supabase
@@ -191,7 +203,7 @@ export async function POST(request: Request) {
     // Amount in kuruş (price * 100)
     const paymentAmount = Math.round(finalPrice * 100)
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://peony-collective.vercel.app'
 
     // 8. Generate PayTR checkout token params
     const paytrParams = createPaymentToken({

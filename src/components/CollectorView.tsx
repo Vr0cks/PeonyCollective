@@ -4,6 +4,8 @@ import { ShoppingBag, Star, Package, CheckCircle2, Truck, FlaskConical, CreditCa
 import Image from 'next/image'
 import Link from 'next/link'
 import { Order } from '@/src/types'
+import { useState } from 'react'
+import { approveOrder } from '@/src/app/orders/actions'
 
 interface CollectorViewProps {
   orders: Order[]
@@ -30,6 +32,22 @@ function getCurrentStepIndex(status: string): number {
 export default function CollectorView({ orders }: CollectorViewProps) {
   const totalSpend = orders.reduce((s, o) => s + (o.total_price || 0), 0)
   const activeOrders = orders.filter(o => !['completed', 'delivered', 'cancelled', 'refunded'].includes(o.order_status))
+  const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null)
+
+  const handleApprove = async (orderId: string) => {
+    if (!confirm('Siparişi teslim aldığınızı onaylıyor musunuz? Bu işlem geri alınamaz ve satıcı payı havuzdan serbest bırakılacaktır.')) {
+      return
+    }
+    setLoadingOrderId(orderId)
+    try {
+      await approveOrder(orderId)
+      alert('Sipariş başarıyla onaylandı ve satıcı hak edişi serbest bırakıldı!')
+    } catch (err: any) {
+      alert(err.message || 'Sipariş onaylanırken bir hata oluştu.')
+    } finally {
+      setLoadingOrderId(null)
+    }
+  }
 
   return (
     <div className="space-y-10">
@@ -171,15 +189,26 @@ export default function CollectorView({ orders }: CollectorViewProps) {
                         </div>
                       </div>
 
-                      {/* Dijital Pasaport Butonu */}
-                      {hasPassport && (
-                        <div className="mt-5 flex justify-end">
-                          <Link
-                            href="/passport"
-                            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-[#AF9164] text-[#AF9164] px-5 py-2 rounded-full hover:bg-[#AF9164] hover:text-white transition-all duration-300"
-                          >
-                            ✦ Dijital Pasaportu Görüntüle
-                          </Link>
+                      {/* Onay ve Pasaport Butonları */}
+                      {(hasPassport || order.order_status === 'delivered') && (
+                        <div className="mt-5 flex justify-end gap-3">
+                          {order.order_status === 'delivered' && (
+                            <button
+                              onClick={() => handleApprove(order.id)}
+                              disabled={loadingOrderId === order.id}
+                              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-emerald-600 text-white px-5 py-2.5 rounded-full hover:bg-emerald-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {loadingOrderId === order.id ? 'Onaylanıyor...' : '✓ Siparişi Onayla (Escrow)'}
+                            </button>
+                          )}
+                          {hasPassport && (
+                            <Link
+                              href="/passport"
+                              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-[#AF9164] text-[#AF9164] px-5 py-2 rounded-full hover:bg-[#AF9164] hover:text-white transition-all duration-300"
+                            >
+                              ✦ Dijital Pasaportu Görüntüle
+                            </Link>
+                          )}
                         </div>
                       )}
                     </div>

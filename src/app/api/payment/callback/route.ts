@@ -100,62 +100,69 @@ export async function POST(request: Request) {
               .select('id, first_name, last_name, phone_number, address, role')
               .in('id', [order.buyer_id, order.seller_id])
             
-            const buyer = profiles?.find((p: any) => p.id === order.buyer_id)
-            const seller = profiles?.find((p: any) => p.id === order.seller_id)
-            
-            if (buyer) {
-              const { createOtoOrder } = await import('@/src/lib/oto')
-              
-              // Gönderici Peony Lab mi yoksa doğrudan satıcı mı?
-              // Eğer satıcı Admin ise veya ürün 'is_peony_vip' ise ürün Peony'den çıkar.
-              const isShippedByPeony = seller?.role === 'admin' || fullProduct.is_peony_vip
+             const buyer = profiles?.find((p: any) => p.id === order.buyer_id)
+             const seller = profiles?.find((p: any) => p.id === order.seller_id)
+             
+             if (buyer && seller) {
+               const { createOtoOrder } = await import('@/src/lib/oto')
+ 
+               const isShippedByPeony = seller?.role === 'admin' || fullProduct.is_peony_vip
 
-              const otoResult = await createOtoOrder({
-                orderId: order.id,
-                description: `${fullProduct.brand} ${fullProduct.model_name}`,
-                senderInformation: {
-                  firstName: isShippedByPeony ? 'Peony' : (seller?.first_name || 'Peony'),
-                  lastName: isShippedByPeony ? 'Collective' : (seller?.last_name || 'Collective'),
-                  phone: seller?.phone_number || '+905550000000',
-                  city: 'Istanbul', // varsayılan
-                  address: isShippedByPeony ? 'Zorlu Center, Istanbul' : (seller?.address || 'Zorlu Center, Istanbul')
-                },
-                customerInformation: {
-                  firstName: buyer.first_name || 'Musteri',
-                  lastName: buyer.last_name || '',
-                  phone: buyer.phone_number || '+905550000000',
-                  city: 'Istanbul', // varsayılan
-                  address: buyer.address || 'Adres bilgisi yok'
-                }
-              })
-
-              if (otoResult && otoResult.trackingNumber) {
-                await supabase.from('orders').update({
-                  shipping_tracking_buyer: otoResult.trackingNumber
-                }).eq('id', order.id)
-                
-                // --- EMAIL SENDING ---
-                try {
-                  const { sendOrderConfirmationEmail } = await import('@/src/lib/resend')
-                  await sendOrderConfirmationEmail({
-                    orderId: order.id,
-                    buyerName: `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || 'Müşteri',
-                    buyerEmail: order.buyer_email || 'test@peonycollective.com',
-                    totalAmount: order.total_price || 0,
-                    productName: `${fullProduct.brand} ${fullProduct.model_name}`,
-                    trackingNumber: otoResult.trackingNumber
-                  })
-                } catch (emailErr) {
-                  console.error('Email gönderilemedi:', emailErr)
-                  await supabase.from('system_logs').insert({
-                    level: 'error',
-                    source: 'paytr_webhook',
-                    message: 'Sipariş onayı e-postası gönderilemedi',
-                    metadata: { orderId: order.id, error: String(emailErr) }
-                  })
-                }
-              }
-            }
+               const otoResult = await createOtoOrder({
+                 orderId: isShippedByPeony ? `${order.id}_FINAL` : order.id,
+                 description: `${fullProduct.brand} ${fullProduct.model_name}`,
+                 senderInformation: {
+                   firstName: isShippedByPeony ? 'Peony' : (seller?.first_name || 'Satıcı'),
+                   lastName: isShippedByPeony ? 'Collective' : (seller?.last_name || ''),
+                   phone: isShippedByPeony ? '+902123536000' : (seller?.phone_number || '+905550000000'),
+                   city: 'Istanbul',
+                   address: isShippedByPeony ? 'Zorlu Center, Istanbul' : (seller?.address || 'Zorlu Center, Istanbul')
+                 },
+                 customerInformation: {
+                   firstName: isShippedByPeony ? (buyer.first_name || 'Musteri') : 'Peony Lab',
+                   lastName: isShippedByPeony ? (buyer.last_name || '') : '(Uzman Ofisi)',
+                   phone: isShippedByPeony ? (buyer.phone_number || '+905550000000') : '+902123536000',
+                   city: 'Istanbul',
+                   address: isShippedByPeony ? (buyer.address || 'Adres bilgisi yok') : 'Zorlu Center, Kule 3, Kat 4, Beşiktaş, İstanbul'
+                 }
+               })
+ 
+               if (otoResult && (otoResult.trackingNumber || otoResult.shipmentNumber)) {
+                 const trackingNumber = otoResult.trackingNumber || otoResult.shipmentNumber
+                 if (isShippedByPeony) {
+                   await supabase.from('orders').update({
+                     shipping_tracking_buyer: trackingNumber,
+                     order_status: 'shipped_to_buyer'
+                   }).eq('id', order.id)
+                 } else {
+                   await supabase.from('orders').update({
+                     shipping_tracking_seller: trackingNumber,
+                     order_status: 'shipped_to_lab'
+                   }).eq('id', order.id)
+                 }
+                 
+                 // --- EMAIL SENDING ---
+                 try {
+                   const { sendOrderConfirmationEmail } = await import('@/src/lib/resend')
+                   await sendOrderConfirmationEmail({
+                     orderId: order.id,
+                     buyerName: `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || 'Müşteri',
+                     buyerEmail: order.buyer_email || 'test@peonycollective.com',
+                     totalAmount: order.total_price || 0,
+                     productName: `${fullProduct.brand} ${fullProduct.model_name}`,
+                     trackingNumber: trackingNumber
+                   })
+                 } catch (emailErr) {
+                   console.error('Email gönderilemedi:', emailErr)
+                   await supabase.from('system_logs').insert({
+                     level: 'error',
+                     source: 'paytr_webhook',
+                     message: 'Sipariş onayı e-postası gönderilemedi',
+                     metadata: { orderId: order.id, error: String(emailErr) }
+                   })
+                 }
+               }
+             }
           } catch (e) {
             console.error('OTO Create Order Error:', e)
             await supabase.from('system_logs').insert({
@@ -184,7 +191,16 @@ export async function POST(request: Request) {
   } catch (error) {
     const err = error as Error
     console.error('PayTR Callback Error:', err)
-    return new Response('INTERNAL SERVER ERROR: ' + err.message, {
+    try {
+      const supabase = createAdminClient()
+      await supabase.from('system_logs').insert({
+        level: 'error',
+        source: 'paytr_callback_webhook',
+        message: 'PayTR Webhook Callback genel hata oluştu',
+        metadata: { error: err.message, stack: err.stack }
+      })
+    } catch (e) {}
+    return new Response('INTERNAL SERVER ERROR', {
       status: 500,
     })
   }

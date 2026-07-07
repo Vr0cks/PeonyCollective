@@ -2,12 +2,12 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { addProductAction, saveCloudDraft, loadCloudDraft } from '@/src/app/sell/actions'
+import { addProductAction, saveCloudDraft, loadCloudDraft, getBrandsAction, getModelsForBrandAction } from '@/src/app/sell/actions'
 import { createClient } from '@/src/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, ChevronDown, UploadCloud, Video, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react'
 import {
-  genders, mainCategories, brands, conditions,
+  genders, mainCategories, brands as staticBrands, conditions,
   getModelsForBrand, getMaterialsForBrand, getSubcategories, getSizesForSubcategory,
   type Gender, type MainCategory,
 } from '@/src/utils/categoryData'
@@ -149,11 +149,17 @@ export default function SellForm() {
 
   // ─── Marka / Model State'leri ───
   const [selectedBrand, setSelectedBrand] = useState('')
-  const [customBrand, setCustomBrand] = useState('')
   const [selectedModel, setSelectedModel] = useState('')
-  const [customModel, setCustomModel] = useState('')
   const [selectedMaterial, setSelectedMaterial] = useState('')
   const [customMaterial, setCustomMaterial] = useState('')
+
+  // Dynamic Brands & Models States
+  const [dbBrands, setDbBrands] = useState<{ id: string; name: string }[]>([])
+  const [dbModels, setDbModels] = useState<{ id: string; name: string }[]>([])
+  const [brandSearchQuery, setBrandSearchQuery] = useState('')
+  const [modelSearchQuery, setModelSearchQuery] = useState('')
+  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false)
+  const [modelDropdownOpen, setModelDropdownOpen] = useState(false)
   
   // ─── Diğer Text Alanları ───
   const [formCondition, setFormCondition] = useState('')
@@ -202,12 +208,9 @@ export default function SellForm() {
       if (!selectedCategory) errors.category = 'Lütfen kategori seçin'
       if (availableSubcategories.length > 0 && !selectedSubcategory) errors.subcategory = 'Lütfen alt kategori seçin'
       if (selectedSubcategory && availableSizes.length > 0 && !selectedSize) errors.size = 'Lütfen beden seçin'
+      if (!selectedBrand) errors.brand = 'Marka seçimi zorunludur'
+      if (!selectedModel) errors.model = 'Model seçimi zorunludur'
     } else if (step === 2) {
-      const b = selectedBrand === '__other__' ? customBrand : selectedBrand
-      const m = selectedModel === '__other__' ? customModel : selectedModel
-      
-      if (!b) errors.brand = 'Marka zorunludur'
-      if (!m) errors.model = 'Model zorunludur'
       if (!formCondition) errors.condition = 'Kondisyon zorunludur'
       if (!formDescription || formDescription.length < 20) errors.description = 'Açıklama çok kısa (en az 20 karakter)'
     } else if (step === 3) {
@@ -236,10 +239,14 @@ export default function SellForm() {
         if (draft.selectedCategory) setSelectedCategory(draft.selectedCategory)
         if (draft.selectedSubcategory) setSelectedSubcategory(draft.selectedSubcategory)
         if (draft.selectedSize) setSelectedSize(draft.selectedSize)
-        if (draft.selectedBrand) setSelectedBrand(draft.selectedBrand)
-        if (draft.customBrand) setCustomBrand(draft.customBrand)
-        if (draft.selectedModel) setSelectedModel(draft.selectedModel)
-        if (draft.customModel) setCustomModel(draft.customModel)
+        if (draft.selectedBrand) {
+          setSelectedBrand(draft.selectedBrand)
+          setBrandSearchQuery(draft.selectedBrand)
+        }
+        if (draft.selectedModel) {
+          setSelectedModel(draft.selectedModel)
+          setModelSearchQuery(draft.selectedModel)
+        }
         if (draft.selectedMaterial) setSelectedMaterial(draft.selectedMaterial)
         if (draft.customMaterial) setCustomMaterial(draft.customMaterial)
         if (draft.formCondition) setFormCondition(draft.formCondition)
@@ -263,7 +270,7 @@ export default function SellForm() {
     setIsSavingDraft(true)
     await saveCloudDraft({
       selectedGender, selectedCategory, selectedSubcategory, selectedSize,
-      selectedBrand, customBrand, selectedModel, customModel,
+      selectedBrand, selectedModel,
       selectedMaterial, customMaterial, formCondition, formDescription,
       formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
       odorScore, hasSpaTreatment, fullSetItems, isPeonyVip
@@ -312,12 +319,52 @@ export default function SellForm() {
     return () => allGeneratedUrls.current.forEach(url => URL.revokeObjectURL(url))
   }, [])
 
+  // Load brands on mount
+  useEffect(() => {
+    async function loadBrands() {
+      const res = await getBrandsAction()
+      if (res.success && res.brands) {
+        setDbBrands(res.brands)
+      }
+    }
+    loadBrands()
+  }, [])
+
+  // Load models when selected brand changes
+  useEffect(() => {
+    async function loadModels() {
+      if (!selectedBrand) {
+        setDbModels([])
+        return
+      }
+      const matchedBrand = dbBrands.find(b => b.name.toLowerCase() === selectedBrand.toLowerCase())
+      if (matchedBrand) {
+        const res = await getModelsForBrandAction(matchedBrand.id)
+        if (res.success && res.models) {
+          setDbModels(res.models)
+        }
+      } else {
+        setDbModels([])
+      }
+    }
+    loadModels()
+  }, [selectedBrand, dbBrands])
+
   // ─── Hesaplanan Değerler ───
-  const currentBrand = selectedBrand === '__other__' ? customBrand : selectedBrand
-  const currentModel = selectedModel === '__other__' ? customModel : selectedModel
+  const currentBrand = selectedBrand
+  const currentModel = selectedModel
   const currentMaterial = selectedMaterial === '__other__' ? customMaterial : selectedMaterial
 
-  const availableModels = useMemo(() => getModelsForBrand(currentBrand), [currentBrand])
+  const filteredBrands = useMemo(() => {
+    if (!brandSearchQuery) return dbBrands
+    return dbBrands.filter(b => b.name.toLowerCase().includes(brandSearchQuery.toLowerCase()))
+  }, [brandSearchQuery, dbBrands])
+
+  const filteredModels = useMemo(() => {
+    if (!modelSearchQuery) return dbModels
+    return dbModels.filter(m => m.name.toLowerCase().includes(modelSearchQuery.toLowerCase()))
+  }, [modelSearchQuery, dbModels])
+
   const availableMaterials = useMemo(() => getMaterialsForBrand(currentBrand), [currentBrand])
   const availableSubcategories = useMemo(() => selectedCategory ? getSubcategories(selectedCategory as MainCategory) : [], [selectedCategory])
   const availableSizes = useMemo(() => selectedCategory && selectedSubcategory ? getSizesForSubcategory(selectedCategory as MainCategory, selectedSubcategory) : [], [selectedCategory, selectedSubcategory])
@@ -505,30 +552,79 @@ export default function SellForm() {
 
             {/* Marka & Model */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-gray-50">
-              <div>
+              <div className="relative">
                 <label className={labelClasses}>Marka</label>
-                <select className={getInputClasses('brand')} value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} required>
-                  <option value="" disabled>Seçiniz</option>
-                  {brands.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
-                  <option value="__other__">Diğer</option>
-                </select>
-                {selectedBrand === '__other__' && <input className={`${getInputClasses('brand')} mt-4`} value={customBrand} onChange={(e) => setCustomBrand(e.target.value)} placeholder="Marka adını yazın" required />}
+                <input 
+                  type="text" 
+                  className={getInputClasses('brand')} 
+                  placeholder="Marka arayın (örn: Hermès, Chanel)..." 
+                  value={brandSearchQuery} 
+                  onChange={(e) => {
+                    setBrandSearchQuery(e.target.value)
+                    setSelectedBrand('')
+                    setSelectedModel('')
+                    setModelSearchQuery('')
+                  }}
+                  onFocus={() => setBrandDropdownOpen(true)}
+                  onBlur={() => setTimeout(() => setBrandDropdownOpen(false), 200)}
+                  required
+                />
+                {brandDropdownOpen && filteredBrands.length > 0 && (
+                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredBrands.map(b => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedBrand(b.name)
+                          setBrandSearchQuery(b.name)
+                          setBrandDropdownOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-3 text-xs hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                      >
+                        {b.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {renderErrorMsg('brand')}
               </div>
               
-              <div>
+              <div className="relative">
                 <label className={labelClasses}>Model Adı</label>
-                {availableModels.length > 0 ? (
-                  <>
-                    <select className={getInputClasses('model')} value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} required>
-                      <option value="" disabled>Seçiniz</option>
-                      {availableModels.map(m => <option key={m} value={m}>{m}</option>)}
-                      <option value="__other__">Diğer</option>
-                    </select>
-                    {selectedModel === '__other__' && <input className={`${getInputClasses('model')} mt-4`} value={customModel} onChange={(e) => setCustomModel(e.target.value)} placeholder="Örn: Birkin 30" required />}
-                  </>
-                ) : (
-                  <input className={getInputClasses('model')} value={customModel} onChange={(e) => setCustomModel(e.target.value)} placeholder="Örn: Classic Flap Bag" required />
+                <input 
+                  type="text" 
+                  className={getInputClasses('model')} 
+                  placeholder={selectedBrand ? "Model arayın (örn: Birkin 30)..." : "Önce marka seçiniz"} 
+                  value={modelSearchQuery} 
+                  onChange={(e) => {
+                    setModelSearchQuery(e.target.value)
+                    setSelectedModel('')
+                  }}
+                  onFocus={() => {
+                    if (selectedBrand) setModelDropdownOpen(true)
+                  }}
+                  onBlur={() => setTimeout(() => setModelDropdownOpen(false), 200)}
+                  disabled={!selectedBrand}
+                  required
+                />
+                {modelDropdownOpen && filteredModels.length > 0 && (
+                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredModels.map(m => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedModel(m.name)
+                          setModelSearchQuery(m.name)
+                          setModelDropdownOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-3 text-xs hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                      >
+                        {m.name}
+                      </button>
+                    ))}
+                  </div>
                 )}
                 {renderErrorMsg('model')}
               </div>

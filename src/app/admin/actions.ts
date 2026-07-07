@@ -110,3 +110,218 @@ export async function updateProductStatus(
   revalidatePath('/admin')
   revalidatePath('/')
 }
+
+export async function updateOrderStatus(orderId: string, nextStatus: string) {
+  const supabase = await createClient()
+
+  // Yetki Kontrolü
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Oturum açmanız gerekiyor.")
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
+    throw new Error("Bu işlemi yapmaya yetkiniz yok.")
+  }
+
+  // Durumu güncelle
+  const { error } = await supabase
+    .from('orders')
+    .update({ order_status: nextStatus })
+    .eq('id', orderId)
+
+  if (error) {
+    console.error("Sipariş durum güncelleme hatası:", error.message)
+    throw new Error("Sipariş güncellenirken bir hata oluştu.")
+  }
+
+  revalidatePath('/admin/orders')
+  revalidatePath('/orders')
+  revalidatePath('/')
+}
+
+// Yardımcı admin doğrulama fonksiyonu
+async function verifyAdmin() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Oturum açmanız gerekiyor.")
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
+    throw new Error("Bu işlemi yapmaya yetkiniz yok.")
+  }
+  return supabase
+}
+
+/**
+ * Siparişi inceleme durumuna geçirir.
+ */
+export async function transitionOrderToInspecting(orderId: string) {
+  const supabase = await verifyAdmin()
+
+  const { error } = await supabase
+    .from('orders')
+    .update({ order_status: 'inspecting' })
+    .eq('id', orderId)
+
+  if (error) {
+    console.error("Order status update to inspecting failed:", error.message)
+    throw new Error("Sipariş durumu güncellenirken hata oluştu.")
+  }
+
+  revalidatePath('/admin/lab')
+  revalidatePath('/orders')
+}
+
+/**
+ * Siparişi onaylar ve 2. kargoyu (Peony Lab -> Alıcı) oluşturur.
+ */
+export async function approveOrderInLab(orderId: string) {
+  const supabase = await verifyAdmin()
+
+  const { data: order, error: orderErr } = await supabase
+    .from('orders')
+    .select('*, products(*), buyer:profiles!buyer_id(*)')
+    .eq('id', orderId)
+    .single()
+
+  if (orderErr || !order) {
+    throw new Error("Sipariş bulunamadı.")
+  }
+
+  const buyerProfile = order.buyer as any
+  const product = order.products as any
+
+  if (!buyerProfile?.address || !buyerProfile?.phone_number) {
+    throw new Error("Alıcının profil veya adres bilgileri eksik.")
+  }
+
+  const { createOtoOrder } = await import('@/src/lib/oto')
+
+  // 2. Kargo: Peony Lab'den Alıcıya
+  const otoResult = await createOtoOrder({
+    orderId: order.id,
+    description: `${product.brand} ${product.model_name} (Laboratuvar Onaylı)`,
+    senderInformation: {
+      firstName: 'Peony',
+      lastName: 'Lab',
+      phone: '+905550000000',
+      address: 'Zorlu Center, No: 123, Beşiktaş',
+      city: 'İstanbul',
+      email: 'lab@peonycollective.com'
+    },
+    customerInformation: {
+      firstName: buyerProfile.first_name || 'Alıcı',
+      lastName: buyerProfile.last_name || '',
+      phone: buyerProfile.phone_number,
+      address: buyerProfile.address,
+      city: 'İstanbul',
+      email: buyerProfile.email || 'buyer@peony.com'
+    }
+  })
+
+  const trackingNumber = otoResult?.trackingNumber || otoResult?.shipmentNumber
+
+  if (!trackingNumber) {
+    throw new Error("Alıcı kargo kodu oluşturulamadı.")
+  }
+
+  // Siparişi onaylı ve kargolandı durumuna çek
+  const { error: updateErr } = await supabase
+    .from('orders')
+    .update({
+      order_status: 'shipped_to_buyer',
+      shipping_tracking_buyer: trackingNumber
+    })
+    .eq('id', orderId)
+
+  if (updateErr) {
+    console.error("Order status update failed:", updateErr.message)
+    throw new Error("Sipariş durumu güncellenemedi.")
+  }
+
+  // Alıcıya bildirim gönder
+  await supabase.from('notifications').insert({
+    user_id: order.buyer_id,
+    type: 'shipping_update',
+    title: 'Ürününüz Kargoya Verildi',
+    message: `Tebrikler! Satın aldığınız ${product.brand} ${product.model_name} ürünü uzmanlarımız tarafından onaylandı ve size gönderilmek üzere kargolandı. Takip No: ${trackingNumber}`,
+    is_read: false,
+    metadata: { order_id: orderId, tracking_number: trackingNumber }
+  })
+
+  revalidatePath('/admin/lab')
+  revalidatePath('/orders')
+}
+
+/**
+ * Siparişi laboratuvarda sahte olduğu gerekçesiyle reddeder.
+ */
+export async function rejectOrderInLab(orderId: string, reason: string) {
+  const supabase = await verifyAdmin()
+
+  const { data: order, error: orderErr } = await supabase
+    .from('orders')
+    .select('*, products(*)')
+    .eq('id', orderId)
+    .single()
+
+  if (orderErr || !order) {
+    throw new Error("Sipariş bulunamadı.")
+  }
+
+  // Siparişi iade edildi durumuna çek
+  const { error: updateErr } = await supabase
+    .from('orders')
+    .update({
+      order_status: 'refunded'
+    })
+    .eq('id', orderId)
+
+  if (updateErr) {
+    console.error("Order status update failed:", updateErr.message)
+    throw new Error("Sipariş durumu güncellenemedi.")
+  }
+
+  // Ürünü reddedildi olarak işaretle
+  await supabase
+    .from('products')
+    .update({
+      status: 'rejected'
+    })
+    .eq('id', order.product_id)
+
+  const product = order.products as any
+
+  // Alıcıya iade bildirimi
+  await supabase.from('notifications').insert({
+    user_id: order.buyer_id,
+    type: 'order_cancelled',
+    title: 'Sipariş İptal Edildi ve İade Başlatıldı',
+    message: `Satın aldığınız ${product.brand} ${product.model_name} ürünü laboratuvar incelemesini geçemedi ve sipariş iptal edildi. Ücret iadeniz kartınıza yansıtılacaktır. Gerekçe: ${reason}`,
+    is_read: false,
+    metadata: { order_id: orderId }
+  })
+
+  // Satıcıya ret bildirimi
+  await supabase.from('notifications').insert({
+    user_id: order.seller_id,
+    type: 'product_rejected',
+    title: 'Ürününüz Orijinallik Testinden Geçemedi',
+    message: `Gönderdiğiniz ${product.brand} ${product.model_name} ürünü laboratuvar dikiş/logo incelemelerinden geçemedi. Ürün size geri gönderilecektir. Gerekçe: ${reason}`,
+    is_read: false,
+    metadata: { order_id: orderId }
+  })
+
+  revalidatePath('/admin/lab')
+  revalidatePath('/orders')
+}

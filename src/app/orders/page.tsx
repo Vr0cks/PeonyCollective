@@ -2,6 +2,7 @@ import { createClient } from '@/src/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import GetCargoCodeButton from '@/src/components/GetCargoCodeButton'
 
 export const metadata = {
   title: 'Siparişlerim | Peony Collective',
@@ -263,6 +264,12 @@ export default async function OrdersPage({
                           </div>
                         )}
                       </div>
+                    </div>
+                  )}
+
+                  {tab === 'sales' && order.order_status === 'paid' && !order.shipping_tracking_seller && (
+                    <div className="flex justify-end">
+                      <GetCargoCodeButton orderId={order.id} />
                     </div>
                   )}
                 </div>

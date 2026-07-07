@@ -108,6 +108,6 @@ export async function POST(req: Request) {
           metadata: { error: String(error) }
        });
     } catch (e) {} // Ignore secondary errors
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: 'Webhook işlem hatası' }, { status: 400 });
   }
 }

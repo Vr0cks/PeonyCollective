@@ -2,7 +2,7 @@ import { createClient } from '@/src/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Clock, Package, FlaskConical, LogOut, ShieldCheck } from 'lucide-react'
+import { LayoutDashboard, Clock, Package, FlaskConical, LogOut, ShieldCheck, ShoppingCart } from 'lucide-react'
 import { logout } from '@/src/app/login/actions'
 
 const navLinks = [
@@ -10,6 +10,7 @@ const navLinks = [
   { href: '/admin/pending', label: 'Onay Kuyruğu', icon: Clock },
   { href: '/admin/products', label: 'Tüm Ürünler', icon: Package },
   { href: '/admin/lab', label: 'Lab — A/B İnceleme', icon: FlaskConical },
+  { href: '/admin/orders', label: 'Sipariş Yönetimi', icon: ShoppingCart },
 ]
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {

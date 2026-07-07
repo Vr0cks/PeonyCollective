@@ -9,6 +9,7 @@ import EntrupyModal from '@/src/components/EntrupyModal'
 import VirtualTryOnButton from '@/src/components/VirtualTryOnButton'
 import ProductGallery from '@/src/components/ProductGallery'
 import FadeIn from '@/src/components/animations/FadeIn'
+import ProductActionButtons from '@/src/components/ProductActionButtons'
 
 export async function generateMetadata({
   params,
@@ -50,17 +51,18 @@ export default async function ProductDetailPage({
   if (error || !productData) return notFound()
   const product = productData as Product
 
-  if (product.status !== 'approved' && product.status !== 'sold') {
-    const { data: { user } } = await supabase.auth.getUser()
-    let isOwnerOrAdmin = false
-    if (user) {
-      if (user.id === product.seller_id) {
-        isOwnerOrAdmin = true
-      } else {
-        const { data: adminProf } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-        if (adminProf?.role === 'admin') isOwnerOrAdmin = true
-      }
+  const { data: { user } } = await supabase.auth.getUser()
+  let isOwnerOrAdmin = false
+  if (user) {
+    if (user.id === product.seller_id) {
+      isOwnerOrAdmin = true
+    } else {
+      const { data: adminProf } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      if (adminProf?.role === 'admin') isOwnerOrAdmin = true
     }
+  }
+
+  if (product.status !== 'approved' && product.status !== 'sold') {
     if (!isOwnerOrAdmin) return notFound()
   }
 
@@ -205,20 +207,12 @@ export default async function ProductDetailPage({
 
               {/* Butonlar & AR */}
               <FadeIn delay={0.6} direction="left" className="flex flex-col gap-3 pt-6 border-t border-gray-200">
-                {product.status === 'sold' ? (
-                  <button disabled className="w-full bg-gray-100 text-gray-400 py-4 font-bold uppercase tracking-[0.2em] text-[11px] text-center cursor-not-allowed border border-gray-200">
-                    BU PARÇA SATILMIŞTIR
-                  </button>
-                ) : (
-                  <>
-                    <Link href={`/checkout/${product.id}`} className="w-full bg-black text-white py-4 font-bold uppercase tracking-[0.2em] text-[11px] text-center hover:bg-[#AF9164] transition-colors duration-300 block">
-                      SATIN AL
-                    </Link>
-                    
-                    {/* AR Deneyimi Butonu (Client Component) */}                    {/* 3D Model özelliği ileride ekleneceği için şimdilik gizlendi */}
-                    {/* <VirtualTryOnButton productName={product.model_name} /> */}
-                  </>
-                )}
+                <ProductActionButtons 
+                  productId={product.id}
+                  productPrice={product.price}
+                  isOwner={isOwnerOrAdmin}
+                  isSold={product.status === 'sold'}
+                />
               </FadeIn>
 
               {/* Lüks Güvenlik Detayları */}

@@ -75,7 +75,7 @@ export default function AuthPage() {
   const handleSocialLogin = async (provider: 'google' | 'apple') => {
     try {
       setSocialLoading(provider)
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://peony-collective.vercel.app'
       const result = await signInWithProvider(provider, origin)
       if (result?.error) {
         setMessage(result.error)

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Send, Loader2 } from 'lucide-react'
 
 import { Conversation, Message } from '@/src/types'
+import OfferChatWidget from './OfferChatWidget'
 
 interface MessageThreadProps {
   messages: Message[]
@@ -75,6 +76,15 @@ export default function MessageThread({
           </Link>
         )}
       </div>
+
+      {/* Offer Status & Management (If product exists) */}
+      {product && product.id && (
+        <OfferChatWidget
+          productId={product.id}
+          userId={userId}
+          sellerId={product.seller_id || ''}
+        />
+      )}
 
       {/* Messages list */}
       <div className="flex-grow overflow-y-auto p-6 space-y-4 bg-gray-50/20">

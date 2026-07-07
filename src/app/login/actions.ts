@@ -35,7 +35,7 @@ export async function resetPassword(formData: FormData) {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/update-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://peony-collective.vercel.app'}/auth/callback?next=/update-password`,
     })
 
     if (error) {
@@ -75,7 +75,7 @@ export async function signup(formData: FormData) {
           full_name: `${firstName} ${lastName}`,
           role: role,
         },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://peony-collective.vercel.app'}/auth/callback`,
       },
     })
 
@@ -94,7 +94,7 @@ export async function signup(formData: FormData) {
 }
 
 // ─── Sosyal Giriş (Google / Apple) ───
-export async function signInWithProvider(provider: 'google' | 'apple', origin: string = 'http://localhost:3000') {
+export async function signInWithProvider(provider: 'google' | 'apple', origin: string = 'https://peony-collective.vercel.app') {
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signInWithOAuth({

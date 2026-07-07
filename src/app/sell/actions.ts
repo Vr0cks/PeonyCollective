@@ -121,3 +121,36 @@ export async function loadCloudDraft() {
     return { success: false, draft: null }
   }
 }
+
+export async function getBrandsAction() {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('brands')
+      .select('id, name')
+      .order('name', { ascending: true })
+
+    if (error) throw error
+    return { success: true, brands: data || [] }
+  } catch (error: any) {
+    console.error("getBrandsAction error:", error)
+    return { success: false, error: error.message, brands: [] }
+  }
+}
+
+export async function getModelsForBrandAction(brandId: string) {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('models')
+      .select('id, name')
+      .eq('brand_id', brandId)
+      .order('name', { ascending: true })
+
+    if (error) throw error
+    return { success: true, models: data || [] }
+  } catch (error: any) {
+    console.error("getModelsForBrandAction error:", error)
+    return { success: false, error: error.message, models: [] }
+  }
+}

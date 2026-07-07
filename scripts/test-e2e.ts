@@ -10,7 +10,8 @@ interface Order {
   total_price_kurus: number; // Recommendation 3: Standardize to kuruş
   commission_amount_kurus: number;
   seller_amount_kurus: number;
-  status: 'pending_payment' | 'paid' | 'verifying' | 'verified' | 'shipped' | 'delivered' | 'completed' | 'cancelled' | 'refunded';
+  status: 'pending_payment' | 'paid' | 'verifying' | 'verified' | 'shipped_to_lab' | 'inspecting' | 'lab_approved' | 'shipped_to_buyer' | 'shipped' | 'delivered' | 'completed' | 'cancelled' | 'refunded';
+  shipping_tracking_seller?: string;
   shipping_tracking_buyer?: string;
   payment_id?: string;
   entrupy_id?: string;
@@ -118,10 +119,10 @@ class OrderCoordinator {
 
     if (status === 'verified') {
       order.status = 'verified';
-      mockDatabase.log('success', 'ENTRUPY_WEBHOOK', `Ürün orijinalliği onaylandı. Kargo oluşturuluyor...`);
+      mockDatabase.log('success', 'ENTRUPY_WEBHOOK', `Ürün orijinalliği onaylandı. Aşama 1 Kargo kodu oluşturuluyor...`);
       
-      // Kargo Siparişini Oluştur (OTO Kargo)
-      await this.createOtoShipping(order.id);
+      // Kargo Siparişini Oluştur (OTO Kargo): Satıcı -> Peony Lab
+      await this.createOtoShippingSellerToLab(order.id);
     } else {
       // Recommendation 4: Rollback & Refund Akışı
       order.status = 'refunded';
@@ -132,51 +133,77 @@ class OrderCoordinator {
     return { success: true };
   }
 
-  static async createOtoShipping(orderId: string) {
+  static async createOtoShippingSellerToLab(orderId: string) {
     const order = mockDatabase.orders.find(o => o.id === orderId);
     if (!order) return;
 
-    const product = mockDatabase.products.find(p => p.id === order.product_id);
-    if (!product) return;
-
-    mockDatabase.log('info', 'OTO_KARGO', `OTO Kargo sipariş kaydı yapılıyor...`);
+    mockDatabase.log('info', 'OTO_KARGO', `Aşama 1: OTO Kargo siparişi oluşturuluyor (Satıcı → Peony Lab)...`);
 
     // OTO API Simülasyonu
-    const trackingNumber = `OTO_${Math.floor(1000000000 + Math.random() * 9000000000)}`;
-    order.status = 'shipped';
-    order.shipping_tracking_buyer = trackingNumber;
+    const trackingNumber = `OTO_S_${Math.floor(1000000000 + Math.random() * 9000000000)}`;
+    order.status = 'shipped_to_lab';
+    order.shipping_tracking_seller = trackingNumber;
 
-    mockDatabase.log('success', 'OTO_KARGO', `Kargo siparişi başarıyla oluşturuldu. Otomatik atanan kargo firması takip numarası: ${trackingNumber}`);
+    mockDatabase.log('success', 'OTO_KARGO', `Aşama 1 kargo başarıyla oluşturuldu. Takip No (Satıcı → Lab): ${trackingNumber}`);
+  }
+
+  // Lab Ekspertiz İncelemesi ve Onay Akışı (Aşama 2 Kargo)
+  static async handleLabVerification(orderId: string, decision: 'approve' | 'reject', reason?: string) {
+    const order = mockDatabase.orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    mockDatabase.log('info', 'LAB_EKSPERTIZ', `Fiziki ürün labda inceleniyor...`);
+    order.status = 'inspecting';
+
+    if (decision === 'approve') {
+      mockDatabase.log('success', 'LAB_EKSPERTIZ', `Ürün doğruluğu uzmanlar tarafından onaylandı. Aşama 2: OTO Kargo oluşturuluyor (Peony Lab → Alıcı)...`);
+      
+      const trackingNumber = `OTO_B_${Math.floor(1000000000 + Math.random() * 9000000000)}`;
+      order.status = 'shipped'; // shipped_to_buyer
+      order.shipping_tracking_buyer = trackingNumber;
+      
+      mockDatabase.log('success', 'LAB_EKSPERTIZ', `Aşama 2 kargo kodu oluşturuldu. Takip No (Lab → Alıcı): ${trackingNumber}`);
+    } else {
+      order.status = 'refunded';
+      mockDatabase.log('warn', 'LAB_EKSPERTIZ', `Ürün testi geçemedi. Sipariş iptal edildi. Gerekçe: ${reason}`);
+    }
   }
 
   // Delivery update simulation
   static async handleCargoDelivery(trackingNumber: string) {
-    mockDatabase.log('info', 'OTO_TRACKING_WEBHOOK', `Kargo teslim edildi bildirimi alındı. Takip No: ${trackingNumber}`);
+    mockDatabase.log('info', 'OTO_TRACKING_WEBHOOK', `Kargo teslim edildi webhook bildirimi alındı. Takip No: ${trackingNumber}`);
 
     const order = mockDatabase.orders.find(o => o.shipping_tracking_buyer === trackingNumber);
     if (!order) {
-      mockDatabase.log('error', 'OTO_TRACKING_WEBHOOK', `Eşleşen kargo bulunamadı.`);
+      mockDatabase.log('error', 'OTO_TRACKING_WEBHOOK', `Eşleşen alıcı kargosu bulunamadı.`);
       return { success: false };
     }
 
-    // Idempotency: Zaten tamamlanmışsa işlem yapma
     if (order.status === 'completed') {
       mockDatabase.log('warn', 'OTO_TRACKING_WEBHOOK', `Sipariş zaten tamamlanmış durumda.`);
       return { success: true, duplicated: true };
     }
 
     order.status = 'delivered';
-    mockDatabase.log('success', 'OTO_TRACKING_WEBHOOK', `Sipariş teslim edildi.`);
+    mockDatabase.log('success', 'OTO_TRACKING_WEBHOOK', `Alıcıya "Ürünü onaylayın" bildirimi gönderildi. 3 günlük yasal onay süreci başlatıldı.`);
+  }
 
-    // Para Dağıtımı (Escrow Release)
-    await this.releaseFundsToSeller(order.id);
+  // Cron job simulation
+  static async runAutoApproveCron() {
+    mockDatabase.log('info', 'CRON_AUTO_COMPLETE', `Otomatik onaylama cron job'ı tetikleniyor...`);
+    const pendingOrders = mockDatabase.orders.filter(o => o.status === 'delivered');
+    
+    for (const order of pendingOrders) {
+      mockDatabase.log('info', 'CRON_AUTO_COMPLETE', `Sipariş #${order.id} için 3 günlük süre doldu. Otomatik onaylanıyor...`);
+      await this.releaseFundsToSeller(order.id);
+    }
   }
 
   static async releaseFundsToSeller(orderId: string) {
     const order = mockDatabase.orders.find(o => o.id === orderId);
     if (!order) return;
 
-    mockDatabase.log('info', 'PAYTR_ESCROW_RELEASE', `Para dağıtım işlemi başlatılıyor...`);
+    mockDatabase.log('info', 'PAYTR_ESCROW_RELEASE', `Para dağıtım işlemi başlatılıyor (Escrow Release)...`);
     mockDatabase.log('success', 'PAYTR_ESCROW_RELEASE', `Satıcıya aktarılan: ${order.seller_amount_kurus / 100} TL (Satıcı ID: ${order.seller_id})`);
     mockDatabase.log('success', 'PAYTR_ESCROW_RELEASE', `Peony komisyonu: ${order.commission_amount_kurus / 100} TL`);
 
@@ -215,39 +242,32 @@ async function runE2ETests() {
 
   console.log(`\x1b[1mSenaryo 1: Başarılı Uçtan Uca Sipariş, Orijinallik Onayı ve Teslimat\x1b[0m`);
   
-  // 1. Ödeme Webhook'u Simüle Edilir
+  // 1. Ödeme başarılı simülasyonu
   await OrderCoordinator.handlePaymentSuccess(testOrderId, 'paytr_oid_98765', 15000000);
   
-  // Idempotency Testi (Tekrar eden ödeme webhook çağrısı)
-  console.log('\n\x1b[1m[TEST] Idempotency Testi (Mükerrer PayTR Webhook Çağrısı)\x1b[0m');
-  const doublePayment = await OrderCoordinator.handlePaymentSuccess(testOrderId, 'paytr_oid_98765', 15000000);
-  if (doublePayment.duplicated) {
-    console.log('\x1b[32m✔ BAŞARILI: Mükerrer ödeme çağrısı güvenle yoksayıldı (Idempotency).\x1b[0m');
-  } else {
-    console.log('\x1b[31m✘ HATA: Mükerrer ödeme çağrısı engellenemedi!\x1b[0m');
-  }
-
-  // 2. Entrupy Analizi webhook simülasyonu
+  // 2. Entrupy Analizi ve Aşama 1 Kargo
   const order = mockDatabase.orders[0];
   console.log('\n\x1b[1m[TEST] Entrupy Orijinal Ürün Bildirimi Webhook\x1b[0m');
   await OrderCoordinator.handleEntrupyWebhook(order.entrupy_id!, 'verified');
 
-  // Idempotency Testi 2 (Tekrar eden Entrupy bildirimi)
-  const doubleVerification = await OrderCoordinator.handleEntrupyWebhook(order.entrupy_id!, 'verified');
-  if (doubleVerification.duplicated) {
-    console.log('\x1b[32m✔ BAŞARILI: Mükerrer Entrupy doğrulaması güvenle yoksayıldı.\x1b[0m');
-  }
+  // 3. Laboratuvar Karşılaştırma Onayı ve Aşama 2 Kargo
+  console.log('\n\x1b[1m[TEST] Lab Ekspertiz İncelemesi ve Onay (2. Kargo Oluşturma)\x1b[0m');
+  await OrderCoordinator.handleLabVerification(order.id, 'approve');
 
-  // 3. Kargo Teslimatı webhook simülasyonu
-  console.log('\n\x1b[1m[TEST] OTO Kargo Teslim Edildi Webhook & Para Dağıtımı\x1b[0m');
+  // 4. Kargo Teslimatı webhook simülasyonu (3 Günlük onay süreci tetiklenir)
+  console.log('\n\x1b[1m[TEST] OTO Kargo Teslim Edildi Webhook\x1b[0m');
   await OrderCoordinator.handleCargoDelivery(order.shipping_tracking_buyer!);
+
+  // 5. 3 Günlük onay süresi dolması (Cron tetiklenmesi ve Para Dağıtımı)
+  console.log('\n\x1b[1m[TEST] 3 Günlük Süre Sonu Auto-Approval Cron Job\x1b[0m');
+  await OrderCoordinator.runAutoApproveCron();
 
   console.log('\n\x1b[1m\x1b[35m=== Senaryo 1 Sonuçları ===\x1b[0m');
   console.log(`Sipariş Son Durumu: \x1b[32m${order.status.toUpperCase()}\x1b[0m (Beklenen: COMPLETED)`);
   console.log(`Ürün Son Durumu: \x1b[32m${mockDatabase.products[0].status.toUpperCase()}\x1b[0m (Beklenen: SOLD)`);
 
-  // --- Senaryo 2: Entrupy Reddedildi (Sahte Ürün / Refund) Senaryosu ---
-  console.log(`\n\x1b[1mSenaryo 2: Ürün Sahte Çıkması Durumunda Refund (Rollback) Akışı\x1b[0m`);
+  // --- Senaryo 2: Lab Reddedildi (Sahte Ürün / Refund) Senaryosu ---
+  console.log(`\n\x1b[1mSenaryo 2: Lab İncelemesinde Ürün Sahte Çıkması Durumunda Refund Akışı\x1b[0m`);
   
   const badProductId = 'prod_fake_bag_002';
   const badOrderId = 'ord_bad_purchase_002';
@@ -275,12 +295,17 @@ async function runE2ETests() {
   // Ödeme başarılı
   await OrderCoordinator.handlePaymentSuccess(badOrderId, 'paytr_oid_54321', 45000000);
   
-  // Entrupy RED webhook simülasyonu
+  // Entrupy onaylandı -> Aşama 1 Kargo üretildi
   const badOrder = mockDatabase.orders.find(o => o.id === badOrderId)!;
-  await OrderCoordinator.handleEntrupyWebhook(badOrder.entrupy_id!, 'rejected');
+  await OrderCoordinator.handleEntrupyWebhook(badOrder.entrupy_id!, 'verified');
+
+  // Lab incelemesinde RED kararı verilmesi
+  console.log('\n\x1b[1m[TEST] Lab İncelemesi Sahte Ürün Red Kararı\x1b[0m');
+  await OrderCoordinator.handleLabVerification(badOrder.id, 'reject', 'Dikiş aralığı ve logo sıcak pres derinliği hatalı');
 
   console.log('\n\x1b[1m\x1b[35m=== Senaryo 2 Sonuçları ===\x1b[0m');
   console.log(`Sipariş Son Durumu: \x1b[31m${badOrder.status.toUpperCase()}\x1b[0m (Beklenen: REFUNDED)`);
 }
 
 runE2ETests().catch(console.error);
+

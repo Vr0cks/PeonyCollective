@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/src/utils/supabase/server'
 import { createAdminClient } from '@/src/utils/supabase/admin'
 import { createOtoOrder } from '@/src/lib/oto'
+import { maskErrorResponse } from '@/src/utils/security'
 
 export async function POST(request: Request) {
   try {
@@ -95,7 +96,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, trackingNumber: otoResult.trackingNumber })
 
   } catch (error: any) {
-    console.error('[ADMIN SHIPMENT ERROR]', error)
-    return NextResponse.json({ error: error.message || 'Kargo oluşturulamadı' }, { status: 500 })
+    return maskErrorResponse(error, 'Kargo oluşturulamadı')
   }
 }

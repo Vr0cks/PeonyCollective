@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/src/utils/supabase/server'
 import { createOtoOrder, getOtoOrderStatus } from '@/src/lib/oto'
+import { maskErrorResponse } from '@/src/utils/security'
 
 /**
  * POST /api/cargo
@@ -39,34 +40,54 @@ export async function POST(request: Request) {
     if (!sellerProfile?.address || !sellerProfile?.phone_number) {
       return NextResponse.json({ error: 'Satıcı profil bilgileri eksik (adres/telefon).' }, { status: 400 })
     }
-    if (!buyerProfile?.address || !buyerProfile?.phone_number) {
+
+    const product = order.products as Record<string, string>
+    const isStage2 = order.order_status === 'lab_approved' || order.order_status === 'shipped_to_buyer'
+
+    if (isStage2 && (!buyerProfile?.address || !buyerProfile?.phone_number)) {
       return NextResponse.json({ error: 'Alıcı profil bilgileri eksik (adres/telefon).' }, { status: 400 })
     }
 
-    const product = order.products as Record<string, string>
-    
     // OTO Sipariş/Kargo oluşturma
     const otoResponse = await createOtoOrder({
       orderId: orderId, // Peony sipariş ID
       description: `${product?.brand} ${product?.model_name}`,
       weightGrams: 500,
       createShipment: true,
-      senderInformation: {
-        firstName: sellerProfile.first_name || 'Satıcı',
-        lastName: sellerProfile.last_name || '',
-        phone: sellerProfile.phone_number,
-        address: sellerProfile.address,
-        city: 'İstanbul',
-        email: sellerProfile.email || 'seller@peony.com'
-      },
-      customerInformation: {
-        firstName: buyerProfile.first_name || 'Alıcı',
-        lastName: buyerProfile.last_name || '',
-        phone: buyerProfile.phone_number,
-        address: buyerProfile.address,
-        city: 'İstanbul',
-        email: buyerProfile.email || 'buyer@peony.com'
-      },
+      senderInformation: isStage2
+        ? {
+            firstName: 'Peony',
+            lastName: 'Lab',
+            phone: '+905550000000',
+            address: 'Zorlu Center, No: 123, Beşiktaş',
+            city: 'İstanbul',
+            email: 'lab@peonycollective.com'
+          }
+        : {
+            firstName: sellerProfile.first_name || 'Satıcı',
+            lastName: sellerProfile.last_name || '',
+            phone: sellerProfile.phone_number,
+            address: sellerProfile.address,
+            city: 'İstanbul',
+            email: sellerProfile.email || 'seller@peony.com'
+          },
+      customerInformation: isStage2
+        ? {
+            firstName: buyerProfile.first_name || 'Alıcı',
+            lastName: buyerProfile.last_name || '',
+            phone: buyerProfile.phone_number,
+            address: buyerProfile.address,
+            city: 'İstanbul',
+            email: buyerProfile.email || 'buyer@peony.com'
+          }
+        : {
+            firstName: 'Peony',
+            lastName: 'Lab',
+            phone: '+905550000000',
+            address: 'Zorlu Center, No: 123, Beşiktaş',
+            city: 'İstanbul',
+            email: 'lab@peonycollective.com'
+          },
     })
 
     if (!otoResponse.success) {
@@ -76,20 +97,28 @@ export async function POST(request: Request) {
 
     const trackingNumber = otoResponse.trackingNumber || otoResponse.shipmentNumber || 'TBD'
     
-    await supabase
-      .from('orders')
-      .update({
-        shipping_tracking_seller: trackingNumber,
-        order_status: 'shipped_to_lab',
-      })
-      .eq('id', orderId)
+    if (isStage2) {
+      await supabase
+        .from('orders')
+        .update({
+          shipping_tracking_buyer: trackingNumber,
+          order_status: 'shipped_to_buyer',
+        })
+        .eq('id', orderId)
+    } else {
+      await supabase
+        .from('orders')
+        .update({
+          shipping_tracking_seller: trackingNumber,
+          order_status: 'shipped_to_lab',
+        })
+        .eq('id', orderId)
+    }
 
     return NextResponse.json({ success: true, trackingNumber, otoResponse })
 
   } catch (error) {
-    const err = error as Error
-    console.error('Cargo API Error:', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    return maskErrorResponse(error, 'Kargo oluşturulamadı')
   }
 }
 
@@ -110,11 +139,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'order_id parametresi eksik' }, { status: 400 })
     }
 
+    // Yetki Kontrolü: RLS sayesinde eğer kullanıcının izni yoksa siparişe erişemez
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('id', orderId)
+      .single()
+
+    if (orderError || !order) {
+      return NextResponse.json({ error: 'Sipariş bulunamadı veya erişim yetkiniz yok' }, { status: 403 })
+    }
+
     const trackingInfo = await getOtoOrderStatus(orderId)
     return NextResponse.json({ success: true, tracking: trackingInfo })
   } catch (error) {
-    const err = error as Error
-    console.error('Cargo Track Error:', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    return maskErrorResponse(error, 'Kargo bilgisi alınamadı')
   }
 }

@@ -15,12 +15,39 @@ export async function sendMessage(conversationId: string, content: string) {
       return { success: false, error: 'Mesaj içeriği boş olamaz.' }
     }
 
+    // --- SİBER GÜVENLİK FİLTRESİ (TELEFON, E-POSTA, HARİCİ LİNK, IBAN) ---
+    // 1. Telefon Numarası Regex Filtresi (örneğin 05xx xxx xx xx, 905xx..., 5xx-xxx-xx-xx veya boşluklu/obfuse halleri)
+    const phoneRegex = /(?:\+?90|0)?\s*[1-9]\s*(?:\d\s*){9}/
+    
+    // 2. E-posta Regex Filtresi
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/
+
+    // 3. IBAN Filtresi (TR ile başlayan ve 26 haneli olan yapılar)
+    const ibanRegex = /TR\s*(?:\d\s*){24}/i
+
+    // 4. Harici Link Regex Filtresi (http, https, www veya .com/.net/.org/.gov/.edu/.ist/.com.tr gibi uzantılar)
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.(?:com|net|org|edu|gov|mil|biz|info|mobi|name|aero|jobs|museum|cc|tv|co|me|io|info|xyz|club|com\.tr|net\.tr|org\.tr)\b)/i
+
+    const trimmedContent = content.trim()
+
+    if (
+      phoneRegex.test(trimmedContent.replace(/\s+/g, '')) || 
+      emailRegex.test(trimmedContent) || 
+      ibanRegex.test(trimmedContent.replace(/\s+/g, '')) || 
+      urlRegex.test(trimmedContent)
+    ) {
+      return { 
+        success: false, 
+        error: 'Güvenlik Protokolü: Mesajınızda telefon numarası, e-posta adresi, harici web sitesi bağlantısı veya IBAN bilgisi tespit edilmiştir. Lütfen platform dışı iletişime geçmeye çalışmayın.' 
+      }
+    }
+
     const { data: message, error } = await supabase
       .from('messages')
       .insert({
         conversation_id: conversationId,
         sender_id: user.id,
-        content: content.trim(),
+        content: trimmedContent,
         is_read: false,
       })
       .select()

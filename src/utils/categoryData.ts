@@ -192,11 +192,11 @@ export const generalMaterials = [
 
 // ─── Kondisyon Seçenekleri ───
 export const conditions = [
-  'Yeni / Etiketli',
+  'Sıfır/Etiketli',
   'Yeni Gibi',
   'Çok İyi',
-  'İyi',
-  'Kullanılmış',
+  'Temiz',
+  'Yıpranmış',
 ]
 
 // ─── Helper: Marka adına göre modelleri bul ───

@@ -205,3 +205,65 @@ export function verifyCallback(params: PayTRCallbackParams): boolean {
 
   return expectedHash === params.hash
 }
+
+/**
+ * PayTR Approve Payment (Marketplace Escrow Release) API
+ * Onaylanan siparişin ödemesini satıcıya aktarır.
+ */
+export async function approvePayTRPayment(orderId: string): Promise<{ status: 'success' | 'failed'; err_msg?: string }> {
+  const merchantId = process.env.PAYTR_MERCHANT_ID || 'mock_merchant_id'
+  const merchantKey = process.env.PAYTR_MERCHANT_KEY || 'mock_merchant_key'
+  const merchantSalt = process.env.PAYTR_MERCHANT_SALT || 'mock_merchant_salt'
+
+  // Hash hesaplama: merchant_id + merchant_oid + merchant_salt
+  const hashString = merchantId + orderId + merchantSalt
+  const paytrToken = crypto
+    .createHmac('sha256', merchantKey)
+    .update(hashString)
+    .digest('base64')
+
+  const postData = {
+    merchant_id: merchantId,
+    merchant_oid: orderId,
+    paytr_token: paytrToken,
+  }
+
+  // Mock kontrolü
+  if (merchantId === 'mock_merchant_id') {
+    console.log(`[PAYTR MOCK] Sipariş escrow ödemesi onaylandı (Serbest bırakıldı): ${orderId}`)
+    return { status: 'success' }
+  }
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 8000)
+
+  try {
+    const response = await fetch('https://www.paytr.com/odeme/api/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(postData).toString(),
+      signal: controller.signal,
+    })
+
+    clearTimeout(timeoutId)
+
+    const responseText = await response.text()
+    let resultJson: any
+    try {
+      resultJson = JSON.parse(responseText)
+    } catch {
+      throw new Error(`API yanıtı JSON değil: ${responseText}`)
+    }
+
+    if (resultJson.status === 'success') {
+      return { status: 'success' }
+    } else {
+      return { status: 'failed', err_msg: resultJson.err_msg || resultJson.reason || 'Bilinmeyen Hata' }
+    }
+  } catch (error: any) {
+    clearTimeout(timeoutId)
+    console.error('[PAYTR APPROVE PAYMENT ERROR]', error)
+    return { status: 'failed', err_msg: error.message || 'Bağlantı hatası' }
+  }
+}
+
