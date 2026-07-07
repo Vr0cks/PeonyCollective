@@ -195,33 +195,53 @@ export interface OtoOrderStatus {
 
 // ─── API Fonksiyonları ───────────────────────────────────────────────────────
 
-/**
- * OTO'da sipariş (ve opsiyonel olarak kargo) oluşturur.
- *
- * createShipment:true ile tek adımda kargo da oluşturulur.
- * OTO otomatik olarak uygun kargo firmasını atar.
- */
 export async function createOtoOrder(params: OtoCreateOrderParams): Promise<OtoOrderResponse> {
+  const accessToken = await getOtoAccessToken()
+  
+  // Clean phone number format for OTO
+  const cleanPhone = params.senderInformation.phone.replace(/[^0-9]/g, '')
+  const locationCode = 'LOC_' + cleanPhone
+
+  // 1. Try to register the pickup location first
+  try {
+    const locPayload = {
+      name: `${params.senderInformation.firstName} ${params.senderInformation.lastName} Office`,
+      code: locationCode,
+      mobile: cleanPhone.startsWith('90') ? cleanPhone : '90' + cleanPhone.replace(/^0/, ''),
+      city: params.senderInformation.city || 'İstanbul',
+      country: params.senderInformation.country ?? 'TR',
+      address: params.senderInformation.address || 'Zorlu Center Levent Beşiktaş',
+      contactName: `${params.senderInformation.firstName} ${params.senderInformation.lastName}`,
+      contactEmail: params.senderInformation.email || 'seller@peonycollective.com'
+    }
+
+    await fetch(`${OTO_BASE_URL}/createPickupLocation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(locPayload),
+    })
+  } catch (err) {
+    // Ignore location duplication/creation error and proceed to order creation
+    console.warn('[OTO CARGO] Pickup location registration warning/error:', err)
+  }
+
+  // 2. Create the order
   const payload = {
     orderId: params.orderId,
     createShipment: params.createShipment ?? true,
     payment_method: 'paid',
-    amount: 100, // Varsayılan/Dummy tutar, OTO kargo fiyatı için gerekebiliyor
+    amount: 100,
     amount_due: params.codAmount ?? 0,
     currency: 'TRY',
     ...(params.deliveryOptionId && { deliveryOptionId: params.deliveryOptionId }),
     senderName: `${params.senderInformation.firstName} ${params.senderInformation.lastName}`,
-    senderInformation: {
-      senderFullName: `${params.senderInformation.firstName} ${params.senderInformation.lastName}`,
-      senderMobile: params.senderInformation.phone,
-      senderCity: params.senderInformation.city,
-      senderStreet: params.senderInformation.address,
-      senderCountry: params.senderInformation.country ?? 'TR',
-      ...(params.senderInformation.email && { senderEmail: params.senderInformation.email }),
-    },
+    pickupLocationCode: locationCode, // Use the pre-registered pickup location code
     customer: {
       name: `${params.customerInformation.firstName} ${params.customerInformation.lastName}`,
-      mobile: params.customerInformation.phone,
+      mobile: params.customerInformation.phone.replace(/[^0-9]/g, ''),
       email: params.customerInformation.email || 'customer@peony.com',
       address: params.customerInformation.address,
       city: params.customerInformation.city,
