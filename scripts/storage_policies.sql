@@ -1,10 +1,9 @@
 -- ═══════════════════════════════════════════════════════════════
 -- STORAGE BUCKET & POLICY KURULUMU
---
--- ⚠️  ÖNEMLI: Bu dosyayı çalıştırmadan önce Supabase SQL Editor'da
---     sağ üstteki "Role" dropdown'ını  postgres  →  supabase_storage_admin
---     olarak değiştir, sonra Run'a bas.
 -- ═══════════════════════════════════════════════════════════════
+
+-- postgres yetki hatasını aşmak için supabase_storage_admin rolüne geçiyoruz
+SET ROLE supabase_storage_admin;
 
 -- Enable RLS on storage.objects
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
@@ -111,3 +110,6 @@ CREATE POLICY "product-docs: owner or admin modify" ON storage.objects
             OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
         )
     );
+
+-- Rolü varsayılana geri çekiyoruz
+RESET ROLE;
