@@ -21,6 +21,22 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Brands (Markalar) Tablosu
+CREATE TABLE IF NOT EXISTS public.brands (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Models (Modeller) Tablosu
+CREATE TABLE IF NOT EXISTS public.models (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    brand_id UUID REFERENCES public.brands(id) ON DELETE CASCADE NOT NULL,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    UNIQUE (brand_id, name)
+);
+
 -- 2. Products (Ürünler) Tablosu
 CREATE TABLE IF NOT EXISTS public.products (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -47,6 +63,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     full_set_items TEXT[] DEFAULT '{}',
     status TEXT CHECK (status IN ('pending', 'approved', 'rejected', 'sold')) DEFAULT 'pending',
     locked_until TIMESTAMP WITH TIME ZONE,
+    locked_by UUID REFERENCES public.profiles(id),
     is_peony_vip BOOLEAN DEFAULT false,
     entrupy_status TEXT CHECK (entrupy_status IN ('pending', 'analyzing', 'verified', 'rejected')),
     entrupy_certificate_url TEXT,
@@ -66,6 +83,13 @@ CREATE TABLE IF NOT EXISTS public.orders (
     payment_id TEXT,
     commission_amount NUMERIC,
     seller_amount NUMERIC,
+    buyer_name TEXT,
+    buyer_email TEXT,
+    buyer_phone TEXT,
+    shipping_address TEXT,
+    is_gift BOOLEAN DEFAULT false,
+    gift_note TEXT,
+    delivered_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -88,8 +112,54 @@ CREATE TABLE IF NOT EXISTS public.product_drafts (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Realtime için concierge_requests tablosunu etkinleştir
+-- Offers (Teklifler) Tablosu
+CREATE TABLE IF NOT EXISTS public.offers (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    buyer_id UUID REFERENCES public.profiles(id) NOT NULL,
+    product_id UUID REFERENCES public.products(id) NOT NULL,
+    offered_price NUMERIC NOT NULL,
+    status TEXT CHECK (status IN ('pending', 'accepted', 'rejected', 'expired')) DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Conversations (Mesajlaşma Odaları) Tablosu
+CREATE TABLE IF NOT EXISTS public.conversations (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    participant_1 UUID REFERENCES public.profiles(id) NOT NULL,
+    participant_2 UUID REFERENCES public.profiles(id) NOT NULL,
+    product_id UUID REFERENCES public.products(id),
+    last_message TEXT,
+    last_message_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Messages (Mesajlar) Tablosu
+CREATE TABLE IF NOT EXISTS public.messages (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE NOT NULL,
+    sender_id UUID REFERENCES public.profiles(id) NOT NULL,
+    content TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Notifications (Bildirimler) Tablosu
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) NOT NULL,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT false,
+    metadata JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Realtime için yayınları etkinleştir
 ALTER PUBLICATION supabase_realtime ADD TABLE public.concierge_requests;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.conversations;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
 
 -- 6. System Logs Tablosu
 CREATE TABLE IF NOT EXISTS public.system_logs (

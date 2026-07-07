@@ -215,6 +215,21 @@ export default function SellForm() {
       if (!formDescription || formDescription.length < 20) errors.description = 'Açıklama çok kısa (en az 20 karakter)'
     } else if (step === 3) {
       if (publicFiles.length === 0) errors.publicFiles = 'En az 1 adet vitrin fotoğrafı yükleyin'
+    } else if (step === 4) {
+      if (!formPrice || isNaN(Number(formPrice)) || Number(formPrice) <= 0) {
+        errors.price = 'Geçerli bir satış fiyatı belirleyin'
+      }
+      if (!serialNumber) {
+        errors.serial = 'Seri numarası zorunludur (yoksa "none" yazın)'
+      }
+      
+      // Her kategori için fotoğraf sayılarını denetle
+      verificationCategories.forEach(cat => {
+        const filesCount = verificationFiles[cat.key]?.length || 0
+        if (filesCount < cat.min) {
+          errors[cat.key] = `Bu alan için en az ${cat.min} fotoğraf yüklemelisiniz. (Şu an: ${filesCount})`
+        }
+      })
     }
     
     setFieldErrors(errors)
@@ -230,11 +245,30 @@ export default function SellForm() {
     }
   }
 
-  // ─── Cloud Draft Yükleme ───
+  // ─── Otomatik Taslak Kaydet & Yükle (Local Storage & Cloud) ───
   useEffect(() => {
     async function load() {
-      const { success, draft } = await loadCloudDraft()
-      if (success && draft) {
+      // 1. Önce Local Storage kontrol et
+      const localDraftRaw = localStorage.getItem('peony_sell_draft')
+      let draft = null
+      
+      if (localDraftRaw) {
+        try {
+          draft = JSON.parse(localDraftRaw)
+        } catch (e) {
+          console.error('Local draft parse error', e)
+        }
+      }
+      
+      // 2. Local Storage yoksa Bulut taslağına git
+      if (!draft) {
+        const { success, draft: cloudDraft } = await loadCloudDraft()
+        if (success && cloudDraft) {
+          draft = cloudDraft
+        }
+      }
+
+      if (draft) {
         if (draft.selectedGender) setSelectedGender(draft.selectedGender)
         if (draft.selectedCategory) setSelectedCategory(draft.selectedCategory)
         if (draft.selectedSubcategory) setSelectedSubcategory(draft.selectedSubcategory)
@@ -260,11 +294,34 @@ export default function SellForm() {
         if (draft.hasSpaTreatment !== undefined) setHasSpaTreatment(draft.hasSpaTreatment)
         if (draft.fullSetItems) setFullSetItems(draft.fullSetItems)
         if (draft.isPeonyVip !== undefined) setIsPeonyVip(draft.isPeonyVip)
+        if (draft.activeStep) setActiveStep(draft.activeStep)
       }
       setIsDraftLoaded(true)
     }
     load()
   }, [])
+
+  // Her değişiklikte Local Storage'a otomatik kaydet (Debounce/Autosave)
+  useEffect(() => {
+    if (!isDraftLoaded) return
+    
+    const draftData = {
+      selectedGender, selectedCategory, selectedSubcategory, selectedSize,
+      selectedBrand, selectedModel,
+      selectedMaterial, customMaterial, formCondition, formDescription,
+      formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
+      odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, activeStep
+    }
+    
+    localStorage.setItem('peony_sell_draft', JSON.stringify(draftData))
+  }, [
+    selectedGender, selectedCategory, selectedSubcategory, selectedSize,
+    selectedBrand, selectedModel,
+    selectedMaterial, customMaterial, formCondition, formDescription,
+    formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
+    odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, activeStep,
+    isDraftLoaded
+  ])
 
   const handleSaveDraft = async () => {
     setIsSavingDraft(true)
@@ -468,6 +525,7 @@ export default function SellForm() {
 
       if (result.success) {
         saveCloudDraft({}) 
+        localStorage.removeItem('peony_sell_draft')
         router.push('/dashboard?message=Ürün başarıyla onaya gönderildi.')
       } else {
         console.error("Validation Errors:", result.validationErrors)
@@ -829,7 +887,7 @@ export default function SellForm() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {verificationCategories.map(cat => (
-                <div key={cat.key} className="border border-gray-100 rounded-xl p-5 hover:border-gray-200 transition-colors">
+                <div key={cat.key} className={`border rounded-xl p-5 hover:border-gray-200 transition-colors ${fieldErrors[cat.key] ? 'border-red-200 bg-red-50/10' : 'border-gray-100'}`}>
                   <div className="mb-4">
                     <h5 className="text-xs font-bold uppercase tracking-widest text-black mb-1">{cat.label}</h5>
                     <p className="text-[10px] text-gray-400">{cat.desc}</p>
@@ -837,15 +895,17 @@ export default function SellForm() {
                   
                   {cat.key === 'serial' && (
                     <div className="mb-4">
-                      <input className={`${getInputClasses('serial')} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." required />
+                      <input className={`${getInputClasses('serial')} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." />
+                      {renderErrorMsg('serial')}
                       <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız &apos;none&apos; yazabilirsiniz.</p>
                     </div>
                   )}
 
                   <label className="flex items-center justify-center gap-2 border border-gray-200 hover:border-black text-gray-500 hover:text-black py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-colors">
                     <UploadCloud size={14} /> Fotoğraf Seç
-                    <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleVerificationFilesChange(cat.key, e)} required={cat.min > 0} />
+                    <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleVerificationFilesChange(cat.key, e)} />
                   </label>
+                  {renderErrorMsg(cat.key)}
 
                   {verificationPreviews[cat.key]?.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
@@ -893,6 +953,7 @@ export default function SellForm() {
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl font-light text-gray-400">₺</span>
                   </div>
+                  {renderErrorMsg('price')}
                   
                   {formPrice && !isNaN(Number(formPrice)) && Number(formPrice) > 0 && (
                     <div className="grid grid-cols-2 gap-4 mt-6">

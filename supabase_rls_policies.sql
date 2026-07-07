@@ -74,7 +74,104 @@ CREATE POLICY "Only admins can view system logs"
   ON public.system_logs FOR SELECT
   USING ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
 
--- 7. NOTIFICATIONS Tablosu (Varsa)
--- ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
--- CREATE POLICY "Users can view their own notifications"
---   ON public.notifications FOR SELECT USING (auth.uid() = user_id);
+-- 7. NOTIFICATIONS Tablosu
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own notifications"
+  ON public.notifications FOR SELECT 
+  USING (auth.uid() = user_id);
+
+-- 8. BRANDS Tablosu
+ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Brands are viewable by everyone"
+  ON public.brands FOR SELECT
+  USING (true);
+
+CREATE POLICY "Only admins can manage brands"
+  ON public.brands FOR ALL
+  USING ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
+
+-- 9. MODELS Tablosu
+ALTER TABLE public.models ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Models are viewable by everyone"
+  ON public.models FOR SELECT
+  USING (true);
+
+CREATE POLICY "Only admins can manage models"
+  ON public.models FOR ALL
+  USING ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
+
+-- 10. OFFERS Tablosu
+ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Offers are viewable by buyer, seller, or admin"
+  ON public.offers FOR SELECT
+  USING (
+    auth.uid() = buyer_id OR 
+    auth.uid() = (SELECT seller_id FROM public.products WHERE id = product_id) OR
+    (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+  );
+
+CREATE POLICY "Buyers can insert offers"
+  ON public.offers FOR INSERT
+  WITH CHECK (auth.uid() = buyer_id);
+
+CREATE POLICY "Sellers or admins can update offers"
+  ON public.offers FOR UPDATE
+  USING (
+    auth.uid() = (SELECT seller_id FROM public.products WHERE id = product_id) OR
+    (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+  );
+
+-- 11. CONVERSATIONS Tablosu
+ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Conversations are viewable by participants or admin"
+  ON public.conversations FOR SELECT
+  USING (
+    auth.uid() = participant_1 OR 
+    auth.uid() = participant_2 OR
+    (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+  );
+
+CREATE POLICY "Participants or admins can manage conversations"
+  ON public.conversations FOR ALL
+  USING (
+    auth.uid() = participant_1 OR 
+    auth.uid() = participant_2 OR
+    (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+  );
+
+-- 12. MESSAGES Tablosu
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Messages are viewable by conversation participants or admin"
+  ON public.messages FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.conversations 
+      WHERE id = conversation_id AND (participant_1 = auth.uid() OR participant_2 = auth.uid())
+    ) OR
+    (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin'
+  );
+
+CREATE POLICY "Participants can insert messages"
+  ON public.messages FOR INSERT
+  WITH CHECK (
+    auth.uid() = sender_id AND
+    EXISTS (
+      SELECT 1 FROM public.conversations 
+      WHERE id = conversation_id AND (participant_1 = auth.uid() OR participant_2 = auth.uid())
+    )
+  );
+
+CREATE POLICY "Participants can update messages (read receipt)"
+  ON public.messages FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.conversations 
+      WHERE id = conversation_id AND (participant_1 = auth.uid() OR participant_2 = auth.uid())
+    )
+  );
