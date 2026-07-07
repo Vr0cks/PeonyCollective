@@ -115,10 +115,10 @@ export async function POST(request: Request) {
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, phone_number, address, role')
-        .in('id', [order.buyer_id, order.seller_id])
+        .in('id', [order.buyer_id, fullProduct.seller_id])
       
       const buyer = profiles?.find((p: any) => p.id === order.buyer_id)
-      const seller = profiles?.find((p: any) => p.id === order.seller_id)
+      const seller = profiles?.find((p: any) => p.id === fullProduct.seller_id)
 
       if (!buyer || !seller) {
         return NextResponse.json({ error: 'Alıcı veya Satıcı profili bulunamadı.' }, { status: 404 })
