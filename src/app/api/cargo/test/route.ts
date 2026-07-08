@@ -135,7 +135,7 @@ export async function POST(request: Request) {
       }
 
       const otoResult = await createOtoOrder({
-        orderId: `${order.id}_FINAL`,
+        orderId: `${order.id}_FINAL_${Date.now()}`,
         description: `${fullProduct?.brand || 'Luxury Bag'} ${fullProduct?.model_name || ''}`,
         senderInformation: {
           firstName: 'Peony',
@@ -202,7 +202,7 @@ export async function POST(request: Request) {
 
       const isShippedByPeony = seller?.role === 'admin' || fullProduct?.is_peony_vip
       const otoResult = await createOtoOrder({
-        orderId: isShippedByPeony ? `${order.id}_FINAL` : order.id,
+        orderId: isShippedByPeony ? `${order.id}_FINAL_${Date.now()}` : `${order.id}_${Date.now()}`,
         description: `${fullProduct?.brand || 'Luxury Bag'} ${fullProduct?.model_name || ''}`,
         senderInformation: {
           firstName: isShippedByPeony ? 'Peony' : (seller?.first_name || 'Satıcı'),
