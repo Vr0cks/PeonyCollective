@@ -99,6 +99,78 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: response.ok, response: resText });
     }
 
+    if (action === 'arrive_at_lab' && orderId) {
+      const { error: updateErr } = await supabase
+        .from('orders')
+        .update({ order_status: 'inspecting' })
+        .eq('id', orderId)
+
+      if (updateErr) {
+        return NextResponse.json({ error: 'Durum güncellenemedi: ' + updateErr.message }, { status: 500 })
+      }
+      return NextResponse.json({ success: true, message: "Sipariş durumu 'Ekspertiz İncelemesinde' olarak güncellendi." })
+    }
+
+    if (action === 'ship_to_buyer' && orderId) {
+      const { data: order, error: orderErr } = await supabase
+        .from('orders')
+        .select('*, products(*)')
+        .eq('id', orderId)
+        .single()
+
+      if (orderErr || !order) {
+        return NextResponse.json({ error: 'Sipariş bulunamadı: ' + (orderErr?.message || '') }, { status: 404 })
+      }
+
+      const fullProduct = order.products
+
+      const { data: buyer } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', order.buyer_id)
+        .single()
+
+      if (!buyer) {
+        return NextResponse.json({ error: 'Alıcı profili bulunamadı.' }, { status: 404 })
+      }
+
+      const otoResult = await createOtoOrder({
+        orderId: `${order.id}_FINAL`,
+        description: `${fullProduct?.brand || 'Luxury Bag'} ${fullProduct?.model_name || ''}`,
+        senderInformation: {
+          firstName: 'Peony',
+          lastName: 'Collective',
+          phone: '02123536000',
+          city: 'İstanbul',
+          address: 'Zorlu Center, Levent, Beşiktaş'
+        },
+        customerInformation: {
+          firstName: buyer.first_name || 'Müşteri',
+          lastName: buyer.last_name || 'Alıcı',
+          phone: buyer.phone_number || '05550000000',
+          city: 'İstanbul',
+          address: buyer.address || 'Adres bilgisi yok'
+        }
+      })
+
+      let trackingNumber = 'MOCK-TRACKING-BUYER-' + Math.floor(100000 + Math.random() * 900000)
+      const resultTracking = otoResult ? (otoResult.trackingNumber || otoResult.shipmentNumber) : null
+      if (resultTracking) {
+        trackingNumber = resultTracking
+      }
+
+      await supabase.from('orders').update({
+        shipping_tracking_buyer: trackingNumber,
+        order_status: 'shipped_to_buyer'
+      }).eq('id', orderId)
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Ürün alıcıya kargolandı ve OTO Kargo barkodu başarıyla oluşturuldu.', 
+        trackingNumber 
+      })
+    }
+
     if (action === 'mark_as_paid' && orderId) {
       const { data: order, error: orderErr } = await supabase
         .from('orders')

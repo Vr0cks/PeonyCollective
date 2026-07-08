@@ -103,6 +103,58 @@ export default function TestSuiteClient({ initialOrders }: TestSuiteClientProps)
     }
   }
 
+  async function arriveAtLab(orderId: string) {
+    try {
+      setLoadingOrderId(orderId)
+      setStatusMessage(null)
+      const response = await fetch('/api/cargo/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId, action: 'arrive_at_lab' }),
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setStatusMessage({ type: 'success', text: `Kargo Laboratuvara Ulaştı! Sipariş durumu 'İnceleniyor (inspecting)' olarak güncellendi.` })
+        router.refresh()
+      } else {
+        setStatusMessage({ type: 'error', text: `Hata: ${data.error || 'İşlem başarısız.'}` })
+      }
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: `Bağlantı hatası: ${err.message}` })
+    } finally {
+      setLoadingOrderId(null)
+    }
+  }
+
+  async function shipToBuyer(orderId: string) {
+    try {
+      setLoadingOrderId(orderId)
+      setStatusMessage(null)
+      const response = await fetch('/api/cargo/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId, action: 'ship_to_buyer' }),
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setStatusMessage({ type: 'success', text: `Ürün başarıyla alıcıya kargolandı ve OTO kargo takip kodu üretildi!` })
+        router.refresh()
+      } else {
+        setStatusMessage({ type: 'error', text: `Hata: ${data.error || 'İşlem başarısız.'}` })
+      }
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: `Bağlantı hatası: ${err.message}` })
+    } finally {
+      setLoadingOrderId(null)
+    }
+  }
+
   // Reset order to pending_payment for retesting
   async function resetOrder(orderId: string) {
     try {
@@ -222,6 +274,26 @@ export default function TestSuiteClient({ initialOrders }: TestSuiteClientProps)
                           className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[9px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-lg transition-all"
                         >
                           <Play size={10} /> Ödendi Yap (PayTR Simüle)
+                        </button>
+                      )}
+
+                      {order.order_status === 'shipped_to_lab' && (
+                        <button
+                          disabled={!!loadingOrderId}
+                          onClick={() => arriveAtLab(order.id)}
+                          className="inline-flex items-center gap-1.5 bg-orange-600 hover:bg-orange-500 text-white text-[9px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-lg transition-all"
+                        >
+                          <RefreshCw size={10} /> Lab'a Ulaştı
+                        </button>
+                      )}
+
+                      {order.order_status === 'lab_approved' && (
+                        <button
+                          disabled={!!loadingOrderId}
+                          onClick={() => shipToBuyer(order.id)}
+                          className="inline-flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[9px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-lg transition-all"
+                        >
+                          <Truck size={10} /> Alıcıya Kargola
                         </button>
                       )}
 
