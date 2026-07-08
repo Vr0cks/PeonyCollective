@@ -2,6 +2,7 @@ import { createClient } from '@/src/utils/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Product, Profile } from '@/src/types'
+import DeleteProductButton from './DeleteProductButton'
 
 interface PageProps {
   searchParams: Promise<{ status?: string }>
@@ -116,14 +117,17 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     </span>
                   </div>
 
-                  {product.status === 'pending' && (
-                    <Link
-                      href="/admin/pending"
-                      className="shrink-0 text-[9px] font-bold uppercase tracking-wider text-amber-400/60 hover:text-amber-400 transition-colors"
-                    >
-                      İncele →
-                    </Link>
-                  )}
+                  <div className="ml-2 flex items-center gap-2 shrink-0">
+                    {product.status === 'pending' && (
+                      <Link
+                        href="/admin/pending"
+                        className="text-[9px] font-bold uppercase tracking-wider text-amber-400/60 hover:text-amber-400 transition-colors"
+                      >
+                        İncele →
+                      </Link>
+                    )}
+                    <DeleteProductButton productId={product.id} />
+                  </div>
                 </div>
               )
             })
