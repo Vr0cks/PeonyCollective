@@ -106,6 +106,8 @@ export async function updateProductStatus(
   }
 
   // Sayfaları yenile ki değişiklikler anında ekrana yansısın
+  revalidatePath('/admin/pending')
+  revalidatePath('/admin/products')
   revalidatePath('/admin')
   revalidatePath('/')
 }

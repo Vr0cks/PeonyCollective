@@ -149,6 +149,7 @@ export default function SellForm() {
   
   const [activeStep, setActiveStep] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isProcessingFiles, setIsProcessingFiles] = useState(false)
   const [message, setMessage] = useState('')
   const [isDraftLoaded, setIsDraftLoaded] = useState(false)
   const [isSavingDraft, setIsSavingDraft] = useState(false)
@@ -349,88 +350,124 @@ export default function SellForm() {
     setTimeout(() => setMessage(''), 3000)
   }
 
-  // ─── Dosya İşlemleri ───
-  const processFiles = (rawFiles: File[], oldPreviews: string[], setFiles: any, setPreviews: any) => {
-    const validFiles: File[] = []
-    const rejectedFiles: { file: File; reason: 'size' | 'type' }[] = []
-
-    rawFiles.forEach(f => {
-      const isAllowedType = isFileTypeAllowed(f)
-      const isAllowedSize = f.size <= MAX_FILE_SIZE
-
-      if (!isAllowedType) {
-        rejectedFiles.push({ file: f, reason: 'type' })
-      } else if (!isAllowedSize) {
-        rejectedFiles.push({ file: f, reason: 'size' })
-      } else {
-        validFiles.push(f)
-      }
-    })
-
-    if (rejectedFiles.length > 0) {
-      const sizeLimitMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
-      const sizeErrors = rejectedFiles.filter(r => r.reason === 'size')
-      const typeErrors = rejectedFiles.filter(r => r.reason === 'type')
-      
-      let errorMsg = "Bazı dosyalar yüklenemedi:\n"
-      if (sizeErrors.length > 0) {
-        errorMsg += `- ${sizeErrors.length} dosya ${sizeLimitMB}MB boyut sınırını aşıyor.\n`
-      }
-      if (typeErrors.length > 0) {
-        errorMsg += `- ${typeErrors.length} dosya desteklenmeyen formatta (Sadece JPG, PNG, WEBP ve HEIC desteklenir).\n`
-      }
-      alert(errorMsg)
+  // ─── HEIC to JPEG Dönüştürücü ───
+  const convertHeicToJpeg = async (file: File): Promise<File> => {
+    const isHeic = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif') || file.type.toLowerCase() === 'image/heic';
+    if (!isHeic) return file;
+    
+    try {
+      const heic2any = (await import('heic2any')).default;
+      const res = await heic2any({
+        blob: file,
+        toType: 'image/jpeg',
+        quality: 0.8
+      });
+      const blob = Array.isArray(res) ? res[0] : res;
+      return new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+        type: "image/jpeg"
+      });
+    } catch (err) {
+      console.error("HEIC conversion failed, uploading original:", err);
+      return file;
     }
+  };
 
-    oldPreviews.forEach(url => URL.revokeObjectURL(url))
-    const newUrls = validFiles.map(file => URL.createObjectURL(file))
-    allGeneratedUrls.current.push(...newUrls)
-    setFiles(validFiles)
-    setPreviews(newUrls)
+  // ─── Dosya İşlemleri ───
+  const processFiles = async (rawFiles: File[], oldPreviews: string[], setFiles: any, setPreviews: any) => {
+    setIsProcessingFiles(true)
+    try {
+      const processedFiles = await Promise.all(rawFiles.map(convertHeicToJpeg))
+      
+      const validFiles: File[] = []
+      const rejectedFiles: { file: File; reason: 'size' | 'type' }[] = []
+
+      processedFiles.forEach(f => {
+        const isAllowedType = isFileTypeAllowed(f)
+        const isAllowedSize = f.size <= MAX_FILE_SIZE
+
+        if (!isAllowedType) {
+          rejectedFiles.push({ file: f, reason: 'type' })
+        } else if (!isAllowedSize) {
+          rejectedFiles.push({ file: f, reason: 'size' })
+        } else {
+          validFiles.push(f)
+        }
+      })
+
+      if (rejectedFiles.length > 0) {
+        const sizeLimitMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
+        const sizeErrors = rejectedFiles.filter(r => r.reason === 'size')
+        const typeErrors = rejectedFiles.filter(r => r.reason === 'type')
+        
+        let errorMsg = "Bazı dosyalar yüklenemedi:\n"
+        if (sizeErrors.length > 0) {
+          errorMsg += `- ${sizeErrors.length} dosya ${sizeLimitMB}MB boyut sınırını aşıyor.\n`
+        }
+        if (typeErrors.length > 0) {
+          errorMsg += `- ${typeErrors.length} dosya desteklenmeyen formatta (Sadece JPG, PNG, WEBP ve HEIC desteklenir).\n`
+        }
+        alert(errorMsg)
+      }
+
+      oldPreviews.forEach(url => URL.revokeObjectURL(url))
+      const newUrls = validFiles.map(file => URL.createObjectURL(file))
+      allGeneratedUrls.current.push(...newUrls)
+      setFiles(validFiles)
+      setPreviews(newUrls)
+    } finally {
+      setIsProcessingFiles(false)
+    }
   }
 
   const handlePublicFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => processFiles(Array.from(e.target.files || []), publicPreviews, setPublicFiles, setPublicPreviews)
   const handleFlawFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => processFiles(Array.from(e.target.files || []), flawPreviews, setFlawFiles, setFlawPreviews)
   
-  const handleVerificationFilesChange = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVerificationFilesChange = async (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const rawFiles = Array.from(e.target.files || [])
-    const validFiles: File[] = []
-    const rejectedFiles: { file: File; reason: 'size' | 'type' }[] = []
-
-    rawFiles.forEach(f => {
-      const isAllowedType = isFileTypeAllowed(f)
-      const isAllowedSize = f.size <= MAX_FILE_SIZE
-
-      if (!isAllowedType) {
-        rejectedFiles.push({ file: f, reason: 'type' })
-      } else if (!isAllowedSize) {
-        rejectedFiles.push({ file: f, reason: 'size' })
-      } else {
-        validFiles.push(f)
-      }
-    })
-
-    if (rejectedFiles.length > 0) {
-      const sizeLimitMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
-      const sizeErrors = rejectedFiles.filter(r => r.reason === 'size')
-      const typeErrors = rejectedFiles.filter(r => r.reason === 'type')
+    setIsProcessingFiles(true)
+    try {
+      const processedFiles = await Promise.all(rawFiles.map(convertHeicToJpeg))
       
-      let errorMsg = "Bazı dosyalar yüklenemedi:\n"
-      if (sizeErrors.length > 0) {
-        errorMsg += `- ${sizeErrors.length} dosya ${sizeLimitMB}MB boyut sınırını aşıyor.\n`
-      }
-      if (typeErrors.length > 0) {
-        errorMsg += `- ${typeErrors.length} dosya desteklenmeyen formatta (Sadece JPG, PNG, WEBP ve HEIC desteklenir).\n`
-      }
-      alert(errorMsg)
-    }
+      const validFiles: File[] = []
+      const rejectedFiles: { file: File; reason: 'size' | 'type' }[] = []
 
-    const oldUrls = verificationPreviews[key] || []
-    oldUrls.forEach(url => URL.revokeObjectURL(url))
-    const newUrls = validFiles.map(file => URL.createObjectURL(file))
-    allGeneratedUrls.current.push(...newUrls)
-    setVerificationFiles(prev => ({ ...prev, [key]: validFiles }))
-    setVerificationPreviews(prev => ({ ...prev, [key]: newUrls }))
+      processedFiles.forEach(f => {
+        const isAllowedType = isFileTypeAllowed(f)
+        const isAllowedSize = f.size <= MAX_FILE_SIZE
+
+        if (!isAllowedType) {
+          rejectedFiles.push({ file: f, reason: 'type' })
+        } else if (!isAllowedSize) {
+          rejectedFiles.push({ file: f, reason: 'size' })
+        } else {
+          validFiles.push(f)
+        }
+      })
+
+      if (rejectedFiles.length > 0) {
+        const sizeLimitMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
+        const sizeErrors = rejectedFiles.filter(r => r.reason === 'size')
+        const typeErrors = rejectedFiles.filter(r => r.reason === 'type')
+        
+        let errorMsg = "Bazı dosyalar yüklenemedi:\n"
+        if (sizeErrors.length > 0) {
+          errorMsg += `- ${sizeErrors.length} dosya ${sizeLimitMB}MB boyut sınırını aşıyor.\n`
+        }
+        if (typeErrors.length > 0) {
+          errorMsg += `- ${typeErrors.length} dosya desteklenmeyen formatta (Sadece JPG, PNG, WEBP ve HEIC desteklenir).\n`
+        }
+        alert(errorMsg)
+      }
+
+      const oldUrls = verificationPreviews[key] || []
+      oldUrls.forEach(url => URL.revokeObjectURL(url))
+      const newUrls = validFiles.map(file => URL.createObjectURL(file))
+      allGeneratedUrls.current.push(...newUrls)
+      setVerificationFiles(prev => ({ ...prev, [key]: validFiles }))
+      setVerificationPreviews(prev => ({ ...prev, [key]: newUrls }))
+    } finally {
+      setIsProcessingFiles(false)
+    }
   }
 
   const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1057,6 +1094,20 @@ export default function SellForm() {
         </StepAccordion>
 
       </form>
+      
+      {isProcessingFiles && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-center justify-center animate-fade-in">
+          <div className="bg-white p-8 rounded-3xl text-center max-w-sm mx-4 shadow-2xl border border-gray-100 flex flex-col items-center gap-4">
+            <div className="w-12 h-12 rounded-full border-4 border-[#AF9164]/20 border-t-[#AF9164] animate-spin"></div>
+            <div>
+              <p className="text-sm font-bold text-gray-900 uppercase tracking-widest">Fotoğraflar İşleniyor</p>
+              <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
+                Yüksek çözünürlüklü veya HEIC formatındaki fotoğraflarınız tarayıcı uyumlu JPEG formatına dönüştürülüyor. Bu işlem birkaç saniye sürebilir, lütfen bekleyin.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

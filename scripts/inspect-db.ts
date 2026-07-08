@@ -28,32 +28,38 @@ import { createAdminClient } from '../src/utils/supabase/admin';
 
 async function main() {
   const supabase = createAdminClient();
-  const { data: productsRaw, error } = await supabase
+  const { data: products, error } = await supabase
     .from('products')
-    .select(`*, profiles:seller_id (first_name, last_name)`)
-    .order('created_at', { ascending: false });
+    .select('id, brand, model_name, public_images, authenticity_docs, flaw_images');
 
   if (error) {
     console.error('Error fetching products:', error);
     return;
   }
 
-  let emptyStringImages = 0;
-  let noImagesButTruthy = 0;
+  let totalHeicPublic = 0;
+  let totalHeicDocs = 0;
+  let productsWithHeic = 0;
 
-  if (productsRaw) {
-    for (const p of productsRaw) {
-      if (p.public_images) {
-        if (p.public_images.length > 0 && p.public_images.some((img: string) => img === "")) {
-          emptyStringImages++;
-          console.log(`Product ID ${p.id} has empty string in public_images:`, p.public_images);
-        }
-      }
+  for (const p of products || []) {
+    let hasHeic = false;
+    const publicHeic = (p.public_images || []).filter((img: string) => img.toLowerCase().endsWith('.heic')).length;
+    const docsHeic = (p.authenticity_docs || []).filter((img: string) => img.toLowerCase().endsWith('.heic')).length;
+    const flawsHeic = (p.flaw_images || []).filter((img: string) => img.toLowerCase().endsWith('.heic')).length;
+
+    totalHeicPublic += publicHeic;
+    totalHeicDocs += docsHeic + flawsHeic;
+
+    if (publicHeic > 0 || docsHeic > 0 || flawsHeic > 0) {
+      productsWithHeic++;
+      console.log(`Product ID ${p.id} (${p.brand} ${p.model_name}) has HEIC files: ${publicHeic} public, ${docsHeic} docs, ${flawsHeic} flaws`);
     }
   }
 
-  console.log(`\nCheck results:`);
-  console.log(`- Products with empty string image URLs: ${emptyStringImages}`);
+  console.log(`\nAnalysis finished:`);
+  console.log(`- Products with HEIC: ${productsWithHeic}`);
+  console.log(`- Total public HEIC images: ${totalHeicPublic}`);
+  console.log(`- Total private HEIC docs/flaws: ${totalHeicDocs}`);
 }
 
 main().catch(console.error);
