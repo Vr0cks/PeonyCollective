@@ -86,14 +86,26 @@ export async function POST(req: Request) {
         }
 
         // Update associated order status based on Entrupy result
-        if (status === 'verified') {
-          await supabase.from('orders').update({
-            order_status: 'inspecting'
-          }).eq('product_id', customerItemId);
-        } else if (status === 'rejected') {
-          await supabase.from('orders').update({
-            order_status: 'cancelled'
-          }).eq('product_id', customerItemId);
+        const { data: assocOrder } = await supabase
+          .from('orders')
+          .select('order_status')
+          .eq('product_id', customerItemId)
+          .maybeSingle();
+
+        if (assocOrder) {
+          const allowedStatusesToProgress = ['pending_payment', 'paid', 'shipped_to_lab', 'inspecting'];
+          
+          if (allowedStatusesToProgress.includes(assocOrder.order_status)) {
+            if (status === 'verified') {
+              await supabase.from('orders').update({
+                order_status: 'lab_approved'
+              }).eq('product_id', customerItemId);
+            } else if (status === 'rejected') {
+              await supabase.from('orders').update({
+                order_status: 'cancelled'
+              }).eq('product_id', customerItemId);
+            }
+          }
         }
 
         // Başarı logu

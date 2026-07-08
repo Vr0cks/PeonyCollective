@@ -241,6 +241,33 @@ export default function CollectorView({ orders, reservedOffers }: CollectorViewP
                         </div>
                       </div>
 
+                      {/* Lojistik ve Kargo Bilgileri */}
+                      {(order.shipping_tracking_seller || order.shipping_tracking_buyer) && (
+                        <div className="mt-4 bg-gray-50 p-4 rounded-xl text-xs space-y-2 text-left">
+                          <p className="font-medium text-gray-800 uppercase tracking-widest text-[9px]">
+                            Lojistik ve Kargo Bilgileri
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {order.shipping_tracking_seller && (
+                              <div>
+                                <span className="text-gray-400">Satıcı → Peony Lab: </span>
+                                <span className="font-semibold text-black">
+                                  {order.shipping_tracking_seller} (Yurtiçi Kargo)
+                                </span>
+                              </div>
+                            )}
+                            {order.shipping_tracking_buyer && (
+                              <div>
+                                <span className="text-gray-400">Peony Lab → Alıcı: </span>
+                                <span className="font-semibold text-black">
+                                  {order.shipping_tracking_buyer} (Yurtiçi Kargo)
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Onay ve Pasaport Butonları */}
                       {(hasPassport || order.order_status === 'delivered') && (
                         <div className="mt-5 flex justify-end gap-3">
