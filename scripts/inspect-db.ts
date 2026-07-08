@@ -28,19 +28,32 @@ import { createAdminClient } from '../src/utils/supabase/admin';
 
 async function main() {
   const supabase = createAdminClient();
-  const { data: logs, error } = await supabase
-    .from('system_logs')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(15);
+  const { data: productsRaw, error } = await supabase
+    .from('products')
+    .select(`*, profiles:seller_id (first_name, last_name)`)
+    .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching logs:', error);
+    console.error('Error fetching products:', error);
     return;
   }
 
-  console.log('Latest system logs:');
-  console.log(JSON.stringify(logs, null, 2));
+  let emptyStringImages = 0;
+  let noImagesButTruthy = 0;
+
+  if (productsRaw) {
+    for (const p of productsRaw) {
+      if (p.public_images) {
+        if (p.public_images.length > 0 && p.public_images.some((img: string) => img === "")) {
+          emptyStringImages++;
+          console.log(`Product ID ${p.id} has empty string in public_images:`, p.public_images);
+        }
+      }
+    }
+  }
+
+  console.log(`\nCheck results:`);
+  console.log(`- Products with empty string image URLs: ${emptyStringImages}`);
 }
 
 main().catch(console.error);

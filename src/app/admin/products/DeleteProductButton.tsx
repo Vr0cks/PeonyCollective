@@ -13,8 +13,12 @@ export default function DeleteProductButton({ productId }: { productId: string }
     }
     setLoading(true)
     try {
-      await deleteProduct(productId)
-      alert('Ürün başarıyla silindi.')
+      const res = await deleteProduct(productId)
+      if (res && !res.success) {
+        alert(res.error || 'Ürün silinirken bir hata oluştu.')
+      } else {
+        alert('Ürün başarıyla silindi.')
+      }
     } catch (err: any) {
       alert(err.message || 'Ürün silinirken bir hata oluştu.')
     } finally {
