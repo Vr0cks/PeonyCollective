@@ -28,18 +28,19 @@ import { createAdminClient } from '../src/utils/supabase/admin';
 
 async function main() {
   const supabase = createAdminClient();
-  const { data: profiles, error } = await supabase
-    .from('profiles')
-    .select('id, role, first_name, last_name')
-    .limit(5);
+  const { data: logs, error } = await supabase
+    .from('system_logs')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(15);
 
   if (error) {
-    console.error('Error fetching profiles:', error);
+    console.error('Error fetching logs:', error);
     return;
   }
 
-  console.log('Profiles in database:');
-  console.log(JSON.stringify(profiles, null, 2));
+  console.log('Latest system logs:');
+  console.log(JSON.stringify(logs, null, 2));
 }
 
 main().catch(console.error);

@@ -21,8 +21,20 @@ const verificationCategories = [
   { key: 'receipt', label: 'Fatura / Belge', desc: 'İsteğe bağlı belge', min: 0 },
 ]
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/jpg', 'image/heif'];
+
+const isFileTypeAllowed = (file: File) => {
+  const type = file.type.toLowerCase();
+  const name = file.name.toLowerCase();
+  if (ALLOWED_TYPES.includes(type)) return true;
+  return name.endsWith('.jpg') || 
+         name.endsWith('.jpeg') || 
+         name.endsWith('.png') || 
+         name.endsWith('.webp') || 
+         name.endsWith('.heic') || 
+         name.endsWith('.heif');
+};
 
 // ─── Accordion Komponenti ───
 const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveStep, onNext }: { stepNum: number, title: string, desc: string, children: React.ReactNode, activeStep: number, setActiveStep: (n: number) => void, onNext?: () => void }) => {
@@ -339,7 +351,37 @@ export default function SellForm() {
 
   // ─── Dosya İşlemleri ───
   const processFiles = (rawFiles: File[], oldPreviews: string[], setFiles: any, setPreviews: any) => {
-    const validFiles = rawFiles.filter(f => ALLOWED_TYPES.includes(f.type) && f.size <= MAX_FILE_SIZE)
+    const validFiles: File[] = []
+    const rejectedFiles: { file: File; reason: 'size' | 'type' }[] = []
+
+    rawFiles.forEach(f => {
+      const isAllowedType = isFileTypeAllowed(f)
+      const isAllowedSize = f.size <= MAX_FILE_SIZE
+
+      if (!isAllowedType) {
+        rejectedFiles.push({ file: f, reason: 'type' })
+      } else if (!isAllowedSize) {
+        rejectedFiles.push({ file: f, reason: 'size' })
+      } else {
+        validFiles.push(f)
+      }
+    })
+
+    if (rejectedFiles.length > 0) {
+      const sizeLimitMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
+      const sizeErrors = rejectedFiles.filter(r => r.reason === 'size')
+      const typeErrors = rejectedFiles.filter(r => r.reason === 'type')
+      
+      let errorMsg = "Bazı dosyalar yüklenemedi:\n"
+      if (sizeErrors.length > 0) {
+        errorMsg += `- ${sizeErrors.length} dosya ${sizeLimitMB}MB boyut sınırını aşıyor.\n`
+      }
+      if (typeErrors.length > 0) {
+        errorMsg += `- ${typeErrors.length} dosya desteklenmeyen formatta (Sadece JPG, PNG, WEBP ve HEIC desteklenir).\n`
+      }
+      alert(errorMsg)
+    }
+
     oldPreviews.forEach(url => URL.revokeObjectURL(url))
     const newUrls = validFiles.map(file => URL.createObjectURL(file))
     allGeneratedUrls.current.push(...newUrls)
@@ -352,7 +394,37 @@ export default function SellForm() {
   
   const handleVerificationFilesChange = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const rawFiles = Array.from(e.target.files || [])
-    const validFiles = rawFiles.filter(f => ALLOWED_TYPES.includes(f.type) && f.size <= MAX_FILE_SIZE)
+    const validFiles: File[] = []
+    const rejectedFiles: { file: File; reason: 'size' | 'type' }[] = []
+
+    rawFiles.forEach(f => {
+      const isAllowedType = isFileTypeAllowed(f)
+      const isAllowedSize = f.size <= MAX_FILE_SIZE
+
+      if (!isAllowedType) {
+        rejectedFiles.push({ file: f, reason: 'type' })
+      } else if (!isAllowedSize) {
+        rejectedFiles.push({ file: f, reason: 'size' })
+      } else {
+        validFiles.push(f)
+      }
+    })
+
+    if (rejectedFiles.length > 0) {
+      const sizeLimitMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
+      const sizeErrors = rejectedFiles.filter(r => r.reason === 'size')
+      const typeErrors = rejectedFiles.filter(r => r.reason === 'type')
+      
+      let errorMsg = "Bazı dosyalar yüklenemedi:\n"
+      if (sizeErrors.length > 0) {
+        errorMsg += `- ${sizeErrors.length} dosya ${sizeLimitMB}MB boyut sınırını aşıyor.\n`
+      }
+      if (typeErrors.length > 0) {
+        errorMsg += `- ${typeErrors.length} dosya desteklenmeyen formatta (Sadece JPG, PNG, WEBP ve HEIC desteklenir).\n`
+      }
+      alert(errorMsg)
+    }
+
     const oldUrls = verificationPreviews[key] || []
     oldUrls.forEach(url => URL.revokeObjectURL(url))
     const newUrls = validFiles.map(file => URL.createObjectURL(file))

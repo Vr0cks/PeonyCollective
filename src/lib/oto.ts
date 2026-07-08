@@ -256,10 +256,32 @@ export async function createOtoOrder(params: OtoCreateOrderParams): Promise<OtoO
     ],
   }
 
-  return otoFetch<OtoOrderResponse>('/createOrder', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  })
+  try {
+    return await otoFetch<OtoOrderResponse>('/createOrder', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  } catch (error: any) {
+    if (error.message && (error.message.includes('OTO1063') || error.message.includes('already exist'))) {
+      console.log(`[OTO CARGO] Order ${params.orderId} already exists, fetching existing order status...`);
+      try {
+        const statusResult = await getOtoOrderStatus(params.orderId);
+        if (statusResult && statusResult.success) {
+          return {
+            success: true,
+            orderId: params.orderId,
+            trackingNumber: statusResult.trackingNumber,
+            printAWBURL: statusResult.printAWBURL,
+            carrier: statusResult.carrier,
+            status: statusResult.status
+          };
+        }
+      } catch (statusError) {
+        console.error('[OTO CARGO] Failed to fetch existing order status:', statusError);
+      }
+    }
+    throw error;
+  }
 }
 
 /**
