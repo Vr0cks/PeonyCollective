@@ -23,6 +23,7 @@ export const productSchema = z.object({
   odor_score: z.coerce.number().min(1).max(10).optional().nullable(),
   has_spa_treatment: z.boolean().default(false),
   is_peony_vip: z.boolean().default(false),
+  supplier: z.string().max(100, 'Tedarikçi bilgisi çok uzun.').optional().nullable(),
   full_set_items: z.array(z.string()).default([]),
   
   // Storage URLs

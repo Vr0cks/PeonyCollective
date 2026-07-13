@@ -190,6 +190,7 @@ export default function SellForm() {
 
   // ─── Peony VIP (Kargo Hizmeti) ───
   const [isPeonyVip, setIsPeonyVip] = useState<boolean>(false)
+  const [supplier, setSupplier] = useState('')
 
   // ─── Görseller & Önizlemeler ───
   const [publicFiles, setPublicFiles] = useState<File[]>([])
@@ -307,6 +308,7 @@ export default function SellForm() {
         if (draft.hasSpaTreatment !== undefined) setHasSpaTreatment(draft.hasSpaTreatment)
         if (draft.fullSetItems) setFullSetItems(draft.fullSetItems)
         if (draft.isPeonyVip !== undefined) setIsPeonyVip(draft.isPeonyVip)
+        if (draft.supplier) setSupplier(draft.supplier)
         if (draft.activeStep) setActiveStep(draft.activeStep)
       }
       setIsDraftLoaded(true)
@@ -323,7 +325,7 @@ export default function SellForm() {
       selectedBrand, selectedModel,
       selectedMaterial, customMaterial, formCondition, formDescription,
       formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
-      odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, activeStep
+      odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, supplier, activeStep
     }
     
     localStorage.setItem('peony_sell_draft', JSON.stringify(draftData))
@@ -332,7 +334,7 @@ export default function SellForm() {
     selectedBrand, selectedModel,
     selectedMaterial, customMaterial, formCondition, formDescription,
     formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
-    odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, activeStep,
+    odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, supplier, activeStep,
     isDraftLoaded
   ])
 
@@ -343,7 +345,7 @@ export default function SellForm() {
       selectedBrand, selectedModel,
       selectedMaterial, customMaterial, formCondition, formDescription,
       formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
-      odorScore, hasSpaTreatment, fullSetItems, isPeonyVip
+      odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, supplier
     })
     setIsSavingDraft(false)
     setMessage('Taslak buluta kaydedildi.')
@@ -623,6 +625,7 @@ export default function SellForm() {
         odor_score: odorScore ? parseInt(odorScore) : undefined,
         has_spa_treatment: hasSpaTreatment,
         is_peony_vip: isPeonyVip,
+        supplier: supplier || undefined,
         full_set_items: fullSetItems,
         public_images: publicUrls,
         authenticity_docs: authUrls,
@@ -1033,21 +1036,38 @@ export default function SellForm() {
             <div className="pt-10 border-t border-gray-100">
               <div className="max-w-md mx-auto space-y-6">
                 
-                {/* Peony VIP Toggle */}
-                <div className="bg-[#AF9164]/5 border border-[#AF9164]/20 p-5 rounded-xl">
-                  <label className="flex items-start gap-4 cursor-pointer group">
-                    <input type="checkbox" className="hidden" checked={isPeonyVip} onChange={(e) => setIsPeonyVip(e.target.checked)} />
-                    <div className={`w-6 h-6 shrink-0 rounded border flex items-center justify-center transition-colors mt-0.5 ${isPeonyVip ? 'bg-[#AF9164] border-[#AF9164] text-white' : 'border-gray-300 group-hover:border-[#AF9164] text-transparent'}`}>
-                      <Check size={14} strokeWidth={3} />
-                    </div>
-                    <div>
-                      <span className="text-sm font-bold text-gray-900 block mb-1">Peony VIP (Kargolamayı Biz Yapalım)</span>
-                      <span className="text-xs text-gray-600 leading-relaxed block">
-                        Ürününüz satıldığında lojistik süreçleriyle siz uğraşmayın. Peony ekibi adresinizden teslim alsın ve alıcıya sigortalı ulaştırsın. (Bu hizmet seçildiğinde komisyon oranınız standart %20 yerine %30 olarak hesaplanır).
-                      </span>
-                    </div>
-                  </label>
+                {/* Tedarikçi Bilgisi */}
+                <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl space-y-2">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tedarikçi (İsteğe Bağlı)</label>
+                  <input
+                    type="text"
+                    className="w-full text-sm py-2.5 px-4 bg-white border border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors"
+                    value={supplier}
+                    onChange={(e) => setSupplier(e.target.value)}
+                    placeholder="Örn: Tedarikçi A, Tedarikçi B"
+                  />
+                  <p className="text-[10px] text-gray-500 leading-relaxed font-light block">
+                    Bu alana tedarikçi girildiğinde, arka planda takip için kaydedilir ve komisyon oranı otomatik olarak %37 Peony komisyonu / %63 Satıcı payı şeklinde uygulanır.
+                  </p>
                 </div>
+
+                {/* Peony VIP Toggle */}
+                {!supplier && (
+                  <div className="bg-[#AF9164]/5 border border-[#AF9164]/20 p-5 rounded-xl">
+                    <label className="flex items-start gap-4 cursor-pointer group">
+                      <input type="checkbox" className="hidden" checked={isPeonyVip} onChange={(e) => setIsPeonyVip(e.target.checked)} />
+                      <div className={`w-6 h-6 shrink-0 rounded border flex items-center justify-center transition-colors mt-0.5 ${isPeonyVip ? 'bg-[#AF9164] border-[#AF9164] text-white' : 'border-gray-300 group-hover:border-[#AF9164] text-transparent'}`}>
+                        <Check size={14} strokeWidth={3} />
+                      </div>
+                      <div>
+                        <span className="text-sm font-bold text-gray-900 block mb-1">Peony VIP (Kargolamayı Biz Yapalım)</span>
+                        <span className="text-xs text-gray-600 leading-relaxed block">
+                          Ürününüz satıldığında lojistik süreçleriyle siz uğraşmayın. Peony ekibi adresinizden teslim alsın ve alıcıya sigortalı ulaştırsın. (Bu hizmet seçildiğinde komisyon oranınız standart %20 yerine %30 olarak hesaplanır).
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                )}
 
                 <div className="text-center">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-3">Satış Fiyatı Belirleyin (TL)</label>
@@ -1065,17 +1085,27 @@ export default function SellForm() {
                   {renderErrorMsg('price')}
                   
                   {formPrice && !isNaN(Number(formPrice)) && Number(formPrice) > 0 && (
-                    <div className="grid grid-cols-2 gap-4 mt-6">
-                      <div className={`p-4 rounded-xl border ${!isPeonyVip ? 'border-black bg-black text-white' : 'border-gray-200 bg-gray-50'}`}>
-                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Standart Kazanç</p>
-                        <p className="text-xl serif-display">{(Number(formPrice) * 0.8).toLocaleString('tr-TR')} ₺</p>
-                        <p className="text-[9px] opacity-50 mt-1">%20 Komisyon</p>
-                      </div>
-                      <div className={`p-4 rounded-xl border ${isPeonyVip ? 'border-[#AF9164] bg-[#AF9164] text-white' : 'border-[#AF9164]/20 bg-[#AF9164]/5'}`}>
-                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">VIP Kazanç</p>
-                        <p className="text-xl serif-display">{(Number(formPrice) * 0.7).toLocaleString('tr-TR')} ₺</p>
-                        <p className="text-[9px] opacity-70 mt-1">%30 Komisyon (Kargo Bizden)</p>
-                      </div>
+                    <div className="mt-6">
+                      {supplier ? (
+                        <div className="p-5 rounded-xl border border-black bg-black text-white text-center">
+                          <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">{supplier} Payı (%63)</p>
+                          <p className="text-2xl serif-display">{(Number(formPrice) * 0.63).toLocaleString('tr-TR')} ₺</p>
+                          <p className="text-[9px] opacity-50 mt-1.5">%37 Peony Komisyonu ({(Number(formPrice) * 0.37).toLocaleString('tr-TR')} ₺)</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className={`p-4 rounded-xl border ${!isPeonyVip ? 'border-black bg-black text-white' : 'border-gray-200 bg-gray-50'}`}>
+                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Standart Kazanç</p>
+                            <p className="text-xl serif-display">{(Number(formPrice) * 0.8).toLocaleString('tr-TR')} ₺</p>
+                            <p className="text-[9px] opacity-50 mt-1">%20 Komisyon</p>
+                          </div>
+                          <div className={`p-4 rounded-xl border ${isPeonyVip ? 'border-[#AF9164] bg-[#AF9164] text-white' : 'border-[#AF9164]/20 bg-[#AF9164]/5'}`}>
+                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">VIP Kazanç</p>
+                            <p className="text-xl serif-display">{(Number(formPrice) * 0.7).toLocaleString('tr-TR')} ₺</p>
+                            <p className="text-[9px] opacity-70 mt-1">%30 Komisyon (Kargo Bizden)</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

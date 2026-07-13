@@ -139,7 +139,7 @@ export async function POST(request: Request) {
     const finalPrice = productPrice + deliveryFee
 
     // Komisyon Hesaplama (Split Payment Hazırlığı)
-    const commissionRate = product.is_peony_vip ? 0.30 : 0.20
+    const commissionRate = product.supplier ? 0.37 : (product.is_peony_vip ? 0.30 : 0.20)
     const commissionAmount = productPrice * commissionRate
     const sellerAmount = productPrice - commissionAmount
 

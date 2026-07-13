@@ -48,6 +48,7 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
       odor_score: data.odor_score || null,
       has_spa_treatment: data.has_spa_treatment,
       is_peony_vip: data.is_peony_vip,
+      supplier: data.supplier || null,
       full_set_items: data.full_set_items,
       status: 'pending',
       entrupy_status: 'pending'

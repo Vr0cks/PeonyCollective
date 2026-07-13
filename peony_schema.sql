@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     is_peony_vip BOOLEAN DEFAULT false,
     entrupy_status TEXT CHECK (entrupy_status IN ('pending', 'analyzing', 'verified', 'rejected')),
     entrupy_certificate_url TEXT,
+    supplier TEXT DEFAULT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

@@ -45,6 +45,7 @@ export interface Product {
   is_peony_vip?: boolean | null;
   entrupy_status?: 'pending' | 'analyzing' | 'verified' | 'rejected' | null;
   entrupy_certificate_url?: string | null;
+  supplier?: string | null;
   created_at: string;
   profiles?: Partial<Profile>;
 }

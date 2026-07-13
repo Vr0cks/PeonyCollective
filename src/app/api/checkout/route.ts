@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const productIds = cartItems.map((item: any) => item.id)
     const { data: dbProducts, error: dbError } = await supabase
       .from('products')
-      .select('id, price, status, seller_id, brand, model_name, locked_until, locked_by')
+      .select('id, price, status, seller_id, brand, model_name, locked_until, locked_by, supplier')
       .in('id', productIds)
 
     if (dbError || !dbProducts || dbProducts.length === 0) {
@@ -133,12 +133,12 @@ export async function POST(req: Request) {
     // Benzersiz sipariş numarası
     const merchantOid = `PO_${Date.now()}_${Math.floor(Math.random() * 1000)}`
 
-    // Platform Komisyon Motoru (%15)
-    const commissionRate = 0.15
     let totalSellerAmount = 0
 
     // Siparişleri veritabanına "pending_payment" olarak kaydet
     for (const product of dbProducts) {
+      // Platform Komisyon Motoru (Eğer ürünün tedarikçisi varsa %37, yoksa standart %15)
+      const commissionRate = product.supplier ? 0.37 : 0.15
       const commissionAmount = product.price * commissionRate
       const sellerAmount = product.price - commissionAmount
       totalSellerAmount += sellerAmount
