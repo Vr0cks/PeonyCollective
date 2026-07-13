@@ -7,6 +7,7 @@ import { Send, Loader2 } from 'lucide-react'
 
 import { Conversation, Message } from '@/src/types'
 import OfferChatWidget from './OfferChatWidget'
+import { maskContactInfo } from '@/src/utils/security'
 
 interface MessageThreadProps {
   messages: Message[]
@@ -87,6 +88,15 @@ export default function MessageThread({
         />
       )}
 
+      {/* Notice Banner */}
+      <div className="bg-amber-50/60 border-b border-amber-100/50 px-4 md:px-6 py-2.5 flex items-center justify-between text-[10px] text-amber-800 tracking-wide font-light">
+        <div className="flex items-center gap-2">
+          <span>⚠️</span>
+          <span>Güvenliğiniz için telefon numarası, e-posta veya harici link paylaşmayınız.</span>
+        </div>
+        <span className="font-bold text-amber-900 shrink-0">Peony Güvencesi</span>
+      </div>
+
       {/* Messages list */}
       <div ref={scrollRef} className="flex-grow overflow-y-auto p-6 space-y-4 bg-gray-50/20">
         {loading ? (
@@ -112,7 +122,7 @@ export default function MessageThread({
                       : 'bg-white border border-gray-100 text-gray-800 rounded-tl-none shadow-sm'
                   }`}
                 >
-                  <p>{msg.content}</p>
+                  <p>{maskContactInfo(msg.content)}</p>
                   <span
                     className={`block text-[8px] mt-1 text-right leading-none ${
                       isMe ? 'text-zinc-400' : 'text-gray-400'

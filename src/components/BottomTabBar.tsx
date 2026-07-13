@@ -39,8 +39,8 @@ export default function BottomTabBar() {
 
   // Enforces visibility exclusively on viewports matching the 'md:hidden' tailwind directive.
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-t border-gray-100 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] transition-transform duration-300">
-      <div className="flex items-center justify-around h-16 px-2">
+    <div className="md:hidden fixed bottom-5 left-4 right-4 z-40 bg-[#121212]/90 backdrop-blur-xl border border-white/10 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.3)] transition-all duration-300">
+      <div className="flex items-center justify-around h-14 px-2">
         {TABS.map((tab) => {
           const Icon = tab.icon
           const isActive = pathname === tab.href || (tab.href !== '/' && pathname.startsWith(tab.href))
@@ -49,19 +49,22 @@ export default function BottomTabBar() {
             <Link 
               key={tab.name} 
               href={tab.href}
-              className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-[#AF9164]' : 'text-gray-400 hover:text-black'} transition-colors relative`}
+              className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-[#AF9164]' : 'text-zinc-400/80 hover:text-white'} transition-colors relative`}
             >
-              <div className="relative">
-                <Icon size={22} strokeWidth={isActive ? 2 : 1.5} />
+              <div className="relative flex flex-col items-center">
+                <Icon size={18} strokeWidth={isActive ? 2.2 : 1.5} />
                 {mounted && tab.badge && tab.badge > 0 ? (
-                  <span className="absolute -top-1.5 -right-2 bg-[#AF9164] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                  <span className="absolute -top-1.5 -right-2.5 bg-[#AF9164] text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md animate-pulse">
                     {tab.badge}
                   </span>
                 ) : null}
               </div>
-              <span className={`text-[9px] uppercase tracking-wider font-bold ${isActive ? 'text-[#AF9164]' : 'text-gray-400'}`}>
+              <span className={`text-[8px] uppercase tracking-[0.12em] font-bold ${isActive ? 'text-[#AF9164]' : 'text-zinc-500'}`}>
                 {tab.name}
               </span>
+              {isActive && (
+                <span className="absolute bottom-1 w-1 h-1 rounded-full bg-[#AF9164]" />
+              )}
             </Link>
           )
         })}

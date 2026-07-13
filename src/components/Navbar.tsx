@@ -58,9 +58,9 @@ export default async function Navbar() {
           </div>
         </div>
 
-        {/* Orta: Logo (Masaüstü ve Mobilde Mükemmel Ortalı) */}
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-2xl lg:text-3xl font-playfair tracking-[0.35em] uppercase whitespace-nowrap text-[#1A1A1A]">
-          PEONY<span className="italic font-light lowercase text-3xl lg:text-4xl">collective</span>
+        {/* Orta: Logo (Masaüstü ve Mobilde Mükemmel Ortalı ve Taşmayan Yapı) */}
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-base sm:text-2xl lg:text-3xl font-playfair tracking-[0.15em] sm:tracking-[0.35em] uppercase whitespace-nowrap text-[#1A1A1A] transition-all">
+          PEONY<span className="hidden sm:inline italic font-light lowercase text-xl sm:text-3xl lg:text-4xl">collective</span>
         </Link>
 
         {/* Sağ: İkonlar, Arama ve Profil */}

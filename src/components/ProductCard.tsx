@@ -18,19 +18,19 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="group relative w-full block">
       <Link href={`/product/${product.id}`} className="block w-full">
-        {/* Taller Aspect Ratio for luxury feel (3/4 or 4/5) */}
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#F2F2F2] mb-6">
+        {/* Taller Aspect Ratio for luxury feel with soft iOS rounded corners */}
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-white border border-gray-100 rounded-3xl shadow-[0_6px_30px_rgba(0,0,0,0.015)] group-hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-all duration-700 mb-5">
           <Image 
             src={imageUrl} 
             alt={product.brand}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out mix-blend-multiply"
+            className="object-cover group-hover:scale-105 transition-transform duration-[1.8s] ease-out mix-blend-multiply"
           />
           
           {/* Subtle condition badge */}
           <div className="absolute top-4 left-4 z-10">
-             <span className="text-[9px] font-bold uppercase tracking-[0.2em] bg-white px-2 py-1 text-gray-900 border border-black/5">
+             <span className="text-[8px] font-bold uppercase tracking-[0.2em] bg-white/80 backdrop-blur-md px-3 py-1.5 text-gray-900 border border-black/5 rounded-full">
                 {product.condition}
              </span>
           </div>

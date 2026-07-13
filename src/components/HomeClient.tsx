@@ -62,17 +62,76 @@ export default function HomeClient({ products, brands, brand, category, gender }
   const router = useRouter()
   const hasFilter = brand || category || gender
   const [visibleCount, setVisibleCount] = useState(24)
+  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null)
 
   useEffect(() => {
     setVisibleCount(24)
-  }, [brand, category, gender])
+  }, [brand, category, gender, selectedPeriod])
+
+  // Filter products by selected period
+  let displayProducts = products || []
+  if (selectedPeriod === 'Plaj Şıklığı') {
+    displayProducts = displayProducts.filter(p => p.category === 'Ayakkabı' || p.category === 'Aksesuar')
+  } else if (selectedPeriod === 'Şehir Esintisi') {
+    displayProducts = displayProducts.filter(p => p.category === 'Kıyafet' || p.category === 'Çanta')
+  } else if (selectedPeriod === 'Gece Daveti') {
+    displayProducts = displayProducts.filter(p => p.category === 'Kıyafet' || p.category === 'Aksesuar')
+  }
+
+  // Bags under 15k selector
+  const bagsUnder15k = (products || []).filter(p => p.category === 'Çanta' && (p.price ?? 0) <= 15000)
+  const fallbackBags: Product[] = [
+    {
+      id: 'mock-bag-1',
+      seller_id: 'mock-seller',
+      gender: 'KADIN',
+      category: 'Çanta',
+      subcategory: 'El Çantası',
+      size: 'Medium',
+      brand: 'Prada',
+      model_name: 'Nylon Pochette',
+      description: 'Prada Nylon Pochette mock description',
+      price: 12500,
+      condition: 'Yeni Gibi',
+      material: 'Nylon',
+      dimensions: '20x15cm',
+      purchase_year: 2022,
+      serial_number: '123456',
+      public_images: ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=600'],
+      authenticity_docs: [],
+      status: 'approved',
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 'mock-bag-2',
+      seller_id: 'mock-seller',
+      gender: 'KADIN',
+      category: 'Çanta',
+      subcategory: 'Omuz Çantası',
+      size: 'Small',
+      brand: 'Gucci',
+      model_name: 'Supreme Canvas Pouch',
+      description: 'Gucci Canvas Pouch mock description',
+      price: 14800,
+      condition: 'Çok İyi',
+      material: 'Canvas',
+      dimensions: '18x12cm',
+      purchase_year: 2021,
+      serial_number: '654321',
+      public_images: ['https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=600'],
+      authenticity_docs: [],
+      status: 'approved',
+      created_at: new Date().toISOString()
+    }
+  ]
+  const displayBagsUnder15k = bagsUnder15k.length > 0 ? bagsUnder15k : fallbackBags
 
   return (
     <main className="relative overflow-hidden bg-[#F9F9F8]">
       <SellPopup />
       
-      {/* FULL BLEED HERO - CELINE / BOTTEGA VIBE */}
-      <section className="relative h-screen w-full overflow-hidden flex flex-col justify-end">
+      {/* FULL BLEED HERO - CELINE / BOTTEGA VIBE WITH APPLE BENT */}
+      <section className="relative h-[85vh] md:h-screen w-full overflow-hidden flex flex-col justify-end rounded-b-[2.5rem] lg:rounded-b-none shadow-2xl">
         <Image 
           src="https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80&w=2000" 
           fill
@@ -149,6 +208,316 @@ export default function HomeClient({ products, brands, brand, category, gender }
         </div>
       </section>
 
+      {/* 1. SEASONAL YAZ İNDİRİMİ BANNER (Zıtlıkların Uyumu) */}
+      <section className="py-24 bg-[#F9F9F8] border-b border-gray-100">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+            
+            {/* Sol: Manifesto & Yaz İndirimi */}
+            <div className="lg:col-span-5 space-y-8">
+              <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164] bg-[#AF9164]/10 px-3.5 py-1.5 rounded-full inline-block">Mevsimsel Seçki</span>
+              <h2 className="text-3xl sm:text-4xl lg:text-6xl serif-display leading-[1.1] text-gray-900 break-words">
+                Yaz İndirimi: <br />
+                <span className="italic font-light">Zıtlıkların Uyumu</span>
+              </h2>
+              <p className="text-gray-500 font-light leading-relaxed text-base">
+                Lüks, gündelik konfor ile arzunun en üst zirvesini buluşturur. Peony Collective Yaz Seçkisi'nde, sahilde adımlarınıza eşlik edecek en şık terlik ve sandaletlerden, davetlerin en sofistike yıldızı efsanevi Hermès Kelly çantalara uzanan zıt kutuplar bir arada sunuluyor.
+              </p>
+              
+              <div className="pt-6 border-t border-gray-200 flex items-center gap-8">
+                <div>
+                  <p className="text-[9px] text-gray-400 mb-1">ERİŞİLEBİLİR SEÇKİ</p>
+                  <p className="text-sm font-bold text-gray-800">Lüks Terlik & Sandalet</p>
+                </div>
+                <div className="h-8 w-[1px] bg-gray-200" />
+                <div>
+                  <p className="text-[9px] text-gray-400 mb-1">SOFİSTİKE İKONLAR</p>
+                  <p className="text-sm font-bold text-gray-800">Kelly & Birkin Çantalar</p>
+                </div>
+              </div>
+
+              <Link href="#collection" className="inline-flex items-center gap-3 bg-black text-white px-8 py-4 hover:bg-[#AF9164] transition-all duration-500 sans-detail text-[10px] tracking-widest uppercase font-bold mt-4">
+                Yaz İndirimi Seçkisini Gör →
+              </Link>
+            </div>
+
+            {/* Sağ: İki Farklı Segmentin Yan Yana Sergilenmesi */}
+            <div className="lg:col-span-7 grid grid-cols-2 gap-4 md:gap-8">
+              {/* Kelly (Ultra Lüks) */}
+              <div className="space-y-4">
+                <div className="relative aspect-[3/4] overflow-hidden bg-white border border-gray-100 group">
+                  <Image 
+                    src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=800"
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 35vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-[1.5s]"
+                    alt="Hermès Kelly"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="text-[8px] font-bold tracking-widest bg-black text-white px-2 py-1 uppercase">Sofistike</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-[9px] font-bold tracking-wider text-[#AF9164] uppercase">Hermès</p>
+                  <p className="text-sm serif-display italic text-gray-900">Kelly 28 Togo</p>
+                </div>
+              </div>
+
+              {/* Sandalet (Erişilebilir Lüks) */}
+              <div className="space-y-4 mt-12 lg:mt-24">
+                <div className="relative aspect-[3/4] overflow-hidden bg-white border border-gray-100 group">
+                  <Image 
+                    src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=800"
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 35vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-[1.5s]"
+                    alt="Luxury Sandals"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="text-[8px] font-bold tracking-widest bg-black text-white px-2 py-1 uppercase">Ulaşılabilir</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-[9px] font-bold tracking-wider text-[#AF9164] uppercase">Chanel</p>
+                  <p className="text-sm serif-display italic text-gray-900">Logo Leather Sandals</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 2. SHOP BY CATEGORY (Kategorilere Göre Al) */}
+      <section id="categories" className="py-24 bg-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+          <div className="text-center mb-16 space-y-4">
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">SHOP BY CATEGORY</span>
+            <h2 className="text-4xl md:text-5xl serif-display leading-tight text-gray-900">
+              Kategorilere Göre <span className="italic font-light">Alışveriş Yapın</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {categoryCards.map((cat) => (
+              <Link 
+                key={cat.title}
+                href={gender ? `/?gender=${gender}&category=${cat.title}#collection` : cat.href} 
+                className="group relative overflow-hidden block w-full aspect-[3/4] bg-zinc-900"
+              >
+                <Image
+                  src={cat.image}
+                  alt={cat.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  className="object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent transition-all duration-700" />
+                <div className="absolute bottom-8 left-8 z-10">
+                  <p className="sans-detail text-white/70 mb-1 text-[10px] tracking-widest">{cat.subtitle}</p>
+                  <h3 className="text-2xl md:text-3xl serif-display italic text-white group-hover:-translate-y-1 transition-transform duration-500">{cat.title}</h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. KURUCU TEDARİKÇİ BANNERI (Apple-Style, Round Corners on Mobile) */}
+      <section className="py-12 md:py-20 bg-[#1A1A1A] border-y border-[#AF9164]/30 relative overflow-hidden text-white sm:rounded-none">
+        <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-[#AF9164]/10 blur-3xl" />
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-[#AF9164]/5 blur-3xl" />
+        
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 relative z-10 flex flex-col lg:flex-row justify-between items-center gap-8 md:gap-10">
+          <div className="space-y-4 text-center lg:text-left max-w-2xl">
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164] bg-[#AF9164]/10 px-3.5 py-1.5 rounded-full inline-block">Kurucu Tedarikçi Programı</span>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl serif-display text-white leading-tight break-words">
+              Kurucu Tedarikçilere Özel <br />
+              <span className="italic font-light text-[#AF9164]">%0&apos;dan Başlayan Komisyon Oranları</span>
+            </h2>
+            <p className="text-gray-400 font-light text-xs md:text-base leading-relaxed">
+              Peony lansman dönemine özel sınırlı sayıdaki kurucu tedarikçiden biri olun, lüks parçalarınızı en yüksek değerle ve komisyonsuz avantajlarla nakde çevirin.
+            </p>
+          </div>
+          
+          <div className="shrink-0 w-full sm:w-auto text-center">
+            <Link 
+              href="/sell" 
+              className="inline-block w-full sm:w-auto sans-detail bg-[#AF9164] border border-[#AF9164] px-10 py-4 md:py-5 text-white hover:bg-white hover:text-black hover:border-white transition-all duration-500 uppercase tracking-widest text-xs font-bold shadow-lg"
+            >
+              Hemen Başvur
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. 15.000 ₺ ALTI ÇANTALAR & EDITORIAL POST */}
+      <section className="py-24 bg-white border-b border-gray-100">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+            
+            {/* Sol: Editoryal Kart / Blog Post */}
+            <div className="lg:col-span-4 bg-[#F9F9F8] p-8 md:p-12 border border-gray-100 flex flex-col justify-between aspect-[3/4]">
+              <div className="space-y-6">
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">CURATOR&apos;S NOTE</span>
+                <h3 className="text-3xl serif-display italic text-gray-900 leading-tight">
+                  Akıllı Lüks: <br />
+                  15.000 ₺ Altı Çantalar
+                </h3>
+                <p className="text-xs text-gray-500 font-light leading-relaxed">
+                  Lüks gardırop yatırımlarına başlamak için servet harcamanıza gerek yok. Küratörlerimizin seçtiği, günlük kullanıma uygun ve değerini kaybetmeyen, 15.000 ₺ altındaki akıllı çanta seçeneklerini derledik.
+                </p>
+              </div>
+              <div className="pt-6 border-t border-gray-200/50">
+                <Link href="#collection" className="text-[10px] font-bold tracking-widest uppercase text-gray-900 border-b border-black pb-1 hover:text-[#AF9164] hover:border-[#AF9164] transition-all">
+                  TÜMÜNÜ İNCELE
+                </Link>
+              </div>
+            </div>
+
+            {/* Sağ: Bags Under 15k Grid / Swipable Touch-Carousel on Mobile */}
+            <div className="lg:col-span-8 w-full overflow-hidden">
+              <div className="flex overflow-x-auto lg:grid lg:grid-cols-2 gap-6 pb-4 lg:pb-0 scrollbar-none snap-x snap-mandatory px-1 lg:px-0">
+                {displayBagsUnder15k.slice(0, 2).map((bag) => (
+                  <div key={bag.id} className="group relative border border-gray-100 p-6 bg-[#F9F9F8]/50 hover:bg-white hover:shadow-xl transition-all duration-500 rounded-3xl w-[78vw] sm:w-auto shrink-0 snap-start">
+                    <Link href={`/product/${bag.id}`} className="block relative aspect-square w-full overflow-hidden bg-gray-50 rounded-2xl mb-6">
+                      <Image 
+                        src={bag.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=600'}
+                        alt={bag.brand}
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 20vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-[1.5s] mix-blend-multiply"
+                      />
+                    </Link>
+                    <div className="text-center space-y-1">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164]">{bag.brand}</p>
+                      <h4 className="text-sm serif-display italic text-gray-950 truncate">{bag.model_name}</h4>
+                      <p className="text-xs text-gray-500 font-light mt-1">{(bag.price ?? 0).toLocaleString('tr-TR')} ₺</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 5. THE EDIT - CURATED COLLECTION (With Capsule Selector) */}
+      <section id="collection" className="py-32 bg-[#F9F9F8] min-h-screen">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
+          
+          <div className="mb-20 space-y-8 border-b border-gray-200 pb-8">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+              <div>
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">CURATED COLLECTION</span>
+                <h2 className="text-5xl md:text-7xl serif-display tracking-tight text-[#1A1A1A] mt-2">
+                  The <span className="italic">Edit</span>
+                </h2>
+              </div>
+              
+              {/* Brand and Gender select widgets */}
+              <div className="flex flex-col sm:flex-row items-end sm:items-center gap-6">
+                <CustomSelect
+                  value={gender || ''}
+                  placeholder="Tüm Cinsiyetler"
+                  options={genderFilters.map(g => ({ value: g.value, label: g.label }))}
+                  onChange={(val) => {
+                    if (val) {
+                      router.push(`/?gender=${val}${brand ? `&brand=${brand}` : ''}#collection`)
+                    } else {
+                      router.push(`/?${brand ? `brand=${brand}` : ''}#collection`)
+                    }
+                  }}
+                />
+                
+                <CustomSelect
+                  value={brand || ''}
+                  placeholder="Tüm Markalar"
+                  options={brands.map(b => ({ value: b, label: b }))}
+                  onChange={(val) => {
+                    if (val) {
+                      router.push(`/?brand=${encodeURIComponent(val)}${gender ? `&gender=${gender}` : ''}#collection`)
+                    } else {
+                      router.push(`/?${gender ? `gender=${gender}` : ''}#collection`)
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 6. DÖNEMSEL/KAPSÜL SEÇKİLERİ (Interactive Period Capsules) */}
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+              {[
+                { id: null, label: 'Tüm Koleksiyon' },
+                { id: 'Plaj Şıklığı', label: 'Plaj Şıklığı 🏖️' },
+                { id: 'Şehir Esintisi', label: 'Şehir Esintisi 🏙️' },
+                { id: 'Gece Daveti', label: 'Gece Daveti 🌌' },
+              ].map((p) => (
+                <button
+                  key={p.label}
+                  onClick={() => setSelectedPeriod(p.id)}
+                  className={`sans-detail px-6 py-2.5 text-[10px] tracking-widest uppercase border shrink-0 transition-all duration-300 ${
+                    selectedPeriod === p.id
+                      ? 'bg-black text-white border-black font-bold'
+                      : 'bg-white text-gray-500 border-gray-200 hover:text-black hover:border-black'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {(hasFilter || selectedPeriod) && (
+            <div className="mb-16 flex items-center gap-3">
+              <span className="sans-detail text-gray-400 text-xs">Aktif Seçimler:</span>
+              <div className="flex gap-2">
+                {gender && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200">{gender}</span>}
+                {category && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200">{category}</span>}
+                {brand && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200 text-[#AF9164]">{brand}</span>}
+                {selectedPeriod && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200 text-[#AF9164]">{selectedPeriod}</span>}
+              </div>
+              <button 
+                onClick={() => {
+                  setSelectedPeriod(null)
+                  router.push('/#collection')
+                }} 
+                className="sans-detail text-xs text-gray-400 hover:text-black border-b border-transparent hover:border-black ml-4"
+              >
+                Temizle
+              </button>
+            </div>
+          )}
+
+          {!displayProducts || displayProducts.length === 0 ? (
+            <div className="py-32 text-center">
+              <p className="text-gray-400 italic serif-display text-3xl">Bu seçki için parça bulunmuyor.</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-12 gap-y-24">
+                {displayProducts.slice(0, visibleCount).map((p, i) => (
+                  <FadeIn key={p.id} delay={i % 4 * 0.1} direction="up">
+                    <ProductCard product={p} />
+                  </FadeIn>
+                ))}
+              </div>
+              
+              {displayProducts.length > visibleCount && (
+                <div className="mt-24 flex justify-center">
+                  <button 
+                    onClick={() => setVisibleCount(prev => prev + 24)}
+                    className="sans-detail px-12 py-4 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors duration-500 text-sm tracking-[0.2em] uppercase font-bold"
+                  >
+                    Daha Fazla Ürün Göster
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </section>
+
       {/* PEONY VIP - CONCIERGE / WHITE GLOVE SERVICE */}
       <section className="py-24 bg-[#1A1A1A] text-white">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -186,116 +555,8 @@ export default function HomeClient({ products, brands, brand, category, gender }
         </div>
       </section>
 
-      {/* CATEGORIES GRID - MINIMAL, NO GAPS, FULL WIDTH */}
-      <section id="categories" className="py-0 bg-black text-white">
-        {/* Category Grid is now gapless and huge */}
-        <div className="grid grid-cols-1 md:grid-cols-2 auto-rows-[60vh] md:auto-rows-[80vh]">
-          {categoryCards.map((cat, index) => (
-            <Link 
-              key={cat.title}
-              href={gender ? `/?gender=${gender}&category=${cat.title}#collection` : cat.href} 
-              className="group relative overflow-hidden block w-full h-full"
-            >
-              <Image
-                src={cat.image}
-                alt={cat.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover transition-transform duration-[2000ms] ease-out group-hover:scale-110 opacity-70 group-hover:opacity-100"
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all duration-700" />
-              <div className="absolute bottom-12 left-12 md:bottom-16 md:left-16 z-10">
-                <p className="sans-detail text-white/70 mb-2">{cat.subtitle}</p>
-                <h3 className="text-5xl md:text-7xl serif-display italic text-white group-hover:-translate-y-2 transition-transform duration-500">{cat.title}</h3>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* THE EDIT - CURATED COLLECTION */}
-      <section id="collection" className="py-40 bg-[#F9F9F8] min-h-screen">
-        <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-          <div className="mb-24 flex flex-col md:flex-row justify-between items-end gap-12 border-b border-gray-200 pb-8">
-             <div>
-               <h2 className="text-5xl md:text-7xl serif-display tracking-tight text-[#1A1A1A]">
-                 The <span className="italic">Edit</span>
-               </h2>
-             </div>
-             
-             {/* Filtreler Sağda - Yeni Lüks Select Tasarımı */}
-             <div className="flex flex-col sm:flex-row items-end sm:items-center gap-6">
-                <CustomSelect
-                  value={gender || ''}
-                  placeholder="Tüm Cinsiyetler"
-                  options={genderFilters.map(g => ({ value: g.value, label: g.label }))}
-                  onChange={(val) => {
-                    if (val) {
-                      router.push(`/?gender=${val}${brand ? `&brand=${brand}` : ''}#collection`)
-                    } else {
-                      router.push(`/?${brand ? `brand=${brand}` : ''}#collection`)
-                    }
-                  }}
-                />
-                
-                <CustomSelect
-                  value={brand || ''}
-                  placeholder="Tüm Markalar"
-                  options={brands.map(b => ({ value: b, label: b }))}
-                  onChange={(val) => {
-                    if (val) {
-                      router.push(`/?brand=${encodeURIComponent(val)}${gender ? `&gender=${gender}` : ''}#collection`)
-                    } else {
-                      router.push(`/?${gender ? `gender=${gender}` : ''}#collection`)
-                    }
-                  }}
-                />
-             </div>
-          </div>
-
-          {hasFilter && (
-            <div className="mb-16 flex items-center gap-3">
-              <span className="sans-detail text-gray-400">Aktif Seçimler:</span>
-              <div className="flex gap-2">
-                {gender && <span className="sans-detail bg-white px-3 py-1 border border-gray-200">{gender}</span>}
-                {category && <span className="sans-detail bg-white px-3 py-1 border border-gray-200">{category}</span>}
-                {brand && <span className="sans-detail bg-white px-3 py-1 border border-gray-200 text-[#AF9164]">{brand}</span>}
-              </div>
-              <Link href="/#collection" className="sans-detail text-gray-400 hover:text-black border-b border-transparent hover:border-black ml-4">Temizle</Link>
-            </div>
-          )}
-
-          {!products || products.length === 0 ? (
-            <div className="py-32 text-center">
-              <p className="text-gray-400 italic serif-display text-3xl">Bu seçki için parça bulunmuyor.</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-12 gap-y-24">
-                {products.slice(0, visibleCount).map((p, i) => (
-                  <FadeIn key={p.id} delay={i % 4 * 0.1} direction="up">
-                    <ProductCard product={p} />
-                  </FadeIn>
-                ))}
-              </div>
-              
-              {products.length > visibleCount && (
-                <div className="mt-24 flex justify-center">
-                  <button 
-                    onClick={() => setVisibleCount(prev => prev + 24)}
-                    className="sans-detail px-12 py-4 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors duration-500 text-sm tracking-[0.2em] uppercase font-bold"
-                  >
-                    Daha Fazla Ürün Göster
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </section>
-
       {/* PEONY LAB - THE ART OF AUTHENTICATION */}
-      <section className="py-40 bg-[#1A1A1A] text-white overflow-hidden">
+      <section className="py-40 bg-[#1A1A1A] text-white overflow-hidden border-t border-white/10">
         <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-center">
           <div className="lg:col-span-5 space-y-10">
             <p className="sans-detail text-[#AF9164]">EXPERT AUTHENTICATION</p>
@@ -322,8 +583,68 @@ export default function HomeClient({ products, brands, brand, category, gender }
         </div>
       </section>
 
+      {/* 6. PHYSICAL CERTIFICATE OF AUTHENTICITY SPOTLIGHT */}
+      <section className="py-24 bg-white border-y border-gray-100 overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8">
+            <p className="sans-detail text-[#AF9164]">GUARANTEED TRUST</p>
+            <h2 className="text-4xl md:text-5xl serif-display leading-tight text-gray-900">
+              Satış Sonrası <br />
+              <span className="italic font-light text-[#AF9164]">Fiziksel Orijinallik Belgesi</span>
+            </h2>
+            <p className="text-gray-500 font-light leading-relaxed max-w-md">
+              Peony Lab™ küratörlerimiz tarafından 32 noktalı kontrolden geçerek onaylanan tüm ürünler, alıcıya özel tescillenmiş fiziki Orijinallik Sertifikası ile gönderilir. Bu sertifika, ürünün orijinalliğini ömür boyu garanti altına alır ve gelecekteki olası satışlarınızda değer koruma sağlar.
+            </p>
+            <div className="flex gap-4 items-center">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-900 bg-gray-50 border border-gray-200 px-4 py-2">✓ QR Kodlu Takip</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-900 bg-gray-50 border border-gray-200 px-4 py-2">✓ Islak İmzalı</span>
+            </div>
+          </div>
+          
+          {/* Certificate mock container */}
+          <div className="relative flex justify-center items-center py-12 bg-gradient-to-tr from-gray-50 to-zinc-100 rounded-3xl border border-gray-200 overflow-hidden shadow-inner">
+            <div className="relative w-72 aspect-[1/1.414] bg-white border-8 border-double border-zinc-200 p-6 flex flex-col justify-between shadow-2xl rounded-sm">
+              <div className="text-center space-y-4">
+                <p className="text-[8px] tracking-[0.3em] text-[#AF9164] font-bold">PEONY COLLECTIVE</p>
+                <div className="w-8 h-8 rounded-full border border-[#AF9164] mx-auto flex items-center justify-center text-[#AF9164] text-[10px] font-bold">P</div>
+                <h4 className="text-xs serif-display italic border-b border-gray-100 pb-2">Certificate of Authenticity</h4>
+              </div>
+              
+              <div className="space-y-3 my-6 text-[8px] tracking-wider text-gray-600">
+                <div className="flex justify-between border-b border-gray-50 pb-1">
+                  <span>MARKA / BRAND:</span>
+                  <span className="font-bold text-gray-900">HERMÈS</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-50 pb-1">
+                  <span>MODEL:</span>
+                  <span className="font-bold text-gray-900">Kelly 28 Togo Leather</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-50 pb-1">
+                  <span>SERİ NO / SERIAL:</span>
+                  <span className="font-bold text-gray-900">Y-29184-P</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-50 pb-1">
+                  <span>DOĞRULAMA / METHOD:</span>
+                  <span className="font-bold text-gray-900">32-Point Physical & Entrupy™</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-end border-t border-gray-100 pt-4">
+                <div className="text-[6px] text-gray-400 leading-normal">
+                  <p>APPROVED BY PEONY LAB™</p>
+                  <p className="mt-0.5 font-mono">ID: #920-XF8</p>
+                </div>
+                <div className="text-[7px] text-right text-gray-800 italic font-serif">
+                  Küratör İmzası
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ENTRUPY PARTNERSHIP — TECHNOLOGY TRUST LAYER */}
-      <section className="py-32 bg-white border-y border-gray-100 overflow-hidden">
+      <section className="py-32 bg-white border-b border-gray-100 overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12">
           
           {/* Üst: Başlık + Entrupy Logo Alanı */}
@@ -612,7 +933,6 @@ export default function HomeClient({ products, brands, brand, category, gender }
           </FadeIn>
         </div>
       </section>
-
     </main>
   )
 }
