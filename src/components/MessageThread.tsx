@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Send, Loader2 } from 'lucide-react'
@@ -36,6 +36,45 @@ export default function MessageThread({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
+  }, [messages])
+
+  // Smart multi-message phone number reconstruction filter (prevents split number trickery)
+  const processedMessages = useMemo(() => {
+    if (!messages) return []
+    const processed = messages.map(m => ({ ...m }))
+
+    let i = 0
+    while (i < processed.length) {
+      const senderId = processed[i].sender_id
+      const group: typeof processed = []
+      let j = i
+      while (j < processed.length && processed[j].sender_id === senderId) {
+        group.push(processed[j])
+        j++
+      }
+
+      // Reconstruct combined text of consecutive messages
+      const combinedText = group.map(m => m.content).join(' ')
+      const digits = combinedText.replace(/\D/g, '')
+
+      // If combined digits form a typical Turkish mobile/landline number or consecutive digits sum to 10-12
+      const isPhonePattern = /0?5\d{9}/.test(digits) || (digits.length >= 10 && digits.length <= 12)
+
+      if (isPhonePattern) {
+        group.forEach(m => {
+          if (/\d+/.test(m.content)) {
+            // Replace if message is pure numbers
+            if (m.content.replace(/[\s\.-]/g, '').match(/^\d+$/)) {
+              m.content = '[İLETİŞİM BİLGİSİ GİZLENDİ]'
+            } else {
+              m.content = m.content.replace(/\d+[\s\d\.-]*/g, '[İLETİŞİM BİLGİSİ GİZLENDİ]')
+            }
+          }
+        })
+      }
+      i = j
+    }
+    return processed
   }, [messages])
 
   const other = conversation?.other_profile || {}
@@ -108,7 +147,7 @@ export default function MessageThread({
             <p className="text-xs text-gray-400 italic font-light">Sohbeti başlatmak için aşağıdan mesaj gönderin.</p>
           </div>
         ) : (
-          messages.map((msg) => {
+          processedMessages.map((msg) => {
             const isMe = msg.sender_id === userId
             return (
               <div

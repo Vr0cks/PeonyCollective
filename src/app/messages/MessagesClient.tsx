@@ -126,7 +126,7 @@ export default function MessagesClient({ userId, initialConversations, activeId 
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-12 md:py-20 h-[80vh] flex flex-col md:flex-row gap-8">
+    <div className="max-w-[1400px] mx-auto px-6 py-12 md:py-20 h-[90vh] md:h-[800px] min-h-[600px] flex flex-col md:flex-row gap-8">
       {/* Sol Panel: Konuşma Listesi */}
       <div className="w-full md:w-1/3 border border-gray-100 bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col h-full">
         <ConversationList 
