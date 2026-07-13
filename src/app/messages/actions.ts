@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/src/utils/supabase/server'
+import { maskContactInfo } from '@/src/utils/security'
 
 // Send a message in a conversation
 export async function sendMessage(conversationId: string, content: string) {
@@ -30,16 +31,17 @@ export async function sendMessage(conversationId: string, content: string) {
 
     const trimmedContent = content.trim()
 
-    if (
-      phoneRegex.test(trimmedContent.replace(/\s+/g, '')) || 
-      emailRegex.test(trimmedContent) || 
-      ibanRegex.test(trimmedContent.replace(/\s+/g, '')) || 
-      urlRegex.test(trimmedContent)
-    ) {
-      return { 
-        success: false, 
-        error: 'Güvenlik Protokolü: Mesajınızda telefon numarası, e-posta adresi, harici web sitesi bağlantısı veya IBAN bilgisi tespit edilmiştir. Lütfen platform dışı iletişime geçmeye çalışmayın.' 
-      }
+    let finalContent = trimmedContent
+    const hasPhone = phoneRegex.test(trimmedContent.replace(/\s+/g, ''))
+    const hasEmail = emailRegex.test(trimmedContent)
+    const hasIban = ibanRegex.test(trimmedContent.replace(/\s+/g, ''))
+    const hasUrl = urlRegex.test(trimmedContent)
+
+    if (hasPhone || hasEmail || hasIban || hasUrl) {
+      finalContent = maskContactInfo(trimmedContent)
+      // Also mask IBAN and URLs if any
+      finalContent = finalContent.replace(ibanRegex, '[İLETİŞİM BİLGİSİ GİZLENDİ]')
+      finalContent = finalContent.replace(urlRegex, '[İLETİŞİM BİLGİSİ GİZLENDİ]')
     }
 
     const { data: message, error } = await supabase
@@ -47,7 +49,7 @@ export async function sendMessage(conversationId: string, content: string) {
       .insert({
         conversation_id: conversationId,
         sender_id: user.id,
-        content: trimmedContent,
+        content: finalContent,
         is_read: false,
       })
       .select()
@@ -62,7 +64,7 @@ export async function sendMessage(conversationId: string, content: string) {
     await supabase
       .from('conversations')
       .update({
-        last_message: content.trim(),
+        last_message: finalContent,
         last_message_at: new Date().toISOString(),
       })
       .eq('id', conversationId)
