@@ -13,6 +13,12 @@ export default async function SellPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-20 px-4 sm:px-6 lg:px-8 selection:bg-[#AF9164] selection:text-white">
       
@@ -31,7 +37,7 @@ export default async function SellPage({
           </div>
         )}
 
-        <SellForm />
+        <SellForm userEmail={user.email} userRole={profile?.role || undefined} />
       </div>
       
     </div>

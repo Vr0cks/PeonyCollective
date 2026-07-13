@@ -144,9 +144,17 @@ const FileUploadZone = ({ id, label, icon, onChange, multiple = true, accept, pr
   );
 }
 
-export default function SellForm() {
+export default function SellForm({ userEmail, userRole }: { userEmail?: string, userRole?: string }) {
   const router = useRouter()
   
+  const ALLOWED_EMAILS = [
+    'ahmetcanli1943@gmail.com',
+    'designer_7150@peony.com',
+    'ela@peonycollective.com',
+    'rabiakacar86@gmail.com'
+  ]
+  const showSupplierField = userRole === 'admin' || (userEmail && ALLOWED_EMAILS.includes(userEmail.toLowerCase()))
+
   const [activeStep, setActiveStep] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isProcessingFiles, setIsProcessingFiles] = useState(false)
@@ -1037,22 +1045,24 @@ export default function SellForm() {
               <div className="max-w-md mx-auto space-y-6">
                 
                 {/* Tedarikçi Bilgisi */}
-                <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl space-y-2">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tedarikçi (İsteğe Bağlı)</label>
-                  <input
-                    type="text"
-                    className="w-full text-sm py-2.5 px-4 bg-white border border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors"
-                    value={supplier}
-                    onChange={(e) => setSupplier(e.target.value)}
-                    placeholder="Örn: Tedarikçi A, Tedarikçi B"
-                  />
-                  <p className="text-[10px] text-gray-500 leading-relaxed font-light block">
-                    Bu alana tedarikçi girildiğinde, arka planda takip için kaydedilir ve komisyon oranı otomatik olarak %37 Peony komisyonu / %63 Satıcı payı şeklinde uygulanır.
-                  </p>
-                </div>
+                {showSupplierField && (
+                  <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl space-y-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tedarikçi (İsteğe Bağlı)</label>
+                    <input
+                      type="text"
+                      className="w-full text-sm py-2.5 px-4 bg-white border border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors"
+                      value={supplier}
+                      onChange={(e) => setSupplier(e.target.value)}
+                      placeholder="Örn: Tedarikçi A, Tedarikçi B"
+                    />
+                    <p className="text-[10px] text-gray-500 leading-relaxed font-light block">
+                      Bu alana tedarikçi girildiğinde, arka planda takip için kaydedilir ve komisyon oranı otomatik olarak %37 Peony komisyonu / %63 Satıcı payı şeklinde uygulanır.
+                    </p>
+                  </div>
+                )}
 
                 {/* Peony VIP Toggle */}
-                {!supplier && (
+                {(!showSupplierField || !supplier) && (
                   <div className="bg-[#AF9164]/5 border border-[#AF9164]/20 p-5 rounded-xl">
                     <label className="flex items-start gap-4 cursor-pointer group">
                       <input type="checkbox" className="hidden" checked={isPeonyVip} onChange={(e) => setIsPeonyVip(e.target.checked)} />
@@ -1086,7 +1096,7 @@ export default function SellForm() {
                   
                   {formPrice && !isNaN(Number(formPrice)) && Number(formPrice) > 0 && (
                     <div className="mt-6">
-                      {supplier ? (
+                      {showSupplierField && supplier ? (
                         <div className="p-5 rounded-xl border border-black bg-black text-white text-center">
                           <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">{supplier} Payı (%63)</p>
                           <p className="text-2xl serif-display">{(Number(formPrice) * 0.63).toLocaleString('tr-TR')} ₺</p>
