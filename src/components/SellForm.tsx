@@ -151,7 +151,8 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
     'ahmetcanli1943@gmail.com',
     'designer_7150@peony.com',
     'ela@peonycollective.com',
-    'rabiakacar86@gmail.com'
+    'rabiakacar86@gmail.com',
+    'info@peonycollective.com'
   ]
   const showSupplierField = userRole === 'admin' || (userEmail && ALLOWED_EMAILS.includes(userEmail.toLowerCase()))
 

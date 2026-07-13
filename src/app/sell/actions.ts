@@ -38,7 +38,8 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
         'ahmetcanli1943@gmail.com',
         'designer_7150@peony.com',
         'ela@peonycollective.com',
-        'rabiakacar86@gmail.com'
+        'rabiakacar86@gmail.com',
+        'info@peonycollective.com'
       ];
       const isAdmin = profile?.role === 'admin' || (user.email && ALLOWED_EMAILS.includes(user.email.toLowerCase()));
       
