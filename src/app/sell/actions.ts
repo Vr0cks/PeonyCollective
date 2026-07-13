@@ -25,6 +25,28 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
 
     const data = validatedFields.data;
 
+    // Server-side security check for supplier
+    let resolvedSupplier = null;
+    if (data.supplier) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      const ALLOWED_EMAILS = [
+        'ahmetcanli1943@gmail.com',
+        'designer_7150@peony.com',
+        'ela@peonycollective.com',
+        'rabiakacar86@gmail.com'
+      ];
+      const isAdmin = profile?.role === 'admin' || (user.email && ALLOWED_EMAILS.includes(user.email.toLowerCase()));
+      
+      if (isAdmin) {
+        resolvedSupplier = data.supplier;
+      }
+    }
+
     // 2. Veritabanı Kaydı
     const { data: insertedProduct, error: insertError } = await supabase.from('products').insert({
       seller_id: user.id,
@@ -48,7 +70,7 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
       odor_score: data.odor_score || null,
       has_spa_treatment: data.has_spa_treatment,
       is_peony_vip: data.is_peony_vip,
-      supplier: data.supplier || null,
+      supplier: resolvedSupplier,
       full_set_items: data.full_set_items,
       status: 'pending',
       entrupy_status: 'pending'
