@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ShieldCheck, CheckCircle2, Award, Loader2 } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
@@ -10,6 +10,13 @@ export default function Footer() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    console.log(
+      "%cDeveloped by vr0cks (vr0cks.com)",
+      "color: #AF9164; font-size: 12px; font-weight: bold; font-family: monospace; padding: 4px;"
+    )
+  }, [])
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
