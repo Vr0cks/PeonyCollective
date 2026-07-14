@@ -351,12 +351,31 @@ export async function sendItSupportPingAction(messageText: string) {
       return { success: false, error: 'Telegram entegrasyonu (env değişkenleri) henüz yapılandırılmamış.' }
     }
 
+    // 1. Veritabanına "open" bilet olarak kaydet (RLS bypass admin client ile)
+    const adminDb = createAdminClient()
+    const { data: ticket, error: ticketError } = await adminDb
+      .from('it_support_tickets')
+      .insert({
+        user_id: user.id,
+        message: messageText,
+        status: 'open'
+      })
+      .select('*')
+      .single()
+
+    if (ticketError) {
+      console.warn('[DB TICKET SAVE WARNING] Could not save ticket to database:', ticketError.message)
+    }
+
+    const ticketIdStr = ticket ? `\n\n📌 *Talep ID:* \`${ticket.id}\`` : ''
+
     const message = `🔔 *YENİ IT DESTEK TALEBİ*\n\n` +
       `👤 *Gönderen:* ${userName}\n` +
       `📧 *E-posta:* ${user.email || 'Belirtilmemiş'}\n` +
       `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}\n\n` +
-      `💬 *Mesaj:*\n${messageText}\n\n` +
-      `⚠️ _Lütfen admin panelinden sistem durumunu kontrol edin._`
+      `💬 *Mesaj:*\n${messageText}` +
+      ticketIdStr +
+      `\n\n⚠️ _Cevap vermek için bu mesaja "Yanıtla (Reply)" yapıp mesajınızı yazabilirsiniz._`
 
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
@@ -373,6 +392,17 @@ export async function sendItSupportPingAction(messageText: string) {
     if (!response.ok) {
       const errorText = await response.text()
       throw new Error(`Telegram API responded with status ${response.status}: ${errorText}`)
+    }
+
+    // 2. Telegram message_id bilgisini veritabanına geri işle (reply mekanizması için)
+    const resData = await response.json()
+    const telegramMessageId = resData?.result?.message_id
+
+    if (ticket && telegramMessageId) {
+      await adminDb
+        .from('it_support_tickets')
+        .update({ telegram_message_id: String(telegramMessageId) })
+        .eq('id', ticket.id)
     }
 
     return { success: true }

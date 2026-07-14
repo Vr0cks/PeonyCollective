@@ -7,19 +7,40 @@ import FadeIn from '@/src/components/animations/FadeIn'
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
 
-  // İstatistikler
+  // Kullanıcı profilini ve ismi al
+  const { data: { user } } = await supabase.auth.getUser()
+  let greeting = 'Hoş Geldiniz'
+  let userName = ''
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('first_name, last_name')
+      .eq('id', user.id)
+      .single()
+    if (profile) {
+      userName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
+      greeting = `Hoş Geldiniz, ${userName}`
+    }
+  }
+
+  // Bugünün istatistikleri
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  
   const [
     { count: totalCount },
     { count: pendingCount },
     { count: approvedCount },
     { count: rejectedCount },
     { count: soldCount },
+    { count: todayConciergeCount }
   ] = await Promise.all([
     supabase.from('products').select('*', { count: 'exact', head: true }),
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'sold'),
+    supabase.from('concierge_requests').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString())
   ])
 
   // Son 8 ürün
@@ -50,12 +71,21 @@ export default async function AdminDashboardPage() {
     <div className="p-8 min-h-full">
 
       {/* Başlık */}
-      <FadeIn delay={0.1} direction="down" className="mb-10">
-        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Admin Panel</p>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Genel Bakış</h1>
-        <p className="text-white/40 text-sm mt-1">
-          {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
+      <FadeIn delay={0.1} direction="down" className="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 bg-white/3 border border-white/5 p-6 rounded-2xl backdrop-blur-md">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#AF9164] mb-2">Sistem Konsolu</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight serif-display">{greeting}</h1>
+          <p className="text-white/40 text-xs mt-1.5 font-mono uppercase tracking-wider">
+            {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+        <div className="bg-white/5 border border-white/10 px-5 py-4 rounded-xl max-w-sm text-left">
+          <p className="text-[9px] font-bold uppercase tracking-widest text-[#AF9164] mb-1">Günün Özeti</p>
+          <p className="text-xs text-white/70 leading-relaxed">
+            Bugün sisteme düşen yeni VIP teklif sayısı: <strong className="text-white">{todayConciergeCount ?? 0}</strong>. <br />
+            Onay kuyruğunda bekleyen ürün sayısı: <strong className="text-amber-400">{pendingCount ?? 0}</strong>.
+          </p>
+        </div>
       </FadeIn>
 
       {/* İSTATİSTİK KARTLARI */}
