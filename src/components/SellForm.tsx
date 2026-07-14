@@ -12,13 +12,53 @@ import {
   type Gender, type MainCategory,
 } from '@/src/utils/categoryData'
 
-// ─── Onay Fotoğrafları Kategorileri ───
-const verificationCategories = [
-  { key: 'logo', label: 'Logo Detayı', desc: '3 farklı açıdan logonun yakın çekimi', min: 3 },
-  { key: 'stitching', label: 'Dikiş Detayı', desc: '3 farklı açıdan dikiş kalitesi', min: 3 },
-  { key: 'hardware', label: 'Metal Aksam', desc: '3 farklı açıdan fermuar, toka', min: 3 },
-  { key: 'serial', label: 'Seri Numarası', desc: 'Kodun okunaklı fotoğrafı', min: 1 },
-  { key: 'receipt', label: 'Fatura / Belge', desc: 'İsteğe bağlı belge', min: 0 },
+// ─── Entrupy Onay Fotoğrafları — Kategori Bazlı Rehber ───
+type VerifCategory = { key: string; label: string; desc: string; tip: string; min: number; optional?: boolean }
+
+const ENTRUPY_PHOTO_GUIDE: Record<string, VerifCategory[]> = {
+  'Çanta': [
+    { key: 'front_back', label: 'Ön & Arka', desc: 'Çantanın tam ön ve arka yüzü', tip: 'Düz, ışıklı zeminde, tüm çanta görünür olsun', min: 2 },
+    { key: 'interior', label: 'İç Kısım', desc: 'Tüm iç bölme ve cepler açık şekilde', tip: 'İç astarı ve tüm cepleri gösterin', min: 1 },
+    { key: 'logo', label: 'Logo Detayı', desc: 'Dış ve iç logo yakın çekimi', tip: 'Odak net olsun, tüm harfler okunabilir olsun', min: 2 },
+    { key: 'hardware', label: 'Metal Aksam', desc: 'Fermuar, toka, zincir ve ayak detayları', tip: 'Her metal parçayı ayrı ayrı fotoğraflayın', min: 3 },
+    { key: 'stitching', label: 'Dikiş Kalitesi', desc: 'Dikiş sırası makro çekim', tip: 'En az 3 farklı dikiş bölgesi, çok yakından', min: 3 },
+    { key: 'serial', label: 'Seri / Tarih Kodu', desc: 'İç etiketteki kod veya damga', tip: "Kodu bulamadıysanız 'none' yazın", min: 1 },
+    { key: 'material', label: 'Malzeme Dokusu', desc: 'Deri veya kumaşın makro yüzey çekimi', tip: 'Entrupy bu dokuyu AI ile analiz eder — çok yakın çekin', min: 2 },
+    { key: 'receipt', label: 'Fatura / Belge', desc: 'Satın alma faturası veya orijinallik kartı', tip: 'İsteğe bağlı ama güven artırır', min: 0, optional: true },
+  ],
+  'Giyim': [
+    { key: 'front_back', label: 'Ön & Arka', desc: 'Ürünün düz serilmiş veya askılı tam görünümü', tip: 'Düz zemin, gün ışığı tercih edilir', min: 2 },
+    { key: 'label_care', label: 'Yıkama & Marka Etiketi', desc: 'İçindeki tüm etiketler açık okunaklı şekilde', tip: 'Marka, ülke, beden ve yıkama sembollerinin hepsi görünsün', min: 2 },
+    { key: 'logo', label: 'Logo / Baskı Detayı', desc: 'Varsa logo nakış veya baskısı yakından', tip: 'Odak net — her harf okunaklı olsun', min: 1 },
+    { key: 'stitching', label: 'Dikiş & Finish Kalitesi', desc: 'Yaka, kol ucu veya dikiş sonu yakın çekimi', tip: 'İç dikişleri de gösterin', min: 2 },
+    { key: 'material', label: 'Kumaş Dokusu', desc: 'Kumaş yüzeyinin makro çekimi', tip: 'Entrupy kumaş örüntüsünü AI ile analiz eder', min: 1 },
+    { key: 'receipt', label: 'Fatura / Belge', desc: 'Satın alma belgesi varsa', tip: 'İsteğe bağlı', min: 0, optional: true },
+  ],
+  'Ayakkabı': [
+    { key: 'pair', label: 'Çift Görünüm', desc: 'İki ayakkabı birlikte (yan ve üst)', tip: 'Çifti yan yana koyun, her ikisi de net görünsün', min: 2 },
+    { key: 'sole', label: 'Taban & Topuk', desc: 'Alt taban ve topuk detayı', tip: 'Marka yazısı okunabilir olsun', min: 2 },
+    { key: 'logo', label: 'Logo & Marka Detayı', desc: 'Üstteki veya içteki logo yakından', tip: 'Her harf net okunabilir olsun', min: 1 },
+    { key: 'interior', label: 'İç Taban (Tabanlık)', desc: 'Ayakkabının içi ve tabanlık', tip: 'Beden ve marka damgasını gösterin', min: 1 },
+    { key: 'hardware', label: 'Detay & Aksam', desc: 'Toka, bağcık ucu, fermuarlar', tip: 'Her metal detay ayrı ayrı', min: 2 },
+    { key: 'material', label: 'Materyal Dokusu', desc: 'Deri veya kumaş yüzeyinin makro çekimi', tip: 'Çok yakın, netlik önemli', min: 1 },
+    { key: 'receipt', label: 'Fatura / Belge', desc: 'Orijinal kutu etiketi veya fatura', tip: 'İsteğe bağlı', min: 0, optional: true },
+  ],
+  'Aksesuar': [
+    { key: 'front_back', label: 'Ön & Arka', desc: 'Aksesuarın tüm yüzeyleri', tip: 'Net, gün ışığında çekin', min: 2 },
+    { key: 'logo', label: 'Logo / İmza Detayı', desc: 'Markanın logosu veya oyma imzası', tip: 'Makro çekim, odak net olsun', min: 1 },
+    { key: 'hardware', label: 'Metal & Aksam', desc: 'Kilit, toka, vida veya metal detaylar', tip: 'Oyma marka yazılarını gösterin', min: 2 },
+    { key: 'serial', label: 'Seri / Tarih Kodu', desc: 'Varsa seri numarası veya üretim kodu', tip: "Bulamazsanız 'none' yazın", min: 1 },
+    { key: 'receipt', label: 'Fatura / Belge', desc: 'Satın alma belgesi', tip: 'İsteğe bağlı', min: 0, optional: true },
+  ],
+}
+
+// Varsayılan (bilinmeyen kategori için)
+const DEFAULT_VERIFICATION: VerifCategory[] = [
+  { key: 'logo', label: 'Logo Detayı', desc: '3 farklı açıdan logonun yakın çekimi', tip: 'Odak net olsun', min: 2 },
+  { key: 'stitching', label: 'Dikiş Detayı', desc: '3 farklı açıdan dikiş kalitesi', tip: 'Makro çekim yapın', min: 2 },
+  { key: 'hardware', label: 'Metal Aksam', desc: '3 farklı açıdan fermuar, toka', tip: 'Her detay ayrı çekim', min: 2 },
+  { key: 'serial', label: 'Seri Numarası', desc: 'Kodun okunaklı fotoğrafı', tip: "Bulamazsanız 'none' yazın", min: 1 },
+  { key: 'receipt', label: 'Fatura / Belge', desc: 'İsteğe bağlı belge', tip: 'İsteğe bağlı', min: 0, optional: true },
 ]
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
@@ -263,7 +303,9 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
       }
       
       // Her kategori için fotoğraf sayılarını denetle
-      verificationCategories.forEach(cat => {
+      const activeVerifCats = ENTRUPY_PHOTO_GUIDE[selectedCategory as string] || DEFAULT_VERIFICATION
+      activeVerifCats.forEach(cat => {
+        if (cat.optional) return
         const filesCount = verificationFiles[cat.key]?.length || 0
         if (filesCount < cat.min) {
           errors[cat.key] = `Bu alan için en az ${cat.min} fotoğraf yüklemelisiniz. (Şu an: ${filesCount})`
@@ -1037,41 +1079,68 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {verificationCategories.map(cat => (
-                <div key={cat.key} className={`border rounded-xl p-5 hover:border-gray-200 transition-colors ${fieldErrors[cat.key] ? 'border-red-200 bg-red-50/10' : 'border-gray-100'}`}>
-                  <div className="mb-4">
-                    <h5 className="text-xs font-bold uppercase tracking-widest text-black mb-1">{cat.label}</h5>
-                    <p className="text-[10px] text-gray-400">{cat.desc}</p>
-                  </div>
-                  
-                  {cat.key === 'serial' && (
-                    <div className="mb-4">
-                      <input className={`${getInputClasses('serial')} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." />
-                      {renderErrorMsg('serial')}
-                      <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız &apos;none&apos; yazabilirsiniz.</p>
+            {/* Entrupy Kategori Bazlı Fotoğraf Rehberi */}
+            {(() => {
+              const verifCats = ENTRUPY_PHOTO_GUIDE[selectedCategory as string] || DEFAULT_VERIFICATION
+              return (
+                <div className="space-y-4">
+                  {!selectedCategory && (
+                    <div className="text-center py-8 text-gray-400 border border-dashed border-gray-200 rounded-2xl">
+                      <p className="text-sm">Fotoğraf rehberini görmek için lütfen Adım 1'den kategori seçin.</p>
                     </div>
                   )}
-
-                  <label className="flex items-center justify-center gap-2 border border-gray-200 hover:border-black text-gray-500 hover:text-black py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-colors">
-                    <UploadCloud size={14} /> Fotoğraf Seç
-                    <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleVerificationFilesChange(cat.key, e)} />
-                  </label>
-                  {renderErrorMsg(cat.key)}
-
-                  {verificationPreviews[cat.key]?.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {verificationPreviews[cat.key].map((url, i) => (
-                        <div key={i} className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} className="w-full h-full object-cover" alt="" />
+                  {selectedCategory && (
+                    <div className="mb-6 flex items-center gap-3 px-4 py-3 bg-[#AF9164]/8 border border-[#AF9164]/20 rounded-xl">
+                      <ShieldCheck className="text-[#AF9164] shrink-0" size={18} strokeWidth={1.5} />
+                      <p className="text-[11px] text-gray-600 leading-relaxed">
+                        <strong className="text-[#AF9164]">{selectedCategory}</strong> kategorisi için Entrupy doğrulaması gerekli fotoğraflar aşağıda listelenmiştir.
+                        Her alanda gösterilen ipucu fotoğraflarınızın kabul edilme ihtimalini artırır.
+                      </p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {verifCats.map(cat => (
+                      <div key={cat.key} className={`border rounded-xl p-5 hover:border-gray-200 transition-colors ${fieldErrors[cat.key] ? 'border-red-200 bg-red-50/10' : cat.optional ? 'border-dashed border-gray-200' : 'border-gray-100'}`}>
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <h5 className="text-xs font-bold uppercase tracking-widest text-black">{cat.label}</h5>
+                            {cat.optional && <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Opsiyonel</span>}
+                            {!cat.optional && <span className="text-[9px] font-bold uppercase tracking-widest text-[#AF9164] bg-[#AF9164]/10 px-2 py-0.5 rounded-full">Min {cat.min}</span>}
+                          </div>
+                          <p className="text-[10px] text-gray-500 leading-relaxed">{cat.desc}</p>
+                          <p className="text-[10px] text-[#AF9164] leading-relaxed mt-1.5 italic">💡 {cat.tip}</p>
                         </div>
-                      ))}
-                    </div>
-                  )}
+
+                        {cat.key === 'serial' && (
+                          <div className="mb-3">
+                            <input className={`${getInputClasses('serial')} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." />
+                            {renderErrorMsg('serial')}
+                            <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız &apos;none&apos; yazabilirsiniz.</p>
+                          </div>
+                        )}
+
+                        <label className="flex items-center justify-center gap-2 border border-gray-200 hover:border-black text-gray-500 hover:text-black py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-colors">
+                          <UploadCloud size={14} /> Fotoğraf Seç
+                          <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleVerificationFilesChange(cat.key, e)} />
+                        </label>
+                        {renderErrorMsg(cat.key)}
+
+                        {verificationPreviews[cat.key]?.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {verificationPreviews[cat.key].map((url, i) => (
+                              <div key={i} className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={url} className="w-full h-full object-cover" alt="" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
+              )
+            })()}
 
             <div className="pt-10 border-t border-gray-100">
               <div className="max-w-md mx-auto space-y-6">
