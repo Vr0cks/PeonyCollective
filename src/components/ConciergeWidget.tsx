@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MessageSquare, X, Send, Crown, CheckCircle2, Shield, Loader2, Terminal, Server, Activity } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
 import { usePathname } from 'next/navigation'
+import { sendItSupportPingAction } from '@/src/app/admin/actions'
 
 export default function ConciergeWidget() {
   const pathname = usePathname()
@@ -162,7 +163,14 @@ export default function ConciergeWidget() {
                       <Activity size={12} className="inline mr-2 group-hover:animate-pulse" /> Sistem Durumunu Kontrol Et
                     </button>
                     <button
-                      onClick={() => alert('IT destek ekibine (dev@peonycollective.com) ping gönderildi. Kısa süre içinde ulaşacağız.')}
+                      onClick={async () => {
+                        const res = await sendItSupportPingAction()
+                        if (res.success) {
+                          alert('IT Destek ekibine Telegram üzerinden anlık bildirim gönderildi. Kısa süre içinde dönüş yapacağız.')
+                        } else {
+                          alert('Bildirim Gönderilemedi: ' + res.error)
+                        }
+                      }}
                       className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-zinc-300 hover:text-emerald-400"
                     >
                       <Terminal size={12} className="inline mr-2" /> Developer Ekibiyle Görüş

@@ -325,4 +325,58 @@ export async function rejectOrderInLab(orderId: string, reason: string) {
 
   revalidatePath('/admin/lab')
   revalidatePath('/orders')
+}
+
+// Telegram IT Destek Bildirim Action
+export async function sendItSupportPingAction() {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Oturum açmanız gerekiyor.' }
+
+    // Kullanıcı adı ve e-postasını al
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('first_name, last_name')
+      .eq('id', user.id)
+      .single()
+
+    const userName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Bilinmeyen Admin'
+
+    const botToken = process.env.TELEGRAM_BOT_TOKEN
+    const chatId = process.env.TELEGRAM_CHAT_ID
+
+    if (!botToken || !chatId) {
+      console.warn('[TELEGRAM PING ERROR] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing in env.')
+      return { success: false, error: 'Telegram entegrasyonu (env değişkenleri) henüz yapılandırılmamış.' }
+    }
+
+    const message = `🔔 *IT DESTEK TALEBİ*\n\n` +
+      `👤 *Gönderen:* ${userName}\n` +
+      `📧 *E-posta:* ${user.email || 'Belirtilmemiş'}\n` +
+      `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR')}\n\n` +
+      `⚠️ _Lütfen admin panelinden sistem durumunu kontrol edin._`
+
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Telegram API responded with status ${response.status}: ${errorText}`)
+    }
+
+    return { success: true }
+  } catch (error: any) {
+    console.error('[IT SUPPORT PING FAILED]', error)
+    return { success: false, error: error.message || 'Telegram bildirimi gönderilemedi.' }
+  }
 }
