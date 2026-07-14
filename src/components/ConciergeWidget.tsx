@@ -338,7 +338,7 @@ export default function ConciergeWidget() {
                         required
                         value={offerData.name}
                         onChange={e => setOfferData({ ...offerData, name: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] uppercase tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -348,7 +348,7 @@ export default function ConciergeWidget() {
                         required
                         value={offerData.contact}
                         onChange={e => setOfferData({ ...offerData, contact: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] uppercase tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -358,7 +358,7 @@ export default function ConciergeWidget() {
                         required
                         value={offerData.product}
                         onChange={e => setOfferData({ ...offerData, product: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] uppercase tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -368,7 +368,7 @@ export default function ConciergeWidget() {
                         required
                         value={offerData.price}
                         onChange={e => setOfferData({ ...offerData, price: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] uppercase tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
                       />
                     </div>
                     <button
