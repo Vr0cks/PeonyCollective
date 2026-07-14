@@ -64,6 +64,13 @@ export default async function Dashboard({ searchParams }: PageProps) {
     )
   }
 
+  // Her zaman veya sadece collector'de concierge taleplerini çek (koleksiyoncu teklifleri olarak)
+  const { data: conciergeRequests } = await supabase
+    .from('concierge_requests')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
   return (
     <main className="min-h-screen bg-[#FCFCFB] py-16 px-6">
       <div className="max-w-6xl mx-auto">
@@ -78,7 +85,7 @@ export default async function Dashboard({ searchParams }: PageProps) {
             pendingApproval={pendingApproval} 
           />
         ) : (
-          <CollectorView orders={myOrders || []} reservedOffers={reservedOffers} />
+          <CollectorView orders={myOrders || []} reservedOffers={reservedOffers} conciergeRequests={conciergeRequests || []} />
         )}
       </div>
     </main>

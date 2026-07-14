@@ -1,15 +1,17 @@
 'use client'
 
-import { ShoppingBag, Star, Package, CheckCircle2, Truck, FlaskConical, CreditCard, MapPin } from 'lucide-react'
+import { ShoppingBag, Star, Package, CheckCircle2, Truck, FlaskConical, CreditCard, MapPin, Crown, Clock, MessageSquare } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Order } from '@/src/types'
 import { useState } from 'react'
 import { approveOrder } from '@/src/app/orders/actions'
+import { createConversation, getAdminIdAction } from '@/src/app/messages/actions'
 
 interface CollectorViewProps {
   orders: Order[]
   reservedOffers?: any[]
+  conciergeRequests?: any[]
 }
 
 // Sipariş adımları
@@ -30,10 +32,20 @@ function getCurrentStepIndex(status: string): number {
   return idx < 0 ? 0 : idx
 }
 
-export default function CollectorView({ orders, reservedOffers }: CollectorViewProps) {
+export default function CollectorView({ orders, reservedOffers, conciergeRequests }: CollectorViewProps) {
   const totalSpend = orders.reduce((s, o) => s + (o.total_price || 0), 0)
   const activeOrders = orders.filter(o => !['completed', 'delivered', 'cancelled', 'refunded'].includes(o.order_status))
   const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null)
+
+  const handleStartSupportChat = async () => {
+    const adminRes = await getAdminIdAction()
+    const res = await createConversation(adminRes.adminId)
+    if (res.success) {
+      window.location.href = `/messages?id=${res.conversationId}`
+    } else {
+      alert(res.error || 'Sohbet başlatılamadı.')
+    }
+  }
 
   const handleApprove = async (orderId: string) => {
     if (!confirm('Siparişi teslim aldığınızı onaylıyor musunuz? Bu işlem geri alınamaz ve satıcı payı havuzdan serbest bırakılacaktır.')) {
@@ -59,9 +71,17 @@ export default function CollectorView({ orders, reservedOffers }: CollectorViewP
           <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 mb-2">COLLECTOR DASHBOARD</p>
           <h1 className="text-4xl serif-display italic text-gray-900">Koleksiyon Panelim</h1>
         </div>
-        <div className="flex items-center gap-2 bg-zinc-900 text-white px-5 py-2.5 rounded-full">
-          <Star size={12} className="text-yellow-400 fill-yellow-400" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Koleksiyoner Üyeliği Aktif</span>
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/settings" 
+            className="text-[10px] font-bold uppercase tracking-widest border border-gray-200 text-gray-600 hover:text-black hover:border-black px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer"
+          >
+            Hesap Ayarlarım
+          </Link>
+          <div className="flex items-center gap-2 bg-zinc-900 text-white px-5 py-2.5 rounded-full">
+            <Star size={12} className="text-yellow-400 fill-yellow-400" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Koleksiyoner Üyeliği Aktif</span>
+          </div>
         </div>
       </div>
 
@@ -307,6 +327,80 @@ export default function CollectorView({ orders, reservedOffers }: CollectorViewP
           </div>
         )}
       </div>
+
+      {/* VIP ÖZEL TALEPLERİM (CONCIERGE) */}
+      {conciergeRequests && conciergeRequests.length > 0 && (
+        <div className="pt-8 border-t border-gray-100">
+          <div className="flex justify-between items-center mb-5">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+              <Crown size={12} className="text-[#AF9164]" /> VIP Özel Taleplerim (Concierge)
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {conciergeRequests.map((req) => {
+              return (
+                <div key={req.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-4 text-left">
+                  <div className="flex flex-wrap justify-between items-start gap-4">
+                    <div>
+                      <span className="inline-block bg-[#AF9164]/10 text-[#AF9164] text-[8px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-1">
+                        Peony Concierge™
+                      </span>
+                      <h3 className="text-base font-semibold text-gray-900 mt-1">{req.product_interest}</h3>
+                      <p className="text-xs text-gray-400 font-light mt-0.5">
+                        Teklif Bütçeniz: <strong className="text-gray-900">{(req.max_price || 0).toLocaleString('tr-TR')} ₺</strong>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {req.status === 'pending' && (
+                        <span className="bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                          İnceleniyor
+                        </span>
+                      )}
+                      {req.status === 'contacted' && (
+                        <span className="bg-blue-500/10 text-blue-600 border border-blue-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          İletişime Geçildi
+                        </span>
+                      )}
+                      {req.status === 'closed' && (
+                        <span className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          Olumlu Sonuçlandı
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Durum Bildirimleri */}
+                  {req.status === 'contacted' && (
+                    <div className="bg-blue-50/70 border border-blue-100/50 rounded-2xl p-4 text-xs text-blue-700 leading-relaxed">
+                      💡 <strong>Bilgilendirme:</strong> Concierge ekibimiz talebinizi inceledi ve sizinle iletişime geçti. Parçanın tedarik süreci hakkında güncellemeleri buradan takip edebilirsiniz.
+                    </div>
+                  )}
+                  {req.status === 'closed' && (
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-xs text-emerald-800 leading-relaxed shadow-sm">
+                      🎉 <strong>Tebrikler!</strong> VIP Özel Talebiniz olumlu sonuçlandırıldı. Talep ettiğiniz parça onaylandı ve Peony lab ekibine sevk edilmek üzere ayrıldı. En kısa sürede işlemleriniz tamamlanacaktır.
+                    </div>
+                  )}
+
+                  {/* Destek Sohbeti Butonu */}
+                  <div className="flex justify-end pt-2 border-t border-gray-50">
+                    <button
+                      onClick={handleStartSupportChat}
+                      className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest border border-gray-200 text-gray-600 hover:text-black hover:border-black px-4 py-2 rounded-full transition-all duration-300 cursor-pointer"
+                    >
+                      <MessageSquare size={11} className="text-[#AF9164]" /> Danışmanla Görüş
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

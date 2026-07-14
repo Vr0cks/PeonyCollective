@@ -272,3 +272,23 @@ export async function markAsRead(conversationId: string) {
     return { success: false, error: 'Hata oluştu.' }
   }
 }
+
+// VIP destek sohbeti için ilk bulduğu admin ID'sini dönen yardımcı action
+export async function getAdminIdAction() {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('role', 'admin')
+      .limit(1)
+      .single()
+
+    if (error || !data) {
+      return { success: true, adminId: '516bccae-8ab6-4e9c-96e7-f315de72c28a' }
+    }
+    return { success: true, adminId: data.id }
+  } catch {
+    return { success: true, adminId: '516bccae-8ab6-4e9c-96e7-f315de72c28a' }
+  }
+}
