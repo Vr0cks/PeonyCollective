@@ -426,4 +426,42 @@ export async function createConciergeRequestAction(name: string, productInterest
     console.error('[CONCIERGE REQUEST FAILED]', err)
     return { success: false, error: err.message || 'Teklif iletilemedi.' }
   }
+}
+
+// Sistem durumunu gerçek zamanlı sorgulayan server action
+export async function checkSystemStatusAction() {
+  try {
+    const supabase = await createClient()
+
+    // 1. Postgres DB ping & latency hesapla
+    const dbStartTime = Date.now()
+    const { error: dbError } = await supabase.from('profiles').select('id').limit(1)
+    const dbLatency = Date.now() - dbStartTime
+    const dbStatus = dbError ? 'OFFLINE' : `ONLINE (${dbLatency}ms)`
+
+    // 2. Storage ping & kontrolü
+    const { error: storageError } = await supabase.storage.listBuckets()
+    const storageStatus = storageError ? 'OFFLINE' : 'ONLINE'
+
+    // 3. Entrupy API Key Kontrolü
+    const entrupyConfigured = !!process.env.ENTRUPY_API_KEY
+    const entrupyStatus = entrupyConfigured ? 'SYNCED' : 'NOT_CONFIGURED'
+
+    return {
+      success: true,
+      dbStatus,
+      storageStatus,
+      entrupyStatus,
+      edgeStatus: 'ONLINE'
+    }
+  } catch (error: any) {
+    console.error('[SYSTEM STATUS ACTION ERROR]', error)
+    return {
+      success: false,
+      dbStatus: 'OFFLINE',
+      storageStatus: 'OFFLINE',
+      entrupyStatus: 'OFFLINE',
+      edgeStatus: 'ONLINE'
+    }
+  }
 }

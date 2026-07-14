@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MessageSquare, X, Send, Crown, CheckCircle2, Shield, Loader2, Terminal, Server, Activity } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
 import { usePathname } from 'next/navigation'
-import { sendItSupportPingAction, createConciergeRequestAction } from '@/src/app/admin/actions'
+import { sendItSupportPingAction, createConciergeRequestAction, checkSystemStatusAction } from '@/src/app/admin/actions'
 
 export default function ConciergeWidget() {
   const pathname = usePathname()
@@ -18,6 +18,29 @@ export default function ConciergeWidget() {
   const [newRequests, setNewRequests] = useState<any[]>([])
   const [supportMessage, setSupportMessage] = useState('')
   const [isSendingPing, setIsSendingPing] = useState(false)
+  const [systemStats, setSystemStats] = useState({
+    db: 'YÜKLENİYOR...',
+    storage: 'YÜKLENİYOR...',
+    entrupy: 'YÜKLENİYOR...',
+    edge: 'YÜKLENİYOR...'
+  })
+
+  const handleCheckStatus = async () => {
+    setChatStep('admin_status')
+    setSystemStats({
+      db: 'SORGULANIYOR...',
+      storage: 'SORGULANIYOR...',
+      entrupy: 'SORGULANIYOR...',
+      edge: 'SORGULANIYOR...'
+    })
+    const res = await checkSystemStatusAction()
+    setSystemStats({
+      db: res.dbStatus,
+      storage: res.storageStatus,
+      entrupy: res.entrupyStatus,
+      edge: res.edgeStatus
+    })
+  }
 
   // Checkout (ödeme) ekranında dikkat dağıtmamak için widget'ı gizle
   if (pathname?.startsWith('/checkout')) {
@@ -155,7 +178,7 @@ export default function ConciergeWidget() {
 
                   <div className="space-y-3 pt-6">
                     <button
-                      onClick={() => setChatStep('admin_status')}
+                      onClick={handleCheckStatus}
                       className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-zinc-300 hover:text-emerald-400 group"
                     >
                       <Activity size={12} className="inline mr-2 group-hover:animate-pulse" /> Sistem Durumunu Kontrol Et
@@ -175,16 +198,20 @@ export default function ConciergeWidget() {
 
               {/* ADMIN: Sistem Durumu */}
               {chatStep === 'admin_status' && (
-                <div className="space-y-6">
+                <div className="space-y-6 text-left">
                   <div className="bg-zinc-900 border border-emerald-500/20 p-4 rounded-2xl text-xs font-mono leading-relaxed text-emerald-400 space-y-3 shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]">
                     <p className="opacity-50 mb-2">{'> systemctl status peony-services'}</p>
-                    <div className="space-y-1">
-                      <p>● Postgres DB: <span className="text-white">ONLINE (9ms)</span></p>
-                      <p>● Next.js Edge: <span className="text-white">ONLINE</span></p>
-                      <p>● Entrupy API: <span className="text-white">SYNCED</span></p>
-                      <p>● Supabase Storage: <span className="text-white">ONLINE</span></p>
+                    <div className="space-y-1 text-[11px]">
+                      <p>● Postgres DB: <span className="text-white">{systemStats.db}</span></p>
+                      <p>● Next.js Edge: <span className="text-white">{systemStats.edge}</span></p>
+                      <p>● Entrupy API: <span className="text-white">{systemStats.entrupy}</span></p>
+                      <p>● Supabase Storage: <span className="text-white">{systemStats.storage}</span></p>
                     </div>
-                    <p className="pt-2 border-t border-emerald-500/20 mt-2 opacity-80 text-[10px]">Tüm altyapı servisleri yeşil durumda.</p>
+                    <p className="pt-2 border-t border-emerald-500/20 mt-2 opacity-80 text-[10px]">
+                      {systemStats.db.includes('OFFLINE') || systemStats.storage.includes('OFFLINE')
+                        ? 'Bazı servisler yanıt vermiyor.'
+                        : 'Tüm altyapı servisleri aktif durumda.'}
+                    </p>
                   </div>
                   <button
                     onClick={() => setChatStep('admin_welcome')}
