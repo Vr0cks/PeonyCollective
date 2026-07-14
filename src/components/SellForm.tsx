@@ -42,11 +42,11 @@ const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveSt
   const isCompleted = activeStep > stepNum
 
   return (
-    <div className={`bg-white rounded-2xl overflow-hidden border transition-all duration-500 ${isActive ? 'border-gray-300 shadow-xl shadow-black/5' : 'border-gray-100 hover:border-gray-200'}`}>
+    <div className={`bg-white rounded-2xl border transition-all duration-500 ${isActive ? 'border-gray-300 shadow-xl shadow-black/5' : 'border-gray-100 hover:border-gray-200'}`}>
       <button 
         type="button"
         onClick={() => setActiveStep(stepNum)}
-        className="w-full px-5 py-5 md:px-8 md:py-6 flex items-center justify-between text-left focus:outline-none cursor-pointer"
+        className="w-full px-5 py-5 md:px-8 md:py-6 flex items-center justify-between text-left focus:outline-none cursor-pointer rounded-t-2xl"
       >
         <div className="flex items-center gap-4 md:gap-6">
           <span className={`text-2xl font-light ${isActive ? 'text-black' : isCompleted ? 'text-[#AF9164]' : 'text-gray-300'}`}>
@@ -797,7 +797,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                   required
                 />
                 {brandDropdownOpen && filteredBrands.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
                     {filteredBrands.map(b => (
                       <button
                         key={b.id}
@@ -807,7 +807,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                           setBrandSearchQuery(b.name)
                           setBrandDropdownOpen(false)
                         }}
-                        className="w-full text-left px-4 py-3 text-xs hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                        className="w-full text-left px-5 py-3 text-sm hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
                       >
                         {b.name}
                       </button>
@@ -836,7 +836,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                   required
                 />
                 {modelDropdownOpen && filteredModels.length > 0 && (
-                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
                     {filteredModels.map(m => (
                       <button
                         key={m.id}
@@ -846,7 +846,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                           setModelSearchQuery(m.name)
                           setModelDropdownOpen(false)
                         }}
-                        className="w-full text-left px-4 py-3 text-xs hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                        className="w-full text-left px-5 py-3 text-sm hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
                       >
                         {m.name}
                       </button>
