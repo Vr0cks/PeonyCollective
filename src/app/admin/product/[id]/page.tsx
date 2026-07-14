@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { updateProductStatus } from '../../actions'
 import { Product, Profile } from '@/src/types'
+import SafeImage from '@/src/components/SafeImage'
 
 export default async function AdminProductDetailPage({
   params,
@@ -86,13 +87,11 @@ export default async function AdminProductDetailPage({
                 <h3 className="text-xs font-bold uppercase tracking-widest text-red-500 mb-4 italic">Gizli Belgeler (Sadece Admin Görür)</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {product.authenticity_docs.map((doc: string, idx: number) => (
-                    <div key={idx} className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-red-100">
-                      <Image 
+                    <div key={idx} className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-red-100 flex items-center justify-center">
+                      <SafeImage 
                         src={doc} 
                         alt="Belge" 
-                        fill 
-                        sizes="(max-width: 1024px) 50vw, 25vw" 
-                        className="object-contain" 
+                        className="w-full h-full object-contain" 
                       />
                     </div>
                   ))}
