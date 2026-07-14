@@ -423,12 +423,12 @@ export default function ConciergeWidget() {
                       VIP Satış Danışmanlarımızla doğrudan görüşmek, canlı görsel talep etmek ya da özel kurye randevusu oluşturmak için lütfen Concierge hattımızla iletişime geçin.
                     </p>
                     <p className="font-bold text-white text-[13px] tracking-widest text-center py-2 border-y border-zinc-800">
-                      +90 (532) PEONY-00
+                      +90 552 365 20 93
                     </p>
                   </div>
                   <div className="flex gap-4 items-center">
                     <a
-                      href="https://wa.me/905327366900"
+                      href="https://wa.me/905523652093"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-lg transition-all"
