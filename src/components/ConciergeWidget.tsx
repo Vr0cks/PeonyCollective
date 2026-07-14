@@ -12,10 +12,12 @@ export default function ConciergeWidget() {
   const isAdmin = pathname?.startsWith('/admin')
 
   const [isOpen, setIsOpen] = useState(false)
-  const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success' | 'admin_welcome' | 'admin_status'>('welcome')
+  const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success' | 'admin_welcome' | 'admin_status' | 'admin_support_form'>('welcome')
   const [offerData, setOfferData] = useState({ name: '', product: '', price: '' })
   const [loading, setLoading] = useState(false)
   const [newRequests, setNewRequests] = useState<any[]>([])
+  const [supportMessage, setSupportMessage] = useState('')
+  const [isSendingPing, setIsSendingPing] = useState(false)
 
   // Checkout (ödeme) ekranında dikkat dağıtmamak için widget'ı gizle
   if (pathname?.startsWith('/checkout')) {
@@ -163,13 +165,9 @@ export default function ConciergeWidget() {
                       <Activity size={12} className="inline mr-2 group-hover:animate-pulse" /> Sistem Durumunu Kontrol Et
                     </button>
                     <button
-                      onClick={async () => {
-                        const res = await sendItSupportPingAction()
-                        if (res.success) {
-                          alert('IT Destek ekibine Telegram üzerinden anlık bildirim gönderildi. Kısa süre içinde dönüş yapacağız.')
-                        } else {
-                          alert('Bildirim Gönderilemedi: ' + res.error)
-                        }
+                      onClick={() => {
+                        setChatStep('admin_support_form')
+                        setSupportMessage('')
                       }}
                       className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/50 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-zinc-300 hover:text-emerald-400"
                     >
@@ -198,6 +196,52 @@ export default function ConciergeWidget() {
                   >
                     ← Konsola Dön
                   </button>
+                </div>
+              )}
+
+              {/* ADMIN: Destek Mesaj Formu */}
+              {chatStep === 'admin_support_form' && (
+                <div className="space-y-4 text-left">
+                  <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl text-xs font-light leading-relaxed text-zinc-300">
+                    Sistemle ilgili yaşadığınız sorunu veya iletmek istediğiniz mesajı yazın. Telegram botu aracılığıyla ekibimize anında iletilecektir.
+                  </div>
+                  <textarea
+                    rows={4}
+                    className="w-full text-xs p-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-emerald-500 focus:outline-none text-white resize-none"
+                    value={supportMessage}
+                    onChange={(e) => setSupportMessage(e.target.value)}
+                    placeholder="Lütfen mesajınızı detaylıca yazın..."
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        if (!supportMessage.trim()) {
+                          alert('Lütfen boş bir mesaj göndermeyin.')
+                          return
+                        }
+                        setIsSendingPing(true)
+                        const res = await sendItSupportPingAction(supportMessage)
+                        setIsSendingPing(false)
+                        if (res.success) {
+                          alert('Mesajınız Telegram üzerinden anlık olarak ekibimize ulaştırıldı.')
+                          setChatStep('admin_welcome')
+                          setSupportMessage('')
+                        } else {
+                          alert('Hata: ' + res.error)
+                        }
+                      }}
+                      disabled={isSendingPing}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl text-[10px] uppercase tracking-wider transition-colors cursor-pointer text-center"
+                    >
+                      {isSendingPing ? 'Gönderiliyor...' : 'Telegram ile Gönder'}
+                    </button>
+                    <button
+                      onClick={() => setChatStep('admin_welcome')}
+                      className="px-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 py-2.5 rounded-xl text-[10px] uppercase tracking-wider cursor-pointer"
+                    >
+                      İptal
+                    </button>
+                  </div>
                 </div>
               )}
 

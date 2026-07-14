@@ -328,7 +328,7 @@ export async function rejectOrderInLab(orderId: string, reason: string) {
 }
 
 // Telegram IT Destek Bildirim Action
-export async function sendItSupportPingAction() {
+export async function sendItSupportPingAction(messageText: string) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -351,10 +351,11 @@ export async function sendItSupportPingAction() {
       return { success: false, error: 'Telegram entegrasyonu (env değişkenleri) henüz yapılandırılmamış.' }
     }
 
-    const message = `🔔 *IT DESTEK TALEBİ*\n\n` +
+    const message = `🔔 *YENİ IT DESTEK TALEBİ*\n\n` +
       `👤 *Gönderen:* ${userName}\n` +
       `📧 *E-posta:* ${user.email || 'Belirtilmemiş'}\n` +
       `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR')}\n\n` +
+      `💬 *Mesaj:*\n${messageText}\n\n` +
       `⚠️ _Lütfen admin panelinden sistem durumunu kontrol edin._`
 
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
