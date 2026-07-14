@@ -388,12 +388,12 @@ export async function createConciergeRequestAction(name: string, productInterest
     const supabase = await createClient()
 
     // 1. Veritabanına kaydet
-    const { data, error } = await supabase.from('concierge_requests').insert({
+    const { error } = await supabase.from('concierge_requests').insert({
       name,
       product_interest: productInterest,
       max_price: maxPrice,
       status: 'pending',
-    }).select('*').single()
+    })
 
     if (error) throw error
 
@@ -421,7 +421,7 @@ export async function createConciergeRequestAction(name: string, productInterest
       }).catch(err => console.error('[TELEGRAM CONCIERGE ERROR]', err))
     }
 
-    return { success: true, request: data }
+    return { success: true }
   } catch (err: any) {
     console.error('[CONCIERGE REQUEST FAILED]', err)
     return { success: false, error: err.message || 'Teklif iletilemedi.' }

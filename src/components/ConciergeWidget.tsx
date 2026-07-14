@@ -13,7 +13,7 @@ export default function ConciergeWidget() {
 
   const [isOpen, setIsOpen] = useState(false)
   const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success' | 'admin_welcome' | 'admin_status' | 'admin_support_form'>('welcome')
-  const [offerData, setOfferData] = useState({ name: '', product: '', price: '' })
+  const [offerData, setOfferData] = useState({ name: '', contact: '', product: '', price: '' })
   const [loading, setLoading] = useState(false)
   const [newRequests, setNewRequests] = useState<any[]>([])
   const [supportMessage, setSupportMessage] = useState('')
@@ -83,28 +83,31 @@ export default function ConciergeWidget() {
 
   const resetChat = () => {
     setChatStep(isAdmin ? 'admin_welcome' : 'welcome')
-    setOfferData({ name: '', product: '', price: '' })
+    setOfferData({ name: '', contact: '', product: '', price: '' })
   }
 
   const handleOfferSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (offerData.name && offerData.product && offerData.price) {
+    if (offerData.name && offerData.contact && offerData.product && offerData.price) {
       setLoading(true)
       try {
         const numericPrice = parseFloat(offerData.price.replace(/[^\d]/g, '')) || 0
+        const formattedName = `${offerData.name.trim()} (${offerData.contact.trim()})`
         const res = await createConciergeRequestAction(
-          offerData.name.trim(),
+          formattedName,
           offerData.product.trim(),
           numericPrice
         )
-        if (!res.success) {
-          console.warn('Concierge requests insert failed:', res.error)
+        if (res.success) {
+          setChatStep('offer_success')
+        } else {
+          alert('Teklif gönderilemedi: ' + res.error)
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error submitting concierge request:', err)
+        alert('Hata oluştu: ' + err.message)
       } finally {
         setLoading(false)
-        setChatStep('offer_success')
       }
     }
   }
@@ -335,6 +338,16 @@ export default function ConciergeWidget() {
                         required
                         value={offerData.name}
                         onChange={e => setOfferData({ ...offerData, name: e.target.value })}
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] uppercase tracking-widest placeholder-zinc-600 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="İLETİŞİM (E-POSTA VEYA TELEFON)"
+                        required
+                        value={offerData.contact}
+                        onChange={e => setOfferData({ ...offerData, contact: e.target.value })}
                         className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] uppercase tracking-widest placeholder-zinc-600 focus:outline-none"
                       />
                     </div>
