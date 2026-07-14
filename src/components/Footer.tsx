@@ -70,8 +70,13 @@ export default function Footer() {
           
           {/* Kolon 1: Marka Tanıtımı */}
           <div className="space-y-6">
-            <Link href="/" className="text-2xl sm:text-3xl font-playfair tracking-[0.3em] uppercase block">
-              Peony<span className="italic font-light text-[#AF9164]">Collective</span>
+            <Link href="/" className="block max-w-[200px] transition-all duration-300 hover:opacity-80">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src="/logo.png" 
+                alt="Peony Collective Logo" 
+                className="h-10 sm:h-12 w-auto object-contain invert brightness-200" 
+              />
             </Link>
             <p className="text-xs uppercase tracking-[0.2em] text-[#AF9164] font-bold">Mirasın Yeni Sahibi</p>
             <p className="text-sm font-light leading-relaxed text-zinc-400 max-w-sm">

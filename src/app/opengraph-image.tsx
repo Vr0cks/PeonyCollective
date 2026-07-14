@@ -64,11 +64,11 @@ export default async function Image() {
 
           <div style={{ display: 'flex', gap: '40px', marginTop: '40px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ color: '#AF9164', fontSize: 24, marginBottom: '10px' }}>✓</span>
+              <span style={{ color: '#AF9164', fontSize: 18, marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>[ PEONY APPROVED ]</span>
               <span style={{ fontSize: 18, color: '#A1A1AA', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Entrupy Onaylı</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ color: '#AF9164', fontSize: 24, marginBottom: '10px' }}>✓</span>
+              <span style={{ color: '#AF9164', fontSize: 18, marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>[ VIP SHIPPING ]</span>
               <span style={{ fontSize: 18, color: '#A1A1AA', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sigortalı Teslimat</span>
             </div>
           </div>
