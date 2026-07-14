@@ -80,8 +80,13 @@ export default async function Navbar() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] leading-none mb-1.5 text-[#1A1A1A]">HESABIM</p>
                   <p className="text-sm font-playfair italic text-gray-500 group-hover:text-[#AF9164] transition-colors duration-300">{profile?.first_name}</p>
                 </div>
-                <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent group-hover:border-[#AF9164] group-hover:bg-[#F9F9F8] transition-all duration-300 text-[#1A1A1A] group-hover:text-[#AF9164]">
-                  <User size={16} strokeWidth={1} />
+                <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center bg-transparent group-hover:border-[#AF9164] group-hover:bg-[#F9F9F8] transition-all duration-300 text-[#1A1A1A] group-hover:text-[#AF9164] overflow-hidden">
+                  {profile?.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={16} strokeWidth={1} />
+                  )}
                 </div>
               </Link>
 

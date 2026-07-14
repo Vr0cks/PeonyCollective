@@ -14,14 +14,17 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
   const [error, setError] = useState<string | null>(null)
 
   // Avatar states
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const url = URL.createObjectURL(file)
-      setAvatarUrl(url)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setAvatarUrl(reader.result as string)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -51,6 +54,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto pb-20">
+      <input type="hidden" name="avatar_url" value={avatarUrl || ''} />
       
       {/* Premium Profil Kartı */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-8">

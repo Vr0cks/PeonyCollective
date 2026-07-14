@@ -48,6 +48,8 @@ export async function updateProfile(prevState: any, formData: FormData) {
       return { success: false, error: 'Vergi Numarası 10 hane olmalıdır.' }
     }
 
+    const avatar_url = formData.get('avatar_url') as string || null
+
     const { error } = await supabase
       .from('profiles')
       .update({
@@ -58,6 +60,7 @@ export async function updateProfile(prevState: any, formData: FormData) {
         tckn: submerchant_type === 'bireysel' ? tckn || null : null,
         vkn: submerchant_type === 'kurumsal' ? vkn || null : null,
         company_title: submerchant_type === 'kurumsal' ? company_title || null : null,
+        avatar_url: avatar_url,
       })
       .eq('id', user.id)
 
