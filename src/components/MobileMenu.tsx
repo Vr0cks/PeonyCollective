@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, User, LogOut, MessageSquare } from 'lucide-react'
+import { Menu, X, User, LogOut, MessageSquare, Settings } from 'lucide-react'
 import { logout } from '@/src/app/login/actions'
 
 import type { User as SupabaseUser } from '@supabase/supabase-js'
@@ -130,6 +130,10 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
                         <Link href="/dashboard" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
                           <User size={16} strokeWidth={1.5} />
                           Panelim
+                        </Link>
+                        <Link href="/settings" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
+                          <Settings size={16} strokeWidth={1.5} />
+                          Hesap Ayarlarım
                         </Link>
                         <Link href="/messages" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
                           <MessageSquare size={16} strokeWidth={1.5} />

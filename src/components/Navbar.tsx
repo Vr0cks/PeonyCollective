@@ -75,7 +75,7 @@ export default async function Navbar() {
               </Link>
               <NotificationBell userId={user.id} />
               
-              <Link href="/dashboard" className="flex items-center gap-4 group">
+              <Link href="/settings" className="flex items-center gap-4 group" title="Hesap Ayarlarım">
                 <div className="text-right hidden sm:block">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] leading-none mb-1.5 text-[#1A1A1A]">HESABIM</p>
                   <p className="text-sm font-playfair italic text-gray-500 group-hover:text-[#AF9164] transition-colors duration-300">{profile?.first_name}</p>

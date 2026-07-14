@@ -387,10 +387,13 @@ export default function CollectorView({ orders, reservedOffers, conciergeRequest
                   )}
 
                   {/* Destek Sohbeti Butonu */}
-                  <div className="flex justify-end pt-2 border-t border-gray-50">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-gray-50">
+                    <p className="text-[9px] text-gray-400 font-light italic">
+                      ℹ Danışmanlarımızın cevap vermesi 2 saati bulabilir.
+                    </p>
                     <button
                       onClick={handleStartSupportChat}
-                      className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest border border-gray-200 text-gray-600 hover:text-black hover:border-black px-4 py-2 rounded-full transition-all duration-300 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest border border-gray-200 text-gray-600 hover:text-black hover:border-black px-4 py-2 rounded-full transition-all duration-300 cursor-pointer shrink-0"
                     >
                       <MessageSquare size={11} className="text-[#AF9164]" /> Danışmanla Görüş
                     </button>

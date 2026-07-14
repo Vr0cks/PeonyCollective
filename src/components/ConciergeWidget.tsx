@@ -402,7 +402,8 @@ export default function ConciergeWidget() {
                   <div className="space-y-2">
                     <h5 className="text-xs font-bold uppercase tracking-[0.2em] text-[#AF9164]">Teklifiniz Alındı</h5>
                     <p className="text-[11px] font-light text-zinc-400 leading-relaxed px-4">
-                      Sayın {offerData.name.toUpperCase()}, <strong>{offerData.product.toUpperCase()}</strong> için yaptığınız <strong>{offerData.price}</strong> tutarındaki teklifiniz Concierge ekibimiz tarafından satıcıya iletilmiştir. Sonuç kayıtlı e-postanıza gönderilecektir.
+                      Sayın {offerData.name.toUpperCase()}, <strong>{offerData.product.toUpperCase()}</strong> için yaptığınız <strong>{offerData.price}</strong> tutarındaki teklifiniz Concierge ekibimiz tarafından satıcıya iletilmiştir. Sonuç kayıtlı e-postanıza gönderilecektir. <br/>
+                      <span className="text-[9px] text-[#AF9164] mt-1.5 block font-light italic">ℹ Danışmanlarımızın cevap vermesi 2 saati bulabilir.</span>
                     </p>
                   </div>
                   <button
