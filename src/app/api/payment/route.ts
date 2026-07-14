@@ -169,7 +169,9 @@ export async function POST(request: Request) {
     // PAYTR PAZARYERİ (SPLIT PAYMENT) MANTIGI
     let submerchantId = null
     const isSupplierProduct = !!product.supplier_id
-    const targetSupplier = product.suppliers
+    const targetSupplier: any = Array.isArray(product.suppliers)
+      ? product.suppliers[0]
+      : product.suppliers
 
     if (isSupplierProduct && targetSupplier) {
       submerchantId = targetSupplier.submerchant_id

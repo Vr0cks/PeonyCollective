@@ -74,7 +74,9 @@ export async function POST(req: Request) {
 
     const firstProduct = dbProducts[0]
     const isSupplierProduct = !!firstProduct.supplier_id
-    const targetSupplier = firstProduct.suppliers
+    const targetSupplier: any = Array.isArray(firstProduct.suppliers)
+      ? firstProduct.suppliers[0]
+      : firstProduct.suppliers
 
     let submerchantId = null
 
