@@ -21,9 +21,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://peonycollective.com"),
-  title: "Peony | İkinci El Lüks Moda Platformu",
-  description: "Orijinalliği onaylanmış ikinci el lüks çanta, kıyafet, ayakkabı ve aksesuar alım satım platformu.",
+  metadataBase: new URL("https://www.peony-collective.com"),
+  title: "Peony Collective | Küratörlü İkinci El Lüks Moda",
+  description: "Uzman onaylı ve orijinallik garantili ikinci el lüks çanta, saat, kıyafet ve aksesuar koleksiyonu. Sürdürülebilir lüksün adresi.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -31,32 +31,34 @@ export const metadata: Metadata = {
     title: "Peony C.",
   },
   icons: {
+    icon: "/icon-192.png",
+    shortcut: "/icon-192.png",
     apple: "/icon-192.png",
   },
-  keywords: ["ikinci el lüks", "orijinal lüks çanta", "ikinci el marka kıyafet", "lüks moda", "sürdürülebilir moda", "peony collective"],
+  keywords: ["ikinci el lüks", "orijinal lüks çanta", "ikinci el marka kıyafet", "lüks moda", "sürdürülebilir moda", "peony collective", "lüks saat"],
   authors: [{ name: "Peony Collective" }],
   creator: "Peony Collective",
   openGraph: {
     type: "website",
     locale: "tr_TR",
-    url: "https://peonycollective.com",
+    url: "https://www.peony-collective.com",
     siteName: "Peony Collective",
-    title: "Peony | İkinci El Lüks Moda Platformu",
-    description: "Orijinalliği onaylanmış ikinci el lüks çanta, kıyafet, ayakkabı ve aksesuar alım satım platformu.",
+    title: "Peony Collective | Küratörlü İkinci El Lüks Moda",
+    description: "Uzman onaylı ve orijinallik garantili ikinci el lüks çanta, saat, kıyafet ve aksesuar koleksiyonu. Sürdürülebilir lüksün adresi.",
     images: [
       {
-        url: "https://peonycollective.com/og-image.jpg",
+        url: "https://www.peony-collective.com/luxury_wardrobe_bg.png",
         width: 1200,
         height: 630,
-        alt: "Peony Collective Lüks İkinci El",
+        alt: "Peony Collective Lüks İkinci El Moda",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Peony | İkinci El Lüks Moda Platformu",
-    description: "Orijinalliği onaylanmış ikinci el lüks çanta, kıyafet, ayakkabı ve aksesuar alım satım platformu.",
-    images: ["https://peonycollective.com/og-image.jpg"],
+    title: "Peony Collective | Küratörlü İkinci El Lüks Moda",
+    description: "Uzman onaylı ve orijinallik garantili ikinci el lüks çanta, saat, kıyafet ve aksesuar koleksiyonu. Sürdürülebilir lüksün adresi.",
+    images: ["https://www.peony-collective.com/luxury_wardrobe_bg.png"],
   },
   robots: {
     index: true,
