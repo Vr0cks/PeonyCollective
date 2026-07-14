@@ -354,7 +354,7 @@ export async function sendItSupportPingAction(messageText: string) {
     const message = `🔔 *YENİ IT DESTEK TALEBİ*\n\n` +
       `👤 *Gönderen:* ${userName}\n` +
       `📧 *E-posta:* ${user.email || 'Belirtilmemiş'}\n` +
-      `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR')}\n\n` +
+      `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}\n\n` +
       `💬 *Mesaj:*\n${messageText}\n\n` +
       `⚠️ _Lütfen admin panelinden sistem durumunu kontrol edin._`
 
@@ -406,7 +406,7 @@ export async function createConciergeRequestAction(name: string, productInterest
         `👤 *Müşteri:* ${name}\n` +
         `👜 *İlgilenilen Ürün:* ${productInterest}\n` +
         `💰 *Teklif Tutarı:* ${maxPrice.toLocaleString('tr-TR')} ₺\n\n` +
-        `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR')}`
+        `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}`
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',

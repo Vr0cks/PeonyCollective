@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/src/utils/supabase/client'
-import { updateConciergeStatusAction, deleteConciergeRequestAction } from './actions'
+import { updateConciergeStatusAction, deleteConciergeRequestAction, getConciergeRequestsAction } from './actions'
 import { Crown, Check, X, PhoneCall, Trash2, ShieldCheck, Mail, Calendar, Landmark } from 'lucide-react'
 
 export default function AdminConciergePage() {
@@ -18,14 +17,11 @@ export default function AdminConciergePage() {
   async function loadRequests() {
     setIsLoading(true)
     try {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('concierge_requests')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setRequests(data || [])
+      const res = await getConciergeRequestsAction()
+      if (!res.success) {
+        throw new Error(res.error)
+      }
+      setRequests(res.requests || [])
     } catch (err: any) {
       setErrorMsg(err.message || 'VIP teklifleri yüklenirken hata oluştu.')
     } finally {
