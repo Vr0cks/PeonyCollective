@@ -380,4 +380,50 @@ export async function sendItSupportPingAction(messageText: string) {
     console.error('[IT SUPPORT PING FAILED]', error)
     return { success: false, error: error.message || 'Telegram bildirimi gönderilemedi.' }
   }
+}
+
+// VIP Özel Teklif (Concierge) Kayıt ve Telegram Bildirim Action
+export async function createConciergeRequestAction(name: string, productInterest: string, maxPrice: number) {
+  try {
+    const supabase = await createClient()
+
+    // 1. Veritabanına kaydet
+    const { data, error } = await supabase.from('concierge_requests').insert({
+      name,
+      product_interest: productInterest,
+      max_price: maxPrice,
+      status: 'pending',
+    }).select('*').single()
+
+    if (error) throw error
+
+    // 2. Telegram Bildirimi Gönder (Eğer Telegram env tanımlıysa)
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN
+    const chatId = process.env.TELEGRAM_CHAT_ID || process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID
+
+    if (botToken && chatId) {
+      const message = `👑 *YENİ VIP TEKLİF (CONCIERGE)*\n\n` +
+        `👤 *Müşteri:* ${name}\n` +
+        `👜 *İlgilenilen Ürün:* ${productInterest}\n` +
+        `💰 *Teklif Tutarı:* ${maxPrice.toLocaleString('tr-TR')} ₺\n\n` +
+        `🕒 *Zaman:* ${new Date().toLocaleString('tr-TR')}`
+
+      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'Markdown'
+        })
+      }).catch(err => console.error('[TELEGRAM CONCIERGE ERROR]', err))
+    }
+
+    return { success: true, request: data }
+  } catch (err: any) {
+    console.error('[CONCIERGE REQUEST FAILED]', err)
+    return { success: false, error: err.message || 'Teklif iletilemedi.' }
+  }
 }

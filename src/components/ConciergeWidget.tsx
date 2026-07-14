@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MessageSquare, X, Send, Crown, CheckCircle2, Shield, Loader2, Terminal, Server, Activity } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
 import { usePathname } from 'next/navigation'
-import { sendItSupportPingAction } from '@/src/app/admin/actions'
+import { sendItSupportPingAction, createConciergeRequestAction } from '@/src/app/admin/actions'
 
 export default function ConciergeWidget() {
   const pathname = usePathname()
@@ -68,18 +68,14 @@ export default function ConciergeWidget() {
     if (offerData.name && offerData.product && offerData.price) {
       setLoading(true)
       try {
-        const supabase = createClient()
         const numericPrice = parseFloat(offerData.price.replace(/[^\d]/g, '')) || 0
-
-        const { error } = await supabase.from('concierge_requests').insert({
-          name: offerData.name.trim(),
-          product_interest: offerData.product.trim(),
-          max_price: numericPrice,
-          status: 'pending',
-        })
-
-        if (error) {
-          console.warn('Concierge requests insert failed, simulated fallback:', error.message)
+        const res = await createConciergeRequestAction(
+          offerData.name.trim(),
+          offerData.product.trim(),
+          numericPrice
+        )
+        if (!res.success) {
+          console.warn('Concierge requests insert failed:', res.error)
         }
       } catch (err) {
         console.error('Error submitting concierge request:', err)
