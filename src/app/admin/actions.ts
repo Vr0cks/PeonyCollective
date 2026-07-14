@@ -343,8 +343,8 @@ export async function sendItSupportPingAction() {
 
     const userName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Bilinmeyen Admin'
 
-    const botToken = process.env.TELEGRAM_BOT_TOKEN
-    const chatId = process.env.TELEGRAM_CHAT_ID
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN
+    const chatId = process.env.TELEGRAM_CHAT_ID || process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID
 
     if (!botToken || !chatId) {
       console.warn('[TELEGRAM PING ERROR] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing in env.')
