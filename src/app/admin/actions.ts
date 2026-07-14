@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/src/utils/supabase/server'
+import { createClient, createAdminClient } from '@/src/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 // Ürünün durumunu değiştiren fonksiyon
