@@ -84,7 +84,7 @@ export default function AdminConciergePage() {
   }
 
   return (
-    <div className="p-8 min-h-full text-white bg-[#0F0F0F]">
+    <div className="p-8 md:pr-24 min-h-full text-white bg-[#0F0F0F]">
       
       {/* Header */}
       <div className="mb-10">

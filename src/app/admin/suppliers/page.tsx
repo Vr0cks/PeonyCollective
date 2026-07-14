@@ -147,7 +147,7 @@ export default function AdminSuppliersPage() {
   }
 
   return (
-    <div className="p-8 min-h-full text-white bg-[#0F0F0F]">
+    <div className="p-8 md:pr-24 min-h-full text-white bg-[#0F0F0F]">
       
       {/* Header */}
       <div className="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
