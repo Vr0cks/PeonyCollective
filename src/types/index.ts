@@ -17,6 +17,21 @@ export interface Profile {
   created_at: string;
 }
 
+export interface Supplier {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  iban: string;
+  tckn: string | null;
+  vkn: string | null;
+  company_title: string | null;
+  submerchant_type: 'bireysel' | 'kurumsal';
+  submerchant_id: string | null;
+  created_at: string;
+}
+
 export interface Product {
   id: string;
   seller_id: string;
@@ -42,12 +57,15 @@ export interface Product {
   full_set_items?: string[] | null;
   status: 'pending' | 'approved' | 'rejected' | 'sold';
   locked_until?: string | null;
+  locked_by?: string | null;
   is_peony_vip?: boolean | null;
   entrupy_status?: 'pending' | 'analyzing' | 'verified' | 'rejected' | null;
   entrupy_certificate_url?: string | null;
   supplier?: string | null;
+  supplier_id?: string | null;
   created_at: string;
   profiles?: Partial<Profile>;
+  suppliers?: Supplier | null;
 }
 
 export interface Order {

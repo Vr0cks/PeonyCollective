@@ -2,7 +2,7 @@ import { createClient } from '@/src/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Clock, Package, FlaskConical, LogOut, ShieldCheck, ShoppingCart, ShieldAlert } from 'lucide-react'
+import { LayoutDashboard, Clock, Package, FlaskConical, LogOut, ShieldCheck, ShoppingCart, ShieldAlert, Users } from 'lucide-react'
 import { logout } from '@/src/app/login/actions'
 
 const navLinks = [
@@ -11,6 +11,7 @@ const navLinks = [
   { href: '/admin/products', label: 'Tüm Ürünler', icon: Package },
   { href: '/admin/lab', label: 'Lab — A/B İnceleme', icon: FlaskConical },
   { href: '/admin/orders', label: 'Sipariş Yönetimi', icon: ShoppingCart },
+  { href: '/admin/suppliers', label: 'Tedarikçiler', icon: Users },
   { href: '/admin/test-suite', label: 'Entegrasyon Testi', icon: ShieldAlert },
 ]
 

@@ -24,6 +24,7 @@ export const productSchema = z.object({
   has_spa_treatment: z.boolean().default(false),
   is_peony_vip: z.boolean().default(false),
   supplier: z.string().max(100, 'Tedarikçi bilgisi çok uzun.').optional().nullable(),
+  supplier_id: z.string().uuid('Geçerli bir tedarikçi seçin.').optional().nullable(),
   full_set_items: z.array(z.string()).default([]),
   
   // Storage URLs

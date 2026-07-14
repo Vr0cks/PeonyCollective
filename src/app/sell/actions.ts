@@ -25,15 +25,16 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
 
     const data = validatedFields.data;
 
-    // Server-side security check for supplier
+    // Server-side security check for supplier / supplier_id
     let resolvedSupplier = null;
-    if (data.supplier) {
+    let resolvedSupplierId = null;
+    if (data.supplier || data.supplier_id) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
-
+ 
       const ALLOWED_EMAILS = [
         'ahmetcanli1943@gmail.com',
         'designer_7150@peony.com',
@@ -44,7 +45,8 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
       const isAdmin = profile?.role === 'admin' || (user.email && ALLOWED_EMAILS.includes(user.email.toLowerCase()));
       
       if (isAdmin) {
-        resolvedSupplier = data.supplier;
+        resolvedSupplier = data.supplier || null;
+        resolvedSupplierId = data.supplier_id || null;
       }
     }
 
@@ -72,6 +74,7 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
       has_spa_treatment: data.has_spa_treatment,
       is_peony_vip: data.is_peony_vip,
       supplier: resolvedSupplier,
+      supplier_id: resolvedSupplierId,
       full_set_items: data.full_set_items,
       status: 'pending',
       entrupy_status: 'pending'
@@ -176,5 +179,80 @@ export async function getModelsForBrandAction(brandId: string) {
   } catch (error: any) {
     console.error("getModelsForBrandAction error:", error)
     return { success: false, error: error.message, models: [] }
+  }
+}
+
+export async function getSuppliersAction() {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('suppliers')
+      .select('*')
+      .order('name', { ascending: true })
+
+    if (error) throw error
+    return { success: true, suppliers: data || [] }
+  } catch (error: any) {
+    console.error("getSuppliersAction error:", error)
+    return { success: false, error: error.message, suppliers: [] }
+  }
+}
+
+export async function addSupplierAction(supplierData: {
+  name: string
+  email?: string
+  phone?: string
+  address?: string
+  iban: string
+  tckn?: string
+  vkn?: string
+  company_title?: string
+  submerchant_type: 'bireysel' | 'kurumsal'
+}) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Oturum açmanız gerekiyor.' }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const ALLOWED_EMAILS = [
+      'ahmetcanli1943@gmail.com',
+      'designer_7150@peony.com',
+      'ela@peonycollective.com',
+      'rabiakacar86@gmail.com',
+      'info@peonycollective.com'
+    ]
+    const isAdmin = profile?.role === 'admin' || (user.email && ALLOWED_EMAILS.includes(user.email.toLowerCase()))
+    
+    if (!isAdmin) {
+      return { success: false, error: 'Tedarikçi eklemek için admin yetkisi gerekiyor.' }
+    }
+
+    const { data, error } = await supabase
+      .from('suppliers')
+      .insert({
+        name: supplierData.name,
+        email: supplierData.email || null,
+        phone: supplierData.phone || null,
+        address: supplierData.address || null,
+        iban: supplierData.iban.toUpperCase().replace(/\s+/g, ''),
+        tckn: supplierData.tckn || null,
+        vkn: supplierData.vkn || null,
+        company_title: supplierData.company_title || null,
+        submerchant_type: supplierData.submerchant_type || 'bireysel'
+      })
+      .select('*')
+      .single()
+
+    if (error) throw error
+    return { success: true, supplier: data }
+  } catch (error: any) {
+    console.error("addSupplierAction error:", error)
+    return { success: false, error: error.message || 'Tedarikçi eklenirken bir hata oluştu.' }
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { addProductAction, saveCloudDraft, loadCloudDraft, getBrandsAction, getModelsForBrandAction } from '@/src/app/sell/actions'
+import { addProductAction, saveCloudDraft, loadCloudDraft, getBrandsAction, getModelsForBrandAction, getSuppliersAction, addSupplierAction } from '@/src/app/sell/actions'
 import { createClient } from '@/src/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, ChevronDown, UploadCloud, Video, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react'
@@ -200,6 +200,22 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
   // ─── Peony VIP (Kargo Hizmeti) ───
   const [isPeonyVip, setIsPeonyVip] = useState<boolean>(false)
   const [supplier, setSupplier] = useState('')
+  const [supplierId, setSupplierId] = useState('')
+  const [suppliersList, setSuppliersList] = useState<any[]>([])
+  const [showNewSupplierForm, setShowNewSupplierForm] = useState(false)
+  
+  // New Supplier fields
+  const [newSupName, setNewSupName] = useState('')
+  const [newSupEmail, setNewSupEmail] = useState('')
+  const [newSupPhone, setNewSupPhone] = useState('')
+  const [newSupAddress, setNewSupAddress] = useState('')
+  const [newSupIban, setNewSupIban] = useState('')
+  const [newSupTckn, setNewSupTckn] = useState('')
+  const [newSupVkn, setNewSupVkn] = useState('')
+  const [newSupCompanyTitle, setNewSupCompanyTitle] = useState('')
+  const [newSupType, setNewSupType] = useState<'bireysel' | 'kurumsal'>('bireysel')
+  const [isAddingSupplier, setIsAddingSupplier] = useState(false)
+  const [supplierError, setSupplierError] = useState('')
 
   // ─── Görseller & Önizlemeler ───
   const [publicFiles, setPublicFiles] = useState<File[]>([])
@@ -318,12 +334,26 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
         if (draft.fullSetItems) setFullSetItems(draft.fullSetItems)
         if (draft.isPeonyVip !== undefined) setIsPeonyVip(draft.isPeonyVip)
         if (draft.supplier) setSupplier(draft.supplier)
+        if (draft.supplierId) setSupplierId(draft.supplierId)
         if (draft.activeStep) setActiveStep(draft.activeStep)
       }
       setIsDraftLoaded(true)
     }
     load()
   }, [])
+
+  // Tedarikçileri Getir
+  useEffect(() => {
+    async function fetchSuppliers() {
+      const res = await getSuppliersAction()
+      if (res.success) {
+        setSuppliersList(res.suppliers || [])
+      }
+    }
+    if (showSupplierField) {
+      fetchSuppliers()
+    }
+  }, [showSupplierField])
 
   // Her değişiklikte Local Storage'a otomatik kaydet (Debounce/Autosave)
   useEffect(() => {
@@ -334,7 +364,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
       selectedBrand, selectedModel,
       selectedMaterial, customMaterial, formCondition, formDescription,
       formDimensions, formPurchaseYear, isFirstOwner, formPrice, serialNumber,
-      odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, supplier, activeStep
+      odorScore, hasSpaTreatment, fullSetItems, isPeonyVip, supplier, supplierId, activeStep
     }
     
     localStorage.setItem('peony_sell_draft', JSON.stringify(draftData))
@@ -635,6 +665,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
         has_spa_treatment: hasSpaTreatment,
         is_peony_vip: isPeonyVip,
         supplier: supplier || undefined,
+        supplier_id: supplierId || undefined,
         full_set_items: fullSetItems,
         public_images: publicUrls,
         authenticity_docs: authUrls,
@@ -1047,17 +1078,205 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                 
                 {/* Tedarikçi Bilgisi */}
                 {showSupplierField && (
-                  <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl space-y-2">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tedarikçi (İsteğe Bağlı)</label>
-                    <input
-                      type="text"
-                      className="w-full text-sm py-2.5 px-4 bg-white border border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors"
-                      value={supplier}
-                      onChange={(e) => setSupplier(e.target.value)}
-                      placeholder="Örn: Tedarikçi A, Tedarikçi B"
-                    />
-                    <p className="text-[10px] text-gray-500 leading-relaxed font-light block">
-                      Bu alana tedarikçi girildiğinde, arka planda takip için kaydedilir ve komisyon oranı otomatik olarak %37 Peony komisyonu / %63 Satıcı payı şeklinde uygulanır.
+                  <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl space-y-4 text-left">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tedarikçi Seçin</label>
+                      <select
+                        className="w-full text-sm py-2.5 px-4 bg-white border border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors"
+                        value={supplierId}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          if (val === 'new') {
+                            setShowNewSupplierForm(true)
+                            setSupplierId('')
+                            setSupplier('')
+                          } else {
+                            setShowNewSupplierForm(false)
+                            setSupplierId(val)
+                            const found = suppliersList.find(s => s.id === val)
+                            setSupplier(found ? found.name : '')
+                          }
+                        }}
+                      >
+                        <option value="">Seçiniz (İsteğe Bağlı)</option>
+                        {suppliersList.map((sup) => (
+                          <option key={sup.id} value={sup.id}>{sup.name}</option>
+                        ))}
+                        <option value="new" className="font-bold text-[#AF9164]">+ Yeni Tedarikçi Ekle</option>
+                      </select>
+                    </div>
+
+                    {showNewSupplierForm && (
+                      <div className="bg-white border border-gray-200 p-4 rounded-lg space-y-3">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#AF9164] border-b border-gray-100 pb-1.5">Yeni Tedarikçi Kartı</h4>
+                        
+                        {supplierError && (
+                          <p className="text-xs text-red-500 font-medium">{supplierError}</p>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-gray-400 font-bold uppercase">Ad Soyad / Unvan</label>
+                            <input
+                              type="text"
+                              className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none"
+                              value={newSupName}
+                              onChange={(e) => setNewSupName(e.target.value)}
+                              placeholder="Tedarikçi A"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-gray-400 font-bold uppercase">E-posta</label>
+                            <input
+                              type="email"
+                              className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none"
+                              value={newSupEmail}
+                              onChange={(e) => setNewSupEmail(e.target.value)}
+                              placeholder="eposta@peony.com"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-gray-400 font-bold uppercase">Telefon</label>
+                            <input
+                              type="text"
+                              className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none"
+                              value={newSupPhone}
+                              onChange={(e) => setNewSupPhone(e.target.value)}
+                              placeholder="053..."
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-gray-400 font-bold uppercase">IBAN</label>
+                            <input
+                              type="text"
+                              className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none uppercase"
+                              value={newSupIban}
+                              onChange={(e) => setNewSupIban(e.target.value)}
+                              placeholder="TR..."
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[9px] text-gray-400 font-bold uppercase">Adres</label>
+                          <textarea
+                            className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none"
+                            value={newSupAddress}
+                            onChange={(e) => setNewSupAddress(e.target.value)}
+                            placeholder="Tedarikçi adresi..."
+                            rows={2}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-gray-400 font-bold uppercase">Tedarikçi Türü</label>
+                            <select
+                              className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none bg-white"
+                              value={newSupType}
+                              onChange={(e) => setNewSupType(e.target.value as any)}
+                            >
+                              <option value="bireysel">Bireysel</option>
+                              <option value="kurumsal">Kurumsal (Firma)</option>
+                            </select>
+                          </div>
+                          {newSupType === 'bireysel' ? (
+                            <div className="space-y-1">
+                              <label className="text-[9px] text-gray-400 font-bold uppercase">TC Kimlik No</label>
+                              <input
+                                type="text"
+                                className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none"
+                                value={newSupTckn}
+                                onChange={(e) => setNewSupTckn(e.target.value)}
+                                placeholder="11 haneli TCKN"
+                                maxLength={11}
+                              />
+                            </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <label className="text-[9px] text-gray-400 font-bold uppercase">Vergi No (VKN)</label>
+                              <input
+                                type="text"
+                                className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none"
+                                value={newSupVkn}
+                                onChange={(e) => setNewSupVkn(e.target.value)}
+                                placeholder="10 haneli VKN"
+                                maxLength={10}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {newSupType === 'kurumsal' && (
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-gray-400 font-bold uppercase">Şirket Resmi Unvanı</label>
+                            <input
+                              type="text"
+                              className="w-full text-xs py-2 px-3 border border-gray-200 rounded focus:border-black focus:outline-none"
+                              value={newSupCompanyTitle}
+                              onChange={(e) => setNewSupCompanyTitle(e.target.value)}
+                              placeholder="Resmi Şirket Unvanı A.Ş."
+                            />
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          className="w-full mt-2 bg-black hover:bg-zinc-800 text-white font-bold py-2 rounded text-xs uppercase tracking-wider transition-colors disabled:opacity-50"
+                          disabled={isAddingSupplier}
+                          onClick={async () => {
+                            if (!newSupName || !newSupIban) {
+                              setSupplierError('Lütfen Tedarikçi Adı ve IBAN alanlarını doldurun.')
+                              return
+                            }
+                            if (!newSupIban.toUpperCase().startsWith('TR') || newSupIban.replace(/\s+/g, '').length !== 26) {
+                              setSupplierError('IBAN numarası geçersiz (TR ile başlamalı ve 26 hane olmalıdır).')
+                              return
+                            }
+                            setIsAddingSupplier(true)
+                            setSupplierError('')
+                            const res = await addSupplierAction({
+                              name: newSupName,
+                              email: newSupEmail,
+                              phone: newSupPhone,
+                              address: newSupAddress,
+                              iban: newSupIban,
+                              tckn: newSupTckn || undefined,
+                              vkn: newSupVkn || undefined,
+                              company_title: newSupCompanyTitle || undefined,
+                              submerchant_type: newSupType
+                            })
+                            setIsAddingSupplier(false)
+                            if (res.success && res.supplier) {
+                              setSuppliersList(prev => [...prev, res.supplier].sort((a,b) => a.name.localeCompare(b.name)))
+                              setSupplierId(res.supplier.id)
+                              setSupplier(res.supplier.name)
+                              setShowNewSupplierForm(false)
+                              
+                              // Reset fields
+                              setNewSupName('')
+                              setNewSupEmail('')
+                              setNewSupPhone('')
+                              setNewSupAddress('')
+                              setNewSupIban('')
+                              setNewSupTckn('')
+                              setNewSupVkn('')
+                              setNewSupCompanyTitle('')
+                            } else {
+                              setSupplierError(res.error || 'Tedarikçi eklenirken bir hata oluştu.')
+                            }
+                          }}
+                        >
+                          {isAddingSupplier ? 'Kaydediliyor...' : 'Tedarikçiyi Kaydet ve Seç'}
+                        </button>
+                      </div>
+                    )}
+
+                    <p className="text-[10px] text-gray-500 leading-relaxed font-light block mt-2 border-t border-gray-200 pt-2">
+                      Kayıtlı bir tedarikçi seçildiğinde, PayTR split payment ödemesi doğrudan bu tedarikçinin IBAN'ına yönlendirilir (%63 Tedarikçi / %37 Peony).
                     </p>
                   </div>
                 )}

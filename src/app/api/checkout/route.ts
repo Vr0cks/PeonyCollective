@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const productIds = cartItems.map((item: any) => item.id)
     const { data: dbProducts, error: dbError } = await supabase
       .from('products')
-      .select('id, price, status, seller_id, brand, model_name, locked_until, locked_by, supplier')
+      .select('id, price, status, seller_id, brand, model_name, locked_until, locked_by, supplier, supplier_id, suppliers(*)')
       .in('id', productIds)
 
     if (dbError || !dbProducts || dbProducts.length === 0) {
@@ -72,57 +72,110 @@ export async function POST(req: Request) {
       locked_by: user.id
     }).in('id', productIdsToLock)
 
-    // Alt Üye İşyeri (PayTR Marketplace) Kontrolü
-    const sellerId = dbProducts[0].seller_id
-    const { data: sellerProfile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', sellerId)
-      .single()
+    const firstProduct = dbProducts[0]
+    const isSupplierProduct = !!firstProduct.supplier_id
+    const targetSupplier = firstProduct.suppliers
 
-    let submerchantId = sellerProfile?.submerchant_id
+    let submerchantId = null
 
-    if (!submerchantId) {
-      // Satıcının IBAN ve TCKN/VKN kontrolü
-      if (!sellerProfile?.iban || (!sellerProfile?.tckn && !sellerProfile?.vkn)) {
-        return NextResponse.json(
-          { error: 'Satıcı ödeme bilgilerini tamamlamadığı için bu ürün şu an satın alınamaz.' },
-          { status: 400 }
-        )
+    if (isSupplierProduct && targetSupplier) {
+      submerchantId = targetSupplier.submerchant_id
+
+      if (!submerchantId) {
+        // Tedarikçinin IBAN ve TCKN/VKN kontrolü
+        if (!targetSupplier.iban || (!targetSupplier.tckn && !targetSupplier.vkn)) {
+          return NextResponse.json(
+            { error: 'Tedarikçi ödeme bilgilerini tamamlamadığı için bu ürün şu an satın alınamaz.' },
+            { status: 400 }
+          )
+        }
+
+        // Alt Üye İşyeri Kaydı (PayTR)
+        try {
+          const subResult = await addSubmerchant({
+            name: targetSupplier.name,
+            address: targetSupplier.address || 'Adres belirtilmemiş',
+            email: targetSupplier.email || `tedarikci_${targetSupplier.id}@peonycollective.com`,
+            iban: targetSupplier.iban,
+            tckn: targetSupplier.tckn || undefined,
+            vkn: targetSupplier.vkn || undefined,
+            companyTitle: targetSupplier.company_title || undefined,
+            submerchantType: targetSupplier.submerchant_type || 'bireysel'
+          })
+          
+          submerchantId = subResult.submerchant_id
+
+          // Kaydedilen submerchantId'yi DB'ye yaz (Admin client kullanarak RLS'i aş)
+          const adminClient = createAdminClient()
+          await adminClient.from('suppliers').update({ submerchant_id: submerchantId }).eq('id', targetSupplier.id)
+          
+        } catch (err: any) {
+          console.error('[PAYTR SUPPLIER SUBMERCHANT ERROR]', err)
+          const adminClient = createAdminClient()
+          await adminClient.from('system_logs').insert({
+            level: 'error',
+            source: 'paytr_supplier_submerchant_checkout',
+            message: 'Tedarikçi PayTR alt-üye kaydı başarısız',
+            metadata: { error: err.message, supplierId: targetSupplier.id }
+          })
+          return NextResponse.json(
+            { error: 'Tedarikçinin hesap bilgileri doğrulanamadı, işlem iptal edildi.' },
+            { status: 400 }
+          )
+        }
       }
+    } else {
+      const sellerId = firstProduct.seller_id
+      const { data: sellerProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', sellerId)
+        .single()
 
-      // Alt Üye İşyeri Kaydı (PayTR)
-      try {
-        const subResult = await addSubmerchant({
-          name: `${sellerProfile.first_name || ''} ${sellerProfile.last_name || ''}`.trim(),
-          address: sellerProfile.address || 'Adres belirtilmemiş',
-          email: 'satici_' + sellerProfile.id + '@peonycollective.com',
-          iban: sellerProfile.iban,
-          tckn: sellerProfile.tckn,
-          vkn: sellerProfile.vkn,
-          companyTitle: sellerProfile.company_title,
-          submerchantType: sellerProfile.submerchant_type || 'bireysel'
-        })
-        
-        submerchantId = subResult.submerchant_id
+      submerchantId = sellerProfile?.submerchant_id
 
-        // Kaydedilen submerchantId'yi DB'ye yaz (Admin client kullanarak RLS'i aş)
-        const adminClient = createAdminClient()
-        await adminClient.from('profiles').update({ submerchant_id: submerchantId }).eq('id', sellerProfile.id)
-        
-      } catch (err: any) {
-        console.error('[PAYTR SUBMERCHANT ERROR]', err)
-        const adminClient = createAdminClient()
-        await adminClient.from('system_logs').insert({
-          level: 'error',
-          source: 'paytr_submerchant_checkout',
-          message: 'Satıcı PayTR alt-üye kaydı başarısız',
-          metadata: { error: err.message, sellerId: sellerProfile.id }
-        })
-        return NextResponse.json(
-          { error: 'Satıcının hesap bilgileri doğrulanamadı, işlem iptal edildi.' },
-          { status: 400 }
-        )
+      if (!submerchantId) {
+        // Satıcının IBAN ve TCKN/VKN kontrolü
+        if (!sellerProfile?.iban || (!sellerProfile?.tckn && !sellerProfile?.vkn)) {
+          return NextResponse.json(
+            { error: 'Satıcı ödeme bilgilerini tamamlamadığı için bu ürün şu an satın alınamaz.' },
+            { status: 400 }
+          )
+        }
+
+        // Alt Üye İşyeri Kaydı (PayTR)
+        try {
+          const subResult = await addSubmerchant({
+            name: `${sellerProfile.first_name || ''} ${sellerProfile.last_name || ''}`.trim(),
+            address: sellerProfile.address || 'Adres belirtilmemiş',
+            email: 'satici_' + sellerProfile.id + '@peonycollective.com',
+            iban: sellerProfile.iban,
+            tckn: sellerProfile.tckn,
+            vkn: sellerProfile.vkn,
+            companyTitle: sellerProfile.company_title,
+            submerchantType: sellerProfile.submerchant_type || 'bireysel'
+          })
+          
+          submerchantId = subResult.submerchant_id
+
+          // Kaydedilen submerchantId'yi DB'ye yaz (Admin client kullanarak RLS'i aş)
+          const adminClient = createAdminClient()
+          await adminClient.from('profiles').update({ submerchant_id: submerchantId }).eq('id', sellerProfile.id)
+          
+        } catch (err: any) {
+          console.error('[PAYTR SUBMERCHANT ERROR]', err)
+          const adminClient = createAdminClient()
+          await adminClient.from('system_logs').insert({
+            level: 'error',
+            source: 'paytr_submerchant_checkout',
+            message: 'Satıcı PayTR alt-üye kaydı başarısız',
+            metadata: { error: err.message, sellerId: sellerProfile.id }
+          })
+          return NextResponse.json(
+            { error: 'Satıcının hesap bilgileri doğrulanamadı, işlem iptal edildi.' },
+            { status: 400 }
+          )
+        }
       }
     }
 
@@ -138,7 +191,7 @@ export async function POST(req: Request) {
     // Siparişleri veritabanına "pending_payment" olarak kaydet
     for (const product of dbProducts) {
       // Platform Komisyon Motoru (Eğer ürünün tedarikçisi varsa %37, yoksa standart %15)
-      const commissionRate = product.supplier ? 0.37 : 0.15
+      const commissionRate = (product.supplier_id || product.supplier) ? 0.37 : 0.15
       const commissionAmount = product.price * commissionRate
       const sellerAmount = product.price - commissionAmount
       totalSellerAmount += sellerAmount
