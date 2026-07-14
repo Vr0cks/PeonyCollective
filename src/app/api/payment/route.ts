@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/src/utils/supabase/server'
 import { createAdminClient } from '@/src/utils/supabase/admin'
 import { createPaymentToken, addSubmerchant } from '@/src/lib/paytr'
+import { decrypt } from '@/src/utils/crypto'
 
 // Basit In-Memory Rate Limiting (Üretim ortamında Redis / Upstash önerilir)
 const rateLimitCache = new Map<string, number>()
@@ -119,6 +120,16 @@ export async function POST(request: Request) {
         },
         { status: 400 }
       )
+    }
+
+    // şifreli alanları çöz—ödeme API'sine ham veri gitmeli
+    if (sellerProfile) {
+      sellerProfile.iban = decrypt(sellerProfile.iban)
+      sellerProfile.tckn = decrypt(sellerProfile.tckn)
+      sellerProfile.vkn = decrypt(sellerProfile.vkn)
+    }
+    if (buyerProfile) {
+      buyerProfile.phone_number = decrypt(buyerProfile.phone_number)
     }
 
     // Check if there is an active accepted offer for this buyer and product

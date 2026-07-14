@@ -3,6 +3,7 @@ import { createPaymentToken, addSubmerchant } from '@/src/lib/paytr'
 import { createClient } from '@/src/utils/supabase/server'
 import { createAdminClient } from '@/src/utils/supabase/admin'
 import { checkRateLimit, maskErrorResponse } from '@/src/utils/security'
+import { decrypt } from '@/src/utils/crypto'
 
 export async function POST(req: Request) {
   try {
@@ -135,6 +136,13 @@ export async function POST(req: Request) {
         .single()
 
       submerchantId = sellerProfile?.submerchant_id
+
+      // şifreli alanları PayTR'a göndermeden önce çöz
+      if (sellerProfile) {
+        sellerProfile.iban = decrypt(sellerProfile.iban)
+        sellerProfile.tckn = decrypt(sellerProfile.tckn)
+        sellerProfile.vkn = decrypt(sellerProfile.vkn)
+      }
 
       if (!submerchantId) {
         // Satıcının IBAN ve TCKN/VKN kontrolü

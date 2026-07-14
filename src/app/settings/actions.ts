@@ -2,6 +2,7 @@
 
 import { createClient } from '@/src/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { encrypt, decrypt } from '@/src/utils/crypto'
 
 
 export async function updateProfile(prevState: any, formData: FormData) {
@@ -53,12 +54,12 @@ export async function updateProfile(prevState: any, formData: FormData) {
     const { error } = await supabase
       .from('profiles')
       .update({
-        phone_number: phoneDigits ? (phoneDigits.startsWith('5') ? '0' + phoneDigits : phoneDigits) : null,
-        iban: iban ? iban.toUpperCase() : null,
+        phone_number: encrypt(phoneDigits ? (phoneDigits.startsWith('5') ? '0' + phoneDigits : phoneDigits) : null),
+        iban: encrypt(iban ? iban.toUpperCase() : null),
         address: address || null,
         submerchant_type: submerchant_type || 'bireysel',
-        tckn: submerchant_type === 'bireysel' ? tckn || null : null,
-        vkn: submerchant_type === 'kurumsal' ? vkn || null : null,
+        tckn: submerchant_type === 'bireysel' ? encrypt(tckn || null) : null,
+        vkn: submerchant_type === 'kurumsal' ? encrypt(vkn || null) : null,
         company_title: submerchant_type === 'kurumsal' ? company_title || null : null,
         avatar_url: avatar_url,
       })
@@ -74,5 +75,24 @@ export async function updateProfile(prevState: any, formData: FormData) {
   } catch (err: any) {
     console.error('updateProfile catch error:', err)
     return { success: false, error: 'Beklenmeyen bir hata oluştu: ' + err.message }
+  }
+}
+
+export async function getDecryptedProfile() {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Oturum kapalı' }
+    
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    if (profile) {
+      profile.phone_number = decrypt(profile.phone_number)
+      profile.iban = decrypt(profile.iban)
+      profile.tckn = decrypt(profile.tckn)
+      profile.vkn = decrypt(profile.vkn)
+    }
+    return { success: true, profile }
+  } catch (err: any) {
+    return { success: false, error: err.message }
   }
 }

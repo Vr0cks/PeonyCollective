@@ -8,6 +8,7 @@ import { ArrowLeft, ShieldCheck, Truck, LogIn, AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { createClient } from '@/src/utils/supabase/client'
+import { getDecryptedProfile } from '@/src/app/settings/actions'
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal } = useCart()
@@ -23,8 +24,9 @@ export default function CheckoutPage() {
       setIsLoggedIn(!!user)
       
       if (user) {
-        // Profil bilgilerini çekip formu otomatik doldur
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+        // Profil bilgilerini şifrelenmiş halini çözerek otomatik doldur
+        const res = await getDecryptedProfile()
+        const profile = res?.profile
         if (profile) {
           setFormData(prev => ({
             ...prev,
