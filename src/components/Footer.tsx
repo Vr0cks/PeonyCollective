@@ -70,7 +70,7 @@ export default function Footer() {
           
           {/* Kolon 1: Marka Tanıtımı */}
           <div className="space-y-6">
-            <Link href="/" className="text-3xl font-playfair tracking-[0.3em] uppercase block">
+            <Link href="/" className="text-2xl sm:text-3xl font-playfair tracking-[0.3em] uppercase block">
               Peony<span className="italic font-light text-[#AF9164]">Collective</span>
             </Link>
             <p className="text-xs uppercase tracking-[0.2em] text-[#AF9164] font-bold">Mirasın Yeni Sahibi</p>

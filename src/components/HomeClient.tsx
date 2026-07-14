@@ -421,7 +421,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
               </div>
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <div className="flex flex-wrap gap-2.5 pb-2">
               {[
                 { id: null, label: 'Tüm Koleksiyon' },
                 { id: 'Plaj Şıklığı', label: 'Plaj Şıklığı 🏖️' },
@@ -431,9 +431,9 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 <button
                   key={p.label}
                   onClick={() => setSelectedPeriod(p.id)}
-                  className={`sans-detail px-4 py-2 text-[9px] tracking-widest uppercase border shrink-0 transition-all duration-300 ${
+                  className={`sans-detail px-5 py-2.5 text-[9px] tracking-widest uppercase border transition-all duration-300 rounded-full cursor-pointer shrink-0 ${
                     selectedPeriod === p.id
-                      ? 'bg-black text-white border-black font-bold'
+                      ? 'bg-black text-white border-black font-bold shadow-sm'
                       : 'bg-white text-gray-500 border-gray-200 hover:text-black hover:border-black'
                   }`}
                 >
