@@ -59,8 +59,9 @@ export async function updateConciergeStatusAction(
       return { success: false, error: 'Bu işlemi yapmaya yetkiniz yok.' }
     }
 
-    // 2. Güncelle
-    const { error } = await supabase
+    // 2. Güncelle (RLS Bypass Admin Client ile)
+    const adminDb = createAdminClient()
+    const { error } = await adminDb
       .from('concierge_requests')
       .update({ status: newStatus })
       .eq('id', requestId)
@@ -94,8 +95,9 @@ export async function deleteConciergeRequestAction(requestId: string) {
       return { success: false, error: 'Bu işlemi yapmaya yetkiniz yok.' }
     }
 
-    // Sil
-    const { error } = await supabase
+    // Sil (RLS Bypass Admin Client ile)
+    const adminDb = createAdminClient()
+    const { error } = await adminDb
       .from('concierge_requests')
       .delete()
       .eq('id', requestId)

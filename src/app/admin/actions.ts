@@ -417,12 +417,17 @@ export async function createConciergeRequestAction(name: string, productInterest
   try {
     const supabase = await createClient()
 
+    // Oturum açmış kullanıcının ID'sini bul (varsa)
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user ? user.id : null
+
     // 1. Veritabanına kaydet
     const { error } = await supabase.from('concierge_requests').insert({
       name,
       product_interest: productInterest,
       max_price: maxPrice,
       status: 'pending',
+      user_id: userId
     })
 
     if (error) throw error
