@@ -64,34 +64,40 @@ export async function POST(req: Request) {
     const supabase = createAdminClient();
 
     const payload = JSON.parse(rawBody);
-    console.log('[ENTRUPY WEBHOOK] Gelen olay:', payload.event);
+    console.log('[ENTRUPY WEBHOOK] Gelen Payload:', JSON.stringify(payload));
 
-    // Olay tipi: 'session.completed' vb.
-    if (payload.event === 'session.completed' || payload.event === 'status_changed') { // Entrupy API'ye göre değişebilir
-      
-      const entrupyId = payload.data?.id; // veya customer_item_id
-      const customerItemId = payload.data?.customer_item_id; // Bizim product.id'miz
-      const rawStatus = payload.data?.status; // 'verified', 'rejected' vs.
-      const certificateUrl = payload.data?.certificate_url; 
+    const items = payload.items || [];
+    
+    for (const item of items) {
+      const entrupyId = item.entrupy_id;
+      const customerItemId = item.text_fields?.customer_item_id || item.text_fields?.identifier;
+      const rawStatus = item.status?.result?.id; // 'authentic', 'invalid', 'unidentified' vs.
+      const certificateUrl = item.certificate?.site || item.certificate?.preview || null;
+
+      console.log('[ENTRUPY WEBHOOK] Ayrıştırılan Bilgiler:', { entrupyId, customerItemId, rawStatus, certificateUrl });
 
       if (customerItemId) {
-        // SQL CHECK constraint: CHECK (entrupy_status IN ('pending', 'analyzing', 'verified', 'rejected'))
-        const allowedStatuses = ['pending', 'analyzing', 'verified', 'rejected'];
+        // Entrupy durumlarını veritabanımızdaki CHECK constraint'e göre eşleyelim:
+        // CHECK (entrupy_status IN ('pending', 'analyzing', 'verified', 'rejected'))
         let status = 'pending';
         
-        if (allowedStatuses.includes(rawStatus)) {
-          status = rawStatus;
-        } else {
-          console.warn(`[ENTRUPY WEBHOOK] Beklenmeyen status değeri alındı: "${rawStatus}". "pending" olarak kaydediliyor.`);
+        if (rawStatus === 'authentic') {
+          status = 'verified';
+        } else if (rawStatus === 'invalid' || rawStatus === 'unidentified') {
+          status = 'rejected';
+        } else if (rawStatus === 'analyzing') {
+          status = 'analyzing';
         }
 
-        // Ürün durumunu otomatik onayla
+        // Ürün durumunu otomatik onayla veya reddet
         const productStatus = status === 'verified' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending';
         
+        console.log(`[ENTRUPY WEBHOOK] DB Güncelleniyor. Ürün ID: ${customerItemId}, Status: ${status}, Ürün Statü: ${productStatus}`);
+
         const { error } = await supabase.from('products').update({
           entrupy_status: status,
           entrupy_certificate_url: certificateUrl,
-          ...(productStatus !== 'pending' && { status: productStatus }) // Durum belli ise otomatik yayınla veya reddet
+          ...(productStatus !== 'pending' && { status: productStatus })
         }).eq('id', customerItemId);
 
         if (error) {
@@ -102,10 +108,10 @@ export async function POST(req: Request) {
             message: 'Ürün Entrupy durumu güncellenemedi',
             metadata: { error: String(error), customerItemId, payload }
           });
-          return NextResponse.json({ error: 'DB Update Failed' }, { status: 500 });
+          continue;
         }
 
-        // Update associated order status based on Entrupy result
+        // Sipariş durumunu güncelle
         const { data: assocOrder } = await supabase
           .from('orders')
           .select('order_status')
@@ -150,7 +156,7 @@ export async function POST(req: Request) {
           message: 'Webhook işlem hatası',
           metadata: { error: String(error) }
        });
-    } catch (e) {} // Ignore secondary errors
+    } catch (e) {}
     return NextResponse.json({ error: 'Webhook işlem hatası' }, { status: 400 });
   }
 }
