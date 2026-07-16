@@ -5,20 +5,34 @@ import { createAdminClient } from '@/src/utils/supabase/admin';
 const WEBHOOK_SECRET = process.env.ENTRUPY_WEBHOOK_SECRET;
 
 function verifySignature(payload: string, signature: string | null): boolean {
+  console.log('[ENTRUPY DEBUG] WEBHOOK_SECRET Var mı:', !!WEBHOOK_SECRET, 'Uzunluk:', WEBHOOK_SECRET?.length);
+  console.log('[ENTRUPY DEBUG] Gelen İmza (Signature):', signature);
+  console.log('[ENTRUPY DEBUG] Gelen Ham Body:', payload);
+
   if (!WEBHOOK_SECRET || !signature) return false;
 
   try {
     const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
-    const digest = hmac.update(payload).digest('hex');
+    const digestHex = hmac.update(payload).digest('hex');
+    const digestBase64 = crypto.createHmac('sha256', WEBHOOK_SECRET).update(payload).digest('base64');
     
-    const digestBuffer = Buffer.from(digest);
+    console.log('[ENTRUPY DEBUG] Hesaplanan Hex Digest:', digestHex);
+    console.log('[ENTRUPY DEBUG] Hesaplanan Base64 Digest:', digestBase64);
+
+    const digestBuffer = Buffer.from(digestHex);
     const signatureBuffer = Buffer.from(signature);
     
-    if (digestBuffer.length !== signatureBuffer.length) {
-      return false;
+    if (digestBuffer.length === signatureBuffer.length && crypto.timingSafeEqual(digestBuffer, signatureBuffer)) {
+      return true;
     }
-    
-    return crypto.timingSafeEqual(digestBuffer, signatureBuffer);
+
+    // Base64 kontrolü
+    const digestBase64Buffer = Buffer.from(digestBase64);
+    if (digestBase64Buffer.length === signatureBuffer.length && crypto.timingSafeEqual(digestBase64Buffer, signatureBuffer)) {
+      return true;
+    }
+
+    return false;
   } catch (error) {
     console.error('[ENTRUPY WEBHOOK] İmza doğrulama hatası:', error);
     return false;
