@@ -11,6 +11,12 @@ function verifySignature(payload: string, signature: string | null): boolean {
 
   if (!WEBHOOK_SECRET || !signature) return false;
 
+  // Entrupy imzayı "SHA256:" prefix'i ile gönderiyor. Onu temizleyelim.
+  let cleanSignature = signature;
+  if (signature.startsWith('SHA256:')) {
+    cleanSignature = signature.substring(7);
+  }
+
   try {
     const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
     const digestHex = hmac.update(payload).digest('hex');
@@ -20,7 +26,7 @@ function verifySignature(payload: string, signature: string | null): boolean {
     console.log('[ENTRUPY DEBUG] Hesaplanan Base64 Digest:', digestBase64);
 
     const digestBuffer = Buffer.from(digestHex);
-    const signatureBuffer = Buffer.from(signature);
+    const signatureBuffer = Buffer.from(cleanSignature);
     
     if (digestBuffer.length === signatureBuffer.length && crypto.timingSafeEqual(digestBuffer, signatureBuffer)) {
       return true;

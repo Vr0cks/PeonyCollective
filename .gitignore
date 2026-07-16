@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Expo & Mobile
+/.expo/
+/mobile/.expo/
+/mobile/dist/
+/mobile/web-build/
+/mobile/ios/
+/mobile/android/
+/mobile/.env*
