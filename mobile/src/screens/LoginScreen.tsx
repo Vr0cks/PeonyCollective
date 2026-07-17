@@ -9,22 +9,26 @@ import {
   KeyboardAvoidingView, 
   ScrollView, 
   Platform,
-  SafeAreaView
+  SafeAreaView,
+  Image,
+  Dimensions
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import { supabase } from '../lib/supabase';
 
+const { width, height } = Dimensions.get('window');
 WebBrowser.maybeCompleteAuthSession();
 
-// Theme Colors
 const COLORS = {
-  bg: '#0A0A0E', // Deep luxury charcoal
-  card: '#13141A', // Rich card slate
-  text: '#F5F5F7', // Off-white premium text
-  textMuted: '#8E909B', // Slate gray
-  primary: '#AF9164', // Classic champagne gold
-  border: '#1F212A' // Thin luxury dividers
+  bg: '#0F1016',
+  overlay: 'rgba(10, 10, 14, 0.75)', // Deep dark overlay
+  card: '#1C1D24', // Card dark background
+  text: '#FFFFFF',
+  textMuted: '#9E9EA5',
+  primary: '#AF9164', // Champagne gold
+  border: 'rgba(255, 255, 255, 0.1)',
+  accent: '#10B981',
 };
 
 interface LoginScreenProps {
@@ -33,6 +37,7 @@ interface LoginScreenProps {
 
 export default function LoginScreen({ onSuccess }: LoginScreenProps) {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -47,14 +52,13 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
 
     try {
       if (isSignUp) {
-        // Sign Up
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               full_name: fullName,
-              role: 'user' // Default role
+              role: 'user'
             }
           }
         });
@@ -62,7 +66,6 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
         alert('Kayıt başarılı! Giriş yapabilirsiniz.');
         setIsSignUp(false);
       } else {
-        // Sign In
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         onSuccess();
@@ -126,81 +129,118 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Editorial Background Image */}
+      <Image 
+        source={{ uri: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000' }} 
+        style={styles.backgroundImage}
+      />
+      <View style={styles.backgroundOverlay} />
+
       <KeyboardAvoidingView 
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-        <View style={styles.authContainer}>
-          <Text style={styles.brandTitle}>PEONY</Text>
-          <Text style={styles.brandSubtitle}>COLLECTIVE</Text>
+        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           
-          <Text style={styles.loginHeader}>{isSignUp ? 'Yeni Hesap Oluştur' : 'Giriş Yap'}</Text>
-          <Text style={styles.loginDescription}>
-            {isSignUp ? 'Peony Collective ailesine katılın.' : 'Lütfen bilgilerinizi girerek devam edin.'}
-          </Text>
+          {/* Main Visual/Editorial Overlay */}
+          {!showEmailForm ? (
+            <View style={styles.welcomeContainer}>
+              <View style={styles.topLogo}>
+                <Text style={styles.brandTitle}>PEONY</Text>
+                <Text style={styles.brandSubtitle}>COLLECTIVE</Text>
+              </View>
 
-          {isSignUp && (
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>AD SOYAD</Text>
-              <TextInput 
-                style={styles.input} 
-                placeholder="e.g. Ahmet Canlı"
-                placeholderTextColor={COLORS.textMuted}
-                value={fullName}
-                onChangeText={setFullName}
-              />
+              <View style={styles.onboardingSection}>
+                <Text style={styles.serifIntro}>Arzunun Objeleri</Text>
+                <Text style={styles.subIntro}>Mirasın yeni sahibi olun. Lüks ikinci el moda ve konsinyerlik hizmeti.</Text>
+
+                {/* Google Button */}
+                <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin} disabled={loading}>
+                  <Text style={styles.googleButtonText}>Google ile Devam Et</Text>
+                </TouchableOpacity>
+
+                {/* Email Login Button */}
+                <TouchableOpacity style={styles.emailOutlineButton} onPress={() => setShowEmailForm(true)}>
+                  <Text style={styles.emailOutlineButtonText}>E-posta ile Devam Et</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.termsText}>
+                  Devam ederek kullanıcı sözleşmesini ve kvkk şartlarını kabul etmiş olursunuz.
+                </Text>
+              </View>
+            </View>
+          ) : (
+            /* Elegant Slide-up Email Form View */
+            <View style={styles.formCard}>
+              <TouchableOpacity style={styles.backButton} onPress={() => setShowEmailForm(false)}>
+                <Text style={styles.backButtonText}>← Geri</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.brandTitleForm}>PEONY</Text>
+              <Text style={styles.loginHeader}>{isSignUp ? 'Yeni Hesap Oluştur' : 'Giriş Yap'}</Text>
+              <Text style={styles.loginDescription}>
+                {isSignUp ? 'Peony Collective ailesine katılın.' : 'Lütfen bilgilerinizi girerek devam edin.'}
+              </Text>
+
+              {isSignUp && (
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>AD SOYAD</Text>
+                  <TextInput 
+                    style={styles.input} 
+                    placeholder="Ahmet Canlı"
+                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                    value={fullName}
+                    onChangeText={setFullName}
+                  />
+                </View>
+              )}
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>E-POSTA</Text>
+                <TextInput 
+                  style={styles.input} 
+                  placeholder="email@peonycollective.com"
+                  placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>ŞİFRE</Text>
+                <TextInput 
+                  style={styles.input} 
+                  secureTextEntry
+                  placeholder="••••••••"
+                  placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                  value={password}
+                  onChangeText={setPassword}
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <TouchableOpacity style={styles.loginButton} onPress={handleAuth} disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.loginButtonText}>{isSignUp ? 'KAYIT OL' : 'GİRİŞ YAP'}</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.switchButton} 
+                onPress={() => setIsSignUp(!isSignUp)}
+              >
+                <Text style={styles.switchText}>
+                  {isSignUp ? 'Zaten hesabınız var mı? Giriş Yapın' : 'Hesabınız yok mu? Kayıt Olun'}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>E-POSTA</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="e.g. email@peonycollective.com"
-              placeholderTextColor={COLORS.textMuted}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>ŞİFRE</Text>
-            <TextInput 
-              style={styles.input} 
-              secureTextEntry
-              placeholder="••••••••"
-              placeholderTextColor={COLORS.textMuted}
-              value={password}
-              onChangeText={setPassword}
-              autoCapitalize="none"
-            />
-          </View>
-
-          <TouchableOpacity style={styles.loginButton} onPress={handleAuth} disabled={loading}>
-            {loading ? (
-              <ActivityIndicator color={COLORS.bg} />
-            ) : (
-              <Text style={styles.loginButtonText}>{isSignUp ? 'KAYIT OL' : 'GİRİŞ YAP'}</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin} disabled={loading}>
-            <Text style={styles.googleButtonText}>GOOGLE İLE DEVAM ET</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.switchButton} 
-            onPress={() => setIsSignUp(!isSignUp)}
-          >
-            <Text style={styles.switchText}>
-              {isSignUp ? 'Zaten hesabınız var mı? Giriş Yapın' : 'Hesabınız yok mu? Kayıt Olun'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -209,88 +249,181 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: '#0F1016',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: width,
+    height: height,
+    resizeMode: 'cover',
+  },
+  backgroundOverlay: {
+    position: 'absolute',
+    width: width,
+    height: height,
+    backgroundColor: COLORS.overlay,
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg,
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
-  authContainer: {
-    paddingHorizontal: 30,
-    paddingVertical: 50,
+  welcomeContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingHorizontal: 25,
+    paddingTop: height * 0.1,
+    paddingBottom: 40,
+  },
+  topLogo: {
+    alignItems: 'center',
   },
   brandTitle: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: COLORS.primary,
+    fontSize: 34,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+    letterSpacing: 10,
     textAlign: 'center',
-    letterSpacing: 8,
   },
   brandSubtitle: {
-    fontSize: 10,
-    color: COLORS.textMuted,
+    fontSize: 9,
+    color: COLORS.primary,
     textAlign: 'center',
-    letterSpacing: 4,
-    marginBottom: 40,
+    marginTop: 6,
+    letterSpacing: 3,
+  },
+  onboardingSection: {
+    marginTop: 'auto',
+  },
+  serifIntro: {
+    fontSize: 36,
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 10,
+    fontWeight: 'normal',
+  },
+  subIntro: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 35,
+    paddingHorizontal: 15,
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    height: 52,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  googleButtonText: {
+    color: '#1F2937',
+    fontWeight: 'bold',
+    fontSize: 15,
+    letterSpacing: 1,
+  },
+  emailOutlineButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    borderRadius: 8,
+    height: 52,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  emailOutlineButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 15,
+    letterSpacing: 1,
+  },
+  termsText: {
+    color: 'rgba(255, 255, 255, 0.4)',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 25,
+    lineHeight: 16,
+  },
+  /* Form Sheet styles */
+  formCard: {
+    backgroundColor: 'rgba(19, 20, 26, 0.95)',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+    paddingBottom: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 15,
+  },
+  backButtonText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  brandTitleForm: {
+    fontSize: 22,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    letterSpacing: 8,
+    textAlign: 'center',
+    marginBottom: 20,
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
   },
   loginHeader: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 8,
+    color: '#FFFFFF',
+    marginBottom: 6,
   },
   loginDescription: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textMuted,
-    marginBottom: 30,
+    marginBottom: 25,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     color: COLORS.primary,
     letterSpacing: 2,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: COLORS.card,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 8,
     height: 50,
-    color: COLORS.text,
+    color: '#FFFFFF',
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   loginButton: {
     backgroundColor: COLORS.primary,
     borderRadius: 8,
-    height: 50,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 15,
   },
   loginButtonText: {
-    color: COLORS.bg,
-    fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 2,
-  },
-  googleButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  googleButtonText: {
-    color: '#1F2937',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1.5,
