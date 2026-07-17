@@ -12,7 +12,8 @@ import {
   Platform,
   Image,
   Dimensions,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  SafeAreaView
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 
