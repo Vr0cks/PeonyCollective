@@ -156,6 +156,30 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 </View>
               </View>
 
+              {/* PEONY ELITE CLUB LOYALTY CARD */}
+              <View style={styles.eliteCard}>
+                <View style={styles.eliteHeader}>
+                  <Text style={styles.eliteBrand}>PEONY ELITE</Text>
+                  <Text style={styles.eliteTier}>★ GOLD MEMBER</Text>
+                </View>
+                <Text style={styles.elitePointLabel}>KULLANILABİLİR İNDİRİM PUANI</Text>
+                <Text style={styles.elitePoints}>4.500 ₺</Text>
+                <Text style={styles.eliteDesc}>
+                  Bir sonraki alışverişinizde ödeme ekranında anında indirim olarak kullanabilirsiniz.
+                </Text>
+                
+                {/* Progress bar to Black Member */}
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBarBg}>
+                    <View style={[styles.progressBarFill, { width: '70%' }]} />
+                  </View>
+                  <View style={styles.progressLabelRow}>
+                    <Text style={styles.progressLabel}>BLACK CARD için 7.500 ₺ kaldı</Text>
+                    <Text style={styles.progressBenefit}>%5 Ekstra İndirim & Erken Erişim</Text>
+                  </View>
+                </View>
+              </View>
+
               {/* Active Orders List Card */}
               <Text style={styles.sectionTitle}>Sipariş Takibi</Text>
               <View style={styles.trackerCard}>
@@ -173,11 +197,18 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 </View>
               </View>
 
-              {/* Saved Cards */}
-              <Text style={styles.sectionTitle}>Kayıtlı Kartlarım</Text>
-              <View style={styles.savedCardBox}>
-                <Text style={styles.savedCardTitle}>💳 MasterCard •••• 4820</Text>
-                <Text style={styles.savedCardExpiry}>Skt: 08/29</Text>
+              {/* Favorite Brands & Price Alerts */}
+              <Text style={styles.sectionTitle}>Takip Ettiğim Markalar & Alarmlar</Text>
+              <View style={styles.brandsBox}>
+                <View style={styles.brandRow}>
+                  <Text style={styles.brandName}>Chanel</Text>
+                  <Text style={styles.brandAlertCount}>3 Yeni Fiyat Alarmı 🔔</Text>
+                </View>
+                <View style={styles.brandRowDivider} />
+                <View style={styles.brandRow}>
+                  <Text style={styles.brandName}>Rolex</Text>
+                  <Text style={styles.brandAlertCount}>Yeni İlan Bildirimi Açık</Text>
+                </View>
               </View>
             </View>
           )}
@@ -518,6 +549,80 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 15,
   },
+  eliteCard: {
+    backgroundColor: '#12131A', // Sleek black card for VIP member status
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor: '#AF9164/30',
+  },
+  eliteHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  eliteBrand: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 2,
+  },
+  eliteTier: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    letterSpacing: 1,
+  },
+  elitePointLabel: {
+    fontSize: 8.5,
+    color: 'rgba(255, 255, 255, 0.5)',
+    letterSpacing: 1.2,
+  },
+  elitePoints: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  eliteDesc: {
+    fontSize: 10.5,
+    color: 'rgba(255, 255, 255, 0.7)',
+    lineHeight: 15,
+    marginBottom: 15,
+  },
+  progressContainer: {
+    borderTopWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingTop: 15,
+  },
+  progressBarBg: {
+    height: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+  },
+  progressLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  progressLabel: {
+    fontSize: 9,
+    color: 'rgba(255, 255, 255, 0.5)',
+  },
+  progressBenefit: {
+    fontSize: 9,
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
   trackerCard: {
     backgroundColor: COLORS.card,
     borderRadius: 16,
@@ -562,25 +667,35 @@ const styles = StyleSheet.create({
     color: '#2E4C36',
     fontWeight: '600',
   },
-  savedCardBox: {
+  brandsBox: {
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
-    padding: 15,
+    paddingVertical: 8,
+    marginBottom: 25,
+  },
+  brandRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
   },
-  savedCardTitle: {
-    fontSize: 12.5,
+  brandName: {
+    fontSize: 13,
     fontWeight: 'bold',
     color: COLORS.text,
   },
-  savedCardExpiry: {
-    fontSize: 11.5,
-    color: COLORS.textMuted,
+  brandAlertCount: {
+    fontSize: 11,
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
+  brandRowDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginHorizontal: 20,
   },
   stepsContainer: {
     flexDirection: 'row',
