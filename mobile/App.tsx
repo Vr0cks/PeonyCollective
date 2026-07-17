@@ -178,7 +178,7 @@ export default function App() {
               style={styles.tabItem}
               onPress={() => setCurrentTab('sell')}
             >
-              <Text style={[styles.tabIcon, currentTab === 'sell' && styles.activeTabIcon]}>⊞</Text>
+              <Text style={[styles.tabIcon, currentTab === 'sell' && styles.activeTabIcon]}>✦</Text>
               <Text style={[styles.tabText, currentTab === 'sell' && styles.activeTabText]}>SAT</Text>
               {currentTab === 'sell' && <View style={styles.activeDot} />}
             </TouchableOpacity>
@@ -187,7 +187,7 @@ export default function App() {
               style={styles.tabItem}
               onPress={() => setCurrentTab('chats')}
             >
-              <Text style={[styles.tabIcon, currentTab === 'chats' && styles.activeTabIcon]}>✉</Text>
+              <Text style={[styles.tabIcon, currentTab === 'chats' && styles.activeTabIcon]}>💬</Text>
               <Text style={[styles.tabText, currentTab === 'chats' && styles.activeTabText]}>MESAJLAR</Text>
               {currentTab === 'chats' && <View style={styles.activeDot} />}
             </TouchableOpacity>
@@ -196,7 +196,7 @@ export default function App() {
               style={styles.tabItem}
               onPress={() => setCurrentTab('support')}
             >
-              <Text style={[styles.tabIcon, currentTab === 'support' && styles.activeTabIcon]}>?</Text>
+              <Text style={[styles.tabIcon, currentTab === 'support' && styles.activeTabIcon]}>♛</Text>
               <Text style={[styles.tabText, currentTab === 'support' && styles.activeTabText]}>DESTEK</Text>
               {currentTab === 'support' && <View style={styles.activeDot} />}
             </TouchableOpacity>

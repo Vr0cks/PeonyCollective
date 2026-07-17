@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: 15,
-    paddingTop: 15,
+    paddingTop: 20,
     paddingBottom: 5,
   },
   searchInput: {
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   conciergeWidget: {
     backgroundColor: COLORS.conciergeBg,
     marginHorizontal: 15,
-    marginTop: 15,
+    marginTop: 25,
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,

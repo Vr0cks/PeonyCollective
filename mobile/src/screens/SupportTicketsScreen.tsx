@@ -110,15 +110,22 @@ export default function SupportTicketsScreen() {
 
       const messageText = `[Konu: ${subject}]\n\n${message}`;
 
-      const { error } = await supabase
-        .from('it_support_tickets')
-        .insert({
-          user_id: user.id,
-          message: messageText,
-          status: 'open'
-        });
+      const session = (await supabase.auth.getSession()).data.session;
+      const accessToken = session?.access_token;
 
-      if (error) throw error;
+      const response = await fetch('https://peony-collective.vercel.app/api/support', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ message: messageText })
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json().catch(() => ({}));
+        throw new Error(errorJson.error || 'Destek talebi iletilemedi.');
+      }
       
       alert('Destek talebiniz başarıyla oluşturuldu.');
       setModalVisible(false);

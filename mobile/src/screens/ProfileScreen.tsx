@@ -7,7 +7,8 @@ import {
   ActivityIndicator,
   ScrollView,
   Platform,
-  Alert
+  Alert,
+  TextInput
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 
@@ -20,7 +21,8 @@ const COLORS = {
   border: '#E8E8E6', // Thin dividers
   danger: '#EF4444',
   accent: '#10B981',
-  promoBg: '#F5ECE1' // Soft warm beige
+  promoBg: '#F5ECE1', // Soft warm beige
+  darkBar: '#12131A'
 };
 
 interface ProfileScreenProps {
@@ -32,6 +34,14 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeAdPackage, setActiveAdPackage] = useState<string | null>(null);
+  
+  // Wallet / Financial mock details
+  const [balance, setBalance] = useState('145.000 ₺');
+  const [pendingPayout, setPendingPayout] = useState('85.000 ₺');
+  
+  // Account settings edit states
+  const [iban, setIban] = useState('TR56 0006 2000 0001 2345 6789 01');
+  const [isEditingIban, setIsEditingIban] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -82,31 +92,47 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
   return (
     <View style={styles.container}>
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {/* Profile Header Box */}
-          <View style={styles.profileBox}>
+          
+          {/* PROFILE HEADER & USER DETAILS */}
+          <View style={styles.profileHeaderBox}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>
                 {profile?.full_name?.charAt(0).toUpperCase() || 'P'}
               </Text>
             </View>
-            <Text style={styles.name}>{profile?.full_name}</Text>
-            <Text style={styles.role}>
-              {profile?.role === 'admin' ? 'Yönetici' : profile?.role === 'operations' ? 'Operasyon Yetkilisi' : 'Üye'}
-            </Text>
-
-            {(profile?.role === 'admin' || profile?.role === 'operations') && (
-              <TouchableOpacity style={styles.adminBtn} onPress={onEnterOperations}>
-                <Text style={styles.adminBtnText}>🛡 OPERASYON PANELİ GİRİŞİ</Text>
-              </TouchableOpacity>
-            )}
-
-            <TouchableOpacity style={styles.logoutBtn} onPress={handleSignOut}>
-              <Text style={styles.logoutBtnText}>Çıkış Yap</Text>
-            </TouchableOpacity>
+            <View style={styles.profileInfoText}>
+              <Text style={styles.name}>{profile?.full_name}</Text>
+              <Text style={styles.role}>
+                {profile?.role === 'admin' ? 'Yönetici' : profile?.role === 'operations' ? 'Operasyon Yetkilisi' : 'Peony Üyesi'}
+              </Text>
+              <Text style={styles.memberSince}>Üyelik Tarihi: 2026</Text>
+            </View>
           </View>
+
+          {/* FINANCIAL DASHBOARD (CÜZDAN & KAZANÇ) */}
+          <View style={styles.walletBox}>
+            <View style={styles.walletCol}>
+              <Text style={styles.walletLabel}>TOPLAM SATIŞ</Text>
+              <Text style={styles.walletValue}>{balance}</Text>
+            </View>
+            <View style={styles.walletDivider} />
+            <View style={styles.walletCol}>
+              <Text style={styles.walletLabel}>BEKLEYEN HAKEDİŞ</Text>
+              <Text style={styles.walletValue}>{pendingPayout}</Text>
+            </View>
+          </View>
+
+          {/* ADMIN OPERATIONS LINK */}
+          {(profile?.role === 'admin' || profile?.role === 'operations') && (
+            <TouchableOpacity style={styles.adminBtn} onPress={onEnterOperations}>
+              <Text style={styles.adminBtnText}>🛡 OPERASYON PANELİ GİRİŞİ</Text>
+            </TouchableOpacity>
+          )}
 
           {/* LÜKS KONSİNYE CANLI TAKİP SİSTEMİ */}
           <Text style={styles.sectionTitle}>Konsinye Ürün Takibi</Text>
@@ -163,7 +189,57 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
             </View>
           </View>
 
-          {/* Monetization / Advertising Portal Section */}
+          {/* ACCOUNT & PREFERENCES LIST */}
+          <Text style={styles.sectionTitle}>Hesap Bilgileri & Ayarlar</Text>
+          
+          <View style={styles.settingsGroup}>
+            {/* IBAN SETTING */}
+            <View style={styles.settingsRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.settingsLabel}>BANKA HESABI (IBAN)</Text>
+                {isEditingIban ? (
+                  <TextInput 
+                    style={styles.ibanInput}
+                    value={iban}
+                    onChangeText={setIban}
+                    onBlur={() => setIsEditingIban(false)}
+                  />
+                ) : (
+                  <Text style={styles.settingsValue}>{iban}</Text>
+                )}
+              </View>
+              <TouchableOpacity 
+                style={styles.editBtn} 
+                onPress={() => setIsEditingIban(!isEditingIban)}
+              >
+                <Text style={styles.editBtnText}>{isEditingIban ? 'Kaydet' : 'Düzenle'}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* REGISTERED ADDRESS */}
+            <View style={styles.settingsRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.settingsLabel}>TESLİMAT ADRESİ</Text>
+                <Text style={styles.settingsValue}>Nişantaşı, Valikonak Cd. No:45 D:12 Şişli / İstanbul</Text>
+              </View>
+              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert('Bilgi', 'Adres düzenleme modülü yakında aktif olacaktır.')}>
+                <Text style={styles.editBtnText}>Düzenle</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* PREFERRED SIZE */}
+            <View style={styles.settingsRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.settingsLabel}>BEDEN TERCİHLERİM</Text>
+                <Text style={styles.settingsValue}>Kıyafet: M / Shoes: 38 / Aksesuar: Medium</Text>
+              </View>
+              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert('Bilgi', 'Beden tercihi modülü yakında aktif olacaktır.')}>
+                <Text style={styles.editBtnText}>Düzenle</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* MONETIZATION / ADVERTISING PORTAL */}
           <Text style={styles.sectionTitle}>Satışlarınızı Artırın</Text>
           <Text style={styles.sectionDesc}>
             Peony Muse ve Vitrin reklam paketleriyle ürünlerinize %50 daha fazla gösterim kazandırın.
@@ -207,6 +283,10 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
             </TouchableOpacity>
           </View>
 
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleSignOut}>
+            <Text style={styles.logoutBtnText}>Oturumu Kapat</Text>
+          </TouchableOpacity>
+
         </ScrollView>
       )}
     </View>
@@ -222,44 +302,85 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 110, // Safe padding for floating tab bar
   },
-  profileBox: {
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileHeaderBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: COLORS.card,
     borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
+    padding: 20,
     borderWidth: 1,
     borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 10,
-    elevation: 2,
-    marginBottom: 25,
+    marginBottom: 16,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginRight: 16,
   },
   avatarText: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  profileInfoText: {
+    flex: 1,
+  },
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.text,
   },
   role: {
-    fontSize: 13,
+    fontSize: 12,
+    color: COLORS.primary,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  memberSince: {
+    fontSize: 10,
     color: COLORS.textMuted,
     marginTop: 4,
-    marginBottom: 25,
+  },
+  walletBox: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  walletCol: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  walletLabel: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: COLORS.textMuted,
+    letterSpacing: 1,
+  },
+  walletValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginTop: 4,
+  },
+  walletDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: COLORS.border,
   },
   adminBtn: {
     backgroundColor: 'rgba(175, 145, 100, 0.1)',
@@ -270,7 +391,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 25,
   },
   adminBtnText: {
     color: COLORS.primary,
@@ -278,19 +399,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: 1,
   },
-  logoutBtn: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.danger,
-    height: 48,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoutBtnText: {
-    color: COLORS.danger,
-    fontWeight: 'bold',
+  sectionTitle: {
     fontSize: 14,
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+    color: COLORS.text,
+    letterSpacing: 1,
+    fontWeight: 'normal',
+    marginBottom: 12,
+  },
+  sectionDesc: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    lineHeight: 18,
+    marginBottom: 15,
   },
   trackerCard: {
     backgroundColor: COLORS.card,
@@ -326,7 +447,7 @@ const styles = StyleSheet.create({
   },
   stepItem: {
     alignItems: 'center',
-    width: 50,
+    width: 45,
   },
   stepCircle: {
     width: 24,
@@ -353,7 +474,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   stepNumber: {
-    color: COLORS.textMuted,
+    color: '#FFFFFF',
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -370,24 +491,61 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 2,
     backgroundColor: COLORS.border,
-    marginBottom: 16, // align vertically with circles
+    marginBottom: 16,
   },
   stepLineActive: {
     backgroundColor: COLORS.primary,
   },
-  sectionTitle: {
-    fontSize: 15,
-    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
-    color: COLORS.text,
-    letterSpacing: 1,
-    fontWeight: 'normal',
-    marginBottom: 6,
+  settingsGroup: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingVertical: 8,
+    marginBottom: 25,
   },
-  sectionDesc: {
-    fontSize: 12,
+  settingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+  },
+  settingsLabel: {
+    fontSize: 8.5,
+    fontWeight: 'bold',
     color: COLORS.textMuted,
-    lineHeight: 18,
-    marginBottom: 20,
+    letterSpacing: 1.2,
+    marginBottom: 4,
+  },
+  settingsValue: {
+    fontSize: 12.5,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  ibanInput: {
+    fontSize: 12.5,
+    color: COLORS.text,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: COLORS.bg,
+  },
+  editBtn: {
+    backgroundColor: '#F3ECE0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 10,
+  },
+  editBtnText: {
+    fontSize: 11,
+    color: COLORS.primary,
+    fontWeight: 'bold',
   },
   adCard: {
     backgroundColor: COLORS.card,
@@ -436,5 +594,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12.5,
     letterSpacing: 1,
+  },
+  logoutBtn: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.danger,
+    height: 48,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 15,
+    marginBottom: 30,
+  },
+  logoutBtnText: {
+    color: COLORS.danger,
+    fontWeight: 'bold',
+    fontSize: 14,
   }
 });
