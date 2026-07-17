@@ -64,6 +64,92 @@ export default function HomeClient({ products, brands, brand, category, gender }
   const [visibleCount, setVisibleCount] = useState(24)
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null)
 
+  // Peony Weather Concierge States
+  const [locationName, setLocationName] = useState('Bodrum')
+  const [temp, setTemp] = useState(32)
+  const [weatherDesc, setWeatherDesc] = useState('Güneşli Esinti')
+  const [curationVibe, setCurationVibe] = useState('Plaj Şıklığı & Akşamüstü Kokteyl Kombinleri')
+
+  // Chatbot (Peony Muse) States
+  const [isMuseOpen, setIsMuseOpen] = useState(false)
+  const [museInput, setMuseInput] = useState('')
+  const [museMessages, setMuseMessages] = useState<Array<{
+    id: string
+    sender: 'user' | 'muse'
+    text: string
+    products?: Array<{
+      id: string
+      brand: string
+      model_name: string
+      price: number
+      image: string
+    }>
+  }>>([
+    {
+      id: 'welcome',
+      sender: 'muse',
+      text: 'Merhaba ben Peony stil küratörünüz Muse. Bugün nereyi ziyaret edeceksiniz veya nasıl bir davete katılacaksınız? Size oranın havasına ve dokusuna en uygun lüks parçaları önereyim.'
+    }
+  ])
+
+  useEffect(() => {
+    // Geolocation simulation
+    const locations = [
+      { name: 'Bodrum', temp: 32, desc: 'Güneşli Esinti', vibe: 'Plaj Şıklığı & Akşamüstü Kokteyl Kombinleri' },
+      { name: 'İstanbul', temp: 26, desc: 'Hafif Bulutlu', vibe: 'Boğaz Havası & Nişantaşı Sokak Şıklığı' },
+      { name: 'Çeşme', temp: 30, desc: 'Rüzgarlı Güneşli', vibe: 'Alaçatı Esintisi & Keten Rahatlığı' },
+      { name: 'Londra', temp: 19, desc: 'Hafif Yağmurlu', vibe: 'Trençkot & Luxury Deri Çanta Kombinleri' }
+    ]
+    const randomLoc = locations[Math.floor(Math.random() * locations.length)]
+    setLocationName(randomLoc.name)
+    setTemp(randomLoc.temp)
+    setWeatherDesc(randomLoc.desc)
+    setCurationVibe(randomLoc.vibe)
+  }, [])
+
+  function handleSendMuseMessage() {
+    if (!museInput.trim()) return
+    const text = museInput.trim()
+    const msgId = Date.now().toString()
+    setMuseMessages(prev => [...prev, { id: msgId, sender: 'user', text }])
+    setMuseInput('')
+
+    setTimeout(() => {
+      let reply = ''
+      let recs: any[] = []
+      const query = text.toLowerCase()
+
+      if (query.includes('tekne') || query.includes('yat') || query.includes('deniz') || query.includes('yacht') || query.includes('plaj') || query.includes('beach') || query.includes('bodrum') || query.includes('çeşme')) {
+        reply = 'Harika bir yaz planı! Deniz havası ve yat davetlerinin o rahat ama göz alıcı şıklığı için Loewe\'nin hasır detaylı ikonik el çantasını ve gün ışığında parlayacak Rolex altın saatini öneriyorum.'
+        recs = [
+          { id: 'loewe-tote', brand: 'LOEWE', model_name: 'Basket Raffia Bag Medium', price: 24500, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
+          { id: 'rolex-sub', brand: 'ROLEX', model_name: 'Submariner Date Gold', price: 685000, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300' }
+        ]
+      } else if (query.includes('akşam') || query.includes('yemek') || query.includes('davet') || query.includes('düğün') || query.includes('gece') || query.includes('party') || query.includes('dinner')) {
+        reply = 'Şık bir gece daveti! Gecenin tüm bakışlarını üzerinizde toplamak için siyah deri Chanel Flap bag ve altın detaylı Cartier kolyeyi öneriyorum. Bu klasik şıklık asla modası geçmeyen bir yatırımdır.'
+        recs = [
+          { id: 'chanel-flap', brand: 'CHANEL', model_name: 'Classic Double Flap Black', price: 345000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
+          { id: 'cartier-love', brand: 'CARTIER', model_name: 'Love Necklace Gold', price: 92000, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300' }
+        ]
+      } else {
+        reply = 'Her ortama uyum sağlayacak "Quiet Luxury" (Sessiz Lüks) stilini öneriyorum. Logolar yerine mükemmel dikişleri ve deri kalitesini öne çıkaran Bottega Veneta örgü deri çanta ve Loro Piana keten şıklığı bugün harika duracaktır.'
+        recs = [
+          { id: 'bottega-cassette', brand: 'BOTTEGA VENETA', model_name: 'Padded Cassette Bag', price: 145000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' }
+        ]
+      }
+
+      setMuseMessages(prev => [
+        ...prev,
+        {
+          id: `muse-${Date.now()}`,
+          sender: 'muse',
+          text: reply,
+          products: recs
+        }
+      ])
+    }, 800)
+  }
+
   // Interactive Tabs State
   const [curatedTab, setCuratedTab] = useState<'seasonal' | 'smart'>('seasonal')
   const [trustTab, setTrustTab] = useState<'how' | 'lab' | 'certificate' | 'stories'>('how')
@@ -81,6 +167,12 @@ export default function HomeClient({ products, brands, brand, category, gender }
     displayProducts = displayProducts.filter(p => p.category === 'Kıyafet' || p.category === 'Çanta')
   } else if (selectedPeriod === 'Gece Daveti') {
     displayProducts = displayProducts.filter(p => p.category === 'Kıyafet' || p.category === 'Aksesuar')
+  } else if (selectedPeriod === 'WeatherConcierge') {
+    if (locationName === 'Bodrum' || locationName === 'Çeşme') {
+      displayProducts = displayProducts.filter(p => p.category === 'Aksesuar' || p.category === 'Ayakkabı' || p.category === 'Çanta')
+    } else {
+      displayProducts = displayProducts.filter(p => p.category === 'Çanta' || p.category === 'Kıyafet')
+    }
   }
 
   // Bags under 15k selector
@@ -443,6 +535,29 @@ export default function HomeClient({ products, brands, brand, category, gender }
             </div>
           </div>
 
+          {/* Geolocation & Weather Concierge Widget */}
+          <div className="mb-12 bg-[#F3ECE0]/60 border border-[#AF9164]/20 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164]">📍 PEONY WEATHER CONCIERGE</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
+                <span className="text-xs text-gray-500 font-medium">{locationName}, {temp}°C • {weatherDesc}</span>
+              </div>
+              <h3 className="text-xl md:text-2xl serif-display text-gray-950">{locationName} Havasına Özel Stil Kürasyonu</h3>
+              <p className="text-sm text-gray-500 font-light max-w-xl">{curationVibe}</p>
+            </div>
+            <button 
+              onClick={() => setSelectedPeriod(selectedPeriod === 'WeatherConcierge' ? null : 'WeatherConcierge')}
+              className={`sans-detail px-8 py-3.5 text-[10px] tracking-widest uppercase transition-all duration-300 rounded-lg shrink-0 cursor-pointer ${
+                selectedPeriod === 'WeatherConcierge'
+                  ? 'bg-black text-white hover:bg-gray-900'
+                  : 'bg-transparent text-black border border-black hover:bg-black hover:text-white'
+              }`}
+            >
+              {selectedPeriod === 'WeatherConcierge' ? '✓ GÖRÜNÜMÜ SIFIRLA' : 'GÖRÜNÜMÜ KEŞFET →'}
+            </button>
+          </div>
+
           {(hasFilter || selectedPeriod) && (
             <div className="mb-12 flex items-center gap-3">
               <span className="sans-detail text-gray-400 text-xs">Aktif Seçimler:</span>
@@ -787,6 +902,103 @@ export default function HomeClient({ products, brands, brand, category, gender }
           </Link>
         </div>
       </section>
+
+      {/* PEONY MUSE - FLOATING CHAT WIDGET */}
+      <div className="fixed bottom-6 right-6 z-[99999] flex flex-col items-end">
+        {isMuseOpen && (
+          <div className="mb-4 w-[360px] md:w-[400px] h-[500px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-[#12131A] text-white p-4 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">✦</span>
+                <div>
+                  <h4 className="text-xs font-bold tracking-widest uppercase text-[#AF9164]">Peony Muse</h4>
+                  <p className="text-[9px] text-gray-400">Kişisel Stil Küratörünüz</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsMuseOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors cursor-pointer text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Message Area */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#FBFBFA]">
+              {museMessages.map((msg) => {
+                const isMe = msg.sender === 'user'
+                return (
+                  <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                    <div className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed ${
+                      isMe 
+                        ? 'bg-[#12131A] text-white rounded-tr-none' 
+                        : 'bg-white text-gray-900 border border-gray-100 rounded-tl-none shadow-sm'
+                    }`}>
+                      {msg.text}
+                    </div>
+
+                    {/* Recommendations inside Muse reply */}
+                    {msg.products && msg.products.length > 0 && (
+                      <div className="mt-3 w-full space-y-2">
+                        <p className="text-[9px] font-bold text-[#AF9164] tracking-wider uppercase">Küratörün Seçtikleri:</p>
+                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+                          {msg.products.map((prod) => (
+                            <Link 
+                              key={prod.id} 
+                              href="/#collection"
+                              className="w-[120px] bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:border-[#AF9164] transition-all block shrink-0"
+                            >
+                              <div className="relative h-[90px] w-full">
+                                <Image src={prod.image} fill className="object-cover" alt="" />
+                              </div>
+                              <div className="p-2 space-y-0.5">
+                                <p className="text-[8px] font-bold text-[#AF9164] tracking-wider uppercase">{prod.brand}</p>
+                                <h5 className="text-[9px] text-gray-950 font-bold truncate">{prod.model_name}</h5>
+                                <p className="text-[9px] text-gray-500">{(prod.price ?? 0).toLocaleString('tr-TR')} ₺</p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Input bar */}
+            <div className="p-3 border-t border-gray-100 flex gap-2 items-center bg-white">
+              <input 
+                type="text" 
+                placeholder="Bugün nereyi ziyaret edeceksiniz?" 
+                value={museInput}
+                onChange={(e) => setMuseInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMuseMessage()}
+                className="flex-1 bg-gray-50 border border-gray-100 rounded-full px-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#AF9164] focus:bg-white transition-all"
+              />
+              <button 
+                onClick={handleSendMuseMessage}
+                className="text-xs font-bold text-[#AF9164] tracking-wider uppercase px-2 py-1 cursor-pointer hover:text-black transition-colors"
+              >
+                SOR
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Bubble Button */}
+        <button 
+          onClick={() => setIsMuseOpen(!isMuseOpen)}
+          className="w-14 h-14 bg-[#12131A] border border-[#AF9164]/30 hover:border-[#AF9164] hover:bg-black rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer relative group"
+        >
+          <span className="text-2xl transition-transform group-hover:rotate-12">✦</span>
+          {/* Small badge */}
+          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#10B981] border border-white rounded-full flex items-center justify-center">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+          </span>
+        </button>
+      </div>
     </main>
   )
 }
