@@ -12,13 +12,13 @@ import {
 import { supabase } from '../lib/supabase';
 
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37', // Gold
-  border: '#2A2D3D',
-  accent: '#10B981'
+  bg: '#FBFBFA', // Luxury off-white
+  card: '#FFFFFF', // Clean white
+  text: '#1A1A1A', // High-contrast charcoal text
+  textMuted: '#7E8085', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#E8E8E6', // Thin dividers
+  accent: '#10B981' // Emerald green
 };
 
 interface Ticket {
@@ -230,12 +230,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   createBtnText: {
-    color: COLORS.bg,
+    color: '#FFFFFF', // White text on gold button
     fontSize: 12,
     fontWeight: 'bold',
   },
   listContent: {
     padding: 15,
+    paddingBottom: 110, // Safe padding for floating tab bar
   },
   emptyContainer: {
     paddingVertical: 80,

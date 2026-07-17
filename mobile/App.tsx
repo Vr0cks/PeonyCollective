@@ -24,17 +24,17 @@ import SupportTicketsScreen from './src/screens/SupportTicketsScreen';
 
 const { width } = Dimensions.get('window');
 
-// Luxury Design Tokens
+// Premium Light Luxury Theme (Matches Website)
 const COLORS = {
-  bg: '#0A0A0E', // Ultra deep black/charcoal
-  card: '#13141A', // Rich card slate
-  text: '#F5F5F7', // Off-white premium text
-  textMuted: '#8E909B', // Slate gray
+  bg: '#FBFBFA', // Luxury off-white
+  card: '#FFFFFF', // Clean white
+  text: '#1A1A1A', // High-contrast charcoal text
+  textMuted: '#7E8085', // Slate gray
   primary: '#AF9164', // Classic champagne gold
-  primaryLight: '#D4AF37', // Bright gold accent
-  border: '#1F212A', // Thin luxury dividers
+  border: '#E8E8E6', // Super thin elegant dividers
   accent: '#10B981', // Emerald green
-  danger: '#EF4444'
+  danger: '#EF4444',
+  darkBar: '#12131A' // Floating navigation background
 };
 
 type Tab = 'feed' | 'sell' | 'chats' | 'support' | 'profile' | 'details' | 'chat_detail' | 'operations';
@@ -53,6 +53,7 @@ interface Product {
 export default function App() {
   const [session, setSession] = useState<any>(null);
   const [currentTab, setCurrentTab] = useState<Tab>('feed');
+  const [role, setRole] = useState<string>('user');
   
   // Navigation states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -63,12 +64,27 @@ export default function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      }
     });
 
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      } else {
+        setRole('user');
+      }
     });
   }, []);
+
+  async function fetchUserRole(userId: string) {
+    const { data } = await supabase.from('profiles').select('role').eq('id', userId).maybeSingle();
+    if (data?.role) {
+      setRole(data.role);
+    }
+  }
 
   function handleSelectProduct(product: Product) {
     setSelectedProduct(product);
@@ -90,12 +106,12 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
       
       {/* Header (Only visible on main tabs) */}
       {isMainTab && (
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>P E O N Y</Text>
+          <Text style={styles.headerTitle}>PEONY</Text>
           <Text style={styles.headerSubtitle}>
             {currentTab === 'feed' && 'L Ü K S  K O L E K S İ Y O N'}
             {currentTab === 'sell' && 'S A T I Ş  T A L E B İ'}
@@ -145,48 +161,57 @@ export default function App() {
         )}
       </View>
 
-      {/* Tab Bar (Only visible on main tabs) */}
+      {/* Tab Bar - Luxury Floating Capsule Design */}
       {isMainTab && (
-        <View style={styles.tabBar}>
-          <TouchableOpacity 
-            style={[styles.tabItem, currentTab === 'feed' && styles.activeTabItem]}
-            onPress={() => setCurrentTab('feed')}
-          >
-            <Text style={[styles.tabIcon, currentTab === 'feed' && styles.activeTabIcon]}>✦</Text>
-            <Text style={[styles.tabText, currentTab === 'feed' && styles.activeTabText]}>VİTRİN</Text>
-          </TouchableOpacity>
+        <View style={styles.tabBarWrapper}>
+          <View style={styles.tabBar}>
+            <TouchableOpacity 
+              style={styles.tabItem}
+              onPress={() => setCurrentTab('feed')}
+            >
+              <Text style={[styles.tabIcon, currentTab === 'feed' && styles.activeTabIcon]}>🧭</Text>
+              <Text style={[styles.tabText, currentTab === 'feed' && styles.activeTabText]}>KEŞFET</Text>
+              {currentTab === 'feed' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.tabItem, currentTab === 'sell' && styles.activeTabItem]}
-            onPress={() => setCurrentTab('sell')}
-          >
-            <Text style={[styles.tabIcon, currentTab === 'sell' && styles.activeTabIcon]}>⊕</Text>
-            <Text style={[styles.tabText, currentTab === 'sell' && styles.activeTabText]}>SAT</Text>
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.tabItem}
+              onPress={() => setCurrentTab('sell')}
+            >
+              <Text style={[styles.tabIcon, currentTab === 'sell' && styles.activeTabIcon]}>⊞</Text>
+              <Text style={[styles.tabText, currentTab === 'sell' && styles.activeTabText]}>SAT</Text>
+              {currentTab === 'sell' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.tabItem, currentTab === 'chats' && styles.activeTabItem]}
-            onPress={() => setCurrentTab('chats')}
-          >
-            <Text style={[styles.tabIcon, currentTab === 'chats' && styles.activeTabIcon]}>✉</Text>
-            <Text style={[styles.tabText, currentTab === 'chats' && styles.activeTabText]}>MESAJLAR</Text>
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.tabItem}
+              onPress={() => setCurrentTab('chats')}
+            >
+              <Text style={[styles.tabIcon, currentTab === 'chats' && styles.activeTabIcon]}>✉</Text>
+              <Text style={[styles.tabText, currentTab === 'chats' && styles.activeTabText]}>MESAJLAR</Text>
+              {currentTab === 'chats' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.tabItem, currentTab === 'support' && styles.activeTabItem]}
-            onPress={() => setCurrentTab('support')}
-          >
-            <Text style={[styles.tabIcon, currentTab === 'support' && styles.activeTabIcon]}>?</Text>
-            <Text style={[styles.tabText, currentTab === 'support' && styles.activeTabText]}>DESTEK</Text>
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.tabItem}
+              onPress={() => setCurrentTab('support')}
+            >
+              <Text style={[styles.tabIcon, currentTab === 'support' && styles.activeTabIcon]}>?</Text>
+              <Text style={[styles.tabText, currentTab === 'support' && styles.activeTabText]}>DESTEK</Text>
+              {currentTab === 'support' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.tabItem, currentTab === 'profile' && styles.activeTabItem]}
-            onPress={() => setCurrentTab('profile')}
-          >
-            <Text style={[styles.tabIcon, currentTab === 'profile' && styles.activeTabIcon]}>👤</Text>
-            <Text style={[styles.tabText, currentTab === 'profile' && styles.activeTabText]}>PROFİL</Text>
-          </TouchableOpacity>
+            {/* Special Golden Crown Profile Button */}
+            <TouchableOpacity 
+              style={[
+                styles.profileTabItem,
+                currentTab === 'profile' && styles.activeProfileTabItem
+              ]}
+              onPress={() => setCurrentTab('profile')}
+            >
+              <Text style={styles.profileTabIcon}>👑</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </SafeAreaView>
@@ -204,46 +229,55 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
-    backgroundColor: COLORS.bg,
+    backgroundColor: COLORS.card,
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: '300',
-    color: COLORS.primary,
-    letterSpacing: 8,
+    fontSize: 22,
+    fontWeight: 'normal',
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+    color: COLORS.text,
+    letterSpacing: 6,
     textAlign: 'center',
   },
   headerSubtitle: {
     fontSize: 9,
-    color: COLORS.textMuted,
+    color: COLORS.primary,
     textAlign: 'center',
-    marginTop: 6,
-    letterSpacing: 3,
+    marginTop: 4,
+    letterSpacing: 2,
+  },
+  tabBarWrapper: {
+    position: 'absolute',
+    bottom: Platform.OS === 'android' ? 25 : 15,
+    left: 15,
+    right: 15,
+    backgroundColor: 'transparent',
+    zIndex: 100,
   },
   tabBar: {
     flexDirection: 'row',
-    height: Platform.OS === 'android' ? 80 : 65, // Added extra height for Android soft keys
-    backgroundColor: COLORS.card,
-    borderTopWidth: 1,
-    borderColor: COLORS.border,
+    height: 64,
+    backgroundColor: COLORS.darkBar,
+    borderRadius: 32,
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingBottom: Platform.OS === 'android' ? 22 : 12, // Solved Android soft keys overlap
+    paddingHorizontal: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.35,
+    shadowRadius: 15,
+    elevation: 10,
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-  },
-  activeTabItem: {
-    borderTopWidth: 2,
-    borderColor: COLORS.primary,
-    marginTop: -2,
+    position: 'relative',
   },
   tabIcon: {
     fontSize: 16,
@@ -254,13 +288,42 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   tabText: {
-    fontSize: 8,
+    fontSize: 7.5,
     fontWeight: 'bold',
     color: COLORS.textMuted,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   activeTabText: {
     color: COLORS.primary,
+  },
+  activeDot: {
+    position: 'absolute',
+    bottom: 6,
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: COLORS.primary,
+  },
+  profileTabItem: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  activeProfileTabItem: {
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    backgroundColor: '#987B51',
+  },
+  profileTabIcon: {
+    fontSize: 20,
+    color: '#FFFFFF',
   }
 });
-

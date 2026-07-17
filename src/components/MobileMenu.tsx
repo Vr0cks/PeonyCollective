@@ -79,7 +79,7 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
               exit="closed"
               variants={overlayVariants}
               onClick={toggleMenu}
-              className="fixed inset-0 bg-black z-50 cursor-pointer"
+              className="fixed inset-0 bg-black/50 z-[9999] cursor-pointer"
               transition={{ duration: 0.3 }}
             />
 
@@ -89,7 +89,7 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
               animate="open"
               exit="closed"
               variants={drawerVariants}
-              className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[360px] bg-white/95 backdrop-blur-2xl z-50 flex flex-col shadow-2xl overflow-y-auto"
+              className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[360px] bg-white z-[10000] flex flex-col shadow-2xl overflow-y-auto"
             >
               
               {/* Çekmece Header (Logo ve Kapat Butonu) */}

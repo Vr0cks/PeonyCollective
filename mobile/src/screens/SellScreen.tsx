@@ -17,13 +17,13 @@ import { supabase } from '../lib/supabase';
 const { width } = Dimensions.get('window');
 
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37', // Gold
-  border: '#2A2D3D',
-  accent: '#10B981',
+  bg: '#FBFBFA', // Luxury off-white
+  card: '#FFFFFF', // Clean white
+  text: '#1A1A1A', // High-contrast charcoal text
+  textMuted: '#7E8085', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#E8E8E6', // Thin dividers
+  accent: '#10B981', // Emerald green
   danger: '#EF4444'
 };
 
@@ -263,6 +263,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
+    paddingBottom: 110, // Safe padding for floating tab bar
   },
   formContainer: {
     paddingBottom: 40,
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   primaryBtnText: {
-    color: COLORS.bg,
+    color: '#FFFFFF', // White text on gold button
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1.5,

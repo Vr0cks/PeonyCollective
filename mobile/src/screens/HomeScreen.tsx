@@ -140,6 +140,18 @@ const styles = StyleSheet.create({
   searchContainer: {
     padding: 15,
   },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    padding: 15,
+  },
   searchInput: {
     backgroundColor: COLORS.card,
     borderRadius: 10,
@@ -151,6 +163,7 @@ const styles = StyleSheet.create({
   },
   gridContent: {
     padding: 15,
+    paddingBottom: 100, // Safe padding for floating tab bar
   },
   columnWrapper: {
     justifyContent: 'space-between',
@@ -163,11 +176,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.border,
+    // Add subtle shadow for premium floating feel
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   imageWrapper: {
     position: 'relative',
     height: COLUMN_WIDTH,
-    backgroundColor: '#000',
+    backgroundColor: '#F5F5F7',
   },
   image: {
     width: '100%',
@@ -178,7 +197,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     left: 8,
-    backgroundColor: 'rgba(16, 185, 129, 0.85)',
+    backgroundColor: 'rgba(175, 145, 100, 0.9)', // Luxury Gold Badge
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 4,
@@ -190,24 +209,24 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   info: {
-    padding: 10,
+    padding: 12,
   },
   brand: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     color: COLORS.primary,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   name: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.text,
     fontWeight: '500',
     marginTop: 2,
   },
   price: {
     fontSize: 13,
-    color: COLORS.textMuted,
+    color: COLORS.text,
     marginTop: 4,
     fontWeight: '600',
   },
