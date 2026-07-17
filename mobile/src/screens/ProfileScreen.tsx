@@ -108,6 +108,61 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
             </TouchableOpacity>
           </View>
 
+          {/* LÜKS KONSİNYE CANLI TAKİP SİSTEMİ */}
+          <Text style={styles.sectionTitle}>Konsinye Ürün Takibi</Text>
+          <View style={styles.trackerCard}>
+            <View style={styles.trackerHeader}>
+              <Text style={styles.trackerProdName}>Chanel Classic Double Flap</Text>
+              <Text style={styles.trackerStatus}>SPA & Bakım Aşaması</Text>
+            </View>
+
+            {/* Stepper Steps */}
+            <View style={styles.stepsContainer}>
+              <View style={styles.stepItem}>
+                <View style={[styles.stepCircle, styles.stepDone]}>
+                  <Text style={styles.stepCheck}>✓</Text>
+                </View>
+                <Text style={styles.stepLabel}>Kabul</Text>
+              </View>
+
+              <View style={[styles.stepLine, styles.stepLineActive]} />
+
+              <View style={styles.stepItem}>
+                <View style={[styles.stepCircle, styles.stepDone]}>
+                  <Text style={styles.stepCheck}>✓</Text>
+                </View>
+                <Text style={styles.stepLabel}>Ekspertiz</Text>
+              </View>
+
+              <View style={[styles.stepLine, styles.stepLineActive]} />
+
+              <View style={styles.stepItem}>
+                <View style={[styles.stepCircle, styles.stepActive]}>
+                  <Text style={styles.stepNumber}>3</Text>
+                </View>
+                <Text style={[styles.stepLabel, styles.stepLabelActive]}>SPA</Text>
+              </View>
+
+              <View style={styles.stepLine} />
+
+              <View style={styles.stepItem}>
+                <View style={styles.stepCircle}>
+                  <Text style={styles.stepNumber}>4</Text>
+                </View>
+                <Text style={styles.stepLabel}>Çekim</Text>
+              </View>
+
+              <View style={styles.stepLine} />
+
+              <View style={styles.stepItem}>
+                <View style={styles.stepCircle}>
+                  <Text style={styles.stepNumber}>5</Text>
+                </View>
+                <Text style={styles.stepLabel}>Vitrin</Text>
+              </View>
+            </View>
+          </View>
+
           {/* Monetization / Advertising Portal Section */}
           <Text style={styles.sectionTitle}>Satışlarınızı Artırın</Text>
           <Text style={styles.sectionDesc}>
@@ -236,6 +291,89 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  trackerCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 25,
+  },
+  trackerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+    paddingBottom: 12,
+  },
+  trackerProdName: {
+    fontSize: 13.5,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  trackerStatus: {
+    fontSize: 11,
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
+  stepsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  stepItem: {
+    alignItems: 'center',
+    width: 50,
+  },
+  stepCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.card,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  stepDone: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  stepActive: {
+    backgroundColor: COLORS.text,
+    borderColor: COLORS.text,
+  },
+  stepCheck: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  stepNumber: {
+    color: COLORS.textMuted,
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  stepLabel: {
+    fontSize: 9,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+  },
+  stepLabelActive: {
+    color: COLORS.text,
+    fontWeight: 'bold',
+  },
+  stepLine: {
+    flex: 1,
+    height: 2,
+    backgroundColor: COLORS.border,
+    marginBottom: 16, // align vertically with circles
+  },
+  stepLineActive: {
+    backgroundColor: COLORS.primary,
   },
   sectionTitle: {
     fontSize: 15,

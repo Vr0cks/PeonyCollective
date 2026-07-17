@@ -224,6 +224,55 @@ export default function HomeScreen({ onSelectProduct }: { onSelectProduct: (prod
                 })}
               </ScrollView>
 
+              {/* PEONY PRIVÉ - VIP EARLY ACCESS / FOMO SLIDER */}
+              <View style={styles.priveContainer}>
+                <View style={styles.priveHeader}>
+                  <View>
+                    <Text style={styles.priveTitle}>🔒 PEONY PRIVÉ</Text>
+                    <Text style={styles.priveSubtitle}>VIP Üyelere 24 Saat Erken Erişim</Text>
+                  </View>
+                  <View style={styles.timerBadge}>
+                    <Text style={styles.timerText}>14:32:05 kaldı</Text>
+                  </View>
+                </View>
+                
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.priveScroll}>
+                  {/* Item 1 */}
+                  <View style={styles.priveCard}>
+                    <Image 
+                      source={{ uri: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' }} 
+                      style={styles.priveImg} 
+                      blurRadius={10} // Blurs the image to create FOMO!
+                    />
+                    <View style={styles.lockOverlay}>
+                      <Text style={styles.lockIcon}>🔒</Text>
+                      <Text style={styles.lockText}>VIP ÖNİZLEME</Text>
+                    </View>
+                    <View style={styles.priveInfo}>
+                      <Text style={styles.priveBrand}>HERMÈS</Text>
+                      <Text style={styles.priveName}>Birkin 30 Togo Black</Text>
+                    </View>
+                  </View>
+
+                  {/* Item 2 */}
+                  <View style={styles.priveCard}>
+                    <Image 
+                      source={{ uri: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300' }} 
+                      style={styles.priveImg} 
+                      blurRadius={10}
+                    />
+                    <View style={styles.lockOverlay}>
+                      <Text style={styles.lockIcon}>🔒</Text>
+                      <Text style={styles.lockText}>VIP ÖNİZLEME</Text>
+                    </View>
+                    <View style={styles.priveInfo}>
+                      <Text style={styles.priveBrand}>CHANEL</Text>
+                      <Text style={styles.priveName}>Classic Double Flap Gold</Text>
+                    </View>
+                  </View>
+                </ScrollView>
+              </View>
+
               {/* Styled Mood Curations Slider (Matches Web Categories) */}
               <Text style={styles.sectionTitle}>Editoryal Kürasyonlar</Text>
               <ScrollView 
@@ -443,6 +492,90 @@ const styles = StyleSheet.create({
   activeCategoryName: {
     color: COLORS.text,
     fontWeight: 'bold',
+  },
+  priveContainer: {
+    marginVertical: 10,
+    backgroundColor: '#12131A', // Luxury black box for early access
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    marginHorizontal: 15,
+    borderRadius: 16,
+  },
+  priveHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  priveTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 1.5,
+  },
+  priveSubtitle: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.6)',
+    marginTop: 2,
+  },
+  timerBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  timerText: {
+    color: COLORS.primary,
+    fontSize: 9.5,
+    fontWeight: 'bold',
+  },
+  priveScroll: {
+    paddingRight: 10,
+  },
+  priveCard: {
+    width: 160,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    overflow: 'hidden',
+    marginRight: 12,
+  },
+  priveImg: {
+    width: 160,
+    height: 120,
+    resizeMode: 'cover',
+  },
+  lockOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    height: 120,
+    backgroundColor: 'rgba(18, 19, 26, 0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lockIcon: {
+    fontSize: 22,
+  },
+  lockText: {
+    color: COLORS.primary,
+    fontSize: 8.5,
+    fontWeight: 'bold',
+    letterSpacing: 1.2,
+    marginTop: 6,
+  },
+  priveInfo: {
+    padding: 10,
+  },
+  priveBrand: {
+    color: COLORS.primary,
+    fontSize: 9,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+  },
+  priveName: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    marginTop: 2,
   },
   moodScroll: {
     paddingLeft: 15,
