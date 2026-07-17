@@ -201,15 +201,13 @@ export default function App() {
               {currentTab === 'support' && <View style={styles.activeDot} />}
             </TouchableOpacity>
 
-            {/* Special Golden Crown Profile Button */}
             <TouchableOpacity 
-              style={[
-                styles.profileTabItem,
-                currentTab === 'profile' && styles.activeProfileTabItem
-              ]}
+              style={styles.tabItem}
               onPress={() => setCurrentTab('profile')}
             >
-              <Text style={styles.profileTabIcon}>👑</Text>
+              <Text style={[styles.tabIcon, currentTab === 'profile' && styles.activeTabIcon]}>👤</Text>
+              <Text style={[styles.tabText, currentTab === 'profile' && styles.activeTabText]}>PROFİL</Text>
+              {currentTab === 'profile' && <View style={styles.activeDot} />}
             </TouchableOpacity>
           </View>
         </View>
