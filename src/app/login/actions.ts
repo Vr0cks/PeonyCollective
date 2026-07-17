@@ -12,11 +12,11 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
-    throw new Error('E-posta veya şifre hatalı. Lütfen tekrar deneyin.')
+    return { error: 'E-posta veya şifre hatalı. Lütfen tekrar deneyin.' }
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  return { success: true }
 }
 
 export async function logout() {

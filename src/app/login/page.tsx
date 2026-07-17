@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signup, login, signInWithProvider, resetPassword } from './actions'
 
 export default function AuthPage() {
+  const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
   const [role, setRole] = useState<'buyer' | 'seller'>('buyer')
   const [message, setMessage] = useState('')
@@ -50,8 +52,13 @@ export default function AuthPage() {
           setMessage(result.message)
         }
       } else if (isLogin) {
-        await login(formData)
-        // Server-side redirect ile anasayfaya yönlendirilecek
+        const result = await login(formData)
+        if (result?.error) {
+          setMessage(result.error)
+        } else if (result?.success) {
+          router.push('/')
+          router.refresh()
+        }
       } else {
         const result = await signup(formData)
         if (result?.error) {
@@ -61,11 +68,7 @@ export default function AuthPage() {
         }
       }
     } catch (error) {
-      const err = error as Error & { digest?: string }
-      // NEXT_REDIRECT hatası normal - redirect çalışıyor demektir
-      if (err.digest?.startsWith('NEXT_REDIRECT')) {
-        return
-      }
+      const err = error as Error
       setMessage(err.message || 'Bir hata oluştu.')
     } finally {
       setIsLoading(false)
