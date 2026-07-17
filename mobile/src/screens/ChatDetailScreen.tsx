@@ -17,13 +17,14 @@ import { supabase } from '../lib/supabase';
 const { width } = Dimensions.get('window');
 
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37', // Gold
-  border: '#2A2D3D',
-  accent: '#10B981'
+  bg: '#FBFBFA', // Luxury off-white
+  card: '#FFFFFF', // Clean white
+  text: '#1A1A1A', // High-contrast charcoal text
+  textMuted: '#7E8085', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#E8E8E6', // Thin dividers
+  accent: '#10B981', // Emerald green
+  darkBar: '#12131A' // Deep black accent for bubbles
 };
 
 interface Message {
@@ -39,7 +40,7 @@ interface ChatDetailScreenProps {
   otherName: string;
   productInfo?: {
     brand: string;
-    name: string;
+    model_name: string;
     image_urls?: string[];
   };
   onBack: () => void;
@@ -105,7 +106,6 @@ export default function ChatDetailScreen({ conversationId, otherName, productInf
     const trimmed = content.trim();
 
     if (phoneRegex.test(trimmed.replace(/\s+/g, '')) || emailRegex.test(trimmed) || ibanRegex.test(trimmed.replace(/\s+/g, '')) || urlRegex.test(trimmed)) {
-      // General mask
       filtered = '[İLETİŞİM BİLGİSİ GİZLENDİ]';
     }
 
@@ -121,7 +121,6 @@ export default function ChatDetailScreen({ conversationId, otherName, productInf
     const finalContent = filterMessageContent(originalText);
 
     try {
-      // Insert message into Supabase
       const { error } = await supabase
         .from('messages')
         .insert({
@@ -133,7 +132,6 @@ export default function ChatDetailScreen({ conversationId, otherName, productInf
 
       if (error) throw error;
 
-      // Update conversation last message details
       await supabase
         .from('conversations')
         .update({
@@ -162,7 +160,7 @@ export default function ChatDetailScreen({ conversationId, otherName, productInf
           <Text style={styles.name}>{otherName}</Text>
           {productInfo && (
             <Text style={styles.productSubtitle} numberOfLines={1}>
-              {productInfo.brand} - {productInfo.name}
+              {productInfo.brand} - {productInfo.model_name}
             </Text>
           )}
         </View>
@@ -235,8 +233,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.card,
@@ -247,14 +245,14 @@ const styles = StyleSheet.create({
   backBtnText: {
     color: COLORS.primary,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'normal',
   },
   headerInfo: {
     flex: 1,
   },
   name: {
     color: COLORS.text,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   productSubtitle: {
@@ -269,7 +267,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 6,
-    backgroundColor: '#000',
+    backgroundColor: '#F3F4F6',
   },
   messageList: {
     padding: 15,
@@ -288,17 +286,22 @@ const styles = StyleSheet.create({
   },
   bubble: {
     maxWidth: '75%',
-    borderRadius: 12,
-    paddingHorizontal: 14,
+    borderRadius: 18,
+    paddingHorizontal: 16,
     paddingVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.02,
+    shadowRadius: 5,
+    elevation: 1,
   },
   myBubble: {
-    backgroundColor: COLORS.primary,
-    borderBottomRightRadius: 2,
+    backgroundColor: COLORS.darkBar, // Premium off-black/charcoal my bubbles
+    borderBottomRightRadius: 4,
   },
   otherBubble: {
-    backgroundColor: COLORS.card,
-    borderBottomLeftRadius: 2,
+    backgroundColor: COLORS.card, // White cards other bubbles
+    borderBottomLeftRadius: 4,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
@@ -307,19 +310,19 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   myMessageText: {
-    color: COLORS.bg,
-    fontWeight: '500',
+    color: '#FFFFFF',
+    fontWeight: '400',
   },
   otherMessageText: {
     color: COLORS.text,
   },
   timeText: {
-    fontSize: 9,
+    fontSize: 8.5,
     marginTop: 4,
     textAlign: 'right',
   },
   myTimeText: {
-    color: 'rgba(15, 16, 22, 0.6)',
+    color: 'rgba(255, 255, 255, 0.5)',
   },
   otherTimeText: {
     color: COLORS.textMuted,
@@ -331,13 +334,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderTopWidth: 1,
     borderColor: COLORS.border,
+    paddingBottom: Platform.OS === 'ios' ? 25 : 12, // iOS safe bar height spacing
   },
   input: {
     flex: 1,
     backgroundColor: COLORS.bg,
     borderRadius: 20,
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 10,
     color: COLORS.text,
     maxHeight: 100,
     borderWidth: 1,
