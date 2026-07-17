@@ -107,7 +107,7 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
             <TouchableOpacity style={styles.card} onPress={() => onSelectProduct(item)}>
               <View style={styles.imageWrapper}>
                 <Image 
-                  source={{ uri: item.image_urls?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500' }} 
+                  source={{ uri: item.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500' }} 
                   style={styles.image}
                 />
                 <View style={styles.verifiedBadge}>
@@ -116,7 +116,7 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
               </View>
               <View style={styles.info}>
                 <Text style={styles.brand} numberOfLines={1}>{item.brand}</Text>
-                <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                <Text style={styles.name} numberOfLines={1}>{item.model_name}</Text>
                 <Text style={styles.price}>{item.price?.toLocaleString('tr-TR')} TL</Text>
               </View>
             </TouchableOpacity>

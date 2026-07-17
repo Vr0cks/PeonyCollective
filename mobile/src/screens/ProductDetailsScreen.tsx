@@ -62,8 +62,8 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
   const spaTreatment = product.has_spa_treatment ?? false;
   const fullSet = product.full_set_items || ['Kutu', 'Toz Torbası'];
   const flawImages = product.flaw_images || [];
-  const galleryImages = product.image_urls && product.image_urls.length > 0 
-    ? product.image_urls 
+  const galleryImages = product.public_images && product.public_images.length > 0 
+    ? product.public_images 
     : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500'];
 
   async function handleBuy() {

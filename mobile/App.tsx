@@ -41,10 +41,10 @@ type Tab = 'feed' | 'sell' | 'chats' | 'support' | 'profile' | 'details' | 'chat
 
 interface Product {
   id: string;
-  name: string;
+  model_name: string;
   brand: string;
   price: number;
-  image_urls?: string[];
+  public_images?: string[];
   entrupy_status: string;
   description?: string;
   material?: string;

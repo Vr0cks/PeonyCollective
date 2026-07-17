@@ -29,7 +29,7 @@ interface Conversation {
     id: string;
     brand: string;
     model_name: string;
-    image_urls?: string[];
+    public_images?: string[];
   };
   other_profile?: {
     full_name?: string;
@@ -59,7 +59,7 @@ export default function ChatListScreen({ onSelectChat }: ChatListScreenProps) {
         .from('conversations')
         .select(`
           *,
-          product:products(id, brand, model_name, image_urls)
+          product:products(id, brand, model_name, public_images)
         `)
         .or(`participant_1.eq.${userObj.id},participant_2.eq.${userObj.id}`)
         .order('last_message_at', { ascending: false });
@@ -116,7 +116,7 @@ export default function ChatListScreen({ onSelectChat }: ChatListScreenProps) {
           }
           renderItem={({ item }) => {
             const name = item.other_profile?.full_name || 'Peony Üyesi';
-            const productImg = item.product?.image_urls?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500';
+            const productImg = item.product?.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500';
             
             return (
               <TouchableOpacity 

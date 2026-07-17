@@ -73,13 +73,14 @@ export default function SupportTicketsScreen() {
       const user = (await supabase.auth.getUser()).data.user;
       if (!user) throw new Error('Oturum bulunamadı.');
 
+      const messageText = `[Konu: ${subject}]\n\n${message}`;
+
       const { error } = await supabase
         .from('it_support_tickets')
         .insert({
           user_id: user.id,
-          subject,
-          message,
-          status: 'pending'
+          message: messageText,
+          status: 'open'
         });
 
       if (error) throw error;

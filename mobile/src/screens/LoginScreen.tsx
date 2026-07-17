@@ -35,6 +35,12 @@ interface LoginScreenProps {
   onSuccess: () => void;
 }
 
+const BACKGROUND_IMAGES = [
+  'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000',
+  'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1000',
+  'https://images.unsplash.com/photo-1588099768531-a72d4a190513?q=80&w=1000'
+];
+
 export default function LoginScreen({ onSuccess }: LoginScreenProps) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -42,6 +48,15 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  React.useEffect(() => {
+    if (showEmailForm) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % BACKGROUND_IMAGES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [showEmailForm]);
 
   async function handleAuth() {
     if (!email || !password || (isSignUp && !fullName)) {
@@ -129,12 +144,28 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Editorial Background Image */}
+      {/* Editorial Background Image Slider */}
       <Image 
-        source={{ uri: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000' }} 
+        source={{ uri: BACKGROUND_IMAGES[currentSlide] }} 
         style={styles.backgroundImage}
       />
       <View style={styles.backgroundOverlay} />
+
+      {/* Instagram Story Progress Indicators */}
+      {!showEmailForm && (
+        <View style={styles.storyProgressContainer}>
+          {BACKGROUND_IMAGES.map((_, idx) => (
+            <View key={idx} style={styles.storyProgressBar}>
+              <View 
+                style={[
+                  styles.storyProgressFill, 
+                  { width: currentSlide === idx ? '100%' : currentSlide > idx ? '100%' : '0%' }
+                ]} 
+              />
+            </View>
+          ))}
+        </View>
+      )}
 
       <KeyboardAvoidingView 
         style={styles.container}
@@ -265,6 +296,27 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  storyProgressContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 50 : 25,
+    left: 15,
+    right: 15,
+    flexDirection: 'row',
+    zIndex: 200,
+    justifyContent: 'space-between',
+  },
+  storyProgressBar: {
+    flex: 1,
+    height: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    marginHorizontal: 3,
+    borderRadius: 1.5,
+    overflow: 'hidden',
+  },
+  storyProgressFill: {
+    height: '100%',
+    backgroundColor: '#FFFFFF',
   },
   scrollContainer: {
     flexGrow: 1,
