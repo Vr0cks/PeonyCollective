@@ -68,7 +68,7 @@ export default function SupportTicketsScreen() {
     {
       id: 'welcome',
       sender: 'ai',
-      text: 'Merhaba ben Peony Kişisel Stil Danışmanınız. Bugün nereyi ziyaret edeceksiniz veya nasıl bir davete katılacaksınız? Size oranın havasına ve trendlerine en uygun lüks parçaları önereyim.'
+      text: 'Merhaba ben Peony stil küratörünüz Muse. Bugün nereyi ziyaret edeceksiniz veya nasıl bir davete katılacaksınız? Size oranın havasına ve dokusuna en uygun lüks parçaları önereyim.'
     }
   ]);
 
@@ -201,18 +201,18 @@ export default function SupportTicketsScreen() {
           refreshing={loading}
           ListHeaderComponent={
             <View style={styles.headerComponent}>
-              {/* AI STYLIST CONCIERGE BANNER */}
+              {/* PEONY MUSE BANNER */}
               <TouchableOpacity 
                 style={styles.stylistCard}
                 onPress={() => setStylistVisible(true)}
               >
                 <View style={styles.stylistHeader}>
-                  <Text style={styles.stylistTag}>✦ PEONY AI STYLIST</Text>
+                  <Text style={styles.stylistTag}>✦ PEONY MUSE</Text>
                   <View style={styles.activeDot} />
                 </View>
                 <Text style={styles.stylistTitle}>Bugün nereyi ziyaret edeceksiniz?</Text>
-                <Text style={styles.stylistDesc}>Bize söyleyin, oraya özel kombin ve lüks sponsorlu ürünleri hemen listeleyelim.</Text>
-                <Text style={styles.stylistAction}>Stil Danışmanını Başlat →</Text>
+                <Text style={styles.stylistDesc}>Gününüzü bize anlatın, size en uygun lüks parçaları ve özel kürasyonları anında eşleştirelim.</Text>
+                <Text style={styles.stylistAction}>Muse Kürasyon Sohbetini Başlat →</Text>
               </TouchableOpacity>
 
               <View style={styles.actionHeader}>
@@ -324,7 +324,7 @@ export default function SupportTicketsScreen() {
             <TouchableOpacity onPress={() => setStylistVisible(false)}>
               <Text style={styles.backBtnText}>← Geri</Text>
             </TouchableOpacity>
-            <Text style={styles.stylistHeaderTitle}>Peony AI Stylist</Text>
+            <Text style={styles.stylistHeaderTitle}>Peony Muse</Text>
             <View style={{ width: 40 }} />
           </View>
 
@@ -343,7 +343,7 @@ export default function SupportTicketsScreen() {
                   {/* Curated Products Scroll inside AI bubble */}
                   {msg.products && msg.products.length > 0 && (
                     <View style={styles.recsContainer}>
-                      <Text style={styles.recsHeader}>Sponsorlu Stil Önerileri:</Text>
+                      <Text style={styles.recsHeader}>Küratörün Seçtikleri:</Text>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recsScroll}>
                         {msg.products.map((prod) => (
                           <View key={prod.id} style={styles.prodCard}>
