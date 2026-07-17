@@ -10,7 +10,8 @@ import {
   TextInput, 
   Dimensions,
   ScrollView,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 
@@ -25,7 +26,8 @@ const COLORS = {
   primary: '#AF9164', // Classic champagne gold
   border: '#E8E8E6', // Thin luxury dividers
   accent: '#10B981', // Emerald green
-  bannerBg: '#E9EFEA' // Very soft pastel green for promotion
+  bannerBg: '#E9EFEA', // Soft green
+  conciergeBg: '#F3ECE0' // Warm luxury beige for weather/location concierge
 };
 
 interface Product {
@@ -36,6 +38,7 @@ interface Product {
   public_images?: string[];
   entrupy_status: string;
   description?: string;
+  category?: string;
 }
 
 const CATEGORIES = [
@@ -46,19 +49,43 @@ const CATEGORIES = [
   { name: 'Giyim', image: 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=200' },
 ];
 
-interface HomeScreenProps {
-  onSelectProduct: (product: Product) => void;
-}
+// Curated Collection filters
+type MoodType = 'all' | 'under15k' | 'evening' | 'beach' | 'quiet_luxury';
 
-export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
+export default function HomeScreen({ onSelectProduct }: { onSelectProduct: (product: Product) => void }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [activeMood, setActiveMood] = useState<MoodType>('all');
+  
+  // Concierge Location & Weather states
+  const [locationName, setLocationName] = useState('Bodrum');
+  const [temp, setTemp] = useState(31);
+  const [weatherDesc, setWeatherDesc] = useState('Yaz Esintisi');
+  const [curationVibe, setCurationVibe] = useState('Plaj Rahatlığı & Keten Şıklığı');
 
   useEffect(() => {
     fetchProducts();
+    requestLocationPermission();
   }, []);
+
+  function requestLocationPermission() {
+    // Dynamic Mock based on real-time hour or location simulation
+    const locations = [
+      { name: 'Bodrum', temp: 32, desc: 'Güneşli Esinti', vibe: 'Plaj Rahatlığı & Akşamüstü Kokteyl Kombinleri' },
+      { name: 'İstanbul', temp: 26, desc: 'Hafif Bulutlu', vibe: 'Boğaz Havası & Nişantaşı Sokak Şıklığı' },
+      { name: 'Çeşme', temp: 30, desc: 'Rüzgarlı Güneşli', vibe: 'Alaçatı Esintisi & Keten Rahatlığı' },
+      { name: 'Londra', temp: 19, desc: 'Hafif Yağmurlu', vibe: 'Trençkot & Luxury Deri Çanta Kombinleri' }
+    ];
+    
+    // Auto pick a location randomly to simulate geolocation detection on start
+    const randomLoc = locations[Math.floor(Math.random() * locations.length)];
+    setLocationName(randomLoc.name);
+    setTemp(randomLoc.temp);
+    setWeatherDesc(randomLoc.desc);
+    setCurationVibe(randomLoc.vibe);
+  }
 
   async function fetchProducts() {
     try {
@@ -80,18 +107,36 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
     const matchesSearch = p.model_name?.toLowerCase().includes(search.toLowerCase()) ||
                           p.brand?.toLowerCase().includes(search.toLowerCase());
     
-    // Simple mock category filtering based on keywords or model name
+    // Category Filter
+    let matchesCategory = true;
     if (selectedCategory) {
       const catLower = selectedCategory.toLowerCase();
-      const matchesCategory = p.model_name?.toLowerCase().includes(catLower) || 
-                              p.brand?.toLowerCase().includes(catLower) ||
-                              (catLower === 'çanta' && p.model_name?.toLowerCase().includes('bag')) ||
-                              (catLower === 'saat' && p.model_name?.toLowerCase().includes('watch')) ||
-                              (catLower === 'takı' && p.model_name?.toLowerCase().includes('gold'));
-      return matchesSearch && matchesCategory;
+      matchesCategory = p.model_name?.toLowerCase().includes(catLower) || 
+                        p.brand?.toLowerCase().includes(catLower) ||
+                        (catLower === 'çanta' && p.model_name?.toLowerCase().includes('bag')) ||
+                        (catLower === 'saat' && p.model_name?.toLowerCase().includes('watch')) ||
+                        (catLower === 'takı' && p.model_name?.toLowerCase().includes('gold'));
     }
 
-    return matchesSearch;
+    // Mood Collection Filter
+    let matchesMood = true;
+    if (activeMood === 'under15k') {
+      matchesMood = p.price < 15000;
+    } else if (activeMood === 'evening') {
+      matchesMood = p.model_name?.toLowerCase().includes('gold') || 
+                    p.model_name?.toLowerCase().includes('clutch') || 
+                    p.brand?.toLowerCase().includes('chanel');
+    } else if (activeMood === 'beach') {
+      matchesMood = p.model_name?.toLowerCase().includes('tote') || 
+                    p.model_name?.toLowerCase().includes('canvas') ||
+                    p.brand?.toLowerCase().includes('loewe');
+    } else if (activeMood === 'quiet_luxury') {
+      matchesMood = p.brand?.toLowerCase().includes('bottega') || 
+                    p.brand?.toLowerCase().includes('hermes') || 
+                    p.brand?.toLowerCase().includes('loropiana');
+    }
+
+    return matchesSearch && matchesCategory && matchesMood;
   });
 
   return (
@@ -100,7 +145,7 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
       <View style={styles.searchContainer}>
         <TextInput 
           style={styles.searchInput}
-          placeholder="Marka, model veya kategori ara..."
+          placeholder="Marka, model veya stil ara..."
           placeholderTextColor={COLORS.textMuted}
           value={search}
           onChangeText={setSearch}
@@ -122,30 +167,44 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
           refreshing={loading}
           ListHeaderComponent={
             <View style={styles.headerComponent}>
-              {/* Luxury Promo Banner (Matches Vestiaire banner style) */}
-              <View style={styles.promoBanner}>
-                <View style={styles.promoTextContainer}>
-                  <Text style={styles.promoTitle}>İlk Satışınıza Özel</Text>
-                  <Text style={styles.promoDesc}>Sıfır hizmet bedeli ve komisyon avantajını kaçırmayın.</Text>
+              
+              {/* Geolocation & Weather Concierge Widget */}
+              <View style={styles.conciergeWidget}>
+                <View style={styles.conciergeHeader}>
+                  <Text style={styles.conciergeTag}>📍 PEONY WEATHER CONCIERGE</Text>
+                  <Text style={styles.weatherInfo}>{locationName}, {temp}°C • {weatherDesc}</Text>
                 </View>
-                <TouchableOpacity style={styles.promoAction}>
-                  <Text style={styles.promoActionText}>İncele →</Text>
+                <Text style={styles.conciergeTitle}>{locationName} Havasına Özel Kürasyon</Text>
+                <Text style={styles.conciergeDesc}>{curationVibe}</Text>
+                <TouchableOpacity 
+                  style={styles.conciergeAction}
+                  onPress={() => {
+                    if (locationName === 'Bodrum' || locationName === 'Çeşme') {
+                      setActiveMood('beach');
+                    } else if (locationName === 'İstanbul') {
+                      setActiveMood('evening');
+                    } else {
+                      setActiveMood('quiet_luxury');
+                    }
+                  }}
+                >
+                  <Text style={styles.conciergeActionText}>Görünümü Keşfet →</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* Shop By Category Circular list */}
-              <Text style={styles.sectionTitle}>Kategorilere Göz At</Text>
+              {/* Shop By Category Horizontal list */}
+              <Text style={styles.sectionTitle}>Kategoriler</Text>
               <ScrollView 
                 horizontal 
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.categoryScroll}
               >
                 <TouchableOpacity 
-                  style={[styles.categoryItem, !selectedCategory && styles.activeCategoryItem]}
+                  style={styles.categoryItem}
                   onPress={() => setSelectedCategory(null)}
                 >
                   <View style={[styles.categoryCircle, !selectedCategory && styles.activeCategoryCircle]}>
-                    <Text style={styles.categoryAllEmoji}>✦</Text>
+                    <Text style={[styles.categoryAllEmoji, !selectedCategory && { color: '#FFF' }]}>✦</Text>
                   </View>
                   <Text style={[styles.categoryName, !selectedCategory && styles.activeCategoryName]}>Tümü</Text>
                 </TouchableOpacity>
@@ -155,7 +214,7 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
                   return (
                     <TouchableOpacity 
                       key={idx}
-                      style={[styles.categoryItem, isActive && styles.activeCategoryItem]}
+                      style={styles.categoryItem}
                       onPress={() => setSelectedCategory(cat.name)}
                     >
                       <Image source={{ uri: cat.image }} style={[styles.categoryImage, isActive && styles.activeCategoryImage]} />
@@ -165,13 +224,56 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
                 })}
               </ScrollView>
 
-              <Text style={styles.sectionTitle}>Yeni Gelenler</Text>
+              {/* Styled Mood Curations Slider (Matches Web Categories) */}
+              <Text style={styles.sectionTitle}>Editoryal Kürasyonlar</Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.moodScroll}
+              >
+                <TouchableOpacity 
+                  style={[styles.moodPill, activeMood === 'all' && styles.activeMoodPill]} 
+                  onPress={() => setActiveMood('all')}
+                >
+                  <Text style={[styles.moodText, activeMood === 'all' && styles.activeMoodText]}>Tüm Vitrin</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.moodPill, activeMood === 'under15k' && styles.activeMoodPill]} 
+                  onPress={() => setActiveMood('under15k')}
+                >
+                  <Text style={[styles.moodText, activeMood === 'under15k' && styles.activeMoodText]}>15K TL Altı Çantalar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.moodPill, activeMood === 'evening' && styles.activeMoodPill]} 
+                  onPress={() => setActiveMood('evening')}
+                >
+                  <Text style={[styles.moodText, activeMood === 'evening' && styles.activeMoodText]}>Gecenin Şıklığı</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.moodPill, activeMood === 'beach' && styles.activeMoodPill]} 
+                  onPress={() => setActiveMood('beach')}
+                >
+                  <Text style={[styles.moodText, activeMood === 'beach' && styles.activeMoodText]}>Plaj Rahatlığı</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.moodPill, activeMood === 'quiet_luxury' && styles.activeMoodPill]} 
+                  onPress={() => setActiveMood('quiet_luxury')}
+                >
+                  <Text style={[styles.moodText, activeMood === 'quiet_luxury' && styles.activeMoodText]}>Sessiz Lüks</Text>
+                </TouchableOpacity>
+              </ScrollView>
+
+              <Text style={styles.sectionTitle}>Sizin İçin Seçilenler</Text>
             </View>
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyIcon}>✦</Text>
-              <Text style={styles.emptyText}>Henüz sergilenecek ürün bulunmuyor.</Text>
+              <Text style={styles.emptyText}>Bu kürasyona ait ürün bulunamadı.</Text>
             </View>
           }
           renderItem={({ item }) => (
@@ -227,41 +329,60 @@ const styles = StyleSheet.create({
   headerComponent: {
     marginBottom: 10,
   },
-  promoBanner: {
-    backgroundColor: COLORS.bannerBg,
+  conciergeWidget: {
+    backgroundColor: COLORS.conciergeBg,
     marginHorizontal: 15,
     marginTop: 15,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(175, 145, 100, 0.15)',
+    shadowColor: '#AF9164',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  conciergeHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  promoTextContainer: {
-    flex: 1,
-    paddingRight: 10,
-  },
-  promoTitle: {
-    fontSize: 13,
+  conciergeTag: {
+    fontSize: 8.5,
     fontWeight: 'bold',
-    color: '#2E4C36',
-    letterSpacing: 0.5,
+    color: COLORS.primary,
+    letterSpacing: 1.2,
   },
-  promoDesc: {
-    fontSize: 11,
-    color: '#4B6B54',
-    marginTop: 4,
-    lineHeight: 15,
+  weatherInfo: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    fontWeight: '600',
   },
-  promoAction: {
-    backgroundColor: '#1E3524',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 6,
+  conciergeTitle: {
+    fontSize: 18,
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+    color: COLORS.text,
+    fontWeight: 'normal',
+    marginBottom: 6,
   },
-  promoActionText: {
+  conciergeDesc: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    lineHeight: 17,
+    marginBottom: 15,
+  },
+  conciergeAction: {
+    backgroundColor: COLORS.darkBar,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    alignSelf: 'flex-start',
+  },
+  conciergeActionText: {
     color: '#FFFFFF',
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: 'bold',
   },
   sectionTitle: {
@@ -282,7 +403,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
   },
-  activeCategoryItem: {},
   categoryCircle: {
     width: 60,
     height: 60,
@@ -324,6 +444,32 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontWeight: 'bold',
   },
+  moodScroll: {
+    paddingLeft: 15,
+    paddingBottom: 10,
+  },
+  moodPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginRight: 10,
+  },
+  activeMoodPill: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  moodText: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    fontWeight: '500',
+  },
+  activeMoodText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
   gridContent: {
     paddingBottom: 100, // Safe padding for floating tab bar
   },
@@ -333,7 +479,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   card: {
-    backgroundColor: 'transparent', // Clean borderless look
+    backgroundColor: 'transparent',
     width: COLUMN_WIDTH,
     overflow: 'hidden',
     marginBottom: 10,
@@ -389,9 +535,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   emptyContainer: {
-    paddingVertical: 80,
+    paddingVertical: 60,
     alignItems: 'center',
     justifyContent: 'center',
+    width: width - 30,
   },
   emptyIcon: {
     fontSize: 32,
