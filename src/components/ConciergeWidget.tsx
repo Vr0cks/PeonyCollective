@@ -181,7 +181,7 @@ export default function ConciergeWidget() {
   const ThemeIcon = isAdmin ? Terminal : Crown
 
   return (
-    <div className="fixed bottom-6 right-6 z-[990]">
+    <div className="fixed bottom-24 right-6 md:bottom-6 md:right-6 z-[990]">
       <AnimatePresence>
         
         {isOpen && (
