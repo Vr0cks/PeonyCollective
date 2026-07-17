@@ -11,12 +11,12 @@ import {
 import { supabase } from '../lib/supabase';
 
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37', // Gold
-  border: '#2A2D3D'
+  bg: '#FBFBFA', // Luxury off-white
+  card: '#FFFFFF', // Clean white
+  text: '#1A1A1A', // High-contrast charcoal text
+  textMuted: '#7E8085', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#E8E8E6' // Thin dividers
 };
 
 interface Conversation {
@@ -28,7 +28,7 @@ interface Conversation {
   product?: {
     id: string;
     brand: string;
-    name: string;
+    model_name: string;
     image_urls?: string[];
   };
   other_profile?: {
@@ -59,7 +59,7 @@ export default function ChatListScreen({ onSelectChat }: ChatListScreenProps) {
         .from('conversations')
         .select(`
           *,
-          product:products(id, brand, name, image_urls)
+          product:products(id, brand, model_name, image_urls)
         `)
         .or(`participant_1.eq.${userObj.id},participant_2.eq.${userObj.id}`)
         .order('last_message_at', { ascending: false });
@@ -134,7 +134,7 @@ export default function ChatListScreen({ onSelectChat }: ChatListScreenProps) {
                     )}
                   </View>
                   <Text style={styles.productContext} numberOfLines={1}>
-                    {item.product?.brand} - {item.product?.name}
+                    {item.product?.brand} - {item.product?.model_name}
                   </Text>
                   <Text style={styles.lastMsg} numberOfLines={1}>
                     {item.last_message || 'Henüz mesaj yok.'}
@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 15,
+    paddingBottom: 110, // Safe padding for floating tab bar
   },
   emptyContainer: {
     paddingVertical: 100,

@@ -9,12 +9,12 @@ import {
 import { supabase } from '../lib/supabase';
 
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37', // Gold
-  border: '#2A2D3D',
+  bg: '#FBFBFA', // Luxury off-white
+  card: '#FFFFFF', // Clean white
+  text: '#1A1A1A', // High-contrast charcoal text
+  textMuted: '#7E8085', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#E8E8E6', // Thin dividers
   danger: '#EF4444',
   accent: '#10B981'
 };
@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
+    paddingBottom: 110, // Safe padding for floating tab bar
   },
   profileBox: {
     width: '100%',
@@ -105,6 +106,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
   },
   avatar: {
     width: 80,
@@ -118,7 +124,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: COLORS.bg,
+    color: '#FFFFFF', // White text on gold avatar circle
   },
   name: {
     fontSize: 20,

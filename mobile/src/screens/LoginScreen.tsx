@@ -8,7 +8,8 @@ import {
   ActivityIndicator, 
   KeyboardAvoidingView, 
   ScrollView, 
-  Platform 
+  Platform,
+  SafeAreaView
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
@@ -124,10 +125,11 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
   }
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView 
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         <View style={styles.authContainer}>
           <Text style={styles.brandTitle}>PEONY</Text>
@@ -199,11 +201,16 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
