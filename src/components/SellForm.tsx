@@ -835,7 +835,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                   disabled={!selectedBrand}
                   required
                 />
-                {modelDropdownOpen && filteredModels.length > 0 && (
+                {modelDropdownOpen && (
                   <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
                     {filteredModels.map(m => (
                       <button
@@ -851,6 +851,18 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                         {m.name}
                       </button>
                     ))}
+                    {modelSearchQuery.trim().length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedModel(modelSearchQuery.trim())
+                          setModelDropdownOpen(false)
+                        }}
+                        className="w-full text-left px-5 py-3 text-sm bg-gray-50 hover:bg-[#AF9164]/20 text-[#AF9164] font-bold uppercase tracking-wider border-none cursor-pointer"
+                      >
+                        ➕ &quot;{modelSearchQuery.trim().toUpperCase()}&quot; Modelini Manuel Yaz
+                      </button>
+                    )}
                   </div>
                 )}
                 {renderErrorMsg('model')}
