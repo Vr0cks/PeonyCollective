@@ -33,11 +33,16 @@ interface ProfileScreenProps {
 export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileScreenProps) {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [profileMode, setProfileMode] = useState<'buyer' | 'seller'>('buyer'); // Switch between Buyer and Seller profiles
   const [activeAdPackage, setActiveAdPackage] = useState<string | null>(null);
   
-  // Wallet / Financial mock details
+  // Seller stats
   const [balance, setBalance] = useState('145.000 ₺');
   const [pendingPayout, setPendingPayout] = useState('85.000 ₺');
+
+  // Buyer stats
+  const [totalSpent, setTotalSpent] = useState('92.500 ₺');
+  const [activeOrdersCount, setActiveOrdersCount] = useState('1 Aktif Sipariş');
   
   // Account settings edit states
   const [iban, setIban] = useState('TR56 0006 2000 0001 2345 6789 01');
@@ -114,18 +119,185 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
             </View>
           </View>
 
-          {/* FINANCIAL DASHBOARD (CÜZDAN & KAZANÇ) */}
-          <View style={styles.walletBox}>
-            <View style={styles.walletCol}>
-              <Text style={styles.walletLabel}>TOPLAM SATIŞ</Text>
-              <Text style={styles.walletValue}>{balance}</Text>
-            </View>
-            <View style={styles.walletDivider} />
-            <View style={styles.walletCol}>
-              <Text style={styles.walletLabel}>BEKLEYEN HAKEDİŞ</Text>
-              <Text style={styles.walletValue}>{pendingPayout}</Text>
-            </View>
+          {/* BUYER / SELLER MODE TOGGLE TABS (ELEGANT SEGMENTED SWITCH) */}
+          <View style={styles.modeTabs}>
+            <TouchableOpacity 
+              style={[styles.modeTab, profileMode === 'buyer' && styles.activeModeTab]}
+              onPress={() => setProfileMode('buyer')}
+            >
+              <Text style={[styles.modeTabText, profileMode === 'buyer' && styles.activeModeTabText]}>
+                🛍️ Alışverişlerim
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.modeTab, profileMode === 'seller' && styles.activeModeTab]}
+              onPress={() => setProfileMode('seller')}
+            >
+              <Text style={[styles.modeTabText, profileMode === 'seller' && styles.activeModeTabText]}>
+                💰 Satışlarım
+              </Text>
+            </TouchableOpacity>
           </View>
+
+          {/* DYNAMIC RENDERING: BUYER ACCOUNT VIEW */}
+          {profileMode === 'buyer' && (
+            <View>
+              {/* Financial Summary */}
+              <View style={styles.walletBox}>
+                <View style={styles.walletCol}>
+                  <Text style={styles.walletLabel}>TOPLAM HARCAMA</Text>
+                  <Text style={styles.walletValue}>{totalSpent}</Text>
+                </View>
+                <View style={styles.walletDivider} />
+                <View style={styles.walletCol}>
+                  <Text style={styles.walletLabel}>AKTİF SİPARİŞ</Text>
+                  <Text style={styles.walletValue}>{activeOrdersCount}</Text>
+                </View>
+              </View>
+
+              {/* Active Orders List Card */}
+              <Text style={styles.sectionTitle}>Sipariş Takibi</Text>
+              <View style={styles.trackerCard}>
+                <View style={styles.trackerHeader}>
+                  <Text style={styles.trackerProdName}>Rolex Submariner Date</Text>
+                  <Text style={[styles.trackerStatus, { color: COLORS.accent }]}>Kargoya Verildi 🚚</Text>
+                </View>
+                <Text style={styles.orderDetailText}>
+                  Kargo Firması: Yurtiçi Kargo • Takip No: YK837261902{'\n'}
+                  Tahmini Teslimat: 2 Gün İçinde
+                </Text>
+                {/* Visual authenticity guarantee indicator */}
+                <View style={styles.guaranteeTag}>
+                  <Text style={styles.guaranteeText}>✓ Spektral Analiz Onaylı Dijital Pasaport Hazır</Text>
+                </View>
+              </View>
+
+              {/* Saved Cards */}
+              <Text style={styles.sectionTitle}>Kayıtlı Kartlarım</Text>
+              <View style={styles.savedCardBox}>
+                <Text style={styles.savedCardTitle}>💳 MasterCard •••• 4820</Text>
+                <Text style={styles.savedCardExpiry}>Skt: 08/29</Text>
+              </View>
+            </View>
+          )}
+
+          {/* DYNAMIC RENDERING: SELLER ACCOUNT VIEW */}
+          {profileMode === 'seller' && (
+            <View>
+              {/* Financial Summary */}
+              <View style={styles.walletBox}>
+                <View style={styles.walletCol}>
+                  <Text style={styles.walletLabel}>TOPLAM SATIŞ</Text>
+                  <Text style={styles.walletValue}>{balance}</Text>
+                </View>
+                <View style={styles.walletDivider} />
+                <View style={styles.walletCol}>
+                  <Text style={styles.walletLabel}>BEKLEYEN HAKEDİŞ</Text>
+                  <Text style={styles.walletValue}>{pendingPayout}</Text>
+                </View>
+              </View>
+
+              {/* Consignment tracking */}
+              <Text style={styles.sectionTitle}>Konsinye Ürün Takibi</Text>
+              <View style={styles.trackerCard}>
+                <View style={styles.trackerHeader}>
+                  <Text style={styles.trackerProdName}>Chanel Classic Double Flap</Text>
+                  <Text style={styles.trackerStatus}>SPA & Bakım Aşaması</Text>
+                </View>
+
+                {/* Stepper Steps */}
+                <View style={styles.stepsContainer}>
+                  <View style={styles.stepItem}>
+                    <View style={[styles.stepCircle, styles.stepDone]}>
+                      <Text style={styles.stepCheck}>✓</Text>
+                    </View>
+                    <Text style={styles.stepLabel}>Kabul</Text>
+                  </View>
+
+                  <View style={[styles.stepLine, styles.stepLineActive]} />
+
+                  <View style={styles.stepItem}>
+                    <View style={[styles.stepCircle, styles.stepDone]}>
+                      <Text style={styles.stepCheck}>✓</Text>
+                    </View>
+                    <Text style={styles.stepLabel}>Ekspertiz</Text>
+                  </View>
+
+                  <View style={[styles.stepLine, styles.stepLineActive]} />
+
+                  <View style={styles.stepItem}>
+                    <View style={[styles.stepCircle, styles.stepActive]}>
+                      <Text style={styles.stepNumber}>3</Text>
+                    </View>
+                    <Text style={[styles.stepLabel, styles.stepLabelActive]}>SPA</Text>
+                  </View>
+
+                  <View style={styles.stepLine} />
+
+                  <View style={styles.stepItem}>
+                    <View style={styles.stepCircle}>
+                      <Text style={styles.stepNumber}>4</Text>
+                    </View>
+                    <Text style={styles.stepLabel}>Çekim</Text>
+                  </View>
+
+                  <View style={styles.stepLine} />
+
+                  <View style={styles.stepItem}>
+                    <View style={styles.stepCircle}>
+                      <Text style={styles.stepNumber}>5</Text>
+                    </View>
+                    <Text style={styles.stepLabel}>Vitrin</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Monetization / Advertising Portal */}
+              <Text style={styles.sectionTitle}>Satışlarınızı Artırın</Text>
+              <Text style={styles.sectionDesc}>
+                Peony Muse ve Vitrin reklam paketleriyle ürünlerinize %50 daha fazla gösterim kazandırın.
+              </Text>
+
+              {/* Package 1: Curator Boost */}
+              <View style={styles.adCard}>
+                <View style={styles.adHeader}>
+                  <Text style={styles.adTitle}>Küratör Öne Çıkarması (Muse Boost)</Text>
+                  <Text style={styles.adPrice}>3.000 ₺ / Ay</Text>
+                </View>
+                <Text style={styles.adDesc}>
+                  Ürünleriniz lüks stil danışmanımız **Peony Muse** sohbetlerinde öncelikli tavsiye olarak eşleştirilir ve vitrinde %50 daha fazla görünürlük kazanır.
+                </Text>
+                <TouchableOpacity 
+                  style={[styles.adBtn, activeAdPackage === 'Küratör Öne Çıkarması' && styles.activeAdBtn]}
+                  onPress={() => handleBuyAdPackage('Küratör Öne Çıkarması', '3.000 ₺ / Ay')}
+                >
+                  <Text style={styles.adBtnText}>
+                    {activeAdPackage === 'Küratör Öne Çıkarması' ? '✓ AKTİF ABONELİK' : 'ABONELİĞİ BAŞLAT'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Package 2: VIP Showcase */}
+              <View style={styles.adCard}>
+                <View style={styles.adHeader}>
+                  <Text style={styles.adTitle}>VIP Vitrin Vitrini (Showcase Pro)</Text>
+                  <Text style={styles.adPrice}>5.000 ₺ / Ay</Text>
+                </View>
+                <Text style={styles.adDesc}>
+                  Ürünleriniz ana sayfadaki üst kategori slider\'larında, Weather Concierge hava durumu listelemelerinde ve aramalarda en üst sırada sponsorlu ibaresi olmadan organik olarak sergilenir.
+                </Text>
+                <TouchableOpacity 
+                  style={[styles.adBtn, activeAdPackage === 'VIP Vitrin Vitrini' && styles.activeAdBtn]}
+                  onPress={() => handleBuyAdPackage('VIP Vitrin Vitrini', '5.000 ₺ / Ay')}
+                >
+                  <Text style={styles.adBtnText}>
+                    {activeAdPackage === 'VIP Vitrin Vitrini' ? '✓ AKTİF ABONELİK' : 'ABONELİĞİ BAŞLAT'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* ADMIN OPERATIONS LINK */}
           {(profile?.role === 'admin' || profile?.role === 'operations') && (
@@ -133,61 +305,6 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               <Text style={styles.adminBtnText}>🛡 OPERASYON PANELİ GİRİŞİ</Text>
             </TouchableOpacity>
           )}
-
-          {/* LÜKS KONSİNYE CANLI TAKİP SİSTEMİ */}
-          <Text style={styles.sectionTitle}>Konsinye Ürün Takibi</Text>
-          <View style={styles.trackerCard}>
-            <View style={styles.trackerHeader}>
-              <Text style={styles.trackerProdName}>Chanel Classic Double Flap</Text>
-              <Text style={styles.trackerStatus}>SPA & Bakım Aşaması</Text>
-            </View>
-
-            {/* Stepper Steps */}
-            <View style={styles.stepsContainer}>
-              <View style={styles.stepItem}>
-                <View style={[styles.stepCircle, styles.stepDone]}>
-                  <Text style={styles.stepCheck}>✓</Text>
-                </View>
-                <Text style={styles.stepLabel}>Kabul</Text>
-              </View>
-
-              <View style={[styles.stepLine, styles.stepLineActive]} />
-
-              <View style={styles.stepItem}>
-                <View style={[styles.stepCircle, styles.stepDone]}>
-                  <Text style={styles.stepCheck}>✓</Text>
-                </View>
-                <Text style={styles.stepLabel}>Ekspertiz</Text>
-              </View>
-
-              <View style={[styles.stepLine, styles.stepLineActive]} />
-
-              <View style={styles.stepItem}>
-                <View style={[styles.stepCircle, styles.stepActive]}>
-                  <Text style={styles.stepNumber}>3</Text>
-                </View>
-                <Text style={[styles.stepLabel, styles.stepLabelActive]}>SPA</Text>
-              </View>
-
-              <View style={styles.stepLine} />
-
-              <View style={styles.stepItem}>
-                <View style={styles.stepCircle}>
-                  <Text style={styles.stepNumber}>4</Text>
-                </View>
-                <Text style={styles.stepLabel}>Çekim</Text>
-              </View>
-
-              <View style={styles.stepLine} />
-
-              <View style={styles.stepItem}>
-                <View style={styles.stepCircle}>
-                  <Text style={styles.stepNumber}>5</Text>
-                </View>
-                <Text style={styles.stepLabel}>Vitrin</Text>
-              </View>
-            </View>
-          </View>
 
           {/* ACCOUNT & PREFERENCES LIST */}
           <Text style={styles.sectionTitle}>Hesap Bilgileri & Ayarlar</Text>
@@ -239,50 +356,6 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
             </View>
           </View>
 
-          {/* MONETIZATION / ADVERTISING PORTAL */}
-          <Text style={styles.sectionTitle}>Satışlarınızı Artırın</Text>
-          <Text style={styles.sectionDesc}>
-            Peony Muse ve Vitrin reklam paketleriyle ürünlerinize %50 daha fazla gösterim kazandırın.
-          </Text>
-
-          {/* Package 1: Curator Boost */}
-          <View style={styles.adCard}>
-            <View style={styles.adHeader}>
-              <Text style={styles.adTitle}>Küratör Öne Çıkarması (Muse Boost)</Text>
-              <Text style={styles.adPrice}>3.000 ₺ / Ay</Text>
-            </View>
-            <Text style={styles.adDesc}>
-              Ürünleriniz lüks stil danışmanımız **Peony Muse** sohbetlerinde öncelikli tavsiye olarak eşleştirilir ve vitrinde %50 daha fazla görünürlük kazanır.
-            </Text>
-            <TouchableOpacity 
-              style={[styles.adBtn, activeAdPackage === 'Küratör Öne Çıkarması' && styles.activeAdBtn]}
-              onPress={() => handleBuyAdPackage('Küratör Öne Çıkarması', '3.000 ₺ / Ay')}
-            >
-              <Text style={styles.adBtnText}>
-                {activeAdPackage === 'Küratör Öne Çıkarması' ? '✓ AKTİF ABONELİK' : 'ABONELİĞİ BAŞLAT'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Package 2: VIP Showcase */}
-          <View style={styles.adCard}>
-            <View style={styles.adHeader}>
-              <Text style={styles.adTitle}>VIP Vitrin Vitrini (Showcase Pro)</Text>
-              <Text style={styles.adPrice}>5.000 ₺ / Ay</Text>
-            </View>
-            <Text style={styles.adDesc}>
-              Ürünleriniz ana sayfadaki üst kategori slider\'larında, Weather Concierge hava durumu listelemelerinde ve aramalarda en üst sırada sponsorlu ibaresi olmadan organik olarak sergilenir.
-            </Text>
-            <TouchableOpacity 
-              style={[styles.adBtn, activeAdPackage === 'VIP Vitrin Vitrini' && styles.activeAdBtn]}
-              onPress={() => handleBuyAdPackage('VIP Vitrin Vitrini', '5.000 ₺ / Ay')}
-            >
-              <Text style={styles.adBtnText}>
-                {activeAdPackage === 'VIP Vitrin Vitrini' ? '✓ AKTİF ABONELİK' : 'ABONELİĞİ BAŞLAT'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
           <TouchableOpacity style={styles.logoutBtn} onPress={handleSignOut}>
             <Text style={styles.logoutBtnText}>Oturumu Kapat</Text>
           </TouchableOpacity>
@@ -315,7 +388,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: COLORS.border,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   avatar: {
     width: 60,
@@ -349,6 +422,37 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: COLORS.textMuted,
     marginTop: 4,
+  },
+  /* Tab Segment Switch */
+  modeTabs: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.border,
+    borderRadius: 10,
+    padding: 3,
+    marginBottom: 20,
+  },
+  modeTab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  activeModeTab: {
+    backgroundColor: COLORS.card,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modeTabText: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    fontWeight: '600',
+  },
+  activeModeTabText: {
+    color: COLORS.text,
+    fontWeight: 'bold',
   },
   walletBox: {
     flexDirection: 'row',
@@ -392,6 +496,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 25,
+    marginTop: 5,
   },
   adminBtnText: {
     color: COLORS.primary,
@@ -425,7 +530,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
     paddingBottom: 12,
@@ -439,6 +544,43 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLORS.primary,
     fontWeight: 'bold',
+  },
+  orderDetailText: {
+    fontSize: 11.5,
+    color: COLORS.textMuted,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  guaranteeTag: {
+    backgroundColor: '#E9EFEA',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+  },
+  guaranteeText: {
+    fontSize: 10,
+    color: '#2E4C36',
+    fontWeight: '600',
+  },
+  savedCardBox: {
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 25,
+  },
+  savedCardTitle: {
+    fontSize: 12.5,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  savedCardExpiry: {
+    fontSize: 11.5,
+    color: COLORS.textMuted,
   },
   stepsContainer: {
     flexDirection: 'row',
