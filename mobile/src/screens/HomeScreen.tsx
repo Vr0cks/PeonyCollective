@@ -16,13 +16,13 @@ const { width } = Dimensions.get('window');
 const COLUMN_WIDTH = (width - 50) / 2;
 
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37',
-  border: '#2A2D3D',
-  accent: '#10B981'
+  bg: '#0A0A0E', // Ultra deep black/charcoal
+  card: '#13141A', // Rich card slate
+  text: '#F5F5F7', // Off-white premium text
+  textMuted: '#8E909B', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#1F212A', // Thin luxury dividers
+  accent: '#10B981' // Emerald green
 };
 
 interface Product {
@@ -99,7 +99,8 @@ export default function HomeScreen({ onSelectProduct }: HomeScreenProps) {
           refreshing={loading}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Hiç ürün bulunamadı.</Text>
+              <Text style={styles.emptyIcon}>✦</Text>
+              <Text style={styles.emptyText}>Henüz sergilenecek ürün bulunmuyor.</Text>
             </View>
           }
           renderItem={({ item }) => (
@@ -211,10 +212,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   emptyContainer: {
-    paddingVertical: 100,
+    paddingVertical: 120,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyIcon: {
+    fontSize: 32,
+    color: COLORS.primary,
+    marginBottom: 10,
   },
   emptyText: {
     color: COLORS.textMuted,
+    fontSize: 12,
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    textTransform: 'uppercase',
   }
 });

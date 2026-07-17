@@ -18,12 +18,12 @@ WebBrowser.maybeCompleteAuthSession();
 
 // Theme Colors
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37', // Gold
-  border: '#2A2D3D'
+  bg: '#0A0A0E', // Deep luxury charcoal
+  card: '#13141A', // Rich card slate
+  text: '#F5F5F7', // Off-white premium text
+  textMuted: '#8E909B', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#1F212A' // Thin luxury dividers
 };
 
 interface LoginScreenProps {
