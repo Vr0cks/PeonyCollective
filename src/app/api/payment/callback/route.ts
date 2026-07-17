@@ -5,11 +5,12 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const rawParams: Record<string, string> = {}
-    formData.forEach((value, key) => {
+    const entries = Array.from((formData as any).entries()) as [string, any][]
+    for (const [key, value] of entries) {
       if (typeof value === 'string') {
         rawParams[key] = value
       }
-    })
+    }
     const params = rawParams as unknown as PayTRCallbackParams
 
     // 1. Verify PayTR signature
