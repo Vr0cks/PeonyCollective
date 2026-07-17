@@ -11,7 +11,10 @@ import {
   SafeAreaView, 
   StatusBar,
   Dimensions,
-  Modal
+  Modal,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform
 } from 'react-native';
 import { supabase } from './src/lib/supabase';
 
@@ -119,7 +122,6 @@ export default function App() {
     setTimeout(async () => {
       if (!selectedProduct) return;
       try {
-        // Here we simulate the webhook by writing to our API route or updating DB directly
         const { error } = await supabase.from('products').update({
           entrupy_status: 'verified',
           status: 'approved'
@@ -137,59 +139,69 @@ export default function App() {
   // --- RENDERING SCREENS ---
 
   if (!session) {
-    // LOGIN SCREEN
+    // LOGIN SCREEN (with Keyboard and Notch protection)
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
-        <View style={styles.authContainer}>
-          <Text style={styles.brandTitle}>PEONY</Text>
-          <Text style={styles.brandSubtitle}>COLLECTIVE • OPERATIONS</Text>
-          
-          <Text style={styles.loginHeader}>Operasyon Girişi</Text>
-          <Text style={styles.loginDescription}>Lütfen yönetici veya operatör hesabınızla giriş yapın.</Text>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.authContainer}>
+              <Text style={styles.brandTitle}>PEONY</Text>
+              <Text style={styles.brandSubtitle}>COLLECTIVE • OPERATIONS</Text>
+              
+              <Text style={styles.loginHeader}>Operasyon Girişi</Text>
+              <Text style={styles.loginDescription}>Lütfen yönetici veya operatör hesabınızla giriş yapın.</Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>E-POSTA</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="e.g. operasyon@peonycollective.com"
-              placeholderTextColor={COLORS.textMuted}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-          </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>E-POSTA</Text>
+                <TextInput 
+                  style={styles.input} 
+                  placeholder="e.g. operasyon@peonycollective.com"
+                  placeholderTextColor={COLORS.textMuted}
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>ŞİFRE</Text>
-            <TextInput 
-              style={styles.input} 
-              secureTextEntry
-              placeholder="••••••••"
-              placeholderTextColor={COLORS.textMuted}
-              value={password}
-              onChangeText={setPassword}
-              autoCapitalize="none"
-            />
-          </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>ŞİFRE</Text>
+                <TextInput 
+                  style={styles.input} 
+                  secureTextEntry
+                  placeholder="••••••••"
+                  placeholderTextColor={COLORS.textMuted}
+                  value={password}
+                  onChangeText={setPassword}
+                  autoCapitalize="none"
+                />
+              </View>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
-            {loading ? (
-              <ActivityIndicator color={COLORS.bg} />
-            ) : (
-              <Text style={styles.loginButtonText}>GİRİŞ YAP</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator color={COLORS.bg} />
+                ) : (
+                  <Text style={styles.loginButtonText}>GİRİŞ YAP</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
 
-  // DASHBOARD SCREEN
+  // DASHBOARD SCREEN (with Notch protection)
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       
       {/* Header */}
       <View style={styles.header}>
@@ -331,9 +343,18 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   centered: {
     flex: 1,
@@ -344,6 +365,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 30,
     justifyContent: 'center',
+    paddingVertical: 40,
   },
   brandTitle: {
     fontSize: 36,
