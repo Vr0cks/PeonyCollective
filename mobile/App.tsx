@@ -17,6 +17,9 @@ import SellScreen from './src/screens/SellScreen';
 import ProductDetailsScreen from './src/screens/ProductDetailsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import OperationsQueueScreen from './src/screens/OperationsQueueScreen';
+import ChatListScreen from './src/screens/ChatListScreen';
+import ChatDetailScreen from './src/screens/ChatDetailScreen';
+import SupportTicketsScreen from './src/screens/SupportTicketsScreen';
 
 const COLORS = {
   bg: '#0F1016',
@@ -27,7 +30,7 @@ const COLORS = {
   border: '#2A2D3D'
 };
 
-type Tab = 'feed' | 'sell' | 'profile' | 'details' | 'operations';
+type Tab = 'feed' | 'sell' | 'chats' | 'support' | 'profile' | 'details' | 'chat_detail' | 'operations';
 
 interface Product {
   id: string;
@@ -43,7 +46,12 @@ interface Product {
 export default function App() {
   const [session, setSession] = useState<any>(null);
   const [currentTab, setCurrentTab] = useState<Tab>('feed');
+  
+  // Navigation states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [selectedChatName, setSelectedChatName] = useState<string>('');
+  const [selectedChatProduct, setSelectedChatProduct] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -60,6 +68,15 @@ export default function App() {
     setCurrentTab('details');
   }
 
+  function handleSelectChat(conversationId: string, otherName: string, productInfo?: any) {
+    setSelectedChatId(conversationId);
+    setSelectedChatName(otherName);
+    setSelectedChatProduct(productInfo);
+    setCurrentTab('chat_detail');
+  }
+
+  const isMainTab = currentTab === 'feed' || currentTab === 'sell' || currentTab === 'chats' || currentTab === 'support' || currentTab === 'profile';
+
   // --- RENDERING SCREENS ---
 
   if (!session) {
@@ -71,12 +88,14 @@ export default function App() {
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       
       {/* Header (Only visible on main tabs) */}
-      {(currentTab === 'feed' || currentTab === 'sell' || currentTab === 'profile') && (
+      {isMainTab && (
         <View style={styles.header}>
           <Text style={styles.headerTitle}>PEONY</Text>
           <Text style={styles.headerSubtitle}>
             {currentTab === 'feed' && 'Lüks Koleksiyon'}
-            {currentTab === 'sell' && 'Çanta Satış Talebi'}
+            {currentTab === 'sell' && 'Satış Talebi'}
+            {currentTab === 'chats' && 'Mesaj kutusu'}
+            {currentTab === 'support' && 'Müşteri Hizmetleri'}
             {currentTab === 'profile' && 'Hesabım'}
           </Text>
         </View>
@@ -90,6 +109,12 @@ export default function App() {
         {currentTab === 'sell' && (
           <SellScreen onSuccess={() => setCurrentTab('feed')} />
         )}
+        {currentTab === 'chats' && (
+          <ChatListScreen onSelectChat={handleSelectChat} />
+        )}
+        {currentTab === 'support' && (
+          <SupportTicketsScreen />
+        )}
         {currentTab === 'profile' && (
           <ProfileScreen 
             onLogout={() => setCurrentTab('feed')}
@@ -102,13 +127,21 @@ export default function App() {
             onBack={() => setCurrentTab('feed')} 
           />
         )}
+        {currentTab === 'chat_detail' && selectedChatId && (
+          <ChatDetailScreen 
+            conversationId={selectedChatId}
+            otherName={selectedChatName}
+            productInfo={selectedChatProduct}
+            onBack={() => setCurrentTab('chats')}
+          />
+        )}
         {currentTab === 'operations' && (
           <OperationsQueueScreen onBack={() => setCurrentTab('profile')} />
         )}
       </View>
 
       {/* Tab Bar (Only visible on main tabs) */}
-      {(currentTab === 'feed' || currentTab === 'sell' || currentTab === 'profile') && (
+      {isMainTab && (
         <View style={styles.tabBar}>
           <TouchableOpacity 
             style={[styles.tabItem, currentTab === 'feed' && styles.activeTabItem]}
@@ -121,7 +154,21 @@ export default function App() {
             style={[styles.tabItem, currentTab === 'sell' && styles.activeTabItem]}
             onPress={() => setCurrentTab('sell')}
           >
-            <Text style={[styles.tabText, currentTab === 'sell' && styles.activeTabText]}>ÇANTA SAT</Text>
+            <Text style={[styles.tabText, currentTab === 'sell' && styles.activeTabText]}>SAT</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.tabItem, currentTab === 'chats' && styles.activeTabItem]}
+            onPress={() => setCurrentTab('chats')}
+          >
+            <Text style={[styles.tabText, currentTab === 'chats' && styles.activeTabText]}>MESAJLAR</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.tabItem, currentTab === 'support' && styles.activeTabItem]}
+            onPress={() => setCurrentTab('support')}
+          >
+            <Text style={[styles.tabText, currentTab === 'support' && styles.activeTabText]}>DESTEK</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -187,10 +234,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   tabText: {
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: 'bold',
     color: COLORS.textMuted,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   activeTabText: {
     color: COLORS.primary,

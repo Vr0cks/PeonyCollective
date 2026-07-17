@@ -122,7 +122,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.formContainer}>
             <Text style={styles.headerTitle}>Ürün Bilgileri</Text>
-            <Text style={styles.headerSubtitle}>Satmak istediğiniz lüks çantanın detaylarını girin.</Text>
+            <Text style={styles.headerSubtitle}>Satmak istediğiniz lüks ürünün detaylarını girin.</Text>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>MARKA</Text>
@@ -173,7 +173,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               <Text style={styles.label}>AÇIKLAMA</Text>
               <TextInput 
                 style={[styles.input, styles.textArea]}
-                placeholder="Çantanın kondisyonu, aşınma durumu, fatura/kutu varlığı hakkında bilgi yazın..."
+                placeholder="Ürünün kondisyonu, aşınma durumu, fatura/kutu varlığı hakkında bilgi yazın..."
                 placeholderTextColor={COLORS.textMuted}
                 multiline
                 numberOfLines={4}
@@ -198,10 +198,10 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
           <View style={styles.cameraBox}>
             <View style={styles.cameraGuide}>
               <Text style={styles.guideText}>
-                {scanStep === 1 && '[ Çantanın Önünü Hizalayın ]'}
-                {scanStep === 2 && '[ Çantanın Arkasını Hizalayın ]'}
+                {scanStep === 1 && '[ Ürünün Önünü Hizalayın ]'}
+                {scanStep === 2 && '[ Ürünün Arkasını Hizalayın ]'}
                 {scanStep === 3 && '[ Logoyu/Damgayı Odaklayın ]'}
-                {scanStep === 4 && '[ Fermuar Tokasını Odaklayın ]'}
+                {scanStep === 4 && '[ Fermuar/Detay Tokasını Odaklayın ]'}
               </Text>
             </View>
             <Image 
@@ -212,10 +212,10 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
 
           <Text style={styles.stepIndicator}>Adım {scanStep} / 4</Text>
           <Text style={styles.guidanceText}>
-            {scanStep === 1 && '1. Adım: Çantanın ön yüzünü tam karşıdan ve net şekilde fotoğraflayın.'}
-            {scanStep === 2 && '2. Adım: Çantanın arka yüzünü ve dikişlerini net şekilde fotoğraflayın.'}
-            {scanStep === 3 && '3. Adım: Çantanın içindeki marka logosu baskısını/metal plakasını yakından çekin.'}
-            {scanStep === 4 && '4. Adım: Fermuar dişlerini ve fermuarın arkasındaki marka damgasını makro çekin.'}
+            {scanStep === 1 && '1. Adım: Ürünün ön yüzünü tam karşıdan ve net şekilde fotoğraflayın.'}
+            {scanStep === 2 && '2. Adım: Ürünün arka yüzünü ve dikişlerini net şekilde fotoğraflayın.'}
+            {scanStep === 3 && '3. Adım: Ürünün içindeki marka logosu baskısını/metal plakasını yakından çekin.'}
+            {scanStep === 4 && '4. Adım: Fermuar dişlerini, seri numarasını veya toka detayını makro çekin.'}
           </Text>
 
           <View style={styles.cameraActions}>

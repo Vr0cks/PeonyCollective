@@ -8,7 +8,8 @@ import {
   ScrollView, 
   Dimensions,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
+  FlatList
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -33,6 +34,13 @@ interface Product {
   entrupy_status: string;
   description?: string;
   material?: string;
+  condition?: string;
+  purchase_year?: number | string;
+  dimensions?: string;
+  odor_score?: number;
+  has_spa_treatment?: boolean;
+  full_set_items?: string[];
+  flaw_images?: string[];
 }
 
 interface ProductDetailsScreenProps {
@@ -44,6 +52,18 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
   const [offerText, setOfferText] = useState('');
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState('');
+
+  // Default values if fields are missing in data
+  const condition = product.condition || 'MÜKEMMEL';
+  const purchaseYear = product.purchase_year || 'BİLİNMİYOR';
+  const dimensions = product.dimensions || 'Boyut bilgisi belirtilmedi';
+  const odorScore = product.odor_score ?? 10;
+  const spaTreatment = product.has_spa_treatment ?? false;
+  const fullSet = product.full_set_items || ['Kutu', 'Dustbag'];
+  const flawImages = product.flaw_images || [];
+  const galleryImages = product.image_urls && product.image_urls.length > 0 
+    ? product.image_urls 
+    : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500'];
 
   async function handleBuy() {
     setLoading(true);
@@ -74,46 +94,118 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backBtn} onPress={onBack}>
-        <Text style={styles.backBtnText}>← Geri Dön</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Back Header */}
+      <View style={styles.navHeader}>
+        <TouchableOpacity style={styles.backBtn} onPress={onBack}>
+          <Text style={styles.backBtnText}>← Vitrin</Text>
+        </TouchableOpacity>
+        <Text style={styles.navTitle} numberOfLines={1}>{product.brand}</Text>
+      </View>
 
-      {/* Product Image */}
-      <Image 
-        source={{ uri: product.image_urls?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500' }} 
-        style={styles.image}
-      />
-
-      <View style={styles.content}>
-        {/* Brand & Name */}
-        <Text style={styles.brand}>{product.brand}</Text>
-        <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>{product.price?.toLocaleString('tr-TR')} TL</Text>
-
-        {/* Certificate Banner */}
-        <View style={styles.certBanner}>
-          <Text style={styles.certIcon}>✓</Text>
-          <View>
-            <Text style={styles.certTitle}>Entrupy Verified</Text>
-            <Text style={styles.certDescription}>Bu ürün yapay zeka analizinden geçerek onaylanmıştır.</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Horizontal Image Gallery */}
+        <View style={styles.galleryContainer}>
+          <FlatList 
+            data={galleryImages}
+            keyExtractor={(item, index) => `${item}-${index}`}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <Image source={{ uri: item }} style={styles.galleryImage} />
+            )}
+          />
+          <View style={styles.badgeContainer}>
+            <View style={styles.verifiedBadge}>
+              <Text style={styles.verifiedText}>✓ ENTRUPY VERIFIED</Text>
+            </View>
           </View>
         </View>
 
-        {/* Description */}
-        <Text style={styles.sectionTitle}>ÜRÜN DETAYI</Text>
-        <Text style={styles.description}>
-          {product.description || 'Bu çanta lüks segment olup Peony Collective uzmanları tarafından kontrol edilmiştir. Çok iyi durumda ve herhangi bir yıpranma bulunmamaktadır.'}
-        </Text>
-
-        <View style={styles.specRow}>
-          <Text style={styles.specLabel}>Materyal:</Text>
-          <Text style={styles.specValue}>{product.material || 'Deri'}</Text>
+        <View style={styles.mainInfo}>
+          <Text style={styles.brand}>{product.brand}</Text>
+          <Text style={styles.name}>{product.name}</Text>
+          <Text style={styles.price}>{product.price?.toLocaleString('tr-TR')} ₺</Text>
         </View>
 
-        {/* Buying Actions */}
-        <View style={styles.actions}>
+        {/* Specs Overview */}
+        <View style={styles.specsGrid}>
+          <View style={styles.specBox}>
+            <Text style={styles.specLabel}>KONDİSYON</Text>
+            <Text style={styles.specValue}>{condition.toUpperCase()}</Text>
+          </View>
+          <View style={styles.specBox}>
+            <Text style={styles.specLabel}>SATIN ALINAN YIL</Text>
+            <Text style={styles.specValue}>{purchaseYear}</Text>
+          </View>
+          <View style={[styles.specBox, { width: '100%', marginTop: 12 }]}>
+            <Text style={styles.specLabel}>BOYUTLAR</Text>
+            <Text style={styles.specValue}>{dimensions}</Text>
+          </View>
+        </View>
+
+        {/* Peony Expert Report Card */}
+        <View style={styles.expertCard}>
+          <Text style={styles.cardHeader}>PEONY UZMAN RAPORU</Text>
+          
+          {/* Odor Score */}
+          <View style={styles.metricRow}>
+            <View style={styles.metricHeader}>
+              <Text style={styles.metricLabel}>KOKU SKORU</Text>
+              <Text style={styles.metricValue}>{odorScore}/10</Text>
+            </View>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressInner, { width: `${odorScore * 10}%` }]} />
+            </View>
+          </View>
+
+          {/* Treatment Status */}
+          <View style={styles.metricRow}>
+            <Text style={styles.metricLabel}>BAKIM GEÇMİŞİ</Text>
+            <Text style={styles.expertStatus}>
+              {spaTreatment ? 'ORİJİNAL DIŞI MÜDAHALE / BOYA' : '%100 FABRİKA KONDİSYONU'}
+            </Text>
+          </View>
+
+          {/* Full Set items */}
+          <View style={styles.metricRow}>
+            <Text style={styles.metricLabel}>İÇERİK (FULL SET)</Text>
+            <View style={styles.setTags}>
+              {fullSet.map((item, idx) => (
+                <View key={idx} style={styles.setTag}>
+                  <Text style={styles.setTagText}>{item.toUpperCase()}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        {/* Condition Report Imperfections (Flaw images) */}
+        {flawImages.length > 0 && (
+          <View style={styles.expertCard}>
+            <Text style={styles.cardHeader}>DEFO & KUSUR RAPORU</Text>
+            <Text style={styles.cardDesc}>
+              Peony Lab tarafından tespit edilen kullanım izleri.
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.flawScroll}>
+              {flawImages.map((img, idx) => (
+                <Image key={idx} source={{ uri: img }} style={styles.flawImage} />
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Description */}
+        <View style={styles.descriptionSection}>
+          <Text style={styles.sectionHeader}>AÇIKLAMA</Text>
+          <Text style={styles.descriptionText}>
+            {product.description || 'Bu lüks parça Peony Collective eksperleri tarafından incelenmiş ve doğrulanmıştır. Herhangi bir aşınma veya yıpranma bulunmamaktadır.'}
+          </Text>
+        </View>
+
+        {/* Checkout actions */}
+        <View style={styles.actionsBox}>
           <TouchableOpacity style={styles.buyBtn} onPress={handleBuy} disabled={loading}>
             {loading && statusText.includes('Ödeme') ? (
               <ActivityIndicator color={COLORS.bg} />
@@ -122,10 +214,10 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
             )}
           </TouchableOpacity>
 
-          <View style={styles.offerContainer}>
+          <View style={styles.offerRow}>
             <TextInput 
               style={styles.offerInput}
-              placeholder="Teklif Ver (TL)"
+              placeholder="Teklif Ver (₺)"
               placeholderTextColor={COLORS.textMuted}
               keyboardType="numeric"
               value={offerText}
@@ -139,13 +231,12 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
               )}
             </TouchableOpacity>
           </View>
+          {statusText ? (
+            <Text style={styles.statusLabel}>{statusText}</Text>
+          ) : null}
         </View>
-
-        {statusText ? (
-          <Text style={styles.statusLabel}>{statusText}</Text>
-        ) : null}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -154,106 +245,222 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bg,
   },
+  navHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+  },
   backBtn: {
-    padding: 15,
-    marginTop: 10,
+    paddingRight: 15,
   },
   backBtnText: {
     color: COLORS.primary,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
   },
-  image: {
+  navTitle: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  galleryContainer: {
+    width: width,
+    height: width,
+    position: 'relative',
+    backgroundColor: '#000',
+  },
+  galleryImage: {
     width: width,
     height: width,
     resizeMode: 'cover',
   },
-  content: {
+  badgeContainer: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+  },
+  verifiedBadge: {
+    backgroundColor: 'rgba(16, 185, 129, 0.9)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  verifiedText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+  },
+  mainInfo: {
     padding: 20,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
   },
   brand: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 'bold',
     color: COLORS.primary,
     textTransform: 'uppercase',
-    letterSpacing: 2,
+    letterSpacing: 3,
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.text,
-    marginTop: 4,
+    marginTop: 6,
   },
   price: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginTop: 8,
-  },
-  certBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderRadius: 12,
-    padding: 15,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.2)',
-  },
-  certIcon: {
-    fontSize: 24,
-    color: COLORS.accent,
-    marginRight: 15,
-    fontWeight: 'bold',
-  },
-  certTitle: {
-    color: COLORS.accent,
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  certDescription: {
-    color: COLORS.textMuted,
-    fontSize: 12,
-    marginTop: 2,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 22,
     color: COLORS.primary,
-    letterSpacing: 1.5,
-    marginTop: 30,
-    marginBottom: 10,
+    fontWeight: '600',
+    marginTop: 10,
   },
-  description: {
-    color: COLORS.text,
-    fontSize: 14,
-    lineHeight: 22,
-  },
-  specRow: {
+  specsGrid: {
     flexDirection: 'row',
-    marginTop: 15,
-    borderTopWidth: 1,
+    flexWrap: 'wrap',
+    padding: 20,
+    justifyContent: 'space-between',
+  },
+  specBox: {
+    width: '48%',
+    backgroundColor: COLORS.card,
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
     borderColor: COLORS.border,
-    paddingTop: 15,
   },
   specLabel: {
+    fontSize: 9,
     color: COLORS.textMuted,
-    fontSize: 14,
-    width: 100,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   specValue: {
+    fontSize: 12,
     color: COLORS.text,
-    fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
   },
-  actions: {
-    marginTop: 35,
-    marginBottom: 40,
+  expertCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    marginHorizontal: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 20,
+  },
+  cardHeader: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    letterSpacing: 1.5,
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+    paddingBottom: 8,
+  },
+  cardDesc: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+    marginBottom: 15,
+  },
+  metricRow: {
+    marginBottom: 16,
+  },
+  metricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  metricLabel: {
+    fontSize: 9,
+    color: COLORS.textMuted,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  metricValue: {
+    fontSize: 11,
+    color: COLORS.text,
+    fontWeight: 'bold',
+  },
+  progressBar: {
+    height: 3,
+    backgroundColor: COLORS.border,
+    borderRadius: 1.5,
+    width: '100%',
+  },
+  progressInner: {
+    height: 3,
+    backgroundColor: COLORS.primary,
+    borderRadius: 1.5,
+  },
+  expertStatus: {
+    color: COLORS.text,
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  setTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 6,
+  },
+  setTag: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  setTagText: {
+    color: COLORS.text,
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  flawScroll: {
+    flexDirection: 'row',
+  },
+  flawImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 6,
+    marginRight: 10,
+    backgroundColor: '#000',
+  },
+  descriptionSection: {
+    paddingHorizontal: 20,
+    marginBottom: 30,
+  },
+  sectionHeader: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  descriptionText: {
+    color: COLORS.text,
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  actionsBox: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
   buyBtn: {
     backgroundColor: COLORS.primary,
-    borderRadius: 8,
     height: 50,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -261,28 +468,28 @@ const styles = StyleSheet.create({
   buyBtnText: {
     color: COLORS.bg,
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
-  offerContainer: {
+  offerRow: {
     flexDirection: 'row',
   },
   offerInput: {
     flex: 2,
     backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     borderRadius: 8,
     height: 48,
     color: COLORS.text,
     paddingHorizontal: 15,
-    borderWidth: 1,
-    borderColor: COLORS.border,
     marginRight: 10,
   },
   offerBtn: {
     flex: 1,
-    borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.primary,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -293,8 +500,8 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     color: COLORS.primary,
+    fontSize: 12,
     textAlign: 'center',
     marginTop: 10,
-    fontSize: 13,
   }
 });

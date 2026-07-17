@@ -10,7 +10,11 @@ import {
   ScrollView, 
   Platform 
 } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
 import { supabase } from '../lib/supabase';
+
+WebBrowser.maybeCompleteAuthSession();
 
 // Theme Colors
 const COLORS = {
@@ -43,7 +47,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
     try {
       if (isSignUp) {
         // Sign Up
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -64,6 +68,56 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
       }
     } catch (error: any) {
       alert('Hata: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleLogin() {
+    setLoading(true);
+    try {
+      const redirectUrl = AuthSession.makeRedirectUri({
+        scheme: 'peony',
+        path: 'auth/callback',
+      });
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error) throw error;
+
+      const res = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+      
+      if (res.type === 'success' && res.url) {
+        const hashIndex = res.url.indexOf('#');
+        if (hashIndex !== -1) {
+          const hash = res.url.substring(hashIndex + 1);
+          const params = hash.split('&').reduce((acc, current) => {
+            const [key, value] = current.split('=');
+            acc[key] = decodeURIComponent(value);
+            return acc;
+          }, {} as Record<string, string>);
+
+          const accessToken = params['access_token'];
+          const refreshToken = params['refresh_token'];
+
+          if (accessToken && refreshToken) {
+            const { error: setSessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+            if (setSessionError) throw setSessionError;
+            onSuccess();
+          }
+        }
+      }
+    } catch (error: any) {
+      alert('Google Giriş Hatası: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -129,6 +183,10 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
             ) : (
               <Text style={styles.loginButtonText}>{isSignUp ? 'KAYIT OL' : 'GİRİŞ YAP'}</Text>
             )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin} disabled={loading}>
+            <Text style={styles.googleButtonText}>GOOGLE İLE DEVAM ET</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -215,6 +273,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 2,
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  googleButtonText: {
+    color: '#1F2937',
+    fontWeight: 'bold',
+    fontSize: 15,
+    letterSpacing: 1.5,
   },
   switchButton: {
     marginTop: 25,
