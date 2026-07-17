@@ -9,25 +9,26 @@ import {
   Dimensions,
   TextInput,
   ActivityIndicator,
-  FlatList
+  FlatList,
+  Platform
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 const COLORS = {
-  bg: '#0F1016',
-  card: '#181A24',
-  text: '#FFFFFF',
-  textMuted: '#8E909B',
-  primary: '#D4AF37', // Gold
-  border: '#2A2D3D',
-  accent: '#10B981',
+  bg: '#FBFBFA', // Luxury off-white
+  card: '#FFFFFF', // Clean white
+  text: '#1A1A1A', // High-contrast charcoal text
+  textMuted: '#7E8085', // Slate gray
+  primary: '#AF9164', // Classic champagne gold
+  border: '#E8E8E6', // Thin dividers
+  accent: '#10B981', // Emerald green
   danger: '#EF4444'
 };
 
 interface Product {
   id: string;
-  name: string;
+  model_name: string;
   brand: string;
   price: number;
   image_urls?: string[];
@@ -59,7 +60,7 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
   const dimensions = product.dimensions || 'Boyut bilgisi belirtilmedi';
   const odorScore = product.odor_score ?? 10;
   const spaTreatment = product.has_spa_treatment ?? false;
-  const fullSet = product.full_set_items || ['Kutu', 'Dustbag'];
+  const fullSet = product.full_set_items || ['Kutu', 'Toz Torbası'];
   const flawImages = product.flaw_images || [];
   const galleryImages = product.image_urls && product.image_urls.length > 0 
     ? product.image_urls 
@@ -125,7 +126,7 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
 
         <View style={styles.mainInfo}>
           <Text style={styles.brand}>{product.brand}</Text>
-          <Text style={styles.name}>{product.name}</Text>
+          <Text style={styles.name}>{product.model_name}</Text>
           <Text style={styles.price}>{product.price?.toLocaleString('tr-TR')} ₺</Text>
         </View>
 
@@ -208,7 +209,7 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
         <View style={styles.actionsBox}>
           <TouchableOpacity style={styles.buyBtn} onPress={handleBuy} disabled={loading}>
             {loading && statusText.includes('Ödeme') ? (
-              <ActivityIndicator color={COLORS.bg} />
+              <ActivityIndicator color="#FFFFFF" />
             ) : (
               <Text style={styles.buyBtnText}>HEMEN SATIN AL</Text>
             )}
@@ -225,7 +226,7 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
             />
             <TouchableOpacity style={styles.offerBtn} onPress={handleMakeOffer} disabled={loading}>
               {loading && statusText.includes('Teklif') ? (
-                <ActivityIndicator color={COLORS.text} />
+                <ActivityIndicator color={COLORS.primary} />
               ) : (
                 <Text style={styles.offerBtnText}>Teklif Et</Text>
               )}
@@ -248,34 +249,36 @@ const styles = StyleSheet.create({
   navHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
+    backgroundColor: COLORS.card,
   },
   backBtn: {
     paddingRight: 15,
   },
   backBtnText: {
     color: COLORS.primary,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   navTitle: {
     color: COLORS.text,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 60,
   },
   galleryContainer: {
     width: width,
     height: width,
     position: 'relative',
-    backgroundColor: '#000',
+    backgroundColor: '#F5F5F7',
   },
   galleryImage: {
     width: width,
@@ -288,14 +291,14 @@ const styles = StyleSheet.create({
     left: 15,
   },
   verifiedBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.9)',
+    backgroundColor: 'rgba(175, 145, 100, 0.95)', // Gold luxury opacity badge
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
+    paddingVertical: 6,
+    borderRadius: 4,
   },
   verifiedText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
     letterSpacing: 1.5,
   },
@@ -303,23 +306,24 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
+    backgroundColor: COLORS.card,
   },
   brand: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
     color: COLORS.primary,
     textTransform: 'uppercase',
     letterSpacing: 3,
   },
   name: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: COLORS.text,
     marginTop: 6,
   },
   price: {
-    fontSize: 22,
-    color: COLORS.primary,
+    fontSize: 20,
+    color: COLORS.text,
     fontWeight: '600',
     marginTop: 10,
   },
@@ -333,12 +337,17 @@ const styles = StyleSheet.create({
     width: '48%',
     backgroundColor: COLORS.card,
     borderRadius: 8,
-    padding: 12,
+    padding: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.02,
+    shadowRadius: 5,
+    elevation: 1,
   },
   specLabel: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: COLORS.textMuted,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -357,6 +366,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 10,
+    elevation: 2,
   },
   cardHeader: {
     fontSize: 11,
@@ -393,21 +407,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   progressBar: {
-    height: 3,
-    backgroundColor: COLORS.border,
-    borderRadius: 1.5,
+    height: 4,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 2,
     width: '100%',
   },
   progressInner: {
-    height: 3,
+    height: 4,
     backgroundColor: COLORS.primary,
-    borderRadius: 1.5,
+    borderRadius: 2,
   },
   expertStatus: {
-    color: COLORS.text,
+    color: COLORS.primary,
     fontSize: 11,
     fontWeight: 'bold',
     marginTop: 4,
+    letterSpacing: 0.5,
   },
   setTags: {
     flexDirection: 'row',
@@ -418,6 +433,7 @@ const styles = StyleSheet.create({
   setTag: {
     borderWidth: 1,
     borderColor: COLORS.border,
+    backgroundColor: '#FAFAFA',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -435,11 +451,12 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 6,
     marginRight: 10,
-    backgroundColor: '#000',
+    backgroundColor: '#F3F4F6',
   },
   descriptionSection: {
     paddingHorizontal: 20,
     marginBottom: 30,
+    backgroundColor: 'transparent',
   },
   sectionHeader: {
     fontSize: 10,
@@ -450,23 +467,23 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: COLORS.text,
-    fontSize: 13,
-    lineHeight: 20,
+    fontSize: 13.5,
+    lineHeight: 21,
   },
   actionsBox: {
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   buyBtn: {
     backgroundColor: COLORS.primary,
-    height: 50,
+    height: 52,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
   },
   buyBtnText: {
-    color: COLORS.bg,
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.5,
@@ -480,23 +497,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 8,
-    height: 48,
+    height: 50,
     color: COLORS.text,
     paddingHorizontal: 15,
     marginRight: 10,
   },
   offerBtn: {
     flex: 1,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.primary,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   offerBtnText: {
     color: COLORS.primary,
     fontWeight: 'bold',
     fontSize: 14,
+    letterSpacing: 0.5,
   },
   statusLabel: {
     color: COLORS.primary,
