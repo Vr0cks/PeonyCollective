@@ -1,8 +1,9 @@
 import { createClient } from '@/src/utils/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
-import { updateProductStatus, triggerVisionAnalysisAction } from '../actions'
+import { updateProductStatus } from '../actions'
 import { Product, Profile } from '@/src/types'
+import ClaudeVisionCard from '@/src/components/ClaudeVisionCard'
 
 export default async function AdminPendingPage() {
   const supabase = await createClient()
@@ -138,34 +139,12 @@ export default async function AdminPendingPage() {
                   {(() => {
                     const aiLogs = (product as any).ai_authentication_logs
                     const latestLog = Array.isArray(aiLogs) && aiLogs.length > 0 ? aiLogs[aiLogs.length - 1] : null
-                    const triggerAction = triggerVisionAnalysisAction.bind(null, product.id)
 
                     return (
-                      <div className="bg-[#18191E] border border-[#AF9164]/30 rounded-xl p-4 mt-2 shadow-lg relative z-30">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] font-bold tracking-[2px] uppercase text-[#AF9164] flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#AF9164] animate-pulse" /> ✦ PEONY LAB GÖRSEL ANALİZ RAPORU
-                          </span>
-                          <span className="text-[9.5px] bg-[#AF9164]/10 text-[#AF9164] px-2.5 py-1 rounded border border-[#AF9164]/30 font-semibold tracking-wider">
-                            {latestLog ? `Güven Skoru: %${latestLog.claude_confidence || 95}` : 'Bekliyor'}
-                          </span>
-                        </div>
-                        
-                        <p className="text-xs text-neutral-300 leading-relaxed font-sans">
-                          {latestLog ? latestLog.claude_raw_response : 'Fotoğraflar yüklendi. Claude Vision ön inceleme raporu oluşturulmaya hazır.'}
-                        </p>
-
-                        {!latestLog && (
-                          <form action={triggerAction} className="mt-3 relative z-40">
-                            <button 
-                              type="submit"
-                              className="w-full py-2.5 bg-[#AF9164] hover:bg-[#96794F] text-white rounded-lg text-[10px] font-bold uppercase tracking-[1.5px] transition-all cursor-pointer shadow-md"
-                            >
-                              ⚡ CLAUDE VISION ANALİZİNİ BAŞLAT
-                            </button>
-                          </form>
-                        )}
-                      </div>
+                      <ClaudeVisionCard 
+                        productId={product.id}
+                        initialLog={latestLog}
+                      />
                     )
                   })()}
 
