@@ -632,18 +632,24 @@ interface ProfileScreenProps {
           {profileMode === 'vault' && (
             <View style={{ paddingHorizontal: 15 }}>
               {/* Vault Portfolio Value summary card */}
-              <View style={[styles.vaultValueCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
-                <View style={styles.vaultValueHeader}>
-                  <Text style={styles.vaultLabel}>{isEn ? 'PORTFOLIO TOTAL VALUE' : 'PORTFÖY TOPLAM DEĞERİ'}</Text>
-                  <Text style={styles.vaultTrend}>+3.7% {isEn ? 'this month' : 'bu ay'} 📈</Text>
-                </View>
-                <Text style={[styles.vaultValueText, { color: THEME.text }]}>1.030.000 ₺</Text>
-                <Text style={[styles.vaultSubText, { color: THEME.textMuted }]}>
-                  {isEn 
-                    ? 'Estimated current value of your verified luxury assets based on live market stats.'
-                    : 'Doğrulanmış lüks varlıklarınızın piyasa verilerine dayalı tahmini güncel değeri.'}
-                </Text>
-              </View>
+              {(() => {
+                const totalPortfolioValue = myProducts.reduce((acc, curr) => acc + (curr.status === 'approved' ? Number(curr.price || 0) : 0), 1030000);
+                const appreciationValue = Math.round(totalPortfolioValue * 0.12); // ~12% average appreciation
+                return (
+                  <View style={[styles.vaultValueCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
+                    <View style={styles.vaultValueHeader}>
+                      <Text style={styles.vaultLabel}>{isEn ? 'PORTFOLIO TOTAL VALUE' : 'PORTFÖY TOPLAM DEĞERİ'}</Text>
+                      <Text style={styles.vaultTrend}>+12.4% {isEn ? 'Total Appreciation' : 'Toplam Değer Kazancı'} 📈</Text>
+                    </View>
+                    <Text style={[styles.vaultValueText, { color: THEME.text }]}>₺{totalPortfolioValue.toLocaleString('tr-TR')}</Text>
+                    <Text style={[styles.vaultSubText, { color: THEME.textMuted }]}>
+                      {isEn 
+                        ? `Live valuation of your ${myProducts.length + 2} verified luxury assets. Net gain: ₺${appreciationValue.toLocaleString('tr-TR')}`
+                        : `Doğrulanmış ${myProducts.length + 2} lüks varlığınızın güncel canlı piyasa değeri. Net kârınız: ₺${appreciationValue.toLocaleString('tr-TR')}`}
+                    </Text>
+                  </View>
+                );
+              })()}
 
               {/* Asset list */}
               <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Vault Assets' : 'Kasa Varlıkları'}</Text>
@@ -651,7 +657,7 @@ interface ProfileScreenProps {
               {/* Asset 1 */}
               <View style={[styles.assetItemCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.assetItemRow}>
-                  <View style={styles.assetDot} />
+                  <View style={[styles.assetDot, { backgroundColor: '#10B981' }]} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.assetBrand}>CHANEL</Text>
                     <Text style={[styles.assetModel, { color: THEME.text }]}>Classic Double Flap Medium Black</Text>
@@ -659,7 +665,7 @@ interface ProfileScreenProps {
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
                     <Text style={[styles.assetCurrentVal, { color: THEME.text }]}>345.000 ₺</Text>
-                    <Text style={[styles.assetAppreciation, { color: THEME.textMuted }]}>{isEn ? '+35.000 ₺ (Cost: 310k)' : '+35.000 ₺ (Alış: 310k)'}</Text>
+                    <Text style={[styles.assetAppreciation, { color: '#10B981' }]}>{isEn ? '+35k Gain (11.3%)' : '+35k Kâr (%11.3)'}</Text>
                   </View>
                 </View>
               </View>
@@ -667,7 +673,7 @@ interface ProfileScreenProps {
               {/* Asset 2 */}
               <View style={[styles.assetItemCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.assetItemRow}>
-                  <View style={styles.assetDot} />
+                  <View style={[styles.assetDot, { backgroundColor: '#10B981' }]} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.assetBrand}>ROLEX</Text>
                     <Text style={[styles.assetModel, { color: THEME.text }]}>Submariner Date Starbucks 41mm</Text>
@@ -675,10 +681,35 @@ interface ProfileScreenProps {
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
                     <Text style={[styles.assetCurrentVal, { color: THEME.text }]}>685.000 ₺</Text>
-                    <Text style={[styles.assetAppreciation, { color: THEME.textMuted }]}>{isEn ? '+10.000 ₺ (Cost: 675k)' : '+10.000 ₺ (Alış: 675k)'}</Text>
+                    <Text style={[styles.assetAppreciation, { color: '#10B981' }]}>{isEn ? '+10k Gain (1.5%)' : '+10k Kâr (%1.5)'}</Text>
                   </View>
                 </View>
               </View>
+
+              {/* Dynamically render user products in portfolio */}
+              {myProducts.filter(p => p.status === 'approved').map(p => {
+                const costPrice = Math.round(p.price * 0.93);
+                const gain = p.price - costPrice;
+                const gainPercent = ((gain / costPrice) * 100).toFixed(1);
+                return (
+                  <View key={p.id} style={[styles.assetItemCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
+                    <View style={styles.assetItemRow}>
+                      <View style={[styles.assetDot, { backgroundColor: '#10B981' }]} />
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.assetBrand}>{p.brand?.toUpperCase()}</Text>
+                        <Text style={[styles.assetModel, { color: THEME.text }]}>{p.model_name}</Text>
+                        <Text style={styles.assetStatus}>Peony AI Certified ✓</Text>
+                      </View>
+                      <View style={{ alignItems: 'flex-end' }}>
+                        <Text style={[styles.assetCurrentVal, { color: THEME.text }]}>₺{(p.price || 0).toLocaleString('tr-TR')}</Text>
+                        <Text style={[styles.assetAppreciation, { color: '#10B981' }]}>
+                          +₺{gain.toLocaleString('tr-TR')} ({gainPercent}%)
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                );
+              })}
 
               {/* Certify My Bag Service */}
               <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Vault Services' : 'Kasa Hizmetleri'}</Text>
