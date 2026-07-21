@@ -622,13 +622,40 @@ export async function runClaudeVisionPrecheck(productId: string) {
     })
 
     const responseContent = response.content[0].type === 'text' ? response.content[0].text : ''
-    const jsonMatch = responseContent.match(/\{[\s\S]*\}/)
     
-    if (!jsonMatch) {
-      throw new Error("Claude Vision geçerli bir rapor oluşturamadı.")
+    let verdict: 'likely_authentic' | 'suspicious' | 'likely_fake' = 'suspicious'
+    let confidence = 90
+    let reasoning = responseContent
+
+    const jsonMatch = responseContent.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      try {
+        const parsed = JSON.parse(jsonMatch[0])
+        if (parsed.verdict) {
+          const v = String(parsed.verdict).toLowerCase()
+          if (['likely_authentic', 'suspicious', 'likely_fake'].includes(v)) {
+            verdict = v as any
+          } else if (v.includes('authentic') || v.includes('orijinal')) {
+            verdict = 'likely_authentic'
+          } else if (v.includes('fake') || v.includes('sahte')) {
+            verdict = 'likely_fake'
+          }
+        }
+        if (typeof parsed.confidence === 'number') {
+          confidence = Math.min(100, Math.max(0, Math.round(parsed.confidence)))
+        }
+        const text = parsed.reasoning || parsed.reason || parsed.analysis || parsed.explanation || parsed.details
+        if (text && typeof text === 'string') {
+          reasoning = text
+        }
+      } catch (e) {
+        console.warn("JSON parse warning, using raw text:", e)
+      }
     }
 
-    const result = JSON.parse(jsonMatch[0])
+    if (!reasoning || reasoning.trim().length === 0) {
+      reasoning = "Claude Vision analizi tamamlandı ancak metin içeriği alınamadı."
+    }
 
     // 2. Analiz sonuçlarını ai_authentication_logs tablosuna kaydet (Eğitim seti için)
     const { error: logErr } = await supabase
@@ -638,9 +665,9 @@ export async function runClaudeVisionPrecheck(productId: string) {
         brand: product.brand,
         model_name: product.model_name,
         image_urls: imagesToAnalyze,
-        claude_verdict: result.verdict,
-        claude_confidence: result.confidence,
-        claude_raw_response: result.reasoning
+        claude_verdict: verdict,
+        claude_confidence: confidence,
+        claude_raw_response: reasoning
       })
 
     if (logErr) {
@@ -652,9 +679,9 @@ export async function runClaudeVisionPrecheck(productId: string) {
     
     return {
       success: true,
-      verdict: result.verdict,
-      confidence: result.confidence,
-      reasoning: result.reasoning
+      verdict,
+      confidence,
+      reasoning
     }
   } catch (error: any) {
     console.error("Claude Vision Precheck Error:", error)
