@@ -60,7 +60,7 @@ export async function sendOrderConfirmationEmail({
         </table>
 
         <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 24px;">
-          Siparişinizin anlık kargo durumunu sitemizdeki <a href="https://peonycollective.com/kargom-nerede" style="color: #AF9164; text-decoration: none;">Kargom Nerede</a> sayfasından takip edebilirsiniz.
+          Siparişinizin anlık kargo durumunu sitemizdeki <a href="https://peony-collective.com/kargom-nerede" style="color: #AF9164; text-decoration: none;">Kargom Nerede</a> sayfasından takip edebilirsiniz.
         </p>
         
         <p style="font-size: 14px; line-height: 1.6; color: #666;">
@@ -77,7 +77,7 @@ export async function sendOrderConfirmationEmail({
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Concierge <concierge@peonycollective.com>', // Doğrulanmış domain olmalı
+      from: 'Peony Concierge <concierge@peony-collective.com>', // Doğrulanmış domain olmalı
       to: [buyerEmail],
       subject: `Peony Sipariş Onayı: ${productName}`,
       html: emailHtml,
