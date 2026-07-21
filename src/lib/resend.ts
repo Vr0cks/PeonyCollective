@@ -277,7 +277,7 @@ export async function sendEntrupyRequestAdminEmail({
   try {
     const data = await resend.emails.send({
       from: 'Peony Concierge <concierge@peony-collective.com>',
-      to: ['rabiakacar86@gmail.com'],
+      to: ['vr0cksdev@gmail.com', 'rabiakacar86@gmail.com'],
       subject: `Entrupy Doğrulama Talebi: ${sellerName} - ${productName}`,
       html: emailHtml,
     })
