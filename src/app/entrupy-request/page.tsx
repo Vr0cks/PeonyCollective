@@ -1,215 +1,225 @@
 'use client'
 
-import React, { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/src/utils/supabase/client'
-import { sendEntrupyAppointmentEmailAction } from './actions'
 
-function EntrupyRequestFormContent() {
+function EntrupyRequestForm() {
   const searchParams = useSearchParams()
-  const productName = searchParams.get('product_name') || 'Lüks Çanta'
+  const productId = searchParams.get('product_id') || ''
+  const productName = searchParams.get('product_name') || ''
 
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [profile, setProfile] = useState<any>(null)
-  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  // Guest Form states
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [address, setAddress] = useState('')
+  const [formData, setFormData] = useState({
+    sellerName: '',
+    sellerEmail: '',
+    sellerPhone: '',
+    sellerAddress: '',
+    productName: productName || 'Lüks Çanta / Saat Ürünü',
+    productId: productId
+  })
 
   useEffect(() => {
-    async function checkAuth() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUser(user)
-        setEmail(user.email || '')
-        const { data: prof } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, phone, address')
-          .eq('id', user.id)
-          .maybeSingle()
-        if (prof) {
-          setProfile(prof)
-          setFullName(`${prof.first_name || ''} ${prof.last_name || ''}`.trim() || user.email || '')
-          if (prof.phone) setPhone(prof.phone)
-          if (prof.address) setAddress(prof.address)
+    async function loadUserData() {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, phone_number, address')
+            .eq('id', user.id)
+            .single()
+
+          setFormData(prev => ({
+            ...prev,
+            sellerEmail: user.email || prev.sellerEmail,
+            sellerName: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : prev.sellerName,
+            sellerPhone: profile?.phone_number || prev.sellerPhone,
+            sellerAddress: profile?.address || prev.sellerAddress,
+          }))
         }
+      } catch (err) {
+        console.error('Error loading user data:', err)
       }
-      setLoading(false)
     }
-    checkAuth()
+
+    loadUserData()
   }, [])
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitting(true)
+    setLoading(true)
+    setErrorMsg(null)
 
     try {
-      const res = await sendEntrupyAppointmentEmailAction({
-        customerName: fullName || email || 'Değerli Müşteri',
-        customerEmail: email,
-        phone: phone || undefined,
-        address: address || undefined,
-        productName: productName,
-        isLoggedIn: !!user
+      const res = await fetch('/api/entrupy-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       })
 
-      if (res.success) {
-        setSubmitted(true)
-      } else {
-        alert('Randevu iletilirken bir sorun oluştu, lütfen info@peony-collective.com ile iletişime geçin.')
-      }
-    } catch (err: any) {
-      alert('Hata: ' + err.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
+      const data = await res.json()
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0E0E10] flex items-center justify-center text-amber-100">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#AF9164]"></div>
-      </div>
-    )
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'İşlem gerçekleştirilemedi.')
+      }
+
+      setSuccess(true)
+    } catch (err: any) {
+      console.error('Entrupy request error:', err)
+      setErrorMsg(err.message || 'Talebiniz gönderilirken bir hata oluştu.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="min-h-screen bg-[#0E0E10] text-[#F9F6F0] flex flex-col justify-center items-center px-4 py-12">
-      <div className="max-w-xl w-full bg-[#18191E] border border-amber-900/30 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-        {/* Decorative Gold Glow */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#AF9164]/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        {/* Header */}
-        <div className="text-center mb-8">
-          <span className="text-[10px] tracking-[4px] text-[#AF9164] uppercase font-bold block mb-2">
-            ✦ VIP EKSPERTİZ SEÇENEĞİ
-          </span>
-          <h1 className="font-serif text-2xl md:text-3xl text-white font-normal mb-3">
-            %99.6 Entrupy Mikroskobik Doğrulama
+    <div className="min-h-screen bg-[#0A0A0C] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
+      {/* Brand Header */}
+      <div className="text-center mb-8">
+        <Link href="/" className="inline-block">
+          <h1 className="font-serif italic text-3xl sm:text-4xl tracking-widest text-white mb-1">
+            Peony Collective
           </h1>
-          <p className="text-xs text-neutral-400 leading-relaxed max-w-md mx-auto">
-            Dünyanın en güvenilir fiziksel mikroskobik yapay zeka doğrulama teknolojisi ile çantanızı inceleyelim.
-          </p>
-        </div>
+        </Link>
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">
+          ✦ ENTRUPY MİKROSKOBİK FİZİKİ İNCELEME TALEP FORMU
+        </p>
+      </div>
 
-        {/* Courier Notice Box */}
-        <div className="mb-6 p-4 rounded-xl bg-amber-950/20 border border-amber-900/40 text-amber-200/90 text-xs leading-relaxed flex items-start gap-3">
-          <span className="text-lg">📍</span>
-          <div>
-            <strong className="block text-amber-400 font-semibold mb-1">İstanbul İçi VIP Kurye Hizmeti</strong>
-            Özel sigortalı VIP kurye kapınızdan teslim alma hizmetimiz şu an için sadece <strong>İstanbul içi</strong> adreslerde geçerlidir.
-          </div>
-        </div>
+      {/* Main Container */}
+      <div className="w-full max-w-xl bg-[#141519] border border-[#AF9164]/30 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+        {/* Decorative ambient accent */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#AF9164]/10 rounded-full blur-3xl pointer-events-none" />
 
-        {submitted ? (
+        {success ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-400 text-3xl mx-auto mb-4">
-              ✓
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto mb-6">
+              <span className="text-2xl">✓</span>
             </div>
-            <h3 className="text-xl font-serif text-white mb-2">Randevu Talebiniz Alındı</h3>
-            <p className="text-xs text-neutral-300 leading-relaxed max-w-sm mx-auto mb-6">
-              VIP Kurye ekibimiz ve eksperimiz en kısa sürede sizinle iletişime geçerek kapınızdan teslim alma saatini teyit edecektir.
+            <h2 className="text-2xl font-serif text-white mb-3">Talebiniz Alındı ✦</h2>
+            <p className="text-white/70 text-sm leading-relaxed mb-6">
+              Entrupy %99.6 mikroskobik fiziki doğrulama talebiniz başarıyla kaydedildi. Ekibimiz iletişim bilgileriniz üzerinden sizinle en kısa sürede iletişime geçerek kurye organizasyonunu sağlayacaktır.
             </p>
-            <a 
-              href="/" 
-              className="inline-block bg-[#AF9164] hover:bg-[#96794F] text-white text-xs font-bold tracking-[2px] uppercase px-8 py-3.5 rounded-xl transition-all"
+            <div className="p-4 bg-[#AF9164]/10 border border-[#AF9164]/20 rounded-xl text-xs text-[#AF9164] mb-8">
+              📍 <em>Kapıdan alma hizmetimiz olan VIP kuryemiz <strong>Peony Courier</strong> şu an için sadece <strong>İstanbul içi</strong> geçerlidir.</em>
+            </div>
+            <Link
+              href="/"
+              className="inline-block px-8 py-3 bg-[#AF9164] hover:bg-[#96794F] text-white text-xs font-bold uppercase tracking-[2px] rounded-lg transition-all"
             >
-              ANASAYFAYA DÖN
-            </a>
+              Ana Sayfaya Dön
+            </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Targeted Product Info */}
-            <div className="p-3 bg-neutral-900/60 border border-neutral-800 rounded-xl flex items-center justify-between text-xs">
-              <span className="text-neutral-400">İncelenecek Ürün:</span>
-              <span className="font-semibold text-amber-300">{productName}</span>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#AF9164] block mb-1">
+                İnceleme Yapılacak Ürün
+              </span>
+              <h3 className="text-lg font-medium text-white">
+                {formData.productName}
+              </h3>
             </div>
 
-            {user ? (
-              /* LOGGED IN USER VIEW */
-              <div className="p-4 bg-amber-900/10 border border-amber-800/30 rounded-xl space-y-2">
-                <p className="text-xs text-neutral-300">
-                  <strong className="text-white">Kayıtlı Müşteri:</strong> {fullName} ({user.email})
-                </p>
-                {phone && <p className="text-xs text-neutral-400">Telefon: {phone}</p>}
-                {address && <p className="text-xs text-neutral-400">Adres: {address}</p>}
-                <p className="text-[11px] text-amber-400/80 pt-2">
-                  ✓ Sistemde kayıtlı bilgileriniz otomatik olarak <strong>info@peony-collective.com</strong> adresine randevu bildirimi olarak iletilecektir.
-                </p>
-              </div>
-            ) : (
-              /* GUEST FORM VIEW */
-              <div className="space-y-3 pt-2">
-                <div>
-                  <label className="block text-[10px] font-bold text-[#AF9164] tracking-widest mb-1 uppercase">
-                    ADINIZ VE SOYADINIZ *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={e => setFullName(e.target.value)}
-                    placeholder="Örn. Ahmet Canlı"
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#AF9164]"
-                  />
-                </div>
+            <div className="p-4 bg-[#1C1D24] border border-white/5 rounded-xl text-xs text-white/70 leading-relaxed">
+              <p className="mb-2 text-[#AF9164] font-semibold">
+                %99.6 Doğruluk Oranı ve Finansal Garanti ✦
+              </p>
+              Çantanızı dünyanın 1 numaralı mikroskobik yapay zeka teknolojisi <strong>Entrupy</strong> ile fiziki incelemeye tabi tutmak için lütfen aşağıdaki bilgileri doğrulayın.
+            </div>
 
-                <div>
-                  <label className="block text-[10px] font-bold text-[#AF9164] tracking-widest mb-1 uppercase">
-                    E-POSTA ADRESİNİZ *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="Örn. ahmet@example.com"
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#AF9164]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-[#AF9164] tracking-widest mb-1 uppercase">
-                    TELEFON NUMARANIZ *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    placeholder="Örn. 0532 000 00 00"
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#AF9164]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-[#AF9164] tracking-widest mb-1 uppercase">
-                    İSTANBUL İÇİ KURYE ADRESİNİZ *
-                  </label>
-                  <textarea
-                    required
-                    rows={2}
-                    value={address}
-                    onChange={e => setAddress(e.target.value)}
-                    placeholder="İlçe, Mahalle, Cadde ve Bina No bilgisi..."
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#AF9164]"
-                  />
-                </div>
+            {errorMsg && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg">
+                {errorMsg}
               </div>
             )}
 
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider text-white/50 mb-1">
+                  Ad Soyad
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.sellerName}
+                  onChange={e => setFormData({ ...formData, sellerName: e.target.value })}
+                  placeholder="Örn: Ahmet Yiğit Canlı"
+                  className="w-full bg-[#1C1D24] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#AF9164] transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider text-white/50 mb-1">
+                  E-posta Adresi
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.sellerEmail}
+                  onChange={e => setFormData({ ...formData, sellerEmail: e.target.value })}
+                  placeholder="ornek@domain.com"
+                  className="w-full bg-[#1C1D24] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#AF9164] transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider text-white/50 mb-1">
+                  Telefon Numarası
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.sellerPhone}
+                  onChange={e => setFormData({ ...formData, sellerPhone: e.target.value })}
+                  placeholder="05XX XXX XX XX"
+                  className="w-full bg-[#1C1D24] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#AF9164] transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider text-white/50 mb-1">
+                  Teslimat / Kurye Adresi
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={formData.sellerAddress}
+                  onChange={e => setFormData({ ...formData, sellerAddress: e.target.value })}
+                  placeholder="Ürünün VIP kurye ile alınacağı açık adresiniz..."
+                  className="w-full bg-[#1C1D24] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#AF9164] transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Courier Note */}
+            <div className="p-3 bg-[#AF9164]/10 border border-[#AF9164]/20 rounded-xl text-[11px] text-[#AF9164] leading-relaxed">
+              📍 <em>Kapıdan alma hizmetimiz olan <strong>Peony Courier</strong> (Özel sigortalı VIP kurye) sadece <strong>İstanbul içi</strong> geçerlidir.</em>
+            </div>
+
             <button
               type="submit"
-              disabled={submitting}
-              className="w-full bg-[#AF9164] hover:bg-[#96794F] text-white text-xs font-bold tracking-[2px] uppercase py-4 rounded-xl shadow-lg shadow-amber-900/20 transition-all mt-4 disabled:opacity-50"
+              disabled={loading}
+              className={`w-full py-4 rounded-xl text-xs font-bold uppercase tracking-[2px] transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 ${
+                loading
+                  ? 'bg-[#AF9164]/50 text-white/60 cursor-not-allowed'
+                  : 'bg-[#AF9164] hover:bg-[#96794F] text-white'
+              }`}
             >
-              {submitting ? 'İLETİLİYOR...' : 'ENTRUPY VIP RANDEVUSU TALEP ET ✦'}
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  TALEP İLETİLİYOR...
+                </>
+              ) : (
+                'ENTRUPY DOĞRULAMASI TALEP ET ✦'
+              )}
             </button>
           </form>
         )}
@@ -220,8 +230,8 @@ function EntrupyRequestFormContent() {
 
 export default function EntrupyRequestPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0E0E10]" />}>
-      <EntrupyRequestFormContent />
+    <Suspense fallback={<div className="min-h-screen bg-[#0A0A0C] text-white flex items-center justify-center">Yükleniyor...</div>}>
+      <EntrupyRequestForm />
     </Suspense>
   )
 }

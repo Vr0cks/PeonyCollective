@@ -84,8 +84,10 @@ export async function updateProductStatus(
       })
       const { data: userObj } = await adminAuthClient.auth.admin.getUserById(product.seller_id)
       
-      const { data: sellerProfile } = await supabase.from('profiles').select('first_name, last_name').eq('id', product.seller_id).single()
+      const { data: sellerProfile } = await supabase.from('profiles').select('first_name, last_name, phone_number, address').eq('id', product.seller_id).single()
       
+      const hasCompleteProfile = Boolean(sellerProfile?.phone_number && sellerProfile?.address)
+
       if (userObj.user?.email) {
         try {
           const { sendProductStatusEmail } = await import('@/src/lib/resend')
@@ -93,8 +95,10 @@ export async function updateProductStatus(
             sellerEmail: userObj.user.email,
             sellerName: `${sellerProfile?.first_name || ''} ${sellerProfile?.last_name || ''}`.trim() || 'Satıcı',
             productName: `${product.brand} ${product.model_name}`,
+            productId: productId,
             status: newStatus,
-            reason: actualReason
+            reason: actualReason,
+            hasCompleteProfile: hasCompleteProfile
           })
         } catch (emailSendErr) {
           console.error('Resend e-posta gönderme hatası:', emailSendErr)
