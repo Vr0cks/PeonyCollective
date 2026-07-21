@@ -13,8 +13,10 @@ interface ClaudeVisionCardProps {
 }
 
 export default function ClaudeVisionCard({ productId, initialLog }: ClaudeVisionCardProps) {
+  const isInvalidLog = !initialLog || !initialLog.claude_raw_response || initialLog.claude_raw_response === 'Analiz raporu boş döndü.' || initialLog.claude_raw_response.includes('Analiz raporu boş döndü')
+
   const [loading, setLoading] = useState(false)
-  const [log, setLog] = useState(initialLog || null)
+  const [log, setLog] = useState(isInvalidLog ? null : initialLog)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const router = useRouter()
 

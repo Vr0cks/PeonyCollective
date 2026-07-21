@@ -138,7 +138,10 @@ export default async function AdminPendingPage() {
                   {/* ✦ PEONY LAB GÖRSEL KONTROL ANALİZ RAPORU */}
                   {(() => {
                     const aiLogs = (product as any).ai_authentication_logs
-                    const latestLog = Array.isArray(aiLogs) && aiLogs.length > 0 ? aiLogs[aiLogs.length - 1] : null
+                    const validLogs = Array.isArray(aiLogs) 
+                      ? aiLogs.filter(l => l && l.claude_raw_response && l.claude_raw_response.trim() !== '' && !l.claude_raw_response.includes('Analiz raporu boş döndü')) 
+                      : []
+                    const latestLog = validLogs.length > 0 ? validLogs[validLogs.length - 1] : null
 
                     return (
                       <ClaudeVisionCard 
