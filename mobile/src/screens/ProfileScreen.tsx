@@ -1,3 +1,11 @@
+/**
+ * @file ProfileScreen.tsx
+ * @description Peony Collective Mobil Uygulaması Profil ve Hesap Yönetimi Ekranı.
+ * 
+ * Bu ekran kullanıcı profil bilgilerini, sipariş geçmişini, satılan ürün durumlarını ve
+ * kullanıcı ayarlarını yönetir.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
@@ -61,9 +69,53 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
   const [avatarUrl, setAvatarUrl] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150');
   const [isEditingInfo, setIsEditingInfo] = useState(false);
 
+  const [myProducts, setMyProducts] = useState<any[]>([]);
+
   useEffect(() => {
     fetchProfile();
+    fetchUserProducts();
   }, []);
+
+  async function fetchUserProducts() {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) return;
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .eq('seller_id', user.id)
+        .order('created_at', { ascending: false });
+      if (data) setMyProducts(data);
+    } catch (e) {
+      console.log('Error fetching user products:', e);
+    }
+  }
+
+  async function handleReducePrice(productId: string, currentPrice: number) {
+    const suggestedNewPrice = Math.round(currentPrice * 0.90);
+    Alert.alert(
+      isEn ? 'Peony AI Smart Discount' : 'Peony AI Akıllı Fiyat İndirimi',
+      isEn 
+        ? `Reduce price from ₺${currentPrice.toLocaleString('tr-TR')} to ₺${suggestedNewPrice.toLocaleString('tr-TR')} to sell faster on feed?`
+        : `7 gündür satılamayan ürününüz için fiyatı ₺${currentPrice.toLocaleString('tr-TR')} -> ₺${suggestedNewPrice.toLocaleString('tr-TR')} seviyesine düşürüp vitrinde üst sıraya çıkarmak istiyor musunuz?`,
+      [
+        { text: isEn ? 'Cancel' : 'İptal', style: 'cancel' },
+        {
+          text: isEn ? 'Apply Discount' : 'İndirimi Uygula',
+          onPress: async () => {
+            const { error } = await supabase
+              .from('products')
+              .update({ price: suggestedNewPrice, rank: 100 })
+              .eq('id', productId);
+            if (!error) {
+              Alert.alert(isEn ? 'Success' : 'Başarılı', isEn ? 'Price updated and boosted to top of feed!' : 'Fiyat güncellendi ve ilan vitrinde üst sıraya yükseltildi!');
+              fetchUserProducts();
+            }
+          }
+        }
+      ]
+    );
+  }
 
   async function fetchProfile() {
     try {
@@ -437,60 +489,68 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 </View>
               </View>
 
-              {/* Consignment tracking */}
-              <Text style={styles.sectionTitle}>{isEn ? 'Consignment Tracking' : 'Konsinye Ürün Takibi'}</Text>
-              <View style={styles.trackerCard}>
-                <View style={styles.trackerHeader}>
-                  <Text style={styles.trackerProdName}>Chanel Classic Double Flap</Text>
-                  <Text style={styles.trackerStatus}>{isEn ? 'SPA & Spa Care Phase' : 'SPA & Bakım Aşaması'}</Text>
+              {/* User Real Submitted Products List */}
+              <Text style={styles.sectionTitle}>{isEn ? 'My Luxury Assets' : 'Varlıklarım ve Satış Durumları'}</Text>
+              {myProducts.length === 0 ? (
+                <View style={[styles.trackerCard, { alignItems: 'center', paddingVertical: 24 }]}>
+                  <Text style={{ fontSize: 28, marginBottom: 8 }}>🛍️</Text>
+                  <Text style={{ fontSize: 13, color: COLORS.textMuted }}>{isEn ? 'No products listed yet.' : 'Henüz sergilenen bir ürününüz bulunmuyor.'}</Text>
                 </View>
+              ) : (
+                myProducts.map(p => {
+                  const createdDate = new Date(p.created_at || Date.now());
+                  const daysDiff = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+                  const isUnsold7Days = daysDiff >= 7 && p.status === 'approved';
 
-                {/* Stepper Steps */}
-                <View style={styles.stepsContainer}>
-                  <View style={styles.stepItem}>
-                    <View style={[styles.stepCircle, styles.stepDone]}>
-                      <Text style={styles.stepCheck}>✓</Text>
+                  const statusBadgeText = p.status === 'approved' 
+                    ? (isEn ? 'ON SHOWCASE (VİTRİNDE)' : 'VİTRİNDE (SATIŞTA)')
+                    : p.status === 'pending'
+                    ? (isEn ? 'PEONY AI EXPERTISE' : 'PEONY AI İNCELEMESİNDE')
+                    : (isEn ? 'REJECTED' : 'REDDEDİLDİ');
+
+                  const statusBadgeBg = p.status === 'approved' ? '#ECFDF5' : p.status === 'pending' ? '#FEF3C7' : '#FFF5F5';
+                  const statusBadgeColor = p.status === 'approved' ? '#059669' : p.status === 'pending' ? '#D97706' : '#EF4444';
+
+                  return (
+                    <View key={p.id} style={[styles.trackerCard, { marginBottom: 14 }]}>
+                      <View style={styles.trackerHeader}>
+                        <Text style={styles.trackerProdName}>{p.brand} {p.model_name}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.primary }}>
+                          ₺{Number(p.price || 0).toLocaleString('tr-TR')}
+                        </Text>
+                      </View>
+
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 10 }}>
+                        <View style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: statusBadgeBg, borderRadius: 4 }}>
+                          <Text style={{ fontSize: 10, fontWeight: 'bold', color: statusBadgeColor }}>{statusBadgeText}</Text>
+                        </View>
+                        {p.ai_confidence && (
+                          <Text style={{ fontSize: 10, color: COLORS.textMuted, marginLeft: 10 }}>
+                            Peony AI Skoru: %{p.ai_confidence}
+                          </Text>
+                        )}
+                      </View>
+
+                      {/* 7 Days Unsold Price Reduce Suggestion Alert & Button */}
+                      {isUnsold7Days && (
+                        <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: COLORS.border }}>
+                          <Text style={{ fontSize: 11, color: '#D97706', fontWeight: '600', marginBottom: 6 }}>
+                            ⚠️ Ürününüz {daysDiff} gündür satılmadı. Peony AI fiyatınızı %10 düşürerek hızlı satmanızı öneriyor.
+                          </Text>
+                          <TouchableOpacity 
+                            style={{ backgroundColor: COLORS.primary, paddingVertical: 8, borderRadius: 6, alignItems: 'center' }}
+                            onPress={() => handleReducePrice(p.id, p.price)}
+                          >
+                            <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' }}>
+                              Fiyatı ₺{Math.round(p.price * 0.9).toLocaleString('tr-TR')} Yap & Vitrinde Yükselt
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
                     </View>
-                    <Text style={styles.stepLabel}>{isEn ? 'Received' : 'Kabul'}</Text>
-                  </View>
-
-                  <View style={[styles.stepLine, styles.stepLineActive]} />
-
-                  <View style={styles.stepItem}>
-                    <View style={[styles.stepCircle, styles.stepDone]}>
-                      <Text style={styles.stepCheck}>✓</Text>
-                    </View>
-                    <Text style={styles.stepLabel}>{isEn ? 'Expertise' : 'Ekspertiz'}</Text>
-                  </View>
-
-                  <View style={[styles.stepLine, styles.stepLineActive]} />
-
-                  <View style={styles.stepItem}>
-                    <View style={[styles.stepCircle, styles.stepActive]}>
-                      <Text style={styles.stepNumber}>3</Text>
-                    </View>
-                    <Text style={[styles.stepLabel, styles.stepLabelActive]}>SPA</Text>
-                  </View>
-
-                  <View style={styles.stepLine} />
-
-                  <View style={styles.stepItem}>
-                    <View style={styles.stepCircle}>
-                      <Text style={styles.stepNumber}>4</Text>
-                    </View>
-                    <Text style={styles.stepLabel}>{isEn ? 'Studio' : 'Çekim'}</Text>
-                  </View>
-
-                  <View style={styles.stepLine} />
-
-                  <View style={styles.stepItem}>
-                    <View style={styles.stepCircle}>
-                      <Text style={styles.stepNumber}>5</Text>
-                    </View>
-                    <Text style={styles.stepLabel}>{isEn ? 'Listed' : 'Vitrin'}</Text>
-                  </View>
-                </View>
-              </View>
+                  );
+                })
+              )}
 
               {/* Monetization / Advertising Portal */}
               <Text style={styles.sectionTitle}>{isEn ? 'Boost Your Sales' : 'Satışlarınızı Artırın'}</Text>
