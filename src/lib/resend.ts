@@ -131,6 +131,7 @@ export async function sendProductStatusEmail({
       </a>
     </div>
   ` : ''
+  const reasonHtml = reason && status === 'rejected' ? `<p style="font-size: 14px; color: #DC2626; margin-top: 16px; padding: 12px; background-color: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 6px;"><strong>Red Nedeni:</strong> ${reason}</p>` : ''
 
   const emailHtml = `
     <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #FAFAFA; color: #1A1A1A;">
