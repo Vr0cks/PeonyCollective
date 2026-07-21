@@ -84,17 +84,30 @@ export default async function AdminProductDetailPage({
             {/* Varsa Gizli Belgeler (Fatura vb.) */}
             {product.authenticity_docs && product.authenticity_docs.length > 0 && (
               <div className="mt-12 pt-8 border-t border-gray-100">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-red-500 mb-4 italic">Gizli Belgeler (Sadece Admin Görür)</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-red-500 mb-4 italic">Gizli Belgeler (Sadece Admin Görür - 15D İmzalı)</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {product.authenticity_docs.map((doc: string, idx: number) => (
-                    <div key={idx} className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-red-100 flex items-center justify-center">
-                      <SafeImage 
-                        src={doc} 
-                        alt="Belge" 
-                        className="w-full h-full object-contain" 
-                      />
-                    </div>
-                  ))}
+                  {await Promise.all(
+                    product.authenticity_docs.map(async (doc: string, idx: number) => {
+                      let signedUrl = doc;
+                      if (doc.includes('product-images') && !doc.startsWith('http')) {
+                        // Extract relative path inside bucket
+                        const path = doc.split('product-images/').pop();
+                        if (path) {
+                          const { data } = await supabase.storage.from('product-images').createSignedUrl(path, 900); // 15 minutes validity
+                          if (data?.signedUrl) signedUrl = data.signedUrl;
+                        }
+                      }
+                      return (
+                        <div key={idx} className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-red-100 flex items-center justify-center">
+                          <SafeImage 
+                            src={signedUrl} 
+                            alt="Belge" 
+                            className="w-full h-full object-contain" 
+                          />
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             )}
