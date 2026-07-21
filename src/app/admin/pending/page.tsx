@@ -161,7 +161,7 @@ export default async function AdminPendingPage() {
                               type="submit"
                               className="w-full py-2.5 bg-[#AF9164] hover:bg-[#96794F] text-white rounded-lg text-[10px] font-bold uppercase tracking-[1.5px] transition-all cursor-pointer shadow-md"
                             >
-                              ⚡ CLAUDE VISION ANALİZİNİ BAŞLAT (3 SN)
+                              ⚡ CLAUDE VISION ANALİZİNİ BAŞLAT
                             </button>
                           </form>
                         )}

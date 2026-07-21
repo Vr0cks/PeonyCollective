@@ -538,44 +538,77 @@ export async function runClaudeVisionPrecheck(productId: string) {
       apiKey: process.env.ANTHROPIC_API_KEY,
     })
 
-    // Claude API'sine görselleri block olarak besle (Maksimum 5 fotoğraf)
-    const imageBlocks = imagesToAnalyze.slice(0, 5).map((url: string) => ({
-      type: 'image' as const,
+    // Claude API'sine görselleri base64 formatında besle (Maksimum 5 fotoğraf)
+    const imageBlocks = await Promise.all(
+      imagesToAnalyze.slice(0, 5).map(async (url: string) => {
+        try {
+          const res = await fetch(url)
+          if (!res.ok) return null
+          const arrayBuffer = await res.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+          
+          const contentType = res.headers.get('content-type') || ''
+          let media_type: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg'
+          if (contentType.includes('png')) media_type = 'image/png'
+          else if (contentType.includes('webp')) media_type = 'image/webp'
+          else if (contentType.includes('gif')) media_type = 'image/gif'
+
+          return {
+            type: 'image' as const,
+            source: {
+              type: 'base64' as const,
+              media_type,
+              data: buffer.toString('base64')
+            }
+          }
+        } catch (e) {
+          console.error('Image fetch error:', url, e)
+          return null
+        }
+      })
+    )
+
+    const validImageBlocks = imageBlocks.filter((block): block is {
+      type: 'image'
       source: {
-        type: 'url' as const,
-        url: url
+        type: 'base64'
+        media_type: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+        data: string
       }
-    }))
+    } => block !== null)
+
+    if (validImageBlocks.length === 0) {
+      throw new Error("Analiz edilecek görseller indirilemedi veya yüklenemedi.")
+    }
 
     const systemPrompt = `
       Sen lüks ikinci el çanta ve saat orijinallik doğrulama uzmanısın.
       
-      GÖNDERİLEN GÖRSELLERİN GEÇERLİLİK KONTROLÜ:
-      - Eğer gönderilen fotoğraflar tamamen siyah, aşırı karanlık, bulanık, boş veya bir lüks çanta/saat İÇERMİYORSA (örneğin sadece oda, zemin, manzara veya insan yüzü varsa), bu talebi orijinallik kontrolüne almadan KESİNLİKLE REDDETMELİSİN.
-      - Bu tür geçersiz durumlarda kararını "suspicious" yap, güven skorunu 100 ver ve gerekçeye tam olarak şunu yaz: "Lütfen fotoğrafları aydınlık bir ortamda, örnek kılavuzda gösterilen açılarla yeniden çekin. Boş, karanlık veya alakasız fotoğraflar ön incelemeyi geçemez."
+      GÖNDERİLEN GÖRSELLERİN GEÇERLİLİK KONTROLÜ VE UYUMSUZLUK DETEKSİYONU:
+      - Eğer gönderilen fotoğraflar tamamen siyah, aşırı karanlık, bulanık, boş veya lüks çanta/saat İÇERMİYORSA talebi KESİNLİKLE REDDET.
+      - UYUMSUZLUK KONTROLÜ: Beyan edilen ürün bilgisi (${product.brand} - ${product.model_name}) ile fotoğraftaki nesne eşleşmiyorsa (örneğin saat ürünü/markası adı altında ÇANTA fotoğrafı yüklenmişse veya tam tersi), bu durumu kesinlikle tespit et! Kararını "suspicious" yap, güven skorunu 95 belirle ve gerekçede ürün başlığı/kategorisi ile yüklenen görsel arasındaki nesne uyumsuzluğunu net olarak açıkla.
       
       ORİJİNALLİK DEĞERLENDİRME KURALLARI:
-      - Görseller geçerliyse; fotoğraflardaki dikiş simetrisini, deri dokusunu, logo fontunu, metal parça kalitesini ve seri numarası damgalarını detaylı incele.
+      - Görseller geçerliyse ve ürün bilgisiyle uyumluysa; fotoğraflardaki dikiş simetrisini, deri dokusunu, logo fontunu, metal parça kalitesini, saat kadranı/donanım detaylarını ve seri numarası damgalarını detaylı incele.
       - Değerlendirmeni yaptıktan sonra mutlaka aşağıdaki JSON formatında bir rapor döndür. JSON dışında hiçbir metin yazma:
       
       Format:
       {
         "verdict": "likely_authentic|suspicious|likely_fake",
         "confidence": 0-100, (verdiğin kararın güven skoru)
-        "reasoning": "Buraya çantanın dikişleri, donanım veya logo detayları hakkındaki gerekçeli analiz raporunu yaz..."
+        "reasoning": "Buraya çantanın/saatin detayları ve analiz raporunu yaz..."
       }
     `
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1000,
       system: systemPrompt,
-      images: undefined, // Type correction helper
       messages: [
         {
           role: 'user',
           content: [
-            ...imageBlocks,
+            ...validImageBlocks,
             {
               type: 'text',
               text: `Bu ${product.brand} - ${product.model_name} ürününü analiz et.`
@@ -583,7 +616,7 @@ export async function runClaudeVisionPrecheck(productId: string) {
           ]
         }
       ]
-    } as any)
+    })
 
     const responseContent = response.content[0].type === 'text' ? response.content[0].text : ''
     const jsonMatch = responseContent.match(/\{[\s\S]*\}/)
