@@ -1187,18 +1187,18 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
           <View style={styles.successBadge}>
             <Text style={styles.successIcon}>✓</Text>
           </View>
-          <Text style={styles.successTitle}>{isEn ? 'Request Submitted to Peony' : 'Talep Peony Onayına İletildi'}</Text>
+          <Text style={styles.successTitle}>{isEn ? 'Request Submitted to Peony AI' : 'Talep Peony AI & Entrupy Onayına İletildi'}</Text>
           <Text style={styles.successText}>
             {isEn 
-              ? 'Your product photos and details have been registered. Peony AI pre-check analysis has started.'
-              : 'Ürününüzün fotoğrafları ve detayları başarıyla kaydedildi. Peony AI ön inceleme analizi başlatılmıştır.'}
+              ? 'Your product photos and details have been registered into Peony AI dataset. Dual-engine visual & Entrupy pre-check analysis has started.'
+              : 'Ürün fotoğraflarınız Peony AI veri setine ve ön inceleme hattına aktarıldı. Çift katmanlı Peony AI & Entrupy doğrulama analizi başlatılmıştır.'}
           </Text>
 
           <View style={styles.infoHighlightCard}>
             <Text style={styles.infoHighlightText}>
               {isEn 
-                ? '🕒 Standard response time is 30 to 60 minutes during business hours (09:00 - 18:00). You will be notified in-app and via email.'
-                : '🕒 Peony uzman ve AI değerlendirmesi mesai saatleri (09:00 - 18:00) içerisinde ortalama 30 ile 60 dakika sürmektedir. Değerlendirme tamamlandığında bildirim iletilecektir.'}
+                ? '✦ Dual-Engine Authentication: Peony AI visual scoring completes in ~10 seconds. Upon approval, your item is listed on showcase with Entrupy Certified status.'
+                : '✦ Çift Katmanlı Güvenlik: Peony AI görsel skorlaması ~10 saniyede tamamlanır. Onaylandığında ürününüz Entrupy Sertifikasyon etiketiyle vitrinde sergilenir.'}
             </Text>
           </View>
 
