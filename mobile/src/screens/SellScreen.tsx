@@ -362,9 +362,40 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   // Active Camera Slot for Simulation Modal
   const [activeSlotKey, setActiveSlotKey] = useState<string | null>(null);
 
-  // Active Guide Modal
-  const [showGuide, setShowGuide] = useState(false);
-  const [activeGuideSlotKey, setActiveGuideSlotKey] = useState<string>('front');
+  // Price Estimation Widget State
+  const [priceEstimate, setPriceEstimate] = useState<{
+    estimatedMin: number;
+    estimatedMax: number;
+    suggestedPrice: number;
+    avgSalesDays: number;
+    adviceTr: string;
+  } | null>(null);
+  const [loadingEstimate, setLoadingEstimate] = useState(false);
+
+  async function fetchPriceEstimate() {
+    if (!brand || !name) return;
+    setLoadingEstimate(true);
+    try {
+      const res = await fetch('https://www.peony-collective.com/api/price-estimate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand,
+          model_name: name,
+          category: selectedCategoryId,
+          condition
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPriceEstimate(data);
+      }
+    } catch (e) {
+      console.log('Price estimate fetch error:', e);
+    } finally {
+      setLoadingEstimate(false);
+    }
+  }
 
   const isEn = t('wishlistEmpty') === 'Your wishlist is empty.';
 
@@ -785,7 +816,39 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               placeholderTextColor={COLORS.textMuted}
               value={name}
               onChangeText={setName}
+              onBlur={fetchPriceEstimate}
             />
+
+            {/* Peony AI Market Value Estimator Widget */}
+            {(loadingEstimate || priceEstimate) && (
+              <View style={styles.estimateCard}>
+                {loadingEstimate ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <ActivityIndicator size="small" color={COLORS.primary} />
+                    <Text style={styles.estimateLoadingText}>{isEn ? 'Peony AI analyzing market value...' : 'Peony AI 2. el piyasa değerini hesaplıyor...'}</Text>
+                  </View>
+                ) : priceEstimate ? (
+                  <View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={styles.estimateTitle}>✦ PEONY AI PİYASA REHBERİ</Text>
+                      <Text style={styles.estimateSpeedTag}>⚡ ~{priceEstimate.avgSalesDays} {isEn ? 'Days Sale' : 'Günde Satış'}</Text>
+                    </View>
+                    <Text style={styles.estimateRange}>
+                      ₺{priceEstimate.estimatedMin.toLocaleString('tr-TR')} - ₺{priceEstimate.estimatedMax.toLocaleString('tr-TR')}
+                    </Text>
+                    <Text style={styles.estimateAdvice}>💡 {priceEstimate.adviceTr}</Text>
+                    <TouchableOpacity 
+                      style={styles.applySuggestedBtn}
+                      onPress={() => setPrice(String(priceEstimate.suggestedPrice))}
+                    >
+                      <Text style={styles.applySuggestedBtnText}>
+                        {isEn ? `Apply Suggested Price: ₺${priceEstimate.suggestedPrice.toLocaleString('tr-TR')}` : `Önerilen Fiyatı Uygula: ₺${priceEstimate.suggestedPrice.toLocaleString('tr-TR')}`}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
+              </View>
+            )}
 
             <Text style={[styles.label, { marginTop: 15 }]}>{isEn ? 'ESTIMATED PRICE (TL)' : 'HEDEF SATIŞ FİYATI (TL)'}</Text>
             <TextInput 
@@ -796,6 +859,16 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               value={price}
               onChangeText={setPrice}
             />
+
+            {/* Overpricing Alert Notice */}
+            {priceEstimate && Number(price) > priceEstimate.estimatedMax * 1.35 && (
+              <View style={styles.overpriceAlertCard}>
+                <Text style={styles.overpriceAlertTitle}>⚠️ YÜKSEK FİYAT UYARISI</Text>
+                <Text style={styles.overpriceAlertText}>
+                  Girdiğiniz fiyat Peony AI piyasa değerinin üzerindedir. Ürününüz onaylansa bile vitrin önceliğinde geride kalabilir ve Muse tarafından önerilmeyebilir.
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Condition Select */}
@@ -1807,7 +1880,77 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  // Loading & Success
+  // Estimator & Overprice Widget Styles
+  estimateCard: {
+    backgroundColor: '#FAF7F2',
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 10,
+  },
+  estimateLoadingText: {
+    fontSize: 12,
+    color: COLORS.primaryDark,
+    marginLeft: 8,
+    fontWeight: '600',
+  },
+  estimateTitle: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.primaryDark,
+    letterSpacing: 1.2,
+  },
+  estimateSpeedTag: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.accent,
+  },
+  estimateRange: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginVertical: 4,
+  },
+  estimateAdvice: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+    lineHeight: 16,
+    marginBottom: 8,
+  },
+  applySuggestedBtn: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  applySuggestedBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  overpriceAlertCard: {
+    backgroundColor: '#FFF5F5',
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+  },
+  overpriceAlertTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.danger,
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  overpriceAlertText: {
+    fontSize: 11,
+    color: '#991B1B',
+    lineHeight: 16,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

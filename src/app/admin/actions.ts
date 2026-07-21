@@ -28,7 +28,7 @@ export async function updateProductStatus(
   // 1.5. Bildirim gönderebilmek için ürün detaylarını al
   const { data: product } = await supabase
     .from('products')
-    .select('seller_id, brand, model_name, price, category')
+    .select('seller_id, brand, model_name, price, category, ai_confidence')
     .eq('id', productId)
     .single()
 
@@ -101,7 +101,8 @@ export async function updateProductStatus(
             productId: productId,
             status: newStatus,
             reason: actualReason,
-            hasCompleteProfile: hasCompleteProfile
+            hasCompleteProfile: hasCompleteProfile,
+            aiConfidence: product.ai_confidence
           })
         } catch (emailSendErr) {
           console.error('Resend e-posta gönderme hatası:', emailSendErr)
@@ -664,7 +665,7 @@ export async function runClaudeVisionPrecheck(productId: string) {
       reasoning = "Claude Vision analizi tamamlandı ancak metin içeriği alınamadı."
     }
 
-    // 2. Analiz sonuçlarını ai_authentication_logs tablosuna kaydet (Eğitim seti için)
+    // 2. Analiz sonuçlarını ai_authentication_logs tablosuna kaydet (Eğitim seti için) and update product score/rank
     const { error: logErr } = await supabase
       .from('ai_authentication_logs')
       .insert({
@@ -676,6 +677,28 @@ export async function runClaudeVisionPrecheck(productId: string) {
         claude_confidence: confidence,
         claude_raw_response: reasoning
       })
+
+    // 3. Update the product database entry with the score, and check for overpricing to adjust ranking
+    const finalPrice = product.price || 0;
+    
+    // Automatically fetch estimate in backend to set anti-overpricing rank
+    let rank = 100; // default standard priority rank
+    try {
+      const { data: estimateData } = await supabase.rpc('get_estimated_range', { p_brand: product.brand, p_model: product.model_name });
+      if (estimateData && estimateData.max_price && finalPrice > estimateData.max_price * 1.35) {
+        rank = 10; // lower catalog rank for severely overpriced goods
+      }
+    } catch (e) {
+      // silent pass
+    }
+
+    await supabase
+      .from('products')
+      .update({
+        ai_confidence: confidence,
+        rank: rank
+      })
+      .eq('id', product.id)
 
     if (logErr) {
       console.error("AI auth log yazma hatası:", logErr.message)
