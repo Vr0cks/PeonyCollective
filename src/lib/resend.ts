@@ -175,8 +175,7 @@ export async function sendProductStatusEmail({
   }
 }
 
-// Alias for admin actions compatibility
-export const sendProductStatusEmail = sendProductApprovalStatusEmail;
+export const sendProductApprovalStatusEmail = sendProductStatusEmail;
 
 interface PasswordResetEmailProps {
   userEmail: string
