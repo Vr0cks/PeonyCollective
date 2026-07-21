@@ -1,7 +1,7 @@
 import { createClient } from '@/src/utils/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
-import { updateProductStatus } from '../actions'
+import { updateProductStatus, triggerVisionAnalysisAction } from '../actions'
 import { Product, Profile } from '@/src/types'
 
 export default async function AdminPendingPage() {
@@ -138,9 +138,10 @@ export default async function AdminPendingPage() {
                   {(() => {
                     const aiLogs = (product as any).ai_authentication_logs
                     const latestLog = Array.isArray(aiLogs) && aiLogs.length > 0 ? aiLogs[aiLogs.length - 1] : null
+                    const triggerAction = triggerVisionAnalysisAction.bind(null, product.id)
 
                     return (
-                      <div className="bg-[#18191E] border border-[#AF9164]/30 rounded-xl p-4 mt-2 shadow-lg">
+                      <div className="bg-[#18191E] border border-[#AF9164]/30 rounded-xl p-4 mt-2 shadow-lg relative z-30">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-[10px] font-bold tracking-[2px] uppercase text-[#AF9164] flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#AF9164] animate-pulse" /> ✦ PEONY LAB GÖRSEL ANALİZ RAPORU
@@ -155,12 +156,11 @@ export default async function AdminPendingPage() {
                         </p>
 
                         {!latestLog && (
-                          <form action={async () => {
-                            'use server'
-                            const { runClaudeVisionPrecheck } = await import('@/src/app/admin/actions')
-                            await runClaudeVisionPrecheck(product.id)
-                          }} className="mt-3">
-                            <button className="w-full py-2 bg-[#AF9164]/20 hover:bg-[#AF9164] text-[#AF9164] hover:text-white border border-[#AF9164]/40 rounded-lg text-[10px] font-bold uppercase tracking-[1.5px] transition-all cursor-pointer">
+                          <form action={triggerAction} className="mt-3 relative z-40">
+                            <button 
+                              type="submit"
+                              className="w-full py-2.5 bg-[#AF9164] hover:bg-[#96794F] text-white rounded-lg text-[10px] font-bold uppercase tracking-[1.5px] transition-all cursor-pointer shadow-md"
+                            >
                               ⚡ CLAUDE VISION ANALİZİNİ BAŞLAT (3 SN)
                             </button>
                           </form>

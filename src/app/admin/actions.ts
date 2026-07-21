@@ -620,9 +620,12 @@ export async function runClaudeVisionPrecheck(productId: string) {
       confidence: result.confidence,
       reasoning: result.reasoning
     }
-
   } catch (error: any) {
     console.error("Claude Vision Precheck Error:", error)
     throw new Error(`Claude Vision analizi başarısız: ${error.message}`)
   }
+}
+
+export async function triggerVisionAnalysisAction(productId: string) {
+  await runClaudeVisionPrecheck(productId)
 }
