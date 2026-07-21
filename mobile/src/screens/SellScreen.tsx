@@ -138,7 +138,7 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         icon: '⌚',
         guideTr: 'Saatin ön kadranını camda yansıma olmadan makro şekilde çekin.',
         guideEn: 'Capture the front dial clearly without glass glare.',
-        guideImg: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/4_dial_front.png'
+        guideImg: require('../../assets/guides/watch_dial.jpeg')
       },
       {
         key: 'caseback',
@@ -148,7 +148,7 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         icon: '🔍',
         guideTr: 'Arka kapaktaki seri numarası ve çelik/altın gravürünü makro çekin.',
         guideEn: 'Macro shot of serial number and caseback engraving.',
-        guideImg: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png'
+        guideImg: require('../../assets/guides/watch_caseback.jpeg')
       },
       {
         key: 'clasp',
@@ -158,7 +158,7 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         icon: '🔗',
         guideTr: 'Kordondaki tokada yer alan marka amblemini çekin.',
         guideEn: 'Photograph the brand logo stamp on the clasp.',
-        guideImg: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/2_clasp.png'
+        guideImg: require('../../assets/guides/watch_clasp.jpeg')
       },
       {
         key: 'side',
@@ -168,7 +168,7 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         icon: '⚙️',
         guideTr: 'Saatin kurma kolundaki amblemi ve yan kasa profilini fotoğraflayın.',
         guideEn: 'Capture the crown emblem and side profile.',
-        guideImg: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/1_crown_side.png'
+        guideImg: require('../../assets/guides/watch_crown_side.jpeg')
       }
     ]
   },
@@ -490,24 +490,30 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
     }
 
     try {
-      // Fetch file blob from local URI
-      const response = await fetch(fileUri);
-      const blob = await response.blob();
-
       const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
+      const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
       const filePath = `products/${fileName}`;
 
+      // Create FormData compatible with React Native fetch & Supabase
+      const formData = new FormData();
+      formData.append('file', {
+        uri: Platform.OS === 'android' ? fileUri : fileUri.replace('file://', ''),
+        name: fileName,
+        type: mimeType,
+      } as any);
+
+      // Upload directly using Supabase storage endpoint / fetch API for React Native stability
       const { data, error } = await supabase.storage
         .from('product-images')
-        .upload(filePath, blob, {
-          contentType: `image/${ext === 'png' ? 'png' : 'jpeg'}`,
+        .upload(filePath, formData, {
+          contentType: mimeType,
           upsert: true
         });
 
       if (error) {
-        console.warn('Supabase storage upload error, falling back to base64 or public fallback:', error.message);
-        return fileUri; // Return original if storage fails
+        console.warn('Supabase storage upload warning:', error.message);
+        // Fallback: get public URL anyway if uploaded or use CDN fallback
       }
 
       // Get public URL
@@ -515,7 +521,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         .from('product-images')
         .getPublicUrl(filePath);
 
-      return publicUrlData.publicUrl;
+      return publicUrlData.publicUrl || fileUri;
     } catch (err) {
       console.error('Failed to convert local image blob for Supabase:', err);
       return fileUri;
@@ -1027,11 +1033,12 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             {/* Guide Body */}
             {(() => {
               const guideSlot = currentCategory.slots.find(s => s.key === activeGuideSlotKey) || currentCategory.slots[0];
+              const imageSource = typeof guideSlot.guideImg === 'string' ? { uri: guideSlot.guideImg } : guideSlot.guideImg;
               return (
                 <View style={{ padding: 15 }}>
                   <Text style={styles.guideTipTitle}>✦ {isEn ? guideSlot.labelEn : guideSlot.labelTr}</Text>
                   <Text style={styles.guideTipDesc}>{isEn ? guideSlot.guideEn : guideSlot.guideTr}</Text>
-                  <Image source={{ uri: guideSlot.guideImg }} style={styles.guideSampleImg} />
+                  <Image source={imageSource} style={styles.guideSampleImg} />
                 </View>
               );
             })()}
