@@ -134,24 +134,37 @@ export default async function AdminPendingPage() {
                     </p>
                   )}
 
-                  {/* 🤖 PEONY AI (CLAUDE VISION) PRECHECK ANALYSIS BADGE */}
+                  {/* ✦ PEONY LAB GÖRSEL KONTROL ANALİZ RAPORU */}
                   {(() => {
                     const aiLogs = (product as any).ai_authentication_logs
                     const latestLog = Array.isArray(aiLogs) && aiLogs.length > 0 ? aiLogs[aiLogs.length - 1] : null
 
                     return (
-                      <div className="bg-amber-950/20 border border-amber-900/40 rounded-xl p-3.5 mt-1">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[9.5px] font-bold tracking-[1.5px] uppercase text-[#AF9164] flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#AF9164] animate-ping" /> 🤖 PEONY AI GÖRSEL KONTROL RAPORU
+                      <div className="bg-[#18191E] border border-[#AF9164]/30 rounded-xl p-4 mt-2 shadow-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] font-bold tracking-[2px] uppercase text-[#AF9164] flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#AF9164] animate-pulse" /> ✦ PEONY LAB GÖRSEL ANALİZ RAPORU
                           </span>
-                          <span className="text-[9px] bg-[#AF9164]/10 text-[#AF9164] px-2 py-0.5 rounded border border-[#AF9164]/20 font-mono">
-                            {latestLog ? `Güven Skoru: %${latestLog.claude_confidence || 95}` : 'Vision Bekleniyor'}
+                          <span className="text-[9.5px] bg-[#AF9164]/10 text-[#AF9164] px-2.5 py-1 rounded border border-[#AF9164]/30 font-semibold tracking-wider">
+                            {latestLog ? `Güven Skoru: %${latestLog.claude_confidence || 95}` : 'Bekliyor'}
                           </span>
                         </div>
-                        <p className="text-xs text-amber-200/90 leading-relaxed">
-                          {latestLog?.claude_raw_response || '✨ Fotoğraflar yüklendi. Claude Vision otomatik ön kontrol analizini tamamlıyor...'}
+                        
+                        <p className="text-xs text-neutral-300 leading-relaxed font-sans">
+                          {latestLog ? latestLog.claude_raw_response : 'Fotoğraflar yüklendi. Claude Vision ön inceleme raporu oluşturulmaya hazır.'}
                         </p>
+
+                        {!latestLog && (
+                          <form action={async () => {
+                            'use server'
+                            const { runClaudeVisionPrecheck } = await import('@/src/app/admin/actions')
+                            await runClaudeVisionPrecheck(product.id)
+                          }} className="mt-3">
+                            <button className="w-full py-2 bg-[#AF9164]/20 hover:bg-[#AF9164] text-[#AF9164] hover:text-white border border-[#AF9164]/40 rounded-lg text-[10px] font-bold uppercase tracking-[1.5px] transition-all cursor-pointer">
+                              ⚡ CLAUDE VISION ANALİZİNİ BAŞLAT (3 SN)
+                            </button>
+                          </form>
+                        )}
                       </div>
                     )
                   })()}
