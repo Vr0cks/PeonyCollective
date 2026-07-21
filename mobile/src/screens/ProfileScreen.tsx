@@ -40,7 +40,21 @@ interface ProfileScreenProps {
   onEnterOperations: () => void;
 }
 
-export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileScreenProps) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Dynamic Theme Colors Mapper
+  const THEME = {
+    bg: isDarkMode ? '#121214' : '#FBFBFA',
+    card: isDarkMode ? '#1A1A1E' : '#FFFFFF',
+    text: isDarkMode ? '#FFFFFF' : '#1A1A1A',
+    textMuted: isDarkMode ? '#A1A1A5' : '#7E8085',
+    border: isDarkMode ? '#2C2C30' : '#E8E8E6',
+    primary: '#AF9164',
+    danger: '#EF4444',
+    accent: '#10B981',
+    promoBg: isDarkMode ? '#2A2621' : '#F5ECE1'
+  };
+
   const isEn = t('wishlistEmpty') === 'Your wishlist is empty.';
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -171,29 +185,42 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: THEME.bg }]}>
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+          <ActivityIndicator size="large" color={THEME.primary} />
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           
+          {/* Theme Quick Switcher Row */}
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 15, paddingTop: 10 }}>
+            <TouchableOpacity 
+              style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: THEME.card, borderWidth: 1, borderColor: THEME.border, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }}
+              onPress={() => setIsDarkMode(!isDarkMode)}
+            >
+              <Text style={{ fontSize: 13, marginRight: 6 }}>{isDarkMode ? '☀️' : '🌙'}</Text>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: THEME.text }}>
+                {isDarkMode ? (isEn ? 'LIGHT MODE' : 'AÇIK MOD') : (isEn ? 'DARK MODE' : 'KOYU MOD')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           {/* PROFILE HEADER & USER DETAILS */}
-          <View style={styles.profileHeaderBox}>
-            <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+          <View style={[styles.profileHeaderBox, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
+            <Image source={{ uri: avatarUrl }} style={[styles.avatarImage, { borderColor: THEME.primary }]} />
             <View style={styles.profileInfoText}>
-              <Text style={styles.name}>{preferredName || profile?.full_name}</Text>
+              <Text style={[styles.name, { color: THEME.text }]}>{preferredName || profile?.full_name}</Text>
               <Text style={styles.role}>
                 {profile?.role === 'admin' ? 'Admin' : profile?.role === 'operations' ? (isEn ? 'Operations Officer' : 'Operasyon Yetkilisi') : (t('defaultMemberName') || 'Peony Member')}
               </Text>
-              <Text style={styles.memberSince}>{isEn ? 'Membership: 2026' : 'Üyelik Tarihi: 2026'}</Text>
+              <Text style={[styles.memberSince, { color: THEME.textMuted }]}>{isEn ? 'Membership: 2026' : 'Üyelik Tarihi: 2026'}</Text>
             </View>
           </View>
 
           {/* PERSONAL & CORPORATE DETAILS (TCKN, VKN, PREFERRED NAME, PHONE, EMAIL, AVATAR EDIT) */}
-          <View style={styles.detailsCard}>
-            <View style={styles.detailsHeader}>
+          <View style={[styles.detailsCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
+            <View style={[styles.detailsHeader, { borderColor: THEME.border }]}>
               <Text style={styles.detailsTitle}>
                 {isEditingInfo 
                   ? (isEn ? '✦ EDIT PROFILE INFO' : '✦ PROFİL BİLGİLERİNİ DÜZENLE') 
@@ -202,14 +229,14 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               <View style={{ flexDirection: 'row' }}>
                 {isEditingInfo && (
                   <TouchableOpacity 
-                    style={[styles.editInfoBtn, { marginRight: 8, borderColor: COLORS.danger }]} 
+                    style={[styles.editInfoBtn, { marginRight: 8, borderColor: THEME.danger }]} 
                     onPress={() => setIsEditingInfo(false)}
                   >
-                    <Text style={[styles.editInfoBtnText, { color: COLORS.danger }]}>İPTAL</Text>
+                    <Text style={[styles.editInfoBtnText, { color: THEME.danger }]}>İPTAL</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity 
-                  style={[styles.editInfoBtn, isEditingInfo && { backgroundColor: COLORS.primary, borderColor: COLORS.primary }]} 
+                  style={[styles.editInfoBtn, { backgroundColor: isEditingInfo ? THEME.primary : THEME.card, borderColor: THEME.border }]} 
                   onPress={() => {
                     if (isEditingInfo) {
                       setIsEditingInfo(false);
@@ -219,7 +246,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                     }
                   }}
                 >
-                  <Text style={[styles.editInfoBtnText, isEditingInfo && { color: '#FFFFFF' }]}>
+                  <Text style={[styles.editInfoBtnText, { color: isEditingInfo ? '#FFFFFF' : THEME.text }]}>
                     {isEditingInfo ? 'KAYDET' : 'DÜZENLE'}
                   </Text>
                 </TouchableOpacity>
@@ -229,14 +256,14 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
             {isEditingInfo ? (
               /* Editable Input Fields Grouped */
               <View style={styles.editFieldsGroup}>
-                <View style={styles.editSectionTitleRow}>
+                <View style={[styles.editSectionTitleRow, { borderColor: THEME.border }]}>
                   <Text style={styles.editSectionTitle}>👤 KİŞİSEL BİLGİLER</Text>
                 </View>
                 
                 <View style={styles.infoRowField}>
                   <Text style={styles.fieldLabel}>TERCİH EDİLEN İSİM</Text>
                   <TextInput 
-                    style={styles.fieldInput} 
+                    style={[styles.fieldInput, { backgroundColor: THEME.bg, color: THEME.text, borderColor: THEME.border }]} 
                     value={preferredName} 
                     onChangeText={setPreferredName} 
                     placeholder="Adınız Soyadınız"
@@ -247,7 +274,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 <View style={styles.infoRowField}>
                   <Text style={styles.fieldLabel}>E-POSTA ADRESİ</Text>
                   <TextInput 
-                    style={styles.fieldInput} 
+                    style={[styles.fieldInput, { backgroundColor: THEME.bg, color: THEME.text, borderColor: THEME.border }]} 
                     value={emailAddr} 
                     onChangeText={setEmailAddr} 
                     autoCapitalize="none"
@@ -260,7 +287,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 <View style={styles.infoRowField}>
                   <Text style={styles.fieldLabel}>İLETİŞİM TELEFONU</Text>
                   <TextInput 
-                    style={styles.fieldInput} 
+                    style={[styles.fieldInput, { backgroundColor: THEME.bg, color: THEME.text, borderColor: THEME.border }]} 
                     value={phone} 
                     onChangeText={setPhone} 
                     keyboardType="phone-pad"
@@ -269,14 +296,14 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                   />
                 </View>
 
-                <View style={styles.editSectionTitleRow}>
+                <View style={[styles.editSectionTitleRow, { borderColor: THEME.border }]}>
                   <Text style={styles.editSectionTitle}>🏢 FATURA & VERGİ BİLGİLERİ</Text>
                 </View>
 
                 <View style={styles.infoRowField}>
                   <Text style={styles.fieldLabel}>T.C. KİMLİK NO (TCKN)</Text>
                   <TextInput 
-                    style={styles.fieldInput} 
+                    style={[styles.fieldInput, { backgroundColor: THEME.bg, color: THEME.text, borderColor: THEME.border }]} 
                     value={tckn} 
                     onChangeText={setTckn} 
                     maxLength={11}
@@ -289,7 +316,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 <View style={styles.infoRowField}>
                   <Text style={styles.fieldLabel}>VERGİ KİMLİK NO (VKN)</Text>
                   <TextInput 
-                    style={styles.fieldInput} 
+                    style={[styles.fieldInput, { backgroundColor: THEME.bg, color: THEME.text, borderColor: THEME.border }]} 
                     value={vkn} 
                     onChangeText={setVkn} 
                     maxLength={10}
@@ -302,7 +329,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 <View style={styles.infoRowField}>
                   <Text style={styles.fieldLabel}>FİRMA ÜNVANI</Text>
                   <TextInput 
-                    style={styles.fieldInput} 
+                    style={[styles.fieldInput, { backgroundColor: THEME.bg, color: THEME.text, borderColor: THEME.border }]} 
                     value={companyName} 
                     onChangeText={setCompanyName} 
                     placeholder="Resmi Şirket Adı"
@@ -313,7 +340,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 <View style={styles.infoRowField}>
                   <Text style={styles.fieldLabel}>PROFİL FOTOĞRAFI URL</Text>
                   <TextInput 
-                    style={styles.fieldInput} 
+                    style={[styles.fieldInput, { backgroundColor: THEME.bg, color: THEME.text, borderColor: THEME.border }]} 
                     value={avatarUrl} 
                     onChangeText={setAvatarUrl} 
                     placeholder="Görsel URL Adresi"
@@ -329,96 +356,93 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                   <View style={styles.displayGrid}>
                     <View style={styles.displayCol}>
                       <Text style={styles.displayLabel}>{isEn ? 'PREFERRED NAME' : 'TERCİH EDİLEN İSİM'}</Text>
-                      <Text style={styles.displayVal}>{preferredName || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                      <Text style={[styles.displayVal, { color: THEME.text }]}>{preferredName || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
                     </View>
                     <View style={styles.displayCol}>
                       <Text style={styles.displayLabel}>{isEn ? 'PHONE NUMBER' : 'TELEFON NUMARASI'}</Text>
-                      <Text style={styles.displayVal}>{phone || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                      <Text style={[styles.displayVal, { color: THEME.text }]}>{phone || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
                     </View>
                   </View>
                   <View style={[styles.displayCol, { marginTop: 12 }]}>
                     <Text style={styles.displayLabel}>{isEn ? 'EMAIL ADDRESS' : 'E-POSTA ADRESİ'}</Text>
-                    <Text style={styles.displayVal}>{emailAddr || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                    <Text style={[styles.displayVal, { color: THEME.text }]}>{emailAddr || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
                   </View>
                 </View>
 
-                <View style={styles.displaySectionDivider} />
-
-                <View style={styles.displaySection}>
-                  <Text style={styles.displaySectionHeader}>{isEn ? '🏢 CORPORATE & BILLING' : '🏢 KURUMSAL & FATURALANDIRMA'}</Text>
-                  <View style={styles.displayGrid}>
-                    <View style={styles.displayCol}>
-                      <Text style={styles.displayLabel}>{isEn ? 'NATIONAL ID (TCKN)' : 'T.C. KİMLİK NO (TCKN)'}</Text>
-                      <Text style={styles.displayVal}>{tckn || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                {/* Show Corporate Tax Info fields only if they exist */}
+                {(tckn || vkn || companyName) && (
+                  <View style={[styles.displaySection, { marginTop: 18, borderTopWidth: 1, borderColor: THEME.border, paddingTop: 14 }]}>
+                    <Text style={styles.displaySectionHeader}>{isEn ? '🏢 BILLING DETAILS' : '🏢 FATURANDIRMA BİLGİLERİ'}</Text>
+                    <View style={styles.displayGrid}>
+                      {tckn && (
+                        <View style={styles.displayCol}>
+                          <Text style={styles.displayLabel}>TCKN</Text>
+                          <Text style={[styles.displayVal, { color: THEME.text }]}>{tckn}</Text>
+                        </View>
+                      )}
+                      {vkn && (
+                        <View style={styles.displayCol}>
+                          <Text style={styles.displayLabel}>VKN</Text>
+                          <Text style={[styles.displayVal, { color: THEME.text }]}>{vkn}</Text>
+                        </View>
+                      )}
                     </View>
-                    <View style={styles.displayCol}>
-                      <Text style={styles.displayLabel}>{isEn ? 'TAX NUMBER (VKN)' : 'VERGİ NO (VKN)'}</Text>
-                      <Text style={styles.displayVal}>{vkn || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
-                    </View>
+                    {companyName && (
+                      <View style={[styles.displayCol, { marginTop: 12 }]}>
+                        <Text style={styles.displayLabel}>{isEn ? 'COMPANY NAME' : 'FİRMA RESMİ ÜNVANI'}</Text>
+                        <Text style={[styles.displayVal, { color: THEME.text }]}>{companyName}</Text>
+                      </View>
+                    )}
                   </View>
-                  <View style={[styles.displayCol, { marginTop: 12 }]}>
-                    <Text style={styles.displayLabel}>{isEn ? 'COMPANY NAME' : 'FİRMA ÜNVANI'}</Text>
-                    <Text style={styles.displayVal}>{companyName || (isEn ? 'Individual Member' : 'Bireysel Üye')}</Text>
-                  </View>
-                </View>
+                )}
               </View>
             )}
           </View>
 
-          {/* BUYER / SELLER / VAULT MODE TOGGLE TABS (ELEGANT SEGMENTED SWITCH) */}
-          <View style={styles.modeTabs}>
+          {/* DYNAMIC MODE SELECTOR TABS (Buyer, Seller, Vault) */}
+          <View style={[styles.modeTabs, { backgroundColor: THEME.border }]}>
             <TouchableOpacity 
-              style={[styles.modeTab, profileMode === 'buyer' && styles.activeModeTab]}
+              style={[styles.modeTab, profileMode === 'buyer' && [styles.activeModeTab, { backgroundColor: THEME.card }]]}
               onPress={() => setProfileMode('buyer')}
             >
-              <Text style={[styles.modeTabText, profileMode === 'buyer' && styles.activeModeTabText]}>
-                🛍️ {isEn ? 'Orders' : 'Alışverişler'}
+              <Text style={[styles.modeTabText, profileMode === 'buyer' && [styles.activeModeTabText, { color: THEME.text }]]}>
+                {isEn ? 'BUYER PROFILE' : 'ALICI HESABI'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={[styles.modeTab, profileMode === 'seller' && styles.activeModeTab]}
+              style={[styles.modeTab, profileMode === 'seller' && [styles.activeModeTab, { backgroundColor: THEME.card }]]}
               onPress={() => setProfileMode('seller')}
             >
-              <Text style={[styles.modeTabText, profileMode === 'seller' && styles.activeModeTabText]}>
-                💰 {isEn ? 'Sales' : 'Satışlar'}
+              <Text style={[styles.modeTabText, profileMode === 'seller' && [styles.activeModeTabText, { color: THEME.text }]]}>
+                {isEn ? 'SELLER CENTER' : 'SATICI HESABI'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={[styles.modeTab, profileMode === 'vault' && styles.activeModeTab]}
+              style={[styles.modeTab, profileMode === 'vault' && [styles.activeModeTab, { backgroundColor: THEME.card }]]}
               onPress={() => setProfileMode('vault')}
             >
-              <Text style={[styles.modeTabText, profileMode === 'vault' && styles.activeModeTabText]}>
-                🏦 {isEn ? 'Digital Vault' : 'Dijital Kasa'}
+              <Text style={[styles.modeTabText, profileMode === 'vault' && [styles.activeModeTabText, { color: THEME.text }]]}>
+                {isEn ? 'PORTFOLIO' : 'DEĞER GRAFİĞİ'}
               </Text>
             </TouchableOpacity>
           </View>
 
-          {/* DYNAMIC RENDERING: BUYER ACCOUNT VIEW */}
+          {/* DYNAMIC RENDERING: BUYER VIEW */}
           {profileMode === 'buyer' && (
-            <View>
-              {/* Financial Summary */}
-              <View style={styles.walletBox}>
-                <View style={styles.walletCol}>
-                  <Text style={styles.walletLabel}>{isEn ? 'TOTAL SPENT' : 'TOPLAM HARCAMA'}</Text>
-                  <Text style={styles.walletValue}>{totalSpent}</Text>
-                </View>
-                <View style={styles.walletDivider} />
-                <View style={styles.walletCol}>
-                  <Text style={styles.walletLabel}>{isEn ? 'ACTIVE ORDER' : 'AKTİF SİPARİŞ'}</Text>
-                  <Text style={styles.walletValue}>{isEn ? '1 Active Order' : '1 Aktif Sipariş'}</Text>
-                </View>
-              </View>
-
-              {/* PEONY ELITE CLUB LOYALTY CARD */}
+            <View style={{ paddingHorizontal: 15 }}>
+              
+              {/* VIP Loyalty Card */}
               <View style={styles.eliteCard}>
                 <View style={styles.eliteHeader}>
-                  <Text style={styles.eliteBrand}>PEONY ELITE</Text>
-                  <Text style={styles.eliteTier}>★ GOLD MEMBER</Text>
+                  <Text style={styles.eliteBrand}>PEONY VIP</Text>
+                  <Text style={styles.eliteTier}>BLACK MEMBER</Text>
                 </View>
-                <Text style={styles.elitePointLabel}>{isEn ? 'AVAILABLE DISCOUNT POINTS' : 'KULLANILABİLİR İNDİRİM PUANI'}</Text>
-                <Text style={styles.elitePoints}>4.500 ₺</Text>
+                
+                <Text style={styles.elitePointLabel}>{isEn ? 'ACCUMULATED CREDIT POINTS' : 'BİRİKMİŞ PEONY PUAN'}</Text>
+                <Text style={styles.elitePoints}>24.500</Text>
+                
                 <Text style={styles.eliteDesc}>
                   {isEn 
                     ? 'Use these points as an instant discount on your next checkout.' 
@@ -428,7 +452,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 {/* Progress bar to Black Member */}
                 <View style={styles.progressContainer}>
                   <View style={styles.progressBarBg}>
-                    <View style={[styles.progressBarFill, { width: '70%' }]} />
+                    <View style={[styles.progressBarFill, { width: '70%', backgroundColor: THEME.primary }]} />
                   </View>
                   <View style={styles.progressLabelRow}>
                     <Text style={styles.progressLabel}>{isEn ? '7,500 ₺ remaining for BLACK CARD' : 'BLACK CARD için 7.500 ₺ kaldı'}</Text>
@@ -438,13 +462,13 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               </View>
 
               {/* Active Orders List Card */}
-              <Text style={styles.sectionTitle}>{isEn ? 'Order Tracking' : 'Sipariş Takibi'}</Text>
-              <View style={styles.trackerCard}>
-                <View style={styles.trackerHeader}>
-                  <Text style={styles.trackerProdName}>Rolex Submariner Date</Text>
-                  <Text style={[styles.trackerStatus, { color: COLORS.accent }]}>{isEn ? 'Shipped 🚚' : 'Kargoya Verildi 🚚'}</Text>
+              <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Order Tracking' : 'Sipariş Takibi'}</Text>
+              <View style={[styles.trackerCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
+                <View style={[styles.trackerHeader, { borderColor: THEME.border }]}>
+                  <Text style={[styles.trackerProdName, { color: THEME.text }]}>Rolex Submariner Date</Text>
+                  <Text style={[styles.trackerStatus, { color: THEME.accent }]}>{isEn ? 'Shipped 🚚' : 'Kargoya Verildi 🚚'}</Text>
                 </View>
-                <Text style={styles.orderDetailText}>
+                <Text style={[styles.orderDetailText, { color: THEME.textMuted }]}>
                   {isEn 
                     ? `Courier: Yurtiçi Kargo • Tracking No: YK837261902\nEstimated Delivery: In 2 Days`
                     : `Kargo Firması: Yurtiçi Kargo • Takip No: YK837261902\nTahmini Teslimat: 2 Gün İçinde`}
@@ -458,15 +482,15 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               </View>
 
               {/* Favorite Brands & Price Alerts */}
-              <Text style={styles.sectionTitle}>{isEn ? 'Followed Brands & Alerts' : 'Takip Ettiğim Markalar & Alarmlar'}</Text>
-              <View style={styles.brandsBox}>
+              <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Followed Brands & Alerts' : 'Takip Ettiğim Markalar & Alarmlar'}</Text>
+              <View style={[styles.brandsBox, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.brandRow}>
-                  <Text style={styles.brandName}>Chanel</Text>
+                  <Text style={[styles.brandName, { color: THEME.text }]}>Chanel</Text>
                   <Text style={styles.brandAlertCount}>{isEn ? '3 New Price Alerts 🔔' : '3 Yeni Fiyat Alarmı 🔔'}</Text>
                 </View>
-                <View style={styles.brandRowDivider} />
+                <View style={[styles.brandRowDivider, { backgroundColor: THEME.border }]} />
                 <View style={styles.brandRow}>
-                  <Text style={styles.brandName}>Rolex</Text>
+                  <Text style={[styles.brandName, { color: THEME.text }]}>Rolex</Text>
                   <Text style={styles.brandAlertCount}>{isEn ? 'New Listing Alerts On' : 'Yeni İlan Bildirimi Açık'}</Text>
                 </View>
               </View>
@@ -475,26 +499,26 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
           {/* DYNAMIC RENDERING: SELLER ACCOUNT VIEW */}
           {profileMode === 'seller' && (
-            <View>
+            <View style={{ paddingHorizontal: 15 }}>
               {/* Financial Summary */}
-              <View style={styles.walletBox}>
+              <View style={[styles.walletBox, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.walletCol}>
                   <Text style={styles.walletLabel}>{isEn ? 'TOTAL SALES' : 'TOPLAM SATIŞ'}</Text>
-                  <Text style={styles.walletValue}>{balance}</Text>
+                  <Text style={[styles.walletValue, { color: THEME.text }]}>{balance}</Text>
                 </View>
-                <View style={styles.walletDivider} />
+                <View style={[styles.walletDivider, { backgroundColor: THEME.border }]} />
                 <View style={styles.walletCol}>
                   <Text style={styles.walletLabel}>{isEn ? 'PENDING PAYOUT' : 'BEKLEYEN HAKEDİŞ'}</Text>
-                  <Text style={styles.walletValue}>{pendingPayout}</Text>
+                  <Text style={[styles.walletValue, { color: THEME.text }]}>{pendingPayout}</Text>
                 </View>
               </View>
 
               {/* User Real Submitted Products List */}
-              <Text style={styles.sectionTitle}>{isEn ? 'My Luxury Assets' : 'Varlıklarım ve Satış Durumları'}</Text>
+              <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'My Luxury Assets' : 'Varlıklarım ve Satış Durumları'}</Text>
               {myProducts.length === 0 ? (
-                <View style={[styles.trackerCard, { alignItems: 'center', paddingVertical: 24 }]}>
+                <View style={[styles.trackerCard, { backgroundColor: THEME.card, borderColor: THEME.border, alignItems: 'center', paddingVertical: 24 }]}>
                   <Text style={{ fontSize: 28, marginBottom: 8 }}>🛍️</Text>
-                  <Text style={{ fontSize: 13, color: COLORS.textMuted }}>{isEn ? 'No products listed yet.' : 'Henüz sergilenen bir ürününüz bulunmuyor.'}</Text>
+                  <Text style={{ fontSize: 13, color: THEME.textMuted }}>{isEn ? 'No products listed yet.' : 'Henüz sergilenen bir ürününüz bulunmuyor.'}</Text>
                 </View>
               ) : (
                 myProducts.map(p => {
@@ -512,10 +536,10 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                   const statusBadgeColor = p.status === 'approved' ? '#059669' : p.status === 'pending' ? '#D97706' : '#EF4444';
 
                   return (
-                    <View key={p.id} style={[styles.trackerCard, { marginBottom: 14 }]}>
-                      <View style={styles.trackerHeader}>
-                        <Text style={styles.trackerProdName}>{p.brand} {p.model_name}</Text>
-                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: COLORS.primary }}>
+                    <View key={p.id} style={[styles.trackerCard, { backgroundColor: THEME.card, borderColor: THEME.border, marginBottom: 14 }]}>
+                      <View style={[styles.trackerHeader, { borderColor: THEME.border }]}>
+                        <Text style={[styles.trackerProdName, { color: THEME.text }]}>{p.brand} {p.model_name}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: THEME.primary }}>
                           ₺{Number(p.price || 0).toLocaleString('tr-TR')}
                         </Text>
                       </View>
@@ -525,7 +549,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                           <Text style={{ fontSize: 10, fontWeight: 'bold', color: statusBadgeColor }}>{statusBadgeText}</Text>
                         </View>
                         {p.ai_confidence && (
-                          <Text style={{ fontSize: 10, color: COLORS.textMuted, marginLeft: 10 }}>
+                          <Text style={{ fontSize: 10, color: THEME.textMuted, marginLeft: 10 }}>
                             Peony AI Skoru: %{p.ai_confidence}
                           </Text>
                         )}
@@ -533,12 +557,12 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
                       {/* 7 Days Unsold Price Reduce Suggestion Alert & Button */}
                       {isUnsold7Days && (
-                        <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: COLORS.border }}>
+                        <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: THEME.border }}>
                           <Text style={{ fontSize: 11, color: '#D97706', fontWeight: '600', marginBottom: 6 }}>
                             ⚠️ Ürününüz {daysDiff} gündür satılmadı. Peony AI fiyatınızı %10 düşürerek hızlı satmanızı öneriyor.
                           </Text>
                           <TouchableOpacity 
-                            style={{ backgroundColor: COLORS.primary, paddingVertical: 8, borderRadius: 6, alignItems: 'center' }}
+                            style={{ backgroundColor: THEME.primary, paddingVertical: 8, borderRadius: 6, alignItems: 'center' }}
                             onPress={() => handleReducePrice(p.id, p.price)}
                           >
                             <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' }}>
@@ -553,55 +577,51 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               )}
 
               {/* Monetization / Advertising Portal */}
-              <Text style={styles.sectionTitle}>{isEn ? 'Boost Your Sales' : 'Satışlarınızı Artırın'}</Text>
-              <Text style={styles.sectionDesc}>
+              <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Boost Your Sales' : 'Satışlarınızı Artırın'}</Text>
+              <Text style={[styles.sectionDesc, { color: THEME.textMuted }]}>
                 {isEn 
                   ? 'Get up to %50 more views on your items using Peony Muse and Showcase ad packages.'
                   : 'Peony Muse ve Vitrin reklam paketleriyle ürünlerinize %50 daha fazla gösterim kazandırın.'}
               </Text>
 
               {/* Package 1: Curator Boost */}
-              <View style={styles.adCard}>
+              <View style={[styles.adCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.adHeader}>
-                  <Text style={styles.adTitle}>{isEn ? 'Curator Recommendation (Muse Boost)' : 'Küratör Öne Çıkarması (Muse Boost)'}</Text>
+                  <Text style={[styles.adTitle, { color: THEME.text }]}>{isEn ? 'Curator Recommendation (Muse Boost)' : 'Küratör Öne Çıkarması (Muse Boost)'}</Text>
                   <Text style={styles.adPrice}>3.000 ₺ / {isEn ? 'Mo' : 'Ay'}</Text>
                 </View>
-                <Text style={styles.adDesc}>
+                <Text style={[styles.adDesc, { color: THEME.textMuted }]}>
                   {isEn 
                     ? 'Your items are matched as priority recommendations in Peony Muse styling chats and gain %50 more exposure on the feed.'
                     : 'Ürünleriniz lüks stil danışmanımız Peony Muse sohbetlerinde öncelikli tavsiye olarak eşleştirilir ve vitrinde %50 daha fazla görünürlük kazanır.'}
                 </Text>
                 <TouchableOpacity 
-                  style={[styles.adBtn, activeAdPackage === 'Küratör Öne Çıkarması' && styles.activeAdBtn]}
-                  onPress={() => handleBuyAdPackage('Küratör Öne Çıkarması', '3.000 ₺ / Ay')}
+                  style={[styles.adBtn, activeAdPackage === 'Muse Boost' && { backgroundColor: THEME.accent }]}
+                  onPress={() => handleBuyAdPackage('Muse Boost', '3.000 ₺')}
                 >
                   <Text style={styles.adBtnText}>
-                    {activeAdPackage === 'Küratör Öne Çıkarması' 
-                      ? (isEn ? '✓ ACTIVE SUBSCRIPTION' : '✓ AKTİF ABONELİK') 
-                      : (isEn ? 'START SUBSCRIPTION' : 'ABONELİĞİ BAŞLAT')}
+                    {activeAdPackage === 'Muse Boost' ? (isEn ? '✓ ACTIVE' : '✓ AKTİF') : (isEn ? 'ACTIVATE NOW' : 'HEMEN AKTİF ET')}
                   </Text>
                 </TouchableOpacity>
               </View>
 
-              {/* Package 2: VIP Showcase */}
-              <View style={styles.adCard}>
+              {/* Package 2: Elite Showcase */}
+              <View style={[styles.adCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.adHeader}>
-                  <Text style={styles.adTitle}>{isEn ? 'Concierge Main Showcase (Showcase Pro)' : 'Concierge Vitrin Vitrini (Showcase Pro)'}</Text>
+                  <Text style={[styles.adTitle, { color: THEME.text }]}>{isEn ? 'Showcase Priority Placement' : 'Vitrin Öncelikli Listeleme (Showcase Elite)'}</Text>
                   <Text style={styles.adPrice}>5.000 ₺ / {isEn ? 'Mo' : 'Ay'}</Text>
                 </View>
-                <Text style={styles.adDesc}>
+                <Text style={[styles.adDesc, { color: THEME.textMuted }]}>
                   {isEn 
-                    ? 'Your items are showcased at the top of category sliders, Weather Concierge lists, and search queries organically without any sponsored tag.'
-                    : 'Ürünleriniz ana sayfadaki üst kategori slider\'larında, Weather Concierge hava durumu listelemelerinde ve aramalarda en üst sırada sponsorlu ibaresi olmadan organik olarak sergilenir.'}
+                    ? 'Your items are pinned to the top of category feeds and showcased in premium newsletter updates sent to 10k+ VIP collectors.'
+                    : 'Ürünleriniz kategori vitrinlerinde her zaman en üst sırada sabitlenir ve 10 binden fazla VIP koleksiyonere gönderilen özel bültenlerde yer alır.'}
                 </Text>
                 <TouchableOpacity 
-                  style={[styles.adBtn, activeAdPackage === 'Concierge Vitrin Vitrini' && styles.activeAdBtn]}
-                  onPress={() => handleBuyAdPackage('Concierge Vitrin Vitrini', '5.000 ₺ / Ay')}
+                  style={[styles.adBtn, activeAdPackage === 'Showcase Elite' && { backgroundColor: THEME.accent }]}
+                  onPress={() => handleBuyAdPackage('Showcase Elite', '5.000 ₺')}
                 >
                   <Text style={styles.adBtnText}>
-                    {activeAdPackage === 'Concierge Vitrin Vitrini' 
-                      ? (isEn ? '✓ ACTIVE SUBSCRIPTION' : '✓ AKTİF ABONELİK') 
-                      : (isEn ? 'START SUBSCRIPTION' : 'ABONELİĞİ BAŞLAT')}
+                    {activeAdPackage === 'Showcase Elite' ? (isEn ? '✓ ACTIVE' : '✓ AKTİF') : (isEn ? 'ACTIVATE NOW' : 'HEMEN AKTİF ET')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -610,15 +630,15 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
           {/* DYNAMIC RENDERING: DIGITAL VAULT VIEW */}
           {profileMode === 'vault' && (
-            <View>
+            <View style={{ paddingHorizontal: 15 }}>
               {/* Vault Portfolio Value summary card */}
-              <View style={styles.vaultValueCard}>
+              <View style={[styles.vaultValueCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.vaultValueHeader}>
                   <Text style={styles.vaultLabel}>{isEn ? 'PORTFOLIO TOTAL VALUE' : 'PORTFÖY TOPLAM DEĞERİ'}</Text>
                   <Text style={styles.vaultTrend}>+3.7% {isEn ? 'this month' : 'bu ay'} 📈</Text>
                 </View>
-                <Text style={styles.vaultValueText}>1.030.000 ₺</Text>
-                <Text style={styles.vaultSubText}>
+                <Text style={[styles.vaultValueText, { color: THEME.text }]}>1.030.000 ₺</Text>
+                <Text style={[styles.vaultSubText, { color: THEME.textMuted }]}>
                   {isEn 
                     ? 'Estimated current value of your verified luxury assets based on live market stats.'
                     : 'Doğrulanmış lüks varlıklarınızın piyasa verilerine dayalı tahmini güncel değeri.'}
@@ -626,46 +646,46 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               </View>
 
               {/* Asset list */}
-              <Text style={styles.sectionTitle}>{isEn ? 'Vault Assets' : 'Kasa Varlıkları'}</Text>
+              <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Vault Assets' : 'Kasa Varlıkları'}</Text>
               
               {/* Asset 1 */}
-              <View style={styles.assetItemCard}>
+              <View style={[styles.assetItemCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.assetItemRow}>
                   <View style={styles.assetDot} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.assetBrand}>CHANEL</Text>
-                    <Text style={styles.assetModel}>Classic Double Flap Medium Black</Text>
+                    <Text style={[styles.assetModel, { color: THEME.text }]}>Classic Double Flap Medium Black</Text>
                     <Text style={styles.assetStatus}>Entrupy Verified ✓</Text>
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={styles.assetCurrentVal}>345.000 ₺</Text>
-                    <Text style={styles.assetAppreciation}>{isEn ? '+35.000 ₺ (Cost: 310k)' : '+35.000 ₺ (Alış: 310k)'}</Text>
+                    <Text style={[styles.assetCurrentVal, { color: THEME.text }]}>345.000 ₺</Text>
+                    <Text style={[styles.assetAppreciation, { color: THEME.textMuted }]}>{isEn ? '+35.000 ₺ (Cost: 310k)' : '+35.000 ₺ (Alış: 310k)'}</Text>
                   </View>
                 </View>
               </View>
 
               {/* Asset 2 */}
-              <View style={styles.assetItemCard}>
+              <View style={[styles.assetItemCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={styles.assetItemRow}>
                   <View style={styles.assetDot} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.assetBrand}>ROLEX</Text>
-                    <Text style={styles.assetModel}>Submariner Date Starbucks 41mm</Text>
+                    <Text style={[styles.assetModel, { color: THEME.text }]}>Submariner Date Starbucks 41mm</Text>
                     <Text style={styles.assetStatus}>Entrupy Verified ✓</Text>
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={styles.assetCurrentVal}>685.000 ₺</Text>
-                    <Text style={styles.assetAppreciation}>{isEn ? '+10.000 ₺ (Cost: 675k)' : '+10.000 ₺ (Alış: 675k)'}</Text>
+                    <Text style={[styles.assetCurrentVal, { color: THEME.text }]}>685.000 ₺</Text>
+                    <Text style={[styles.assetAppreciation, { color: THEME.textMuted }]}>{isEn ? '+10.000 ₺ (Cost: 675k)' : '+10.000 ₺ (Alış: 675k)'}</Text>
                   </View>
                 </View>
               </View>
 
               {/* Certify My Bag Service */}
-              <Text style={styles.sectionTitle}>{isEn ? 'Vault Services' : 'Kasa Hizmetleri'}</Text>
-              <View style={styles.certifyCard}>
+              <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Vault Services' : 'Kasa Hizmetleri'}</Text>
+              <View style={[styles.certifyCard, { backgroundColor: THEME.promoBg }]}>
                 <Text style={styles.certifyTag}>✦ CERTIFY MY BAG</Text>
-                <Text style={styles.certifyTitle}>{isEn ? 'Register Your Bags' : 'Çantalarınızı Tescil Edin'}</Text>
-                <Text style={styles.certifyDesc}>
+                <Text style={[styles.certifyTitle, { color: THEME.text }]}>{isEn ? 'Register Your Bags' : 'Çantalarınızı Tescil Edin'}</Text>
+                <Text style={[styles.certifyDesc, { color: THEME.textMuted }]}>
                   {isEn 
                     ? 'Get your luxury bags authenticated via Entrupy AI microscopic scanning and expert validation. Receive your digital certificate and add them to your vault.'
                     : 'Elinizdeki lüks çantaları Entrupy AI mikroskobik doğrulaması ve uzman kontrolüyle tescil ettirin. Orijinallik belgenizi alarak ürünlerinizi dijital kasanıza ekleyin.'}
@@ -673,10 +693,10 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 <View style={styles.certifyPriceRow}>
                   <View>
                     <Text style={styles.certifyPriceLabel}>{isEn ? 'Service Fee' : 'Hizmet Bedeli'}</Text>
-                    <Text style={styles.certifyPrice}>1.990 ₺</Text>
+                    <Text style={[styles.certifyPrice, { color: THEME.text }]}>1.990 ₺</Text>
                   </View>
                   <TouchableOpacity 
-                    style={styles.certifyBtn}
+                    style={[styles.certifyBtn, { backgroundColor: THEME.primary }]}
                     onPress={() => {
                       Alert.alert(
                         isEn ? 'Appointment Requested' : 'Randevu Talebi Alındı',
@@ -696,68 +716,72 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
           {/* ADMIN OPERATIONS LINK */}
           {(profile?.role === 'admin' || profile?.role === 'operations') && (
-            <TouchableOpacity style={styles.adminBtn} onPress={onEnterOperations}>
-              <Text style={styles.adminBtnText}>{isEn ? '🛡 OPERATOR PANEL LOGIN' : '🛡 OPERASYON PANELİ GİRİŞİ'}</Text>
-            </TouchableOpacity>
+            <View style={{ paddingHorizontal: 15 }}>
+              <TouchableOpacity style={[styles.adminBtn, { borderColor: THEME.primary }]} onPress={onEnterOperations}>
+                <Text style={styles.adminBtnText}>{isEn ? '🛡 OPERATOR PANEL LOGIN' : '🛡 OPERASYON PANELİ GİRİŞİ'}</Text>
+              </TouchableOpacity>
+            </View>
           )}
 
           {/* ACCOUNT & PREFERENCES LIST */}
-          <Text style={styles.sectionTitle}>{isEn ? 'Account Info & Settings' : 'Hesap Bilgileri & Ayarlar'}</Text>
-          
-          <View style={styles.settingsGroup}>
-            {/* IBAN SETTING */}
-            <View style={styles.settingsRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.settingsLabel}>{isEn ? 'BANK ACCOUNT (IBAN)' : 'BANKA HESABI (IBAN)'}</Text>
-                {isEditingIban ? (
-                  <TextInput 
-                    style={styles.ibanInput}
-                    value={iban}
-                    onChangeText={setIban}
-                    onBlur={() => setIsEditingIban(false)}
-                  />
-                ) : (
-                  <Text style={styles.settingsValue}>{iban}</Text>
-                )}
+          <View style={{ paddingHorizontal: 15 }}>
+            <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Account Info & Settings' : 'Hesap Bilgileri & Ayarlar'}</Text>
+            
+            <View style={[styles.settingsGroup, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
+              {/* IBAN SETTING */}
+              <View style={[styles.settingsRow, { borderColor: THEME.border }]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.settingsLabel}>{isEn ? 'BANK ACCOUNT (IBAN)' : 'BANKA HESABI (IBAN)'}</Text>
+                  {isEditingIban ? (
+                    <TextInput 
+                      style={[styles.ibanInput, { color: THEME.text, backgroundColor: THEME.bg, borderColor: THEME.border }]}
+                      value={iban}
+                      onChangeText={setIban}
+                      onBlur={() => setIsEditingIban(false)}
+                    />
+                  ) : (
+                    <Text style={[styles.settingsValue, { color: THEME.text }]}>{iban}</Text>
+                  )}
+                </View>
+                <TouchableOpacity 
+                  style={[styles.editBtn, { borderColor: THEME.border }]} 
+                  onPress={() => setIsEditingIban(!isEditingIban)}
+                >
+                  <Text style={[styles.editBtnText, { color: THEME.text }]}>
+                    {isEditingIban 
+                      ? (isEn ? 'Save' : 'Kaydet') 
+                      : (isEn ? 'Edit' : 'Düzenle')}
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity 
-                style={styles.editBtn} 
-                onPress={() => setIsEditingIban(!isEditingIban)}
-              >
-                <Text style={styles.editBtnText}>
-                  {isEditingIban 
-                    ? (isEn ? 'Save' : 'Kaydet') 
-                    : (isEn ? 'Edit' : 'Düzenle')}
-                </Text>
-              </TouchableOpacity>
+
+              {/* REGISTERED ADDRESS */}
+              <View style={[styles.settingsRow, { borderColor: THEME.border }]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.settingsLabel}>{isEn ? 'SHIPPING ADDRESS' : 'TESLİMAT ADRESİ'}</Text>
+                  <Text style={[styles.settingsValue, { color: THEME.text }]}>Nişantaşı, Valikonak Cd. No:45 D:12 Şişli / İstanbul</Text>
+                </View>
+                <TouchableOpacity style={[styles.editBtn, { borderColor: THEME.border }]} onPress={() => Alert.alert(isEn ? 'Info' : 'Bilgi', isEn ? 'Address update module will be enabled soon.' : 'Adres düzenleme modülü yakında aktif olacaktır.')}>
+                  <Text style={[styles.editBtnText, { color: THEME.text }]}>{isEn ? 'Edit' : 'Düzenle'}</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* PREFERRED SIZE */}
+              <View style={[styles.settingsRow, { borderColor: THEME.border }]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.settingsLabel}>{isEn ? 'SIZE PREFERENCES' : 'BEDEN TERCİHLERİM'}</Text>
+                  <Text style={[styles.settingsValue, { color: THEME.text }]}>{isEn ? 'Clothes: M / Shoes: 38 / Acc: Medium' : 'Kıyafet: M / Shoes: 38 / Aksesuar: Medium'}</Text>
+                </View>
+                <TouchableOpacity style={[styles.editBtn, { borderColor: THEME.border }]} onPress={() => Alert.alert(isEn ? 'Info' : 'Bilgi', isEn ? 'Size preference module will be enabled soon.' : 'Beden tercihi modülü yakında aktif olacaktır.')}>
+                  <Text style={[styles.editBtnText, { color: THEME.text }]}>{isEn ? 'Edit' : 'Düzenle'}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            {/* REGISTERED ADDRESS */}
-            <View style={styles.settingsRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.settingsLabel}>{isEn ? 'SHIPPING ADDRESS' : 'TESLİMAT ADRESİ'}</Text>
-                <Text style={styles.settingsValue}>Nişantaşı, Valikonak Cd. No:45 D:12 Şişli / İstanbul</Text>
-              </View>
-              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert(isEn ? 'Info' : 'Bilgi', isEn ? 'Address update module will be enabled soon.' : 'Adres düzenleme modülü yakında aktif olacaktır.')}>
-                <Text style={styles.editBtnText}>{isEn ? 'Edit' : 'Düzenle'}</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* PREFERRED SIZE */}
-            <View style={styles.settingsRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.settingsLabel}>{isEn ? 'SIZE PREFERENCES' : 'BEDEN TERCİHLERİM'}</Text>
-                <Text style={styles.settingsValue}>{isEn ? 'Clothes: M / Shoes: 38 / Acc: Medium' : 'Kıyafet: M / Shoes: 38 / Aksesuar: Medium'}</Text>
-              </View>
-              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert(isEn ? 'Info' : 'Bilgi', isEn ? 'Size preference module will be enabled soon.' : 'Beden tercihi modülü yakında aktif olacaktır.')}>
-                <Text style={styles.editBtnText}>{isEn ? 'Edit' : 'Düzenle'}</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.logoutBtn} onPress={handleSignOut}>
+              <Text style={styles.logoutBtnText}>{isEn ? 'Log Out' : 'Oturumu Kapat'}</Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity style={styles.logoutBtn} onPress={handleSignOut}>
-            <Text style={styles.logoutBtnText}>{isEn ? 'Log Out' : 'Oturumu Kapat'}</Text>
-          </TouchableOpacity>
 
         </ScrollView>
       )}
