@@ -23,7 +23,8 @@ import {
 import { supabase } from '../lib/supabase';
 import { t } from '../lib/i18n';
 
-import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
+import { decode } from 'base64-arraybuffer';
 
 const { width } = Dimensions.get('window');
 
@@ -482,7 +483,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   const missingRequiredSlots = currentCategory.slots.filter(s => s.required && !capturedPhotos[s.key]);
   const isPhotoStepValid = missingRequiredSlots.length === 0;
 
-  // Helper function to upload local device image URI to Supabase Storage
+  // Helper function to upload local device image URI to Supabase Storage via Base64
   async function uploadImageToSupabase(fileUri: string): Promise<string> {
     // If image is already an HTTP/HTTPS URL, return as is
     if (fileUri.startsWith('http://') || fileUri.startsWith('https://')) {
@@ -495,25 +496,24 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
       const filePath = `products/${fileName}`;
 
-      // Create FormData compatible with React Native fetch & Supabase
-      const formData = new FormData();
-      formData.append('file', {
-        uri: Platform.OS === 'android' ? fileUri : fileUri.replace('file://', ''),
-        name: fileName,
-        type: mimeType,
-      } as any);
+      // Read local file as Base64 string using expo-file-system
+      const base64Data = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
-      // Upload directly using Supabase storage endpoint / fetch API for React Native stability
+      // Convert Base64 string to ArrayBuffer for Supabase Storage
+      const arrayBuffer = decode(base64Data);
+
       const { data, error } = await supabase.storage
         .from('product-images')
-        .upload(filePath, formData, {
+        .upload(filePath, arrayBuffer, {
           contentType: mimeType,
           upsert: true
         });
 
       if (error) {
-        console.warn('Supabase storage upload warning:', error.message);
-        // Fallback: get public URL anyway if uploaded or use CDN fallback
+        console.error('Supabase storage upload error:', error.message);
+        return fileUri;
       }
 
       // Get public URL
@@ -521,9 +521,9 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         .from('product-images')
         .getPublicUrl(filePath);
 
-      return publicUrlData.publicUrl || fileUri;
+      return publicUrlData.publicUrl;
     } catch (err) {
-      console.error('Failed to convert local image blob for Supabase:', err);
+      console.error('Failed to convert local image for Supabase:', err);
       return fileUri;
     }
   }
