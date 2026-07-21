@@ -311,7 +311,59 @@ export default function App() {
         setRole('user');
       }
     });
-  }, []);
+
+    // --- EXPO PUSH NOTIFICATIONS REGISTRATION ---
+    registerForPushNotificationsAsync().then(token => {
+      if (token && session?.user) {
+        savePushTokenToSupabase(session.user.id, token);
+      }
+    });
+  }, [session]);
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Platform.OS === 'android') {
+      const Notifications = require('expo-notifications');
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#AF9164',
+      });
+    }
+
+    const Device = require('expo-device');
+    if (Device.isDevice) {
+      const Notifications = require('expo-notifications');
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        console.log('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync({
+        projectId: 'peony-collective-project-id' // Placeholder Project ID matching Expo credentials
+      })).data;
+    } else {
+      console.log('Must use physical device for Push Notifications');
+    }
+    return token;
+  }
+
+  async function savePushTokenToSupabase(userId: string, token: string) {
+    try {
+      await supabase
+        .from('profiles')
+        .update({ expo_push_token: token })
+        .eq('id', userId);
+    } catch (e) {
+      console.log('Error saving push token:', e);
+    }
+  }
 
   // Fetch liked products details when modal opens
   useEffect(() => {
