@@ -128,7 +128,7 @@ export async function sendProductStatusEmail({
   const statusBadgeBg = status === 'approved' ? '#ECFDF5' : '#FFF5F5'
 
   const message = status === 'approved'
-    ? `Tebrikler! <strong>${fullProductName}</strong> ilanınız Peony Lab ön inceleme ve doğrulamalarından başarıyla geçti ve platformumuzda satışa sunuldu.`
+    ? `Tebrikler! <strong>${fullProductName}</strong> ürününüz Peony AI görsel ön incelemesinden %78 üzeri doğruluk skoru ile geçmiş olup satışa çıkarılmak adına vitrine alınmıştır. Sorularınız için veya ürünün vitrinden indirilmesini istiyorsanız bizimle iletişime geçebilirsiniz.`
     : `Maalesef <strong>${fullProductName}</strong> ürününüz Peony AI ön inceleme kontrolünü geçememiş ve platform standartlarımıza uymadığı gerekçesiyle reddedilmiştir.`
 
   const reasonHtml = reason && status === 'rejected' ? `
