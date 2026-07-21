@@ -101,6 +101,7 @@ interface ProductStatusEmailProps {
   status: 'approved' | 'rejected'
   reason?: string
   hasCompleteProfile?: boolean
+  aiConfidence?: number
 }
 
 export async function sendProductStatusEmail({
@@ -113,7 +114,8 @@ export async function sendProductStatusEmail({
   productId,
   status,
   reason,
-  hasCompleteProfile
+  hasCompleteProfile,
+  aiConfidence
 }: ProductStatusEmailProps) {
   
   if (!process.env.RESEND_API_KEY) {
@@ -127,8 +129,10 @@ export async function sendProductStatusEmail({
   const statusBadgeColor = status === 'approved' ? '#059669' : '#E53E3E'
   const statusBadgeBg = status === 'approved' ? '#ECFDF5' : '#FFF5F5'
 
+  const scoreText = typeof aiConfidence === 'number' ? `%${aiConfidence}` : '%78 ve üzeri'
+
   const message = status === 'approved'
-    ? `Tebrikler! <strong>${fullProductName}</strong> ürününüz Peony AI görsel ön incelemesinden %78 üzeri doğruluk skoru ile geçmiş olup satışa çıkarılmak adına vitrine alınmıştır. Sorularınız için veya ürünün vitrinden indirilmesini istiyorsanız bizimle iletişime geçebilirsiniz.`
+    ? `Tebrikler! <strong>${fullProductName}</strong> ürününüz Peony AI görsel ön incelemesinden <strong>${scoreText}</strong> doğruluk skoru ile geçmiş olup satışa çıkarılmak adına vitrine alınmıştır. Sorularınız için veya ürünün vitrinden indirilmesini istiyorsanız bizimle iletişime geçebilirsiniz.`
     : `Maalesef <strong>${fullProductName}</strong> ürününüz Peony AI ön inceleme kontrolünü geçememiş ve platform standartlarımıza uymadığı gerekçesiyle reddedilmiştir.`
 
   const reasonHtml = reason && status === 'rejected' ? `
@@ -400,6 +404,147 @@ export async function sendEntrupyRequestAdminEmail({
 }
 
 export const sendProductApprovalStatusEmail = sendProductStatusEmail;
+
+interface OfferEmailProps {
+  sellerEmail: string;
+  sellerName: string;
+  buyerName: string;
+  productName: string;
+  offerAmount: number;
+  acceptLink: string;
+}
+
+export async function sendNewOfferEmail({
+  sellerEmail,
+  sellerName,
+  buyerName,
+  productName,
+  offerAmount,
+  acceptLink
+}: OfferEmailProps) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('⚠️ RESEND_API_KEY tanımlı değil. Yeni teklif e-postası simüle edildi.');
+    return { success: true, simulated: true };
+  }
+
+  const emailHtml = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 34px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
+        <p style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #AF9164; margin-top: 6px; font-weight: bold;">VIP OFFER NOTIFICATION</p>
+      </div>
+      <div style="background-color: #FFFFFF; padding: 40px; border: 1px solid #E2E8F0; border-radius: 8px;">
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px; color: #1A1A1A;">Sayın ${sellerName},</p>
+        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #2D3748;">
+          Vitrindeki <strong>${productName}</strong> ürününüz için <strong>${buyerName}</strong> adlı üyemizden <strong>${offerAmount.toLocaleString('tr-TR')} ₺</strong> tutarında yeni bir VIP teklif aldınız!
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${acceptLink}" style="display: inline-block; background-color: #AF9164; color: #FFFFFF; text-decoration: none; padding: 14px 28px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px;">
+            TEKLİFİ İNCELE & YANITLA ✦
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return resend.emails.send({
+    from: 'Peony VIP <vip@peony-collective.com>',
+    to: [sellerEmail],
+    subject: `Peony VIP Teklif: ${productName} için yeni teklifiniz var!`,
+    html: emailHtml,
+  });
+}
+
+interface OfferUpdateProps {
+  buyerEmail: string;
+  buyerName: string;
+  productName: string;
+  offerAmount: number;
+  status: 'accepted' | 'rejected';
+  checkoutLink: string;
+}
+
+export async function sendOfferUpdateEmail({
+  buyerEmail,
+  buyerName,
+  productName,
+  offerAmount,
+  status,
+  checkoutLink
+}: OfferUpdateProps) {
+  if (!process.env.RESEND_API_KEY) return { success: true, simulated: true };
+
+  const isAccepted = status === 'accepted';
+  const title = isAccepted ? 'Teklifiniz Kabul Edildi! 🎉' : 'Teklif Güncellemesi';
+  const text = isAccepted
+    ? `Tebrikler! **${productName}** için sunduğunuz **${offerAmount.toLocaleString('tr-TR')} ₺** tutarındaki VIP teklifiniz satıcı tarafından kabul edildi. 48 saat geçerli indirimli satın alma bağlantınız aşağıdadır:`
+    : `Maalesef **${productName}** için sunduğunuz **${offerAmount.toLocaleString('tr-TR')} ₺** tutarındaki teklifiniz satıcı tarafından kabul edilmedi. Diğer alternatif ürünleri görmek için sitemizi ziyaret edebilirsiniz.`;
+
+  const emailHtml = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 34px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
+      </div>
+      <div style="background-color: #FFFFFF; padding: 40px; border: 1px solid #E2E8F0; border-radius: 8px;">
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Sayın ${buyerName},</p>
+        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #2D3748;">${text}</p>
+        ${isAccepted ? `
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${checkoutLink}" style="display: inline-block; background-color: #059669; color: #FFFFFF; text-decoration: none; padding: 14px 28px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px;">
+            ÖDEMEYE GEÇ VE SATIN AL ✦
+          </a>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  return resend.emails.send({
+    from: 'Peony VIP <vip@peony-collective.com>',
+    to: [buyerEmail],
+    subject: `Peony VIP Kararı: ${title}`,
+    html: emailHtml,
+  });
+}
+
+interface ProductSoldProps {
+  sellerEmail: string;
+  sellerName: string;
+  productName: string;
+  payoutAmount: number;
+}
+
+export async function sendProductSoldEmail({
+  sellerEmail,
+  sellerName,
+  productName,
+  payoutAmount
+}: ProductSoldProps) {
+  if (!process.env.RESEND_API_KEY) return { success: true, simulated: true };
+
+  const emailHtml = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 34px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
+        <p style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #AF9164; margin-top: 6px; font-weight: bold;">CONGRATULATIONS — ITEM SOLD</p>
+      </div>
+      <div style="background-color: #FFFFFF; padding: 40px; border: 1px solid #E2E8F0; border-radius: 8px;">
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Sayın ${sellerName},</p>
+        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #2D3748;">
+          Tebrikler! Vitrindeki <strong>${productName}</strong> ürününüz başarıyla satılmıştır. 
+          Hakediş tutarınız olan <strong>${payoutAmount.toLocaleString('tr-TR')} ₺</strong>, ürün Peony Lab fiziki incelemesinden / kargodan geçtikten sonra kayıtlı IBAN hesabınıza aktarılacaktır.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return resend.emails.send({
+    from: 'Peony Hub <hub@peony-collective.com>',
+    to: [sellerEmail],
+    subject: `Tebrikler, Ürününüz Satıldı! 🎉 (${productName})`,
+    html: emailHtml,
+  });
+}
 
 interface PasswordResetEmailProps {
   userEmail: string
