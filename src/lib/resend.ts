@@ -94,6 +94,9 @@ interface ProductStatusEmailProps {
   sellerEmail: string
   sellerName: string
   productName: string
+  productBrand?: string
+  productPrice?: number
+  productCategory?: string
   productId?: string
   status: 'approved' | 'rejected'
   reason?: string
@@ -104,6 +107,9 @@ export async function sendProductStatusEmail({
   sellerEmail,
   sellerName,
   productName,
+  productBrand,
+  productPrice,
+  productCategory,
   productId,
   status,
   reason,
@@ -115,19 +121,54 @@ export async function sendProductStatusEmail({
     return { success: true, simulated: true }
   }
 
+  const fullProductName = productBrand ? `${productBrand} ${productName}` : productName
   const title = status === 'approved' ? 'Ürününüz Onaylandı' : 'Ürününüz Reddedildi'
+  
+  const statusBadgeColor = status === 'approved' ? '#059669' : '#E53E3E'
+  const statusBadgeBg = status === 'approved' ? '#ECFDF5' : '#FFF5F5'
+
   const message = status === 'approved'
-    ? `Tebrikler! <strong>${productName}</strong> ürününüz Peony Lab ön inceleme testlerinden başarıyla geçti ve platformumuzda satışa sunuldu.`
-    : `Maalesef <strong>${productName}</strong> ürününüz Peony AI ön inceleme kontrolünü geçememiş ve reddedilmiştir.`
+    ? `Tebrikler! <strong>${fullProductName}</strong> ilanınız Peony Lab ön inceleme ve doğrulamalarından başarıyla geçti ve platformumuzda satışa sunuldu.`
+    : `Maalesef <strong>${fullProductName}</strong> ürününüz Peony AI ön inceleme kontrolünü geçememiş ve platform standartlarımıza uymadığı gerekçesiyle reddedilmiştir.`
 
   const reasonHtml = reason && status === 'rejected' ? `
-    <div style="margin-top: 20px; padding: 16px 20px; background-color: #FFF5F5; border-left: 4px solid #E53E3E; border-radius: 4px;">
-      <p style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; color: #E53E3E; margin: 0 0 6px 0;">Red Gerekçesi</p>
-      <p style="font-size: 14px; color: #2D3748; margin: 0; line-height: 1.5;">${reason}</p>
+    <div style="margin-top: 24px; padding: 20px; background-color: #FFF5F5; border: 1px solid #FEB2B2; border-left: 4px solid #E53E3E; border-radius: 6px;">
+      <p style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; color: #E53E3E; margin: 0 0 8px 0;">🔴 RED GEREKÇESİ VE AÇIKLAMA</p>
+      <p style="font-size: 14px; color: #2D3748; margin: 0; line-height: 1.6;">${reason}</p>
     </div>
   ` : ''
 
-  const entrupyTargetUrl = `https://peony-collective.com/entrupy-request?product_id=${productId || ''}&product_name=${encodeURIComponent(productName)}`
+  const productSummaryHtml = `
+    <div style="margin-top: 24px; background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 20px;">
+      <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: #718096; margin: 0 0 12px 0;">📦 İLAN ÖZETİ</p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <tr style="border-bottom: 1px solid #EDF2F7;">
+          <td style="padding: 8px 0; color: #718096; width: 130px;">Marka / Model</td>
+          <td style="padding: 8px 0; font-weight: bold; color: #1A1A1A;">${fullProductName}</td>
+        </tr>
+        ${productPrice ? `
+        <tr style="border-bottom: 1px solid #EDF2F7;">
+          <td style="padding: 8px 0; color: #718096;">Satış Fiyatı</td>
+          <td style="padding: 8px 0; font-weight: bold; color: #AF9164;">${productPrice.toLocaleString('tr-TR')} ₺</td>
+        </tr>
+        ` : ''}
+        ${productCategory ? `
+        <tr style="border-bottom: 1px solid #EDF2F7;">
+          <td style="padding: 8px 0; color: #718096;">Kategori</td>
+          <td style="padding: 8px 0; color: #2D3748;">${productCategory}</td>
+        </tr>
+        ` : ''}
+        ${productId ? `
+        <tr>
+          <td style="padding: 8px 0; color: #718096;">İlan Referansı</td>
+          <td style="padding: 8px 0; font-family: monospace; font-size: 11px; color: #718096;">${productId}</td>
+        </tr>
+        ` : ''}
+      </table>
+    </div>
+  `
+
+  const entrupyTargetUrl = `https://peony-collective.com/entrupy-request?product_id=${productId || ''}&product_name=${encodeURIComponent(fullProductName)}`
 
   const entrupyOfferHtml = status === 'rejected' ? `
     <div style="margin-top: 28px; padding: 24px; background-color: #FAF7F2; border: 1px solid #E2D9CC; border-radius: 8px;">
@@ -135,13 +176,13 @@ export async function sendProductStatusEmail({
         <span style="font-size: 10px; font-weight: bold; letter-spacing: 2px; color: #AF9164; text-transform: uppercase;">✦ ALTERNATİF EKSPERTİZ SEÇENEĞİ</span>
       </div>
       <h3 style="font-size: 16px; font-family: 'Times New Roman', serif; font-weight: 600; color: #1A1A1A; margin: 0 0 12px 0;">
-        %99.6 Doğruluk Oranlı Entrupy Mikroskobik İnceleme
+        %99.6 Doğruluk Oranlı Entrupy Mikroskobik Fiziki İnceleme
       </h3>
       <p style="font-size: 13.5px; line-height: 1.6; color: #4A5568; margin: 0 0 16px 0;">
-        Ürününüzün orijinalliğinden emin misiniz? Çantanızı %99.6 doğruluk oranına ve finansal garantiye sahip, dünyanın 1 numaralı mikroskobik yapay zeka teknolojisi <strong>Entrupy</strong> ile fiziksel incelemeye tabi tutabiliriz.
+        Ürününüzün orijinalliğinden ve kalitesinden emin misiniz? Dijital görsel ön incelemesinde tespit edilen durumları netleştirmek adına çantanızı %99.6 doğruluk oranına ve finansal garantiye sahip, dünyanın 1 numaralı mikroskobik yapay zeka teknolojisi <strong>Entrupy</strong> ile fiziksel incelemeye tabi tutabiliriz.
       </p>
       
-      <div style="margin-bottom: 16px;">
+      <div style="margin-bottom: 16px; text-align: left;">
         <a href="${entrupyTargetUrl}" style="display: inline-block; background-color: #AF9164; color: #FFFFFF; text-decoration: none; padding: 14px 24px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px; box-shadow: 0 2px 4px rgba(175,145,100,0.2);">
           ${hasCompleteProfile ? 'ENTRUPY DOĞRULAMASI TALEP ET ✦' : 'İLETİŞİM BİLGİLERİNİ DOLDUR VE ENTRUPY TALEP ET ✦'}
         </a>
@@ -156,35 +197,37 @@ export async function sendProductStatusEmail({
   ` : ''
 
   const emailHtml = `
-    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
       <div style="text-align: center; margin-bottom: 32px;">
         <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 34px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
         <p style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #AF9164; margin-top: 6px; font-weight: bold;">LUXURY AUTHENTICATED MARKETPLACE</p>
       </div>
       
       <div style="background-color: #FFFFFF; padding: 40px; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-        <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: ${status === 'approved' ? '#059669' : '#E53E3E'}; margin-bottom: 20px; font-weight: bold;">
+        <div style="display: inline-block; padding: 4px 12px; background-color: ${statusBadgeBg}; color: ${statusBadgeColor}; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px;">
           ${title}
-        </p>
+        </div>
         
-        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px;">Sayın ${sellerName},</p>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px; color: #1A1A1A;">Sayın ${sellerName},</p>
         <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #2D3748;">
           ${message}
         </p>
-        
+
+        ${productSummaryHtml}
         ${reasonHtml}
         ${entrupyOfferHtml}
 
         <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #EDF2F7; text-align: center;">
-          <a href="https://peony-collective.com/dashboard" style="display: inline-block; background-color: #1A1A1A; color: #FFFFFF; text-decoration: none; padding: 12px 24px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; border-radius: 4px;">
-            Küratör Paneline Git
+          <a href="https://peony-collective.com/dashboard" style="display: inline-block; background-color: #1A1A1A; color: #FFFFFF; text-decoration: none; padding: 13px 26px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; border-radius: 4px;">
+            Küratör Hesabına Git →
           </a>
         </div>
       </div>
 
       <div style="text-align: center; margin-top: 32px; font-size: 11px; color: #A0AEC0; line-height: 1.6;">
         <p style="margin: 0;">📍 <em>Kapıdan alma hizmetimiz olan <strong>Peony Courier</strong> sadece İstanbul içidir.</em></p>
-        <p style="margin-top: 8px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;">© 2026 PEONY COLLECTIVE. TÜM HAKLARI SAKLIDIR.</p>
+        <p style="margin-top: 6px;">Sorularınız için <a href="mailto:concierge@peony-collective.com" style="color: #AF9164; text-decoration: none;">concierge@peony-collective.com</a> adresinden bize ulaşabilirsiniz.</p>
+        <p style="margin-top: 12px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;">© 2026 PEONY COLLECTIVE. TÜM HAKLARI SAKLIDIR.</p>
       </div>
     </div>
   `
@@ -193,7 +236,7 @@ export async function sendProductStatusEmail({
     const data = await resend.emails.send({
       from: 'Peony Concierge <concierge@peony-collective.com>',
       to: [sellerEmail],
-      subject: `Peony Lab Bildirimi: ${title}`,
+      subject: `Peony Lab Bildirimi: ${title} (${fullProductName})`,
       html: emailHtml,
     })
 

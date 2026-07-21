@@ -28,7 +28,7 @@ export async function updateProductStatus(
   // 1.5. Bildirim gönderebilmek için ürün detaylarını al
   const { data: product } = await supabase
     .from('products')
-    .select('seller_id, brand, model_name')
+    .select('seller_id, brand, model_name, price, category')
     .eq('id', productId)
     .single()
 
@@ -94,7 +94,10 @@ export async function updateProductStatus(
           await sendProductStatusEmail({
             sellerEmail: userObj.user.email,
             sellerName: `${sellerProfile?.first_name || ''} ${sellerProfile?.last_name || ''}`.trim() || 'Satıcı',
-            productName: `${product.brand} ${product.model_name}`,
+            productName: product.model_name,
+            productBrand: product.brand,
+            productPrice: product.price,
+            productCategory: product.category,
             productId: productId,
             status: newStatus,
             reason: actualReason,
