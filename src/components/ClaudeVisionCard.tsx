@@ -79,7 +79,9 @@ export default function ClaudeVisionCard({ productId, initialLog }: ClaudeVision
           {log?.claude_verdict && getVerdictBadge(log.claude_verdict)}
           <span className="text-[9.5px] bg-[#AF9164]/10 text-[#AF9164] px-2.5 py-1 rounded border border-[#AF9164]/30 font-semibold tracking-wider">
             {log && typeof log.claude_confidence === 'number' 
-              ? `Güven Skoru: %${log.claude_confidence}` 
+              ? (log.claude_verdict === 'suspicious' || log.claude_verdict === 'likely_fake')
+                ? `Orijinallik Skoru: %${log.claude_confidence > 50 ? (100 - log.claude_confidence) : log.claude_confidence}`
+                : `Orijinallik Skoru: %${log.claude_confidence}`
               : loading ? 'İnceleniyor...' : 'Bekliyor'}
           </span>
         </div>
@@ -92,7 +94,7 @@ export default function ClaudeVisionCard({ productId, initialLog }: ClaudeVision
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Fotoğraflar Claude 3.5 Sonnet Vision AI tarafından analiz ediliyor, lütfen bekleyin...
+            Fotoğraflar Claude Sonnet 4.5 Vision AI tarafından analiz ediliyor, lütfen bekleyin...
           </span>
         ) : log ? (
           log.claude_raw_response || 'Analiz raporu boş döndü.'

@@ -589,7 +589,7 @@ export async function runClaudeVisionPrecheck(productId: string) {
       
       GÖNDERİLEN GÖRSELLERİN GEÇERLİLİK KONTROLÜ VE UYUMSUZLUK DETEKSİYONU:
       - Eğer gönderilen fotoğraflar tamamen siyah, aşırı karanlık, bulanık, boş veya lüks çanta/saat İÇERMİYORSA talebi KESİNLİKLE REDDET.
-      - UYUMSUZLUK KONTROLÜ: Beyan edilen ürün bilgisi (${product.brand} - ${product.model_name}) ile fotoğraftaki nesne eşleşmiyorsa (örneğin saat ürünü/markası adı altında ÇANTA fotoğrafı yüklenmişse veya tam tersi), bu durumu kesinlikle tespit et! Kararını "suspicious" yap, güven skorunu 95 belirle ve gerekçede ürün başlığı/kategorisi ile yüklenen görsel arasındaki nesne uyumsuzluğunu net olarak açıkla.
+      - UYUMSUZLUK / SAHTECİLİK KONTROLÜ: Beyan edilen ürün bilgisi (${product.brand} - ${product.model_name}) ile fotoğraftaki nesne eşleşmiyorsa (örneğin saat ürünü/markası adı altında ÇANTA fotoğrafı yüklenmişse veya tam tersi), bu durumu kesinlikle tespit et! Kararını "suspicious" veya "likely_fake" yap, ORIJİNALLİK GÜVEN SKORUNU 0-15 arasında DÜŞÜK bir değer ver (örneğin 5 veya 10) ve gerekçede ürün başlığı/kategorisi ile yüklenen görsel arasındaki nesne uyumsuzluğunu net olarak açıkla.
       
       ORİJİNALLİK DEĞERLENDİRME KURALLARI:
       - Görseller geçerliyse ve ürün bilgisiyle uyumluysa; fotoğraflardaki dikiş simetrisini, deri dokusunu, logo fontunu, metal parça kalitesini, saat kadranı/donanım detaylarını ve seri numarası damgalarını detaylı incele.
@@ -598,7 +598,7 @@ export async function runClaudeVisionPrecheck(productId: string) {
       Format:
       {
         "verdict": "likely_authentic|suspicious|likely_fake",
-        "confidence": 0-100, (verdiğin kararın güven skoru)
+        "confidence": 0-100, (ürünün orijinal olduğuna dair verilen güven skoru; uyumsuz/şüpheli ürünler için 0-15 arası çok düşük verilmeli)
         "reasoning": "Buraya çantanın/saatin detayları ve analiz raporunu yaz..."
       }
     `
