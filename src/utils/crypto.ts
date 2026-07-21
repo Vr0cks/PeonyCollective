@@ -1,8 +1,12 @@
 import crypto from 'crypto'
 
-// Projenin ortam değişkenlerinde ENCRYPTION_KEY yoksa varsayılan güvenli bir anahtar kullanıyoruz.
-// Canlıya çıkarken .env dosyasına en az 32 karakterlik rastgele bir anahtar ekleyebilirsiniz.
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'peony_secret_encryption_key_32_bytes_long_minimum!'
+// ENCRYPTION_KEY: IBAN, TCKN ve VKN gibi hassas verileri şifrelemek için kullanılır.
+// Bu değişken .env.local ve Vercel environment'ında tanımlı olmalıdır.
+// Tanımsızsa uygulama başlamaz — bu kasıtlı bir güvenlik önlemidir.
+if (!process.env.ENCRYPTION_KEY) {
+  throw new Error('[GÜVENLİK] ENCRYPTION_KEY ortam değişkeni tanımlı değil. .env.local dosyasına ekleyin.')
+}
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY as string
 const IV_LENGTH = 16
 
 /**

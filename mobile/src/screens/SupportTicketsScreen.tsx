@@ -16,6 +16,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { t } from '../lib/i18n';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,39 +40,15 @@ interface Ticket {
   created_at: string;
 }
 
-interface ChatbotMessage {
-  id: string;
-  sender: 'user' | 'ai';
-  text: string;
-  products?: Array<{
-    id: string;
-    brand: string;
-    model_name: string;
-    price: number;
-    image: string;
-  }>;
-}
-
-export default function SupportTicketsScreen() {
+export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist: () => void }) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [stylistVisible, setStylistVisible] = useState(false);
 
   // Support ticket inputs
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-
-  // AI Stylist Chatbot states
-  const [chatbotInput, setChatbotInput] = useState('');
-  const [chatbotMessages, setChatbotMessages] = useState<ChatbotMessage[]>([
-    {
-      id: 'welcome',
-      sender: 'ai',
-      text: 'Merhaba ben Peony stil küratörünüz Muse. Bugün nereyi ziyaret edeceksiniz veya nasıl bir davete katılacaksınız? Size oranın havasına ve dokusuna en uygun lüks parçaları önereyim.'
-    }
-  ]);
 
   useEffect(() => {
     fetchTickets();
@@ -99,7 +76,8 @@ export default function SupportTicketsScreen() {
 
   async function handleSubmit() {
     if (!subject || !message) {
-      alert('Lütfen konu ve açıklama alanlarını doldurun.');
+      const allFieldsAlert = t('loginAlertAllFields') || 'Lütfen tüm alanları doldurun.';
+      alert(allFieldsAlert);
       return;
     }
     setSubmitting(true);
@@ -127,7 +105,8 @@ export default function SupportTicketsScreen() {
         throw new Error(errorJson.error || 'Destek talebi iletilemedi.');
       }
       
-      alert('Destek talebiniz başarıyla oluşturuldu.');
+      const successAlert = t('wishlistEmpty') === 'Your wishlist is empty.' ? 'Your support request has been created successfully.' : 'Destek talebiniz başarıyla oluşturuldu.';
+      alert(successAlert);
       setModalVisible(false);
       setSubject('');
       setMessage('');
@@ -137,60 +116,6 @@ export default function SupportTicketsScreen() {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  // Simulated AI Stylist dynamic recommendation algorithm
-  function handleSendMessageToStylist() {
-    if (!chatbotInput.trim()) return;
-
-    const userText = chatbotInput.trim();
-    const messageId = Date.now().toString();
-
-    // Append user message
-    const updatedMessages = [
-      ...chatbotMessages,
-      { id: messageId, sender: 'user' as const, text: userText }
-    ];
-    setChatbotMessages(updatedMessages);
-    setChatbotInput('');
-
-    // Trigger AI response calculation after short delay
-    setTimeout(() => {
-      let responseText = '';
-      let recommendedProducts: any[] = [];
-
-      const query = userText.toLowerCase();
-
-      if (query.includes('tekne') || query.includes('yat') || query.includes('deniz') || query.includes('yacht') || query.includes('plaj') || query.includes('beach') || query.includes('bodrum') || query.includes('çeşme')) {
-        responseText = 'Harika bir yaz planı! Deniz havası ve yat davetlerinin o rahat ama göz alıcı şıklığı için Loewe\'nin hasır detaylı ikonik el çantasını ve gün ışığında parlayacak Rolex altın saatini öneriyorum.';
-        recommendedProducts = [
-          { id: 'loewe-tote', brand: 'LOEWE', model_name: 'Basket Raffia Bag Medium', price: 24500, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
-          { id: 'rolex-sub', brand: 'ROLEX', model_name: 'Submariner Date Gold', price: 685000, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300' }
-        ];
-      } else if (query.includes('akşam') || query.includes('yemek') || query.includes('davet') || query.includes('düğün') || query.includes('gece') || query.includes('party') || query.includes('dinner')) {
-        responseText = 'Şık bir gece daveti! Gecenin tüm bakışlarını üzerinizde toplamak için siyah deri Chanel Flap bag ve altın detaylı Cartier kolyeyi öneririm. Bu klasik şıklık asla modası geçmeyen bir yatırımdır.';
-        recommendedProducts = [
-          { id: 'chanel-flap', brand: 'CHANEL', model_name: 'Classic Double Flap Black', price: 345000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
-          { id: 'cartier-love', brand: 'CARTIER', model_name: 'Love Necklace Gold', price: 92000, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300' }
-        ];
-      } else {
-        // Quiet luxury default fallback
-        responseText = 'Her ortama uyum sağlayacak "Quiet Luxury" (Sessiz Lüks) stilini öneriyorum. Logolar yerine mükemmel dikişleri ve deri kalitesini öne çıkaran Bottega Veneta örgü deri çanta ve Loro Piana keten şıklığı bugün harika duracaktır.';
-        recommendedProducts = [
-          { id: 'bottega-cassette', brand: 'BOTTEGA VENETA', model_name: 'Padded Cassette Bag', price: 145000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' }
-        ];
-      }
-
-      setChatbotMessages(prev => [
-        ...prev,
-        {
-          id: `ai-${Date.now()}`,
-          sender: 'ai',
-          text: responseText,
-          products: recommendedProducts
-        }
-      ]);
-    }, 1000);
   }
 
   return (
@@ -212,34 +137,35 @@ export default function SupportTicketsScreen() {
               {/* PEONY MUSE BANNER */}
               <TouchableOpacity 
                 style={styles.stylistCard}
-                onPress={() => setStylistVisible(true)}
+                onPress={onOpenStylist}
               >
                 <View style={styles.stylistHeader}>
                   <Text style={styles.stylistTag}>✦ PEONY MUSE</Text>
                   <View style={styles.activeDot} />
                 </View>
-                <Text style={styles.stylistTitle}>Bugün nereyi ziyaret edeceksiniz?</Text>
-                <Text style={styles.stylistDesc}>Gününüzü bize anlatın, size en uygun lüks parçaları ve özel kürasyonları anında eşleştirelim.</Text>
-                <Text style={styles.stylistAction}>Muse Kürasyon Sohbetini Başlat →</Text>
+                <Text style={styles.stylistTitle}>{t('wishlistEmpty') === 'Your wishlist is empty.' ? 'Where are you visiting today?' : 'Bugün nereyi ziyaret edeceksiniz?'}</Text>
+                <Text style={styles.stylistDesc}>{t('wishlistEmpty') === 'Your wishlist is empty.' ? 'Tell us about your day, and we will match the perfect luxury pieces and custom curations for you.' : 'Gününüzü bize anlatın, size en uygun lüks parçaları ve özel kürasyonları anında eşleştirelim.'}</Text>
+                <Text style={styles.stylistAction}>{t('wishlistEmpty') === 'Your wishlist is empty.' ? 'Start Muse Curation Chat →' : 'Muse Kürasyon Sohbetini Başlat →'}</Text>
               </TouchableOpacity>
 
               <View style={styles.actionHeader}>
-                <Text style={styles.subtitle}>Destek Talepleriniz</Text>
+                <Text style={styles.subtitle}>{t('supportCenterTitle') || 'Destek Talepleriniz'}</Text>
                 <TouchableOpacity style={styles.createBtn} onPress={() => setModalVisible(true)}>
-                  <Text style={styles.createBtnText}>+ Yeni Talep</Text>
+                  <Text style={styles.createBtnText}>{t('newTicket') || '+ Yeni Talep'}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Henüz hiçbir destek talebiniz bulunmuyor.</Text>
+              <Text style={styles.emptyText}>{t('emptyTickets') || 'Henüz hiçbir destek talebiniz bulunmuyor.'}</Text>
             </View>
           }
           renderItem={({ item }) => {
             // Check if it's the combined message format
             const hasSubject = item.message.startsWith('[Konu:');
-            let displayedSubject = 'Genel IT Desteği';
+            const defaultSubject = t('wishlistEmpty') === 'Your wishlist is empty.' ? 'General IT Support' : 'Genel IT Desteği';
+            let displayedSubject = defaultSubject;
             let displayedMsg = item.message;
 
             if (hasSubject) {
@@ -256,7 +182,7 @@ export default function SupportTicketsScreen() {
                   <Text style={styles.subject} numberOfLines={1}>{displayedSubject}</Text>
                   <View style={[styles.badge, item.status === 'replied' ? styles.badgeReplied : styles.badgePending]}>
                     <Text style={styles.badgeText}>
-                      {item.status === 'replied' ? 'CEVAPLANDI' : 'BEKLEMEDE'}
+                      {item.status === 'replied' ? (t('ticketStatusReplied') || 'CEVAPLANDI') : (t('ticketStatusPending') || 'BEKLEMEDE')}
                     </Text>
                   </View>
                 </View>
@@ -264,12 +190,12 @@ export default function SupportTicketsScreen() {
                 
                 {item.reply && (
                   <View style={styles.replyBox}>
-                    <Text style={styles.replyLabel}>Destek Ekibi Cevabı:</Text>
+                    <Text style={styles.replyLabel}>{t('ticketReplyLabel') || 'Destek Ekibi Cevabı:'}</Text>
                     <Text style={styles.replyText}>{item.reply}</Text>
                   </View>
                 )}
                 <Text style={styles.date}>
-                  {new Date(item.created_at).toLocaleDateString('tr-TR')}
+                  {new Date(item.created_at).toLocaleDateString(t('wishlistEmpty') === 'Your wishlist is empty.' ? 'en-US' : 'tr-TR')}
                 </Text>
               </View>
             );
@@ -282,7 +208,7 @@ export default function SupportTicketsScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Destek Talebi Oluştur</Text>
+              <Text style={styles.modalTitle}>{t('newTicket') || 'Destek Talebi Oluştur'}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Text style={styles.closeBtn}>✕</Text>
               </TouchableOpacity>
@@ -290,10 +216,10 @@ export default function SupportTicketsScreen() {
 
             <ScrollView contentContainerStyle={styles.modalScroll}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>KONU / BAŞLIK</Text>
+                <Text style={styles.label}>{t('ticketSubject') || 'KONU / BAŞLIK'}</Text>
                 <TextInput 
                   style={styles.input}
-                  placeholder="Yaşadığınız sorunu kısaca başlık olarak yazın..."
+                  placeholder={t('ticketPlaceholderSubject') || 'Yaşadığınız sorunu kısaca başlık olarak yazın...'}
                   placeholderTextColor={COLORS.textMuted}
                   value={subject}
                   onChangeText={setSubject}
@@ -301,10 +227,10 @@ export default function SupportTicketsScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>AÇIKLAMA / DETAYLAR</Text>
+                <Text style={styles.label}>{t('ticketMessage') || 'AÇIKLAMA / DETAYLAR'}</Text>
                 <TextInput 
                   style={[styles.input, styles.textArea]}
-                  placeholder="Detaylı açıklamayı buraya girin..."
+                  placeholder={t('ticketPlaceholderMessage') || 'Detaylı açıklamayı buraya girin...'}
                   placeholderTextColor={COLORS.textMuted}
                   value={message}
                   onChangeText={setMessage}
@@ -316,80 +242,12 @@ export default function SupportTicketsScreen() {
                 {submitting ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text style={styles.submitBtnText}>TALEBİ İLET</Text>
+                  <Text style={styles.submitBtnText}>{t('ticketSubmit') || 'TALEBİ İLET'}</Text>
                 )}
               </TouchableOpacity>
             </ScrollView>
           </View>
         </View>
-      </Modal>
-
-      {/* AI STYLIST CHATBOT MODAL */}
-      <Modal visible={stylistVisible} animationType="slide">
-        <SafeAreaView style={styles.stylistModalContainer}>
-          {/* Header */}
-          <View style={styles.stylistModalHeader}>
-            <TouchableOpacity onPress={() => setStylistVisible(false)}>
-              <Text style={styles.backBtnText}>← Geri</Text>
-            </TouchableOpacity>
-            <Text style={styles.stylistHeaderTitle}>Peony Muse</Text>
-            <View style={{ width: 40 }} />
-          </View>
-
-          {/* Messages list */}
-          <ScrollView contentContainerStyle={styles.chatbotScroll}>
-            {chatbotMessages.map((msg) => {
-              const isMe = msg.sender === 'user';
-              return (
-                <View key={msg.id} style={[styles.chatbotRow, isMe ? styles.chatbotMyRow : styles.chatbotAiRow]}>
-                  <View style={[styles.chatbotBubble, isMe ? styles.chatbotMyBubble : styles.chatbotAiBubble]}>
-                    <Text style={[styles.chatbotText, isMe ? styles.chatbotMyText : styles.chatbotAiText]}>
-                      {msg.text}
-                    </Text>
-                  </View>
-
-                  {/* Curated Products Scroll inside AI bubble */}
-                  {msg.products && msg.products.length > 0 && (
-                    <View style={styles.recsContainer}>
-                      <Text style={styles.recsHeader}>Küratörün Seçtikleri:</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recsScroll}>
-                        {msg.products.map((prod) => (
-                          <View key={prod.id} style={styles.prodCard}>
-                            <Image source={{ uri: prod.image }} style={styles.prodImg} />
-                            <View style={styles.prodInfo}>
-                              <Text style={styles.prodBrand} numberOfLines={1}>{prod.brand}</Text>
-                              <Text style={styles.prodName} numberOfLines={1}>{prod.model_name}</Text>
-                              <Text style={styles.prodPrice}>{prod.price?.toLocaleString('tr-TR')} ₺</Text>
-                            </View>
-                          </View>
-                        ))}
-                      </ScrollView>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-          </ScrollView>
-
-          {/* Input Bar */}
-          <KeyboardAvoidingView 
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
-          >
-            <View style={styles.chatbotInputBar}>
-              <TextInput 
-                style={styles.chatbotInput}
-                placeholder="Bugün nereye gidiyorsunuz? Örn: Tekne turu"
-                placeholderTextColor={COLORS.textMuted}
-                value={chatbotInput}
-                onChangeText={setChatbotInput}
-              />
-              <TouchableOpacity style={styles.chatbotSendBtn} onPress={handleSendMessageToStylist}>
-                <Text style={styles.chatbotSendBtnText}>Sor</Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
       </Modal>
     </View>
   );

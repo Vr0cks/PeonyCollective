@@ -9,6 +9,7 @@ import {
   Image 
 } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { t } from '../lib/i18n';
 
 const COLORS = {
   bg: '#FBFBFA', // Luxury off-white
@@ -77,9 +78,10 @@ export default function ChatListScreen({ onSelectChat }: ChatListScreenProps) {
             .eq('id', otherId)
             .maybeSingle();
 
+          const defaultMemberName = t('defaultMemberName') || 'Peony Member';
           const name = profile 
             ? (profile.full_name || `${profile.first_name || ''} ${profile.last_name || ''}`.trim())
-            : 'Peony Üyesi';
+            : defaultMemberName;
 
           return {
             ...conv,
@@ -111,11 +113,12 @@ export default function ChatListScreen({ onSelectChat }: ChatListScreenProps) {
           refreshing={loading}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Henüz hiç mesajlaşmanız yok.</Text>
+              <Text style={styles.emptyText}>{t('wishlistEmpty') === 'Your wishlist is empty.' ? 'You have no messages yet.' : 'Henüz hiç mesajlaşmanız yok.'}</Text>
             </View>
           }
           renderItem={({ item }) => {
-            const name = item.other_profile?.full_name || 'Peony Üyesi';
+            const defaultMemberName = t('defaultMemberName') || 'Peony Member';
+            const name = item.other_profile?.full_name || defaultMemberName;
             const productImg = item.product?.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500';
             
             return (
@@ -137,7 +140,7 @@ export default function ChatListScreen({ onSelectChat }: ChatListScreenProps) {
                     {item.product?.brand} - {item.product?.model_name}
                   </Text>
                   <Text style={styles.lastMsg} numberOfLines={1}>
-                    {item.last_message || 'Henüz mesaj yok.'}
+                    {item.last_message || (t('wishlistEmpty') === 'Your wishlist is empty.' ? 'No messages yet.' : 'Henüz mesaj yok.')}
                   </Text>
                 </View>
               </TouchableOpacity>

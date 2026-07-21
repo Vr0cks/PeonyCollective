@@ -154,7 +154,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
     'rabiakacar86@gmail.com',
     'info@peonycollective.com'
   ]
-  const showSupplierField = userRole === 'admin' || (userEmail && ALLOWED_EMAILS.includes(userEmail.toLowerCase()))
+  const showSupplierField = true // Enabled for all accounts during testing
 
   const [activeStep, setActiveStep] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)

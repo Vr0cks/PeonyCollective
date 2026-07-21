@@ -35,14 +35,7 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
         .eq('id', user.id)
         .single();
  
-      const ALLOWED_EMAILS = [
-        'ahmetcanli1943@gmail.com',
-        'designer_7150@peony.com',
-        'ela@peonycollective.com',
-        'rabiakacar86@gmail.com',
-        'info@peonycollective.com'
-      ];
-      const isAdmin = profile?.role === 'admin' || (user.email && ALLOWED_EMAILS.includes(user.email.toLowerCase()));
+      const isAdmin = profile?.role === 'admin';
       
       if (isAdmin) {
         resolvedSupplier = data.supplier || null;
@@ -220,14 +213,7 @@ export async function addSupplierAction(supplierData: {
       .eq('id', user.id)
       .single()
 
-    const ALLOWED_EMAILS = [
-      'ahmetcanli1943@gmail.com',
-      'designer_7150@peony.com',
-      'ela@peonycollective.com',
-      'rabiakacar86@gmail.com',
-      'info@peonycollective.com'
-    ]
-    const isAdmin = profile?.role === 'admin' || (user.email && ALLOWED_EMAILS.includes(user.email.toLowerCase()))
+    const isAdmin = profile?.role === 'admin'
     
     if (!isAdmin) {
       return { success: false, error: 'Tedarikçi eklemek için admin yetkisi gerekiyor.' }

@@ -499,4 +499,130 @@ export async function checkSystemStatusAction() {
       edgeStatus: 'ONLINE'
     }
   }
-}
+}
+
+/**
+ * Ürün fotoğraflarını Claude 3.5 Sonnet Vision API ile analiz eder
+ * ve sonucu ai_authentication_logs tablosuna kaydeder.
+ */
+export async function runClaudeVisionPrecheck(productId: string) {
+  const supabase = await verifyAdmin()
+
+  // 1. Ürün detaylarını ve fotoğraflarını çek
+  const { data: product, error: prodErr } = await supabase
+    .from('products')
+    .select('id, brand, model_name, public_images, authenticity_docs')
+    .eq('id', productId)
+    .single()
+
+  if (prodErr || !product) {
+    throw new Error("Ürün bulunamadı.")
+  }
+
+  // Analiz edilecek fotoğrafları belirle (Dökümanlar veya vitrin görselleri)
+  const imagesToAnalyze = product.authenticity_docs && product.authenticity_docs.length > 0 
+    ? product.authenticity_docs 
+    : product.public_images
+
+  if (!imagesToAnalyze || imagesToAnalyze.length === 0) {
+    throw new Error("Analiz edilecek fotoğraf bulunamadı.")
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error("ANTHROPIC_API_KEY bulunamadı. Lütfen API anahtarını tanımlayın.")
+  }
+
+  try {
+    const Anthropic = (await import('@anthropic-ai/sdk')).default
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })
+
+    // Claude API'sine görselleri block olarak besle (Maksimum 5 fotoğraf)
+    const imageBlocks = imagesToAnalyze.slice(0, 5).map((url: string) => ({
+      type: 'image' as const,
+      source: {
+        type: 'url' as const,
+        url: url
+      }
+    }))
+
+    const systemPrompt = `
+      Sen lüks ikinci el çanta ve saat orijinallik doğrulama uzmanısın.
+      
+      GÖNDERİLEN GÖRSELLERİN GEÇERLİLİK KONTROLÜ:
+      - Eğer gönderilen fotoğraflar tamamen siyah, aşırı karanlık, bulanık, boş veya bir lüks çanta/saat İÇERMİYORSA (örneğin sadece oda, zemin, manzara veya insan yüzü varsa), bu talebi orijinallik kontrolüne almadan KESİNLİKLE REDDETMELİSİN.
+      - Bu tür geçersiz durumlarda kararını "suspicious" yap, güven skorunu 100 ver ve gerekçeye tam olarak şunu yaz: "Lütfen fotoğrafları aydınlık bir ortamda, örnek kılavuzda gösterilen açılarla yeniden çekin. Boş, karanlık veya alakasız fotoğraflar ön incelemeyi geçemez."
+      
+      ORİJİNALLİK DEĞERLENDİRME KURALLARI:
+      - Görseller geçerliyse; fotoğraflardaki dikiş simetrisini, deri dokusunu, logo fontunu, metal parça kalitesini ve seri numarası damgalarını detaylı incele.
+      - Değerlendirmeni yaptıktan sonra mutlaka aşağıdaki JSON formatında bir rapor döndür. JSON dışında hiçbir metin yazma:
+      
+      Format:
+      {
+        "verdict": "likely_authentic|suspicious|likely_fake",
+        "confidence": 0-100, (verdiğin kararın güven skoru)
+        "reasoning": "Buraya çantanın dikişleri, donanım veya logo detayları hakkındaki gerekçeli analiz raporunu yaz..."
+      }
+    `
+
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 1000,
+      system: systemPrompt,
+      images: undefined, // Type correction helper
+      messages: [
+        {
+          role: 'user',
+          content: [
+            ...imageBlocks,
+            {
+              type: 'text',
+              text: `Bu ${product.brand} - ${product.model_name} ürününü analiz et.`
+            }
+          ]
+        }
+      ]
+    } as any)
+
+    const responseContent = response.content[0].type === 'text' ? response.content[0].text : ''
+    const jsonMatch = responseContent.match(/\{[\s\S]*\}/)
+    
+    if (!jsonMatch) {
+      throw new Error("Claude Vision geçerli bir rapor oluşturamadı.")
+    }
+
+    const result = JSON.parse(jsonMatch[0])
+
+    // 2. Analiz sonuçlarını ai_authentication_logs tablosuna kaydet (Eğitim seti için)
+    const { error: logErr } = await supabase
+      .from('ai_authentication_logs')
+      .insert({
+        product_id: product.id,
+        brand: product.brand,
+        model_name: product.model_name,
+        image_urls: imagesToAnalyze,
+        claude_verdict: result.verdict,
+        claude_confidence: result.confidence,
+        claude_raw_response: result.reasoning
+      })
+
+    if (logErr) {
+      console.error("AI auth log yazma hatası:", logErr.message)
+    }
+
+    revalidatePath('/admin/lab')
+    revalidatePath('/admin/pending')
+    
+    return {
+      success: true,
+      verdict: result.verdict,
+      confidence: result.confidence,
+      reasoning: result.reasoning
+    }
+
+  } catch (error: any) {
+    console.error("Claude Vision Precheck Error:", error)
+    throw new Error(`Claude Vision analizi başarısız: ${error.message}`)
+  }
+}

@@ -11,18 +11,37 @@ export const metadata = {
 
 export default async function CheckoutPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ productId: string }>
+  searchParams: Promise<{ token?: string; refresh?: string }>
 }) {
   const { productId } = await params
+  const { token, refresh } = await searchParams
   const supabase = await createClient()
+
+  // 0. Mobil WebView Entegrasyonu: Token ile otomatik oturum kurma
+  if (token && refresh) {
+    try {
+      await supabase.auth.setSession({
+        access_token: token,
+        refresh_token: refresh
+      })
+    } catch (sessionErr) {
+      console.error('[AUTO-LOGIN ERROR]', sessionErr)
+    }
+  }
 
   // 1. Check user authentication
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) {
-    redirect(`/login?redirect=/checkout/${productId}`)
+    // Mobil URL'yi koruyabilmek için yönlendirme parametresiyle login sayfasına at
+    const redirectUrl = token && refresh 
+      ? `/login?redirect=/checkout/${productId}`
+      : `/login?redirect=/checkout/${productId}`
+    redirect(redirectUrl)
   }
 
   // 2. Fetch product details

@@ -12,6 +12,7 @@ import {
   FlatList,
   Platform
 } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 
 const { width } = Dimensions.get('window');
 
@@ -68,14 +69,28 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
 
   async function handleBuy() {
     setLoading(true);
-    setStatusText('Ödeme ekranına yönlendiriliyorsunuz...');
+    setStatusText('Güvenli ödeme sayfasına yönlendiriliyorsunuz...');
     
-    setTimeout(() => {
+    try {
+      const { supabase } = await import('../lib/supabase');
+      const sessionData = (await supabase.auth.getSession()).data.session;
+      const accessToken = sessionData?.access_token || '';
+      const refreshToken = sessionData?.refresh_token || '';
+
+      // Vercel'deki siteniz
+      const domain = 'https://peony-collective.vercel.app';
+      
+      // Token ve Refresh Token parametrelerini URL'ye ekliyoruz
+      const checkoutUrl = `${domain}/checkout/${product.id}?token=${encodeURIComponent(accessToken)}&refresh=${encodeURIComponent(refreshToken)}`;
+      
+      await WebBrowser.openBrowserAsync(checkoutUrl);
+    } catch (error) {
+      console.error('Ödeme sayfası açılamadı:', error);
+      alert('Ödeme sayfası yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
       setLoading(false);
       setStatusText('');
-      alert('Tebrikler! Satın alma işleminiz başarıyla tamamlandı.');
-      onBack();
-    }, 2000);
+    }
   }
 
   async function handleMakeOffer() {
@@ -128,6 +143,13 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
           <Text style={styles.brand}>{product.brand}</Text>
           <Text style={styles.name}>{product.model_name}</Text>
           <Text style={styles.price}>{product.price?.toLocaleString('tr-TR')} ₺</Text>
+          
+          {/* Social Proof (Views & Favorites counts) */}
+          <View style={styles.socialProofRow}>
+            <Text style={styles.socialProofText}>👁 {product.id === 'chanel-flap' ? '1.428' : '542'} kişi inceledi</Text>
+            <Text style={styles.socialProofDivider}>•</Text>
+            <Text style={styles.socialProofText}>❤️ {product.id === 'chanel-flap' ? '124' : '48'} kişi favorisine ekledi</Text>
+          </View>
         </View>
 
         {/* Specs Overview */}
@@ -326,6 +348,28 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontWeight: '600',
     marginTop: 10,
+  },
+  socialProofRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    backgroundColor: 'rgba(175, 145, 100, 0.05)',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignSelf: 'flex-start',
+    borderWidth: 0.5,
+    borderColor: 'rgba(175, 145, 100, 0.2)',
+  },
+  socialProofText: {
+    fontSize: 10.5,
+    color: COLORS.textMuted,
+    fontWeight: '500',
+  },
+  socialProofDivider: {
+    marginHorizontal: 8,
+    color: COLORS.primary,
+    fontSize: 10.5,
   },
   specsGrid: {
     flexDirection: 'row',

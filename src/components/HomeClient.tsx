@@ -476,15 +476,15 @@ export default function HomeClient({ products, brands, brand, category, gender }
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           
           <div className="mb-16 space-y-6 border-b border-gray-200 pb-8">
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-              <div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+              <div className="w-full md:w-auto">
                 <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">CURATED COLLECTION</span>
                 <h2 className="text-4xl md:text-6xl serif-display tracking-tight text-[#1A1A1A] mt-2">
                   The <span className="italic">Edit</span>
                 </h2>
               </div>
               
-              <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
                 <CustomSelect
                   value={gender || ''}
                   placeholder="Tüm Cinsiyetler"

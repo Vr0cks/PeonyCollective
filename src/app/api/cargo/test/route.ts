@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { getOtoAccessToken, createOtoOrder } from '@/src/lib/oto'
 
 export async function GET(request: Request) {
+  // Bu endpoint sadece development ortamında aktiftir
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Bu endpoint production ortamında devre dışıdır.' }, { status: 403 })
+  }
+
   const { searchParams } = new URL(request.url)
   const action = searchParams.get('action') || 'token'
 
@@ -46,6 +51,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  // Bu endpoint sadece development ortamında aktiftir
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Bu endpoint production ortamında devre dışıdır.' }, { status: 403 })
+  }
+
   try {
     const body = await request.json()
     const { orderId, productId, action, isAuthentic } = body

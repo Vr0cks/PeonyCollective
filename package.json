@@ -9,16 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.3",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.104.1",
-    "expo": "^57.0.6",
+    "expo": "^57.0.7",
     "framer-motion": "^12.38.0",
     "heic-convert": "^2.1.0",
     "heic2any": "^0.0.4",
     "lucide-react": "^1.11.0",
     "next": "16.2.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "resend": "^6.16.0",
     "zod": "^4.4.3"
   },
@@ -31,6 +32,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "~6.0.3"
   }
 }

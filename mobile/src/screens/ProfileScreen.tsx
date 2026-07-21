@@ -8,9 +8,11 @@ import {
   ScrollView,
   Platform,
   Alert,
-  TextInput
+  TextInput,
+  Image
 } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { t } from '../lib/i18n';
 
 const COLORS = {
   bg: '#FBFBFA', // Luxury off-white
@@ -31,9 +33,10 @@ interface ProfileScreenProps {
 }
 
 export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileScreenProps) {
+  const isEn = t('wishlistEmpty') === 'Your wishlist is empty.';
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [profileMode, setProfileMode] = useState<'buyer' | 'seller'>('buyer'); // Switch between Buyer and Seller profiles
+  const [profileMode, setProfileMode] = useState<'buyer' | 'seller' | 'vault'>('buyer'); // Switch between Buyer, Seller, and Vault profiles
   const [activeAdPackage, setActiveAdPackage] = useState<string | null>(null);
   
   // Seller stats
@@ -47,6 +50,16 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
   // Account settings edit states
   const [iban, setIban] = useState('TR56 0006 2000 0001 2345 6789 01');
   const [isEditingIban, setIsEditingIban] = useState(false);
+
+  // Contact and corporate registration states
+  const [preferredName, setPreferredName] = useState('Ahmet Canlı');
+  const [phone, setPhone] = useState('+90 532 123 45 67');
+  const [emailAddr, setEmailAddr] = useState('ahmetcanli1943@gmail.com');
+  const [tckn, setTckn] = useState('12345678901');
+  const [vkn, setVkn] = useState('9876543210');
+  const [companyName, setCompanyName] = useState('Canlı Lüks Giyim Ltd.');
+  const [avatarUrl, setAvatarUrl] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150');
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -65,6 +78,17 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
       if (error) throw error;
       setProfile(data);
+      if (data) {
+        setPreferredName(data.preferred_name || data.full_name || 'Ahmet Canlı');
+        setEmailAddr(user.email || data.email || 'ahmetcanli1943@gmail.com');
+        setPhone(data.phone || '+90 532 123 45 67');
+        setTckn(data.tckn || '12345678901');
+        setVkn(data.vkn || '9876543210');
+        setCompanyName(data.company_name || 'Canlı Lüks Giyim Ltd.');
+        if (data.avatar_url) {
+          setAvatarUrl(data.avatar_url);
+        }
+      }
     } catch (e: any) {
       console.error(e.message);
     } finally {
@@ -79,15 +103,15 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
   function handleBuyAdPackage(packageName: string, price: string) {
     Alert.alert(
-      'Reklam Paketi Satın Al',
-      `${packageName} (${price}) aboneliğini başlatmak istiyor musunuz? Ürünleriniz hemen öncelikli olarak listelenecektir.`,
+      isEn ? 'Buy Promo Package' : 'Reklam Paketi Satın Al',
+      isEn ? `Do you want to start ${packageName} (${price}) subscription? Your products will be highlighted instantly.` : `${packageName} (${price}) aboneliğini başlatmak istiyor musunuz? Ürünleriniz hemen öncelikli olarak listelenecektir.`,
       [
-        { text: 'Vazgeç', style: 'cancel' },
+        { text: isEn ? 'Cancel' : 'Vazgeç', style: 'cancel' },
         { 
-          text: 'Onayla', 
+          text: isEn ? 'Confirm' : 'Onayla', 
           onPress: () => {
             setActiveAdPackage(packageName);
-            Alert.alert('Başarılı', `${packageName} aktif edildi. Satışlarınızda %50\'ye varan artış analizleri yakında profilinizde görünecektir!`);
+            Alert.alert(isEn ? 'Success' : 'Başarılı', isEn ? `${packageName} activated successfully!` : `${packageName} aktif edildi.`);
           } 
         }
       ]
@@ -105,28 +129,198 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
           
           {/* PROFILE HEADER & USER DETAILS */}
           <View style={styles.profileHeaderBox}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {profile?.full_name?.charAt(0).toUpperCase() || 'P'}
-              </Text>
-            </View>
+            <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
             <View style={styles.profileInfoText}>
-              <Text style={styles.name}>{profile?.full_name}</Text>
+              <Text style={styles.name}>{preferredName || profile?.full_name}</Text>
               <Text style={styles.role}>
-                {profile?.role === 'admin' ? 'Yönetici' : profile?.role === 'operations' ? 'Operasyon Yetkilisi' : 'Peony Üyesi'}
+                {profile?.role === 'admin' ? 'Admin' : profile?.role === 'operations' ? (isEn ? 'Operations Officer' : 'Operasyon Yetkilisi') : (t('defaultMemberName') || 'Peony Member')}
               </Text>
-              <Text style={styles.memberSince}>Üyelik Tarihi: 2026</Text>
+              <Text style={styles.memberSince}>{isEn ? 'Membership: 2026' : 'Üyelik Tarihi: 2026'}</Text>
             </View>
           </View>
 
-          {/* BUYER / SELLER MODE TOGGLE TABS (ELEGANT SEGMENTED SWITCH) */}
+          {/* PERSONAL & CORPORATE DETAILS (TCKN, VKN, PREFERRED NAME, PHONE, EMAIL, AVATAR EDIT) */}
+          <View style={styles.detailsCard}>
+            <View style={styles.detailsHeader}>
+              <Text style={styles.detailsTitle}>
+                {isEditingInfo 
+                  ? (isEn ? '✦ EDIT PROFILE INFO' : '✦ PROFİL BİLGİLERİNİ DÜZENLE') 
+                  : (isEn ? '✦ ACCOUNT & CONTACT INFO' : '✦ HESAP VE İLETİŞİM BİLGİLERİ')}
+              </Text>
+              <View style={{ flexDirection: 'row' }}>
+                {isEditingInfo && (
+                  <TouchableOpacity 
+                    style={[styles.editInfoBtn, { marginRight: 8, borderColor: COLORS.danger }]} 
+                    onPress={() => setIsEditingInfo(false)}
+                  >
+                    <Text style={[styles.editInfoBtnText, { color: COLORS.danger }]}>İPTAL</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity 
+                  style={[styles.editInfoBtn, isEditingInfo && { backgroundColor: COLORS.primary, borderColor: COLORS.primary }]} 
+                  onPress={() => {
+                    if (isEditingInfo) {
+                      setIsEditingInfo(false);
+                      Alert.alert('Bilgi', 'Hesap bilgileriniz başarıyla kaydedildi!');
+                    } else {
+                      setIsEditingInfo(true);
+                    }
+                  }}
+                >
+                  <Text style={[styles.editInfoBtnText, isEditingInfo && { color: '#FFFFFF' }]}>
+                    {isEditingInfo ? 'KAYDET' : 'DÜZENLE'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {isEditingInfo ? (
+              /* Editable Input Fields Grouped */
+              <View style={styles.editFieldsGroup}>
+                <View style={styles.editSectionTitleRow}>
+                  <Text style={styles.editSectionTitle}>👤 KİŞİSEL BİLGİLER</Text>
+                </View>
+                
+                <View style={styles.infoRowField}>
+                  <Text style={styles.fieldLabel}>TERCİH EDİLEN İSİM</Text>
+                  <TextInput 
+                    style={styles.fieldInput} 
+                    value={preferredName} 
+                    onChangeText={setPreferredName} 
+                    placeholder="Adınız Soyadınız"
+                    placeholderTextColor="rgba(26,26,26,0.3)"
+                  />
+                </View>
+
+                <View style={styles.infoRowField}>
+                  <Text style={styles.fieldLabel}>E-POSTA ADRESİ</Text>
+                  <TextInput 
+                    style={styles.fieldInput} 
+                    value={emailAddr} 
+                    onChangeText={setEmailAddr} 
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    placeholder="email@peony.com"
+                    placeholderTextColor="rgba(26,26,26,0.3)"
+                  />
+                </View>
+
+                <View style={styles.infoRowField}>
+                  <Text style={styles.fieldLabel}>İLETİŞİM TELEFONU</Text>
+                  <TextInput 
+                    style={styles.fieldInput} 
+                    value={phone} 
+                    onChangeText={setPhone} 
+                    keyboardType="phone-pad"
+                    placeholder="+90 5xx xxx xx xx"
+                    placeholderTextColor="rgba(26,26,26,0.3)"
+                  />
+                </View>
+
+                <View style={styles.editSectionTitleRow}>
+                  <Text style={styles.editSectionTitle}>🏢 FATURA & VERGİ BİLGİLERİ</Text>
+                </View>
+
+                <View style={styles.infoRowField}>
+                  <Text style={styles.fieldLabel}>T.C. KİMLİK NO (TCKN)</Text>
+                  <TextInput 
+                    style={styles.fieldInput} 
+                    value={tckn} 
+                    onChangeText={setTckn} 
+                    maxLength={11}
+                    keyboardType="numeric"
+                    placeholder="11 Haneli TCKN"
+                    placeholderTextColor="rgba(26,26,26,0.3)"
+                  />
+                </View>
+
+                <View style={styles.infoRowField}>
+                  <Text style={styles.fieldLabel}>VERGİ KİMLİK NO (VKN)</Text>
+                  <TextInput 
+                    style={styles.fieldInput} 
+                    value={vkn} 
+                    onChangeText={setVkn} 
+                    maxLength={10}
+                    keyboardType="numeric"
+                    placeholder="10 Haneli VKN"
+                    placeholderTextColor="rgba(26,26,26,0.3)"
+                  />
+                </View>
+
+                <View style={styles.infoRowField}>
+                  <Text style={styles.fieldLabel}>FİRMA ÜNVANI</Text>
+                  <TextInput 
+                    style={styles.fieldInput} 
+                    value={companyName} 
+                    onChangeText={setCompanyName} 
+                    placeholder="Resmi Şirket Adı"
+                    placeholderTextColor="rgba(26,26,26,0.3)"
+                  />
+                </View>
+
+                <View style={styles.infoRowField}>
+                  <Text style={styles.fieldLabel}>PROFİL FOTOĞRAFI URL</Text>
+                  <TextInput 
+                    style={styles.fieldInput} 
+                    value={avatarUrl} 
+                    onChangeText={setAvatarUrl} 
+                    placeholder="Görsel URL Adresi"
+                    placeholderTextColor="rgba(26,26,26,0.3)"
+                  />
+                </View>
+              </View>
+            ) : (
+              /* Beautiful Luxury Display Info Panel */
+              <View style={styles.displayInfoPanel}>
+                <View style={styles.displaySection}>
+                  <Text style={styles.displaySectionHeader}>{isEn ? '👤 PERSONAL CONTACT' : '👤 KİŞİSEL İLETİŞİM'}</Text>
+                  <View style={styles.displayGrid}>
+                    <View style={styles.displayCol}>
+                      <Text style={styles.displayLabel}>{isEn ? 'PREFERRED NAME' : 'TERCİH EDİLEN İSİM'}</Text>
+                      <Text style={styles.displayVal}>{preferredName || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                    </View>
+                    <View style={styles.displayCol}>
+                      <Text style={styles.displayLabel}>{isEn ? 'PHONE NUMBER' : 'TELEFON NUMARASI'}</Text>
+                      <Text style={styles.displayVal}>{phone || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                    </View>
+                  </View>
+                  <View style={[styles.displayCol, { marginTop: 12 }]}>
+                    <Text style={styles.displayLabel}>{isEn ? 'EMAIL ADDRESS' : 'E-POSTA ADRESİ'}</Text>
+                    <Text style={styles.displayVal}>{emailAddr || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.displaySectionDivider} />
+
+                <View style={styles.displaySection}>
+                  <Text style={styles.displaySectionHeader}>{isEn ? '🏢 CORPORATE & BILLING' : '🏢 KURUMSAL & FATURALANDIRMA'}</Text>
+                  <View style={styles.displayGrid}>
+                    <View style={styles.displayCol}>
+                      <Text style={styles.displayLabel}>{isEn ? 'NATIONAL ID (TCKN)' : 'T.C. KİMLİK NO (TCKN)'}</Text>
+                      <Text style={styles.displayVal}>{tckn || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                    </View>
+                    <View style={styles.displayCol}>
+                      <Text style={styles.displayLabel}>{isEn ? 'TAX NUMBER (VKN)' : 'VERGİ NO (VKN)'}</Text>
+                      <Text style={styles.displayVal}>{vkn || (isEn ? 'Not Set' : 'Girilmedi')}</Text>
+                    </View>
+                  </View>
+                  <View style={[styles.displayCol, { marginTop: 12 }]}>
+                    <Text style={styles.displayLabel}>{isEn ? 'COMPANY NAME' : 'FİRMA ÜNVANI'}</Text>
+                    <Text style={styles.displayVal}>{companyName || (isEn ? 'Individual Member' : 'Bireysel Üye')}</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* BUYER / SELLER / VAULT MODE TOGGLE TABS (ELEGANT SEGMENTED SWITCH) */}
           <View style={styles.modeTabs}>
             <TouchableOpacity 
               style={[styles.modeTab, profileMode === 'buyer' && styles.activeModeTab]}
               onPress={() => setProfileMode('buyer')}
             >
               <Text style={[styles.modeTabText, profileMode === 'buyer' && styles.activeModeTabText]}>
-                🛍️ Alışverişlerim
+                🛍️ {isEn ? 'Orders' : 'Alışverişler'}
               </Text>
             </TouchableOpacity>
 
@@ -135,7 +329,16 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               onPress={() => setProfileMode('seller')}
             >
               <Text style={[styles.modeTabText, profileMode === 'seller' && styles.activeModeTabText]}>
-                💰 Satışlarım
+                💰 {isEn ? 'Sales' : 'Satışlar'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.modeTab, profileMode === 'vault' && styles.activeModeTab]}
+              onPress={() => setProfileMode('vault')}
+            >
+              <Text style={[styles.modeTabText, profileMode === 'vault' && styles.activeModeTabText]}>
+                🏦 {isEn ? 'Digital Vault' : 'Dijital Kasa'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -146,13 +349,13 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               {/* Financial Summary */}
               <View style={styles.walletBox}>
                 <View style={styles.walletCol}>
-                  <Text style={styles.walletLabel}>TOPLAM HARCAMA</Text>
+                  <Text style={styles.walletLabel}>{isEn ? 'TOTAL SPENT' : 'TOPLAM HARCAMA'}</Text>
                   <Text style={styles.walletValue}>{totalSpent}</Text>
                 </View>
                 <View style={styles.walletDivider} />
                 <View style={styles.walletCol}>
-                  <Text style={styles.walletLabel}>AKTİF SİPARİŞ</Text>
-                  <Text style={styles.walletValue}>{activeOrdersCount}</Text>
+                  <Text style={styles.walletLabel}>{isEn ? 'ACTIVE ORDER' : 'AKTİF SİPARİŞ'}</Text>
+                  <Text style={styles.walletValue}>{isEn ? '1 Active Order' : '1 Aktif Sipariş'}</Text>
                 </View>
               </View>
 
@@ -162,10 +365,12 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                   <Text style={styles.eliteBrand}>PEONY ELITE</Text>
                   <Text style={styles.eliteTier}>★ GOLD MEMBER</Text>
                 </View>
-                <Text style={styles.elitePointLabel}>KULLANILABİLİR İNDİRİM PUANI</Text>
+                <Text style={styles.elitePointLabel}>{isEn ? 'AVAILABLE DISCOUNT POINTS' : 'KULLANILABİLİR İNDİRİM PUANI'}</Text>
                 <Text style={styles.elitePoints}>4.500 ₺</Text>
                 <Text style={styles.eliteDesc}>
-                  Bir sonraki alışverişinizde ödeme ekranında anında indirim olarak kullanabilirsiniz.
+                  {isEn 
+                    ? 'Use these points as an instant discount on your next checkout.' 
+                    : 'Bir sonraki alışverişinizde ödeme ekranında anında indirim olarak kullanabilirsiniz.'}
                 </Text>
                 
                 {/* Progress bar to Black Member */}
@@ -174,40 +379,43 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                     <View style={[styles.progressBarFill, { width: '70%' }]} />
                   </View>
                   <View style={styles.progressLabelRow}>
-                    <Text style={styles.progressLabel}>BLACK CARD için 7.500 ₺ kaldı</Text>
-                    <Text style={styles.progressBenefit}>%5 Ekstra İndirim & Erken Erişim</Text>
+                    <Text style={styles.progressLabel}>{isEn ? '7,500 ₺ remaining for BLACK CARD' : 'BLACK CARD için 7.500 ₺ kaldı'}</Text>
+                    <Text style={styles.progressBenefit}>{isEn ? '%5 Extra Discount & Early Access' : '%5 Ekstra İndirim & Erken Erişim'}</Text>
                   </View>
                 </View>
               </View>
 
               {/* Active Orders List Card */}
-              <Text style={styles.sectionTitle}>Sipariş Takibi</Text>
+              <Text style={styles.sectionTitle}>{isEn ? 'Order Tracking' : 'Sipariş Takibi'}</Text>
               <View style={styles.trackerCard}>
                 <View style={styles.trackerHeader}>
                   <Text style={styles.trackerProdName}>Rolex Submariner Date</Text>
-                  <Text style={[styles.trackerStatus, { color: COLORS.accent }]}>Kargoya Verildi 🚚</Text>
+                  <Text style={[styles.trackerStatus, { color: COLORS.accent }]}>{isEn ? 'Shipped 🚚' : 'Kargoya Verildi 🚚'}</Text>
                 </View>
                 <Text style={styles.orderDetailText}>
-                  Kargo Firması: Yurtiçi Kargo • Takip No: YK837261902{'\n'}
-                  Tahmini Teslimat: 2 Gün İçinde
+                  {isEn 
+                    ? `Courier: Yurtiçi Kargo • Tracking No: YK837261902\nEstimated Delivery: In 2 Days`
+                    : `Kargo Firması: Yurtiçi Kargo • Takip No: YK837261902\nTahmini Teslimat: 2 Gün İçinde`}
                 </Text>
                 {/* Visual authenticity guarantee indicator */}
                 <View style={styles.guaranteeTag}>
-                  <Text style={styles.guaranteeText}>✓ Spektral Analiz Onaylı Dijital Pasaport Hazır</Text>
+                  <Text style={styles.guaranteeText}>
+                    {isEn ? '✓ Spectral Analysis Approved Digital Passport Ready' : '✓ Spektral Analiz Onaylı Dijital Pasaport Hazır'}
+                  </Text>
                 </View>
               </View>
 
               {/* Favorite Brands & Price Alerts */}
-              <Text style={styles.sectionTitle}>Takip Ettiğim Markalar & Alarmlar</Text>
+              <Text style={styles.sectionTitle}>{isEn ? 'Followed Brands & Alerts' : 'Takip Ettiğim Markalar & Alarmlar'}</Text>
               <View style={styles.brandsBox}>
                 <View style={styles.brandRow}>
                   <Text style={styles.brandName}>Chanel</Text>
-                  <Text style={styles.brandAlertCount}>3 Yeni Fiyat Alarmı 🔔</Text>
+                  <Text style={styles.brandAlertCount}>{isEn ? '3 New Price Alerts 🔔' : '3 Yeni Fiyat Alarmı 🔔'}</Text>
                 </View>
                 <View style={styles.brandRowDivider} />
                 <View style={styles.brandRow}>
                   <Text style={styles.brandName}>Rolex</Text>
-                  <Text style={styles.brandAlertCount}>Yeni İlan Bildirimi Açık</Text>
+                  <Text style={styles.brandAlertCount}>{isEn ? 'New Listing Alerts On' : 'Yeni İlan Bildirimi Açık'}</Text>
                 </View>
               </View>
             </View>
@@ -219,22 +427,22 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               {/* Financial Summary */}
               <View style={styles.walletBox}>
                 <View style={styles.walletCol}>
-                  <Text style={styles.walletLabel}>TOPLAM SATIŞ</Text>
+                  <Text style={styles.walletLabel}>{isEn ? 'TOTAL SALES' : 'TOPLAM SATIŞ'}</Text>
                   <Text style={styles.walletValue}>{balance}</Text>
                 </View>
                 <View style={styles.walletDivider} />
                 <View style={styles.walletCol}>
-                  <Text style={styles.walletLabel}>BEKLEYEN HAKEDİŞ</Text>
+                  <Text style={styles.walletLabel}>{isEn ? 'PENDING PAYOUT' : 'BEKLEYEN HAKEDİŞ'}</Text>
                   <Text style={styles.walletValue}>{pendingPayout}</Text>
                 </View>
               </View>
 
               {/* Consignment tracking */}
-              <Text style={styles.sectionTitle}>Konsinye Ürün Takibi</Text>
+              <Text style={styles.sectionTitle}>{isEn ? 'Consignment Tracking' : 'Konsinye Ürün Takibi'}</Text>
               <View style={styles.trackerCard}>
                 <View style={styles.trackerHeader}>
                   <Text style={styles.trackerProdName}>Chanel Classic Double Flap</Text>
-                  <Text style={styles.trackerStatus}>SPA & Bakım Aşaması</Text>
+                  <Text style={styles.trackerStatus}>{isEn ? 'SPA & Spa Care Phase' : 'SPA & Bakım Aşaması'}</Text>
                 </View>
 
                 {/* Stepper Steps */}
@@ -243,7 +451,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                     <View style={[styles.stepCircle, styles.stepDone]}>
                       <Text style={styles.stepCheck}>✓</Text>
                     </View>
-                    <Text style={styles.stepLabel}>Kabul</Text>
+                    <Text style={styles.stepLabel}>{isEn ? 'Received' : 'Kabul'}</Text>
                   </View>
 
                   <View style={[styles.stepLine, styles.stepLineActive]} />
@@ -252,7 +460,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                     <View style={[styles.stepCircle, styles.stepDone]}>
                       <Text style={styles.stepCheck}>✓</Text>
                     </View>
-                    <Text style={styles.stepLabel}>Ekspertiz</Text>
+                    <Text style={styles.stepLabel}>{isEn ? 'Expertise' : 'Ekspertiz'}</Text>
                   </View>
 
                   <View style={[styles.stepLine, styles.stepLineActive]} />
@@ -270,7 +478,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                     <View style={styles.stepCircle}>
                       <Text style={styles.stepNumber}>4</Text>
                     </View>
-                    <Text style={styles.stepLabel}>Çekim</Text>
+                    <Text style={styles.stepLabel}>{isEn ? 'Studio' : 'Çekim'}</Text>
                   </View>
 
                   <View style={styles.stepLine} />
@@ -279,32 +487,38 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                     <View style={styles.stepCircle}>
                       <Text style={styles.stepNumber}>5</Text>
                     </View>
-                    <Text style={styles.stepLabel}>Vitrin</Text>
+                    <Text style={styles.stepLabel}>{isEn ? 'Listed' : 'Vitrin'}</Text>
                   </View>
                 </View>
               </View>
 
               {/* Monetization / Advertising Portal */}
-              <Text style={styles.sectionTitle}>Satışlarınızı Artırın</Text>
+              <Text style={styles.sectionTitle}>{isEn ? 'Boost Your Sales' : 'Satışlarınızı Artırın'}</Text>
               <Text style={styles.sectionDesc}>
-                Peony Muse ve Vitrin reklam paketleriyle ürünlerinize %50 daha fazla gösterim kazandırın.
+                {isEn 
+                  ? 'Get up to %50 more views on your items using Peony Muse and Showcase ad packages.'
+                  : 'Peony Muse ve Vitrin reklam paketleriyle ürünlerinize %50 daha fazla gösterim kazandırın.'}
               </Text>
 
               {/* Package 1: Curator Boost */}
               <View style={styles.adCard}>
                 <View style={styles.adHeader}>
-                  <Text style={styles.adTitle}>Küratör Öne Çıkarması (Muse Boost)</Text>
-                  <Text style={styles.adPrice}>3.000 ₺ / Ay</Text>
+                  <Text style={styles.adTitle}>{isEn ? 'Curator Recommendation (Muse Boost)' : 'Küratör Öne Çıkarması (Muse Boost)'}</Text>
+                  <Text style={styles.adPrice}>3.000 ₺ / {isEn ? 'Mo' : 'Ay'}</Text>
                 </View>
                 <Text style={styles.adDesc}>
-                  Ürünleriniz lüks stil danışmanımız **Peony Muse** sohbetlerinde öncelikli tavsiye olarak eşleştirilir ve vitrinde %50 daha fazla görünürlük kazanır.
+                  {isEn 
+                    ? 'Your items are matched as priority recommendations in Peony Muse styling chats and gain %50 more exposure on the feed.'
+                    : 'Ürünleriniz lüks stil danışmanımız Peony Muse sohbetlerinde öncelikli tavsiye olarak eşleştirilir ve vitrinde %50 daha fazla görünürlük kazanır.'}
                 </Text>
                 <TouchableOpacity 
                   style={[styles.adBtn, activeAdPackage === 'Küratör Öne Çıkarması' && styles.activeAdBtn]}
                   onPress={() => handleBuyAdPackage('Küratör Öne Çıkarması', '3.000 ₺ / Ay')}
                 >
                   <Text style={styles.adBtnText}>
-                    {activeAdPackage === 'Küratör Öne Çıkarması' ? '✓ AKTİF ABONELİK' : 'ABONELİĞİ BAŞLAT'}
+                    {activeAdPackage === 'Küratör Öne Çıkarması' 
+                      ? (isEn ? '✓ ACTIVE SUBSCRIPTION' : '✓ AKTİF ABONELİK') 
+                      : (isEn ? 'START SUBSCRIPTION' : 'ABONELİĞİ BAŞLAT')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -312,20 +526,110 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               {/* Package 2: VIP Showcase */}
               <View style={styles.adCard}>
                 <View style={styles.adHeader}>
-                  <Text style={styles.adTitle}>VIP Vitrin Vitrini (Showcase Pro)</Text>
-                  <Text style={styles.adPrice}>5.000 ₺ / Ay</Text>
+                  <Text style={styles.adTitle}>{isEn ? 'Concierge Main Showcase (Showcase Pro)' : 'Concierge Vitrin Vitrini (Showcase Pro)'}</Text>
+                  <Text style={styles.adPrice}>5.000 ₺ / {isEn ? 'Mo' : 'Ay'}</Text>
                 </View>
                 <Text style={styles.adDesc}>
-                  Ürünleriniz ana sayfadaki üst kategori slider\'larında, Weather Concierge hava durumu listelemelerinde ve aramalarda en üst sırada sponsorlu ibaresi olmadan organik olarak sergilenir.
+                  {isEn 
+                    ? 'Your items are showcased at the top of category sliders, Weather Concierge lists, and search queries organically without any sponsored tag.'
+                    : 'Ürünleriniz ana sayfadaki üst kategori slider\'larında, Weather Concierge hava durumu listelemelerinde ve aramalarda en üst sırada sponsorlu ibaresi olmadan organik olarak sergilenir.'}
                 </Text>
                 <TouchableOpacity 
-                  style={[styles.adBtn, activeAdPackage === 'VIP Vitrin Vitrini' && styles.activeAdBtn]}
-                  onPress={() => handleBuyAdPackage('VIP Vitrin Vitrini', '5.000 ₺ / Ay')}
+                  style={[styles.adBtn, activeAdPackage === 'Concierge Vitrin Vitrini' && styles.activeAdBtn]}
+                  onPress={() => handleBuyAdPackage('Concierge Vitrin Vitrini', '5.000 ₺ / Ay')}
                 >
                   <Text style={styles.adBtnText}>
-                    {activeAdPackage === 'VIP Vitrin Vitrini' ? '✓ AKTİF ABONELİK' : 'ABONELİĞİ BAŞLAT'}
+                    {activeAdPackage === 'Concierge Vitrin Vitrini' 
+                      ? (isEn ? '✓ ACTIVE SUBSCRIPTION' : '✓ AKTİF ABONELİK') 
+                      : (isEn ? 'START SUBSCRIPTION' : 'ABONELİĞİ BAŞLAT')}
                   </Text>
                 </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* DYNAMIC RENDERING: DIGITAL VAULT VIEW */}
+          {profileMode === 'vault' && (
+            <View>
+              {/* Vault Portfolio Value summary card */}
+              <View style={styles.vaultValueCard}>
+                <View style={styles.vaultValueHeader}>
+                  <Text style={styles.vaultLabel}>{isEn ? 'PORTFOLIO TOTAL VALUE' : 'PORTFÖY TOPLAM DEĞERİ'}</Text>
+                  <Text style={styles.vaultTrend}>+3.7% {isEn ? 'this month' : 'bu ay'} 📈</Text>
+                </View>
+                <Text style={styles.vaultValueText}>1.030.000 ₺</Text>
+                <Text style={styles.vaultSubText}>
+                  {isEn 
+                    ? 'Estimated current value of your verified luxury assets based on live market stats.'
+                    : 'Doğrulanmış lüks varlıklarınızın piyasa verilerine dayalı tahmini güncel değeri.'}
+                </Text>
+              </View>
+
+              {/* Asset list */}
+              <Text style={styles.sectionTitle}>{isEn ? 'Vault Assets' : 'Kasa Varlıkları'}</Text>
+              
+              {/* Asset 1 */}
+              <View style={styles.assetItemCard}>
+                <View style={styles.assetItemRow}>
+                  <View style={styles.assetDot} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.assetBrand}>CHANEL</Text>
+                    <Text style={styles.assetModel}>Classic Double Flap Medium Black</Text>
+                    <Text style={styles.assetStatus}>Entrupy Verified ✓</Text>
+                  </View>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={styles.assetCurrentVal}>345.000 ₺</Text>
+                    <Text style={styles.assetAppreciation}>{isEn ? '+35.000 ₺ (Cost: 310k)' : '+35.000 ₺ (Alış: 310k)'}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Asset 2 */}
+              <View style={styles.assetItemCard}>
+                <View style={styles.assetItemRow}>
+                  <View style={styles.assetDot} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.assetBrand}>ROLEX</Text>
+                    <Text style={styles.assetModel}>Submariner Date Starbucks 41mm</Text>
+                    <Text style={styles.assetStatus}>Entrupy Verified ✓</Text>
+                  </View>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={styles.assetCurrentVal}>685.000 ₺</Text>
+                    <Text style={styles.assetAppreciation}>{isEn ? '+10.000 ₺ (Cost: 675k)' : '+10.000 ₺ (Alış: 675k)'}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Certify My Bag Service */}
+              <Text style={styles.sectionTitle}>{isEn ? 'Vault Services' : 'Kasa Hizmetleri'}</Text>
+              <View style={styles.certifyCard}>
+                <Text style={styles.certifyTag}>✦ CERTIFY MY BAG</Text>
+                <Text style={styles.certifyTitle}>{isEn ? 'Register Your Bags' : 'Çantalarınızı Tescil Edin'}</Text>
+                <Text style={styles.certifyDesc}>
+                  {isEn 
+                    ? 'Get your luxury bags authenticated via Entrupy AI microscopic scanning and expert validation. Receive your digital certificate and add them to your vault.'
+                    : 'Elinizdeki lüks çantaları Entrupy AI mikroskobik doğrulaması ve uzman kontrolüyle tescil ettirin. Orijinallik belgenizi alarak ürünlerinizi dijital kasanıza ekleyin.'}
+                </Text>
+                <View style={styles.certifyPriceRow}>
+                  <View>
+                    <Text style={styles.certifyPriceLabel}>{isEn ? 'Service Fee' : 'Hizmet Bedeli'}</Text>
+                    <Text style={styles.certifyPrice}>1.990 ₺</Text>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.certifyBtn}
+                    onPress={() => {
+                      Alert.alert(
+                        isEn ? 'Appointment Requested' : 'Randevu Talebi Alındı',
+                        isEn 
+                          ? 'Your request for Certify My Bag has been received. Our operations team will contact you within 15 minutes to arrange safe transit and appointment scheduling.'
+                          : 'Certify My Bag tescil talebiniz alınmıştır. Operasyon ekibimiz sigortalı kurye gönderimi ve randevu saatini planlamak üzere sizinle 15 dakika içinde iletişime geçecektir.',
+                        [{ text: isEn ? 'OK' : 'Tamam' }]
+                      );
+                    }}
+                  >
+                    <Text style={styles.certifyBtnText}>{isEn ? 'Book Appointment →' : 'Randevu Al →'}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -333,18 +637,18 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
           {/* ADMIN OPERATIONS LINK */}
           {(profile?.role === 'admin' || profile?.role === 'operations') && (
             <TouchableOpacity style={styles.adminBtn} onPress={onEnterOperations}>
-              <Text style={styles.adminBtnText}>🛡 OPERASYON PANELİ GİRİŞİ</Text>
+              <Text style={styles.adminBtnText}>{isEn ? '🛡 OPERATOR PANEL LOGIN' : '🛡 OPERASYON PANELİ GİRİŞİ'}</Text>
             </TouchableOpacity>
           )}
 
           {/* ACCOUNT & PREFERENCES LIST */}
-          <Text style={styles.sectionTitle}>Hesap Bilgileri & Ayarlar</Text>
+          <Text style={styles.sectionTitle}>{isEn ? 'Account Info & Settings' : 'Hesap Bilgileri & Ayarlar'}</Text>
           
           <View style={styles.settingsGroup}>
             {/* IBAN SETTING */}
             <View style={styles.settingsRow}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.settingsLabel}>BANKA HESABI (IBAN)</Text>
+                <Text style={styles.settingsLabel}>{isEn ? 'BANK ACCOUNT (IBAN)' : 'BANKA HESABI (IBAN)'}</Text>
                 {isEditingIban ? (
                   <TextInput 
                     style={styles.ibanInput}
@@ -360,35 +664,39 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                 style={styles.editBtn} 
                 onPress={() => setIsEditingIban(!isEditingIban)}
               >
-                <Text style={styles.editBtnText}>{isEditingIban ? 'Kaydet' : 'Düzenle'}</Text>
+                <Text style={styles.editBtnText}>
+                  {isEditingIban 
+                    ? (isEn ? 'Save' : 'Kaydet') 
+                    : (isEn ? 'Edit' : 'Düzenle')}
+                </Text>
               </TouchableOpacity>
             </View>
 
             {/* REGISTERED ADDRESS */}
             <View style={styles.settingsRow}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.settingsLabel}>TESLİMAT ADRESİ</Text>
+                <Text style={styles.settingsLabel}>{isEn ? 'SHIPPING ADDRESS' : 'TESLİMAT ADRESİ'}</Text>
                 <Text style={styles.settingsValue}>Nişantaşı, Valikonak Cd. No:45 D:12 Şişli / İstanbul</Text>
               </View>
-              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert('Bilgi', 'Adres düzenleme modülü yakında aktif olacaktır.')}>
-                <Text style={styles.editBtnText}>Düzenle</Text>
+              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert(isEn ? 'Info' : 'Bilgi', isEn ? 'Address update module will be enabled soon.' : 'Adres düzenleme modülü yakında aktif olacaktır.')}>
+                <Text style={styles.editBtnText}>{isEn ? 'Edit' : 'Düzenle'}</Text>
               </TouchableOpacity>
             </View>
 
             {/* PREFERRED SIZE */}
             <View style={styles.settingsRow}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.settingsLabel}>BEDEN TERCİHLERİM</Text>
-                <Text style={styles.settingsValue}>Kıyafet: M / Shoes: 38 / Aksesuar: Medium</Text>
+                <Text style={styles.settingsLabel}>{isEn ? 'SIZE PREFERENCES' : 'BEDEN TERCİHLERİM'}</Text>
+                <Text style={styles.settingsValue}>{isEn ? 'Clothes: M / Shoes: 38 / Acc: Medium' : 'Kıyafet: M / Shoes: 38 / Aksesuar: Medium'}</Text>
               </View>
-              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert('Bilgi', 'Beden tercihi modülü yakında aktif olacaktır.')}>
-                <Text style={styles.editBtnText}>Düzenle</Text>
+              <TouchableOpacity style={styles.editBtn} onPress={() => Alert.alert(isEn ? 'Info' : 'Bilgi', isEn ? 'Size preference module will be enabled soon.' : 'Beden tercihi modülü yakında aktif olacaktır.')}>
+                <Text style={styles.editBtnText}>{isEn ? 'Edit' : 'Düzenle'}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           <TouchableOpacity style={styles.logoutBtn} onPress={handleSignOut}>
-            <Text style={styles.logoutBtnText}>Oturumu Kapat</Text>
+            <Text style={styles.logoutBtnText}>{isEn ? 'Log Out' : 'Oturumu Kapat'}</Text>
           </TouchableOpacity>
 
         </ScrollView>
@@ -867,5 +1175,266 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  /* Digital Vault Styles */
+  vaultValueCard: {
+    backgroundColor: COLORS.darkBar,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#2D2E36',
+  },
+  vaultValueHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  vaultLabel: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: '#987B51',
+    letterSpacing: 1.5,
+  },
+  vaultTrend: {
+    fontSize: 11,
+    color: COLORS.accent,
+    fontWeight: 'bold',
+  },
+  vaultValueText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  vaultSubText: {
+    fontSize: 11.5,
+    color: '#9899A0',
+    lineHeight: 16,
+  },
+  assetItemCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 16,
+    marginBottom: 12,
+  },
+  assetItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  assetDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.primary,
+    marginRight: 12,
+  },
+  assetBrand: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 1,
+  },
+  assetModel: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginTop: 2,
+  },
+  assetStatus: {
+    fontSize: 10,
+    color: COLORS.accent,
+    fontWeight: '600',
+    marginTop: 3,
+  },
+  assetCurrentVal: {
+    fontSize: 13.5,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  assetAppreciation: {
+    fontSize: 9.5,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+  certifyCard: {
+    backgroundColor: COLORS.promoBg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(175, 145, 100, 0.2)',
+    padding: 18,
+    marginBottom: 16,
+  },
+  certifyTag: {
+    fontSize: 8.5,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 1.5,
+    marginBottom: 6,
+  },
+  certifyTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+    color: COLORS.text,
+    marginBottom: 6,
+  },
+  certifyDesc: {
+    fontSize: 11.5,
+    color: COLORS.textMuted,
+    lineHeight: 17,
+    marginBottom: 18,
+  },
+  certifyPriceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  certifyPriceLabel: {
+    fontSize: 9,
+    color: COLORS.textMuted,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+  },
+  certifyPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  certifyBtn: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  certifyBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11.5,
+    fontWeight: 'bold',
+  },
+  avatarImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  detailsCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 15,
+    marginBottom: 20,
+  },
+  detailsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+    paddingBottom: 10,
+    marginBottom: 12,
+  },
+  detailsTitle: {
+    fontSize: 11.5,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 1,
+  },
+  editInfoBtn: {
+    backgroundColor: COLORS.bg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  editInfoBtnText: {
+    fontSize: 10.5,
+    fontWeight: 'bold',
+    color: COLORS.text,
+  },
+  infoRowField: {
+    marginBottom: 12,
+  },
+  fieldLabel: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: COLORS.textMuted,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  fieldValue: {
+    fontSize: 13,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  fieldInput: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 13,
+    color: COLORS.text,
+    backgroundColor: COLORS.bg,
+  },
+  editFieldsGroup: {
+    width: '100%',
+  },
+  editSectionTitleRow: {
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+    paddingBottom: 4,
+    marginTop: 8,
+    marginBottom: 12,
+  },
+  editSectionTitle: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 1.5,
+  },
+  displayInfoPanel: {
+    width: '100%',
+  },
+  displaySection: {
+    marginBottom: 8,
+  },
+  displaySectionHeader: {
+    fontSize: 10.5,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    letterSpacing: 1.5,
+    marginBottom: 12,
+  },
+  displayGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  displayCol: {
+    flex: 1,
+  },
+  displayLabel: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: COLORS.textMuted,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  displayVal: {
+    fontSize: 13.5,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  displaySectionDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 14,
   }
 });

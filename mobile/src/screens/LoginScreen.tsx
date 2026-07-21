@@ -9,13 +9,14 @@ import {
   KeyboardAvoidingView, 
   ScrollView, 
   Platform,
-  SafeAreaView,
   Image,
   Dimensions
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import { supabase } from '../lib/supabase';
+import { t, locale } from '../lib/i18n';
 
 const { width, height } = Dimensions.get('window');
 WebBrowser.maybeCompleteAuthSession();
@@ -38,7 +39,7 @@ interface LoginScreenProps {
 const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000',
   'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1000',
-  'https://images.unsplash.com/photo-1588099768531-a72d4a190513?q=80&w=1000'
+  'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=1000' // High-uptime luxury fashion image
 ];
 
 export default function LoginScreen({ onSuccess }: LoginScreenProps) {
@@ -60,7 +61,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
 
   async function handleAuth() {
     if (!email || !password || (isSignUp && !fullName)) {
-      alert('Lütfen tüm alanları doldurun.');
+      alert(t('loginAlertAllFields'));
       return;
     }
     setLoading(true);
@@ -78,7 +79,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
           }
         });
         if (error) throw error;
-        alert('Kayıt başarılı! Giriş yapabilirsiniz.');
+        alert(t('signUpSuccess'));
         setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -86,7 +87,30 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
         onSuccess();
       }
     } catch (error: any) {
-      alert('Hata: ' + error.message);
+      alert(t('authError') + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleForgotPassword() {
+    if (!email) {
+      alert(locale === 'tr' ? 'Lütfen önce e-posta adresinizi girin.' : 'Please enter your email address first.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'peony://reset-password',
+      });
+      if (error) throw error;
+      alert(locale === 'tr' 
+        ? `${email} adresine şifre sıfırlama bağlantısı gönderildi! (Gelen kutunuzu ve spam kutunuzu kontrol edin)` 
+        : `Password reset link has been sent to ${email}! (Please check your inbox and spam folder)`);
+    } catch (error: any) {
+      alert(locale === 'tr'
+        ? `Supabase Bağlantı Hatası: ${error.message}\n\nİpucu: Supabase Dashboard -> Auth -> URL Configuration kısmına 'peony://reset-password' yönlendirme adresini eklediğinizden ve SMTP ayarlarınızın açık olduğundan emin olun.`
+        : `Supabase Connection Error: ${error.message}\n\nTip: Make sure you added 'peony://reset-password' to Redirect URLs in Supabase Dashboard -> Auth -> URL Configuration and SMTP is enabled.`);
     } finally {
       setLoading(false);
     }
@@ -182,21 +206,31 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
               </View>
 
               <View style={styles.onboardingSection}>
-                <Text style={styles.serifIntro}>Arzunun Objeleri</Text>
-                <Text style={styles.subIntro}>Mirasın yeni sahibi olun. Lüks ikinci el moda ve konsinyerlik hizmeti.</Text>
+                <Text style={styles.serifIntro}>{t('loginObjectsOfDesire')}</Text>
+                <Text style={styles.subIntro}>{t('loginSubIntro')}</Text>
+
+                {/* Guest Login Option */}
+                <TouchableOpacity 
+                  style={[styles.googleButton, { backgroundColor: '#AF9164', borderColor: '#AF9164', marginBottom: 12 }]} 
+                  onPress={() => onSuccess()}
+                >
+                  <Text style={[styles.googleButtonText, { color: '#FFFFFF' }]}>
+                    {locale === 'tr' ? 'Şifresiz Devam Et (Misafir Girişi)' : 'Continue as Guest'}
+                  </Text>
+                </TouchableOpacity>
 
                 {/* Google Button */}
                 <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin} disabled={loading}>
-                  <Text style={styles.googleButtonText}>Google ile Devam Et</Text>
+                  <Text style={styles.googleButtonText}>{t('continueWithGoogle')}</Text>
                 </TouchableOpacity>
 
                 {/* Email Login Button */}
                 <TouchableOpacity style={styles.emailOutlineButton} onPress={() => setShowEmailForm(true)}>
-                  <Text style={styles.emailOutlineButtonText}>E-posta ile Devam Et</Text>
+                  <Text style={styles.emailOutlineButtonText}>{t('continueWithEmail')}</Text>
                 </TouchableOpacity>
 
                 <Text style={styles.termsText}>
-                  Devam ederek kullanıcı sözleşmesini ve kvkk şartlarını kabul etmiş olursunuz.
+                  {t('loginTermsText')}
                 </Text>
               </View>
             </View>
@@ -204,18 +238,18 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
             /* Elegant Slide-up Email Form View */
             <View style={styles.formCard}>
               <TouchableOpacity style={styles.backButton} onPress={() => setShowEmailForm(false)}>
-                <Text style={styles.backButtonText}>← Geri</Text>
+                <Text style={styles.backButtonText}>← {t('back')}</Text>
               </TouchableOpacity>
 
               <Text style={styles.brandTitleForm}>PEONY</Text>
-              <Text style={styles.loginHeader}>{isSignUp ? 'Yeni Hesap Oluştur' : 'Giriş Yap'}</Text>
+              <Text style={styles.loginHeader}>{isSignUp ? t('createNewAccount') : t('loginTitle')}</Text>
               <Text style={styles.loginDescription}>
-                {isSignUp ? 'Peony Collective ailesine katılın.' : 'Lütfen bilgilerinizi girerek devam edin.'}
+                {isSignUp ? t('signUpDesc') : t('loginDesc')}
               </Text>
 
               {isSignUp && (
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>AD SOYAD</Text>
+                  <Text style={styles.label}>{t('labelFullName')}</Text>
                   <TextInput 
                     style={styles.input} 
                     placeholder="Ahmet Canlı"
@@ -227,7 +261,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
               )}
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>E-POSTA</Text>
+                <Text style={styles.label}>{t('labelEmail')}</Text>
                 <TextInput 
                   style={styles.input} 
                   placeholder="email@peonycollective.com"
@@ -240,7 +274,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>ŞİFRE</Text>
+                <Text style={styles.label}>{t('labelPassword')}</Text>
                 <TextInput 
                   style={styles.input} 
                   secureTextEntry
@@ -252,11 +286,22 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
                 />
               </View>
 
+              {!isSignUp && (
+                <TouchableOpacity 
+                  style={{ alignSelf: 'flex-end', marginTop: -4, marginBottom: 16 }}
+                  onPress={handleForgotPassword}
+                >
+                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: '500' }}>
+                    {locale === 'tr' ? 'Şifremi Unuttum?' : 'Forgot Password?'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+
               <TouchableOpacity style={styles.loginButton} onPress={handleAuth} disabled={loading}>
                 {loading ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text style={styles.loginButtonText}>{isSignUp ? 'KAYIT OL' : 'GİRİŞ YAP'}</Text>
+                  <Text style={styles.loginButtonText}>{isSignUp ? t('btnSignUp') : t('btnLogin')}</Text>
                 )}
               </TouchableOpacity>
 
@@ -265,7 +310,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
                 onPress={() => setIsSignUp(!isSignUp)}
               >
                 <Text style={styles.switchText}>
-                  {isSignUp ? 'Zaten hesabınız var mı? Giriş Yapın' : 'Hesabınız yok mu? Kayıt Olun'}
+                  {isSignUp ? t('hasAccountLogin') : t('noAccountRegister')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -327,7 +372,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 25,
     paddingTop: height * 0.1,
-    paddingBottom: 40,
+    paddingBottom: Platform.OS === 'ios' ? 50 : 65, // Increased bottom padding to avoid navigation buttons overlay
   },
   topLogo: {
     alignItems: 'center',
@@ -405,6 +450,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textAlign: 'center',
     marginTop: 25,
+    marginBottom: Platform.OS === 'android' ? 20 : 10,
     lineHeight: 16,
   },
   /* Form Sheet styles */

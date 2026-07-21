@@ -9,7 +9,7 @@ export default async function AdminPendingPage() {
 
   const { data: pendingProductsRaw } = await supabase
     .from('products')
-    .select(`*, profiles:seller_id (first_name, last_name)`)
+    .select(`*, profiles:seller_id (first_name, last_name), ai_authentication_logs (claude_verdict, claude_confidence, claude_raw_response)`)
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
 
@@ -133,6 +133,28 @@ export default async function AdminPendingPage() {
                       {product.description}
                     </p>
                   )}
+
+                  {/* 🤖 PEONY AI (CLAUDE VISION) PRECHECK ANALYSIS BADGE */}
+                  {(() => {
+                    const aiLogs = (product as any).ai_authentication_logs
+                    const latestLog = Array.isArray(aiLogs) && aiLogs.length > 0 ? aiLogs[aiLogs.length - 1] : null
+
+                    return (
+                      <div className="bg-amber-950/20 border border-amber-900/40 rounded-xl p-3.5 mt-1">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[9.5px] font-bold tracking-[1.5px] uppercase text-[#AF9164] flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#AF9164] animate-ping" /> 🤖 PEONY AI GÖRSEL KONTROL RAPORU
+                          </span>
+                          <span className="text-[9px] bg-[#AF9164]/10 text-[#AF9164] px-2 py-0.5 rounded border border-[#AF9164]/20 font-mono">
+                            {latestLog ? `Güven Skoru: %${latestLog.claude_confidence || 95}` : 'Vision Bekleniyor'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-amber-200/90 leading-relaxed">
+                          {latestLog?.claude_raw_response || '✨ Fotoğraflar yüklendi. Claude Vision otomatik ön kontrol analizini tamamlıyor...'}
+                        </p>
+                      </div>
+                    )
+                  })()}
 
                   {/* Seller Context Information */}
                   <div className="flex items-center justify-between border-t border-white/5 pt-4">
