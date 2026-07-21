@@ -1,3 +1,11 @@
+/**
+ * @file App.tsx (Mobile)
+ * @description Peony Collective Mobil Uygulaması Ana Giriş ve Navigasyon Bileşeni.
+ * 
+ * Bu dosya mobil uygulamanın genel sekme navigasyonunu (Bottom Tab Navigator),
+ * oturum yönetimini, dil seçim modallarını ve ekranlar arası durum geçişlerini yönetir.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
@@ -750,14 +758,14 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.bg,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   mainContainer: {
     flex: 1,
   },
   header: {
     paddingHorizontal: 15,
-    paddingVertical: 12,
+    paddingTop: 6,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.card,
