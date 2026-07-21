@@ -538,11 +538,14 @@ export async function runClaudeVisionPrecheck(productId: string) {
       apiKey: process.env.ANTHROPIC_API_KEY,
     })
 
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.peony-collective.com'
+
     // Claude API'sine görselleri base64 formatında besle (Maksimum 5 fotoğraf)
     const imageBlocks = await Promise.all(
       imagesToAnalyze.slice(0, 5).map(async (url: string) => {
         try {
-          const res = await fetch(url)
+          const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : url
+          const res = await fetch(fullUrl)
           if (!res.ok) return null
           const arrayBuffer = await res.arrayBuffer()
           const buffer = Buffer.from(arrayBuffer)
@@ -655,10 +658,38 @@ export async function runClaudeVisionPrecheck(productId: string) {
     }
   } catch (error: any) {
     console.error("Claude Vision Precheck Error:", error)
-    throw new Error(`Claude Vision analizi başarısız: ${error.message}`)
+    
+    // Hata oluşsa dahi sayfayı çökertmemek için ai_authentication_logs tablosuna hata kaydı düş ve revalidate et
+    try {
+      await supabase
+        .from('ai_authentication_logs')
+        .insert({
+          product_id: productId,
+          brand: 'Bilinmiyor',
+          model_name: 'Bilinmiyor',
+          image_urls: [],
+          claude_verdict: 'suspicious',
+          claude_confidence: 0,
+          claude_raw_response: `⚠️ Claude Vision analizi gerçekleştirilemedi: ${error.message || 'Bilinmeyen sunucu hatası'}`
+        })
+      
+      revalidatePath('/admin/lab')
+      revalidatePath('/admin/pending')
+    } catch (dbErr) {
+      console.error("Failed to log vision analysis error:", dbErr)
+    }
+
+    return {
+      success: false,
+      error: error.message
+    }
   }
 }
 
 export async function triggerVisionAnalysisAction(productId: string) {
-  await runClaudeVisionPrecheck(productId)
+  try {
+    await runClaudeVisionPrecheck(productId)
+  } catch (err: any) {
+    console.error("triggerVisionAnalysisAction error:", err)
+  }
 }
