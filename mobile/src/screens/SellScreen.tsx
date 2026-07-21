@@ -23,7 +23,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { t } from '../lib/i18n';
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { decode } from 'base64-arraybuffer';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -387,7 +387,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         quality: 0.8,
         allowsEditing: true,
         aspect: [1, 1],
@@ -414,7 +414,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         quality: 0.8,
         allowsEditing: true,
         aspect: [1, 1],
