@@ -211,6 +211,13 @@ interface EntrupyAdminNotificationProps {
   sellerAddress: string
   productName: string
   productId?: string
+  productBrand?: string
+  productPrice?: number
+  productCategory?: string
+  productCondition?: string
+  aiAnalysisSummary?: string
+  aiVerdict?: string
+  aiConfidence?: number
 }
 
 export async function sendEntrupyRequestAdminEmail({
@@ -219,7 +226,14 @@ export async function sendEntrupyRequestAdminEmail({
   sellerPhone,
   sellerAddress,
   productName,
-  productId
+  productId,
+  productBrand,
+  productPrice,
+  productCategory,
+  productCondition,
+  aiAnalysisSummary,
+  aiVerdict,
+  aiConfidence
 }: EntrupyAdminNotificationProps) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('⚠️ RESEND_API_KEY tanımlı değil. Entrupy bildirimi simüle edildi:', { sellerName, productName })
@@ -227,19 +241,66 @@ export async function sendEntrupyRequestAdminEmail({
   }
 
   const emailHtml = `
-    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 650px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 30px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
-        <p style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #AF9164; margin-top: 6px; font-weight: bold;">ENTRUPY DOĞRULAMA TALEP BİLDİRİMİ</p>
+        <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 32px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
+        <p style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #AF9164; margin-top: 6px; font-weight: bold;">ENTRUPY FİZİKİ DOĞRULAMA TALEP BİLDİRİMİ</p>
       </div>
 
-      <div style="background-color: #FFFFFF; padding: 36px; border: 1px solid #E2E8F0; border-radius: 8px;">
+      <div style="background-color: #FFFFFF; padding: 36px; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
         <p style="font-size: 15px; line-height: 1.6; color: #2D3748; margin-bottom: 24px;">
-          Müşterilerimizden <strong>${sellerName}</strong>, <strong>${productName}</strong> ürünü Peony AI kontrolünden geçememiştir. Kendisi Entrupy fiziki doğrulaması talep etmektedir.
+          Müşterilerimizden <strong>${sellerName}</strong>, aşağıda detayları yer alan ürünü için Peony AI kontrolünü geçememiş ve <strong>Entrupy %99.6 mikroskobik fiziki doğrulama incelemesi</strong> talep etmiştir.
         </p>
 
-        <div style="background-color: #FAF7F2; border: 1px solid #E2D9CC; border-radius: 6px; padding: 20px; margin-top: 20px;">
-          <h4 style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; color: #AF9164; margin: 0 0 16px 0;">MÜŞTERİ İLETİŞİM VE TESLİMAT BİLGİLERİ</h4>
+        <!-- Ürün Detayları -->
+        <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+          <h4 style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; color: #1A1A1A; margin: 0 0 14px 0;">📦 İNCELEME İSTENEN ÜRÜN DETAYLARI</h4>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <tr style="border-bottom: 1px solid #EDF2F7;">
+              <td style="padding: 8px 0; color: #718096; width: 140px;">Marka & Model</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #1A1A1A;">${productBrand ? `${productBrand} ` : ''}${productName}</td>
+            </tr>
+            ${productPrice ? `
+            <tr style="border-bottom: 1px solid #EDF2F7;">
+              <td style="padding: 8px 0; color: #718096;">Satış Fiyatı</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #AF9164;">${productPrice.toLocaleString('tr-TR')} ₺</td>
+            </tr>
+            ` : ''}
+            ${productCategory ? `
+            <tr style="border-bottom: 1px solid #EDF2F7;">
+              <td style="padding: 8px 0; color: #718096;">Kategori / Durum</td>
+              <td style="padding: 8px 0; color: #2D3748;">${productCategory} • ${productCondition || ''}</td>
+            </tr>
+            ` : ''}
+            ${productId ? `
+            <tr>
+              <td style="padding: 8px 0; color: #718096;">Ürün ID</td>
+              <td style="padding: 8px 0; font-family: monospace; font-size: 11px; color: #4A5568;">${productId}</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+
+        <!-- AI Red Analiz Raporu -->
+        ${aiAnalysisSummary ? `
+        <div style="background-color: #FFF5F5; border: 1px solid #FEB2B2; border-left: 4px solid #E53E3E; border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+          <div style="margin-bottom: 10px;">
+            <h4 style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; color: #C53030; margin: 0 0 4px 0;">⚠️ PEONY AI NEDEDEN REDDETTİ? (ANALİZ RAPORU)</h4>
+            ${aiVerdict ? `
+            <span style="display: inline-block; font-size: 10px; font-weight: bold; padding: 2px 8px; background-color: #FED7D7; color: #9B2C2C; border-radius: 4px; margin-top: 4px;">
+              DURUM: ${aiVerdict.toUpperCase()} ${typeof aiConfidence === 'number' ? `(Orijinallik Skoru: %${aiConfidence})` : ''}
+            </span>
+            ` : ''}
+          </div>
+          <p style="font-size: 13px; line-height: 1.6; color: #2D3748; margin: 8px 0 0 0; white-space: pre-wrap;">
+            ${aiAnalysisSummary}
+          </p>
+        </div>
+        ` : ''}
+
+        <!-- Müşteri ve İletişim Bilgileri -->
+        <div style="background-color: #FAF7F2; border: 1px solid #E2D9CC; border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+          <h4 style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; color: #AF9164; margin: 0 0 14px 0;">👤 MÜŞTERİ İLETİŞİM VE TESLİMAT BİLGİLERİ</h4>
           
           <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
             <tr style="border-bottom: 1px solid #EAE2D5;">
@@ -254,20 +315,26 @@ export async function sendEntrupyRequestAdminEmail({
               <td style="padding: 10px 0; color: #718096;">Telefon Numarası</td>
               <td style="padding: 10px 0; font-weight: bold; color: #1A1A1A;"><a href="tel:${sellerPhone}" style="color: #AF9164; text-decoration: none;">${sellerPhone}</a></td>
             </tr>
-            <tr style="border-bottom: 1px solid #EAE2D5;">
+            <tr>
               <td style="padding: 10px 0; color: #718096;">Alım / Kurye Adresi</td>
               <td style="padding: 10px 0; font-weight: bold; color: #1A1A1A;">${sellerAddress}</td>
             </tr>
-            ${productId ? `
-            <tr>
-              <td style="padding: 10px 0; color: #718096;">Ürün Detayı</td>
-              <td style="padding: 10px 0; font-weight: bold; color: #1A1A1A;">${productName} (ID: ${productId})</td>
-            </tr>
-            ` : ''}
           </table>
         </div>
 
-        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #EDF2F7; font-size: 11.5px; color: #718096;">
+        <!-- Butonlar -->
+        <div style="text-align: center; padding-top: 16px; border-top: 1px solid #EDF2F7;">
+          ${productId ? `
+          <a href="https://peony-collective.com/admin/product/${productId}" style="display: inline-block; background-color: #AF9164; color: #FFFFFF; text-decoration: none; padding: 12px 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px; margin-right: 8px;">
+            Ürünü Admin Panelinde İncele →
+          </a>
+          ` : ''}
+          <a href="tel:${sellerPhone}" style="display: inline-block; background-color: #1A1A1A; color: #FFFFFF; text-decoration: none; padding: 12px 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px;">
+            Müşteriyi Ara 📞
+          </a>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #EDF2F7; font-size: 11.5px; color: #718096; text-align: center;">
           📍 <em>Kapıdan alma hizmetimiz olan <strong>Peony Courier</strong> (Özel sigortalı VIP kurye) sadece İstanbul içidir.</em>
         </div>
       </div>
