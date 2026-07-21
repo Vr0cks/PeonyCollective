@@ -25,6 +25,7 @@ import { t } from '../lib/i18n';
 
 import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width } = Dimensions.get('window');
 
