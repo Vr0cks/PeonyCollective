@@ -8,6 +8,7 @@ import { CartProvider } from "@/src/context/CartContext";
 import CartDrawer from "@/src/components/CartDrawer";
 import BottomTabBar from "@/src/components/BottomTabBar";
 import PwaInstallPrompt from "@/src/components/PwaInstallPrompt";
+import ScrollToTop from "@/src/components/ScrollToTop";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: '--font-playfair' });
@@ -133,6 +134,7 @@ export default function RootLayout({
           <ConciergeWidget />
           <BottomTabBar />
           <PwaInstallPrompt />
+          <ScrollToTop />
         </CartProvider>
       </body>
     </html>

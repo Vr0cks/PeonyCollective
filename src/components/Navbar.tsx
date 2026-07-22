@@ -29,7 +29,7 @@ export default async function Navbar() {
   }
 
   return (
-    <nav className="w-full bg-white/95 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+    <nav className="w-full bg-white/75 backdrop-blur-lg border-b border-gray-200/40 shadow-sm sticky top-0 z-50">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between relative">
         
         {/* Sol: Hamburger Mobil Menü ve Masaüstü Linkleri */}

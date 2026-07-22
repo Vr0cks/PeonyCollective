@@ -75,7 +75,7 @@ export default function Footer() {
               <img 
                 src="/logo.png" 
                 alt="Peony Collective Logo" 
-                className="h-10 sm:h-12 w-auto object-contain invert brightness-200" 
+                className="h-10 sm:h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity duration-300" 
               />
             </Link>
             <p className="text-xs uppercase tracking-[0.2em] text-[#AF9164] font-bold">Mirasın Yeni Sahibi</p>
