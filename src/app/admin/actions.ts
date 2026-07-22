@@ -519,7 +519,7 @@ export async function runClaudeVisionPrecheck(productId: string) {
   // 1. Ürün detaylarını ve fotoğraflarını çek
   const { data: product, error: prodErr } = await supabase
     .from('products')
-    .select('id, brand, model_name, public_images, authenticity_docs')
+    .select('id, brand, model_name, price, public_images, authenticity_docs')
     .eq('id', productId)
     .single()
 
