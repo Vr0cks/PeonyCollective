@@ -191,51 +191,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
 
   // Bags under 15k selector
   const bagsUnder15k = (products || []).filter(p => p.category === 'Çanta' && (p.price ?? 0) <= 15000)
-  const fallbackBags: Product[] = [
-    {
-      id: 'mock-bag-1',
-      seller_id: 'mock-seller',
-      gender: 'KADIN',
-      category: 'Çanta',
-      subcategory: 'El Çantası',
-      size: 'Medium',
-      brand: 'Prada',
-      model_name: 'Nylon Pochette',
-      description: 'Prada Nylon Pochette mock description',
-      price: 12500,
-      condition: 'Yeni Gibi',
-      material: 'Nylon',
-      dimensions: '20x15cm',
-      purchase_year: 2022,
-      serial_number: '123456',
-      public_images: ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=600'],
-      authenticity_docs: [],
-      status: 'approved',
-      created_at: new Date().toISOString()
-    },
-    {
-      id: 'mock-bag-2',
-      seller_id: 'mock-seller',
-      gender: 'KADIN',
-      category: 'Çanta',
-      subcategory: 'Omuz Çantası',
-      size: 'Small',
-      brand: 'Gucci',
-      model_name: 'Supreme Canvas Pouch',
-      description: 'Gucci Canvas Pouch mock description',
-      price: 14800,
-      condition: 'Çok İyi',
-      material: 'Canvas',
-      dimensions: '18x12cm',
-      purchase_year: 2021,
-      serial_number: '654321',
-      public_images: ['https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=600'],
-      authenticity_docs: [],
-      status: 'approved',
-      created_at: new Date().toISOString()
-    }
-  ]
-  const displayBagsUnder15k = bagsUnder15k.length > 0 ? bagsUnder15k : fallbackBags
+  const displayBagsUnder15k = bagsUnder15k
 
   return (
     <main className="relative overflow-hidden bg-[#F9F9F8]">
@@ -339,16 +295,18 @@ export default function HomeClient({ products, brands, brand, category, gender }
               >
                 Mevsimsel Seçki
               </button>
-              <button 
-                onClick={() => setCuratedTab('smart')}
-                className={`pb-4 text-xs tracking-widest uppercase sans-detail transition-all border-b-2 ${
-                  curatedTab === 'smart' 
-                    ? 'border-[#AF9164] text-black font-bold' 
-                    : 'border-transparent text-gray-400 hover:text-black'
-                }`}
-              >
-                Akıllı Lüks (15.000 ₺ Altı)
-              </button>
+              {bagsUnder15k.length > 0 && (
+                <button 
+                  onClick={() => setCuratedTab('smart')}
+                  className={`pb-4 text-xs tracking-widest uppercase sans-detail transition-all border-b-2 ${
+                    curatedTab === 'smart' 
+                      ? 'border-[#AF9164] text-black font-bold' 
+                      : 'border-transparent text-gray-400 hover:text-black'
+                  }`}
+                >
+                  Akıllı Lüks (15.000 ₺ Altı)
+                </button>
+              )}
             </div>
           </div>
 
