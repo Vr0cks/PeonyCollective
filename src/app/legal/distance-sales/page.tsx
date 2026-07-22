@@ -10,11 +10,12 @@ export default function DistanceSalesPage() {
         <h2>1. Taraflar</h2>
         <p>İşbu Sözleşme, aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde imzalanmıştır.</p>
         <p><strong>SATICI / ARACI HİZMET SAĞLAYICI:</strong><br />
-        Ünvanı: Peony Collective Moda ve Teknoloji A.Ş.<br />
-        Adresi: Harbiye Mah. Abdi İpekçi Cad. No: 12 Şişli / İstanbul<br />
-        E-posta: support@peonycollective.com<br />
-        Mersis No: 0729084729100001<br />
-        Vergi Dairesi / No: Şişli V.D. / 7290847291</p>
+        Ünvanı: Peony Collective<br />
+        Adresi: Mehmet Akif Mah. Şahinbey Cd. Hacı Tevfikoğulları İş Merkezi No:59, 34774 Çekmeköy / İstanbul<br />
+        Telefon: 0850 885 4110<br />
+        E-posta: info@peonycollective.com<br />
+        Mersis No: [Mersis No]<br />
+        Vergi Dairesi / No: [Vergi Dairesi] / [Vergi No]</p>
         
         <p><strong>ALICI:</strong><br />
         Sipariş verirken Platform'da belirtilen ad ve adres bilgileri esas alınır.</p>

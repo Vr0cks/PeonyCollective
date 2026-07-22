@@ -83,11 +83,10 @@ export default function Footer() {
               Yarım milyonluk bir yatırımı şansa bırakamazsınız. Peony Collective, her parçayı 32 noktalı fiziksel ekspertiz ve 3D Spektral Analizden geçirerek orijinalliğini garantiler.
             </p>
             <div className="text-[10px] text-zinc-500 font-light space-y-1 pt-4 border-t border-white/5">
-              <p className="font-bold text-zinc-400 uppercase tracking-wider mb-1">Peony Collective Moda ve Teknoloji A.Ş.</p>
-              <p>Adres: Harbiye Mah. Abdi İpekçi Cad. No: 12 Şişli / İstanbul</p>
-              <p>Mersis: 0729084729100001 | Vergi No: 7290847291 (Şişli V.D.)</p>
-              <p>KEP Adresi: peonycollective@hs01.kep.tr</p>
-              <p>E-posta: support@peonycollective.com</p>
+              <p className="font-bold text-zinc-400 uppercase tracking-wider mb-1">Peony Collective</p>
+              <p>Adres: Mehmet Akif Mah. Şahinbey Cd. Hacı Tevfikoğulları İş Merkezi No:59, 34774 Çekmeköy/İstanbul</p>
+              <p>Telefon: 0850 885 4110 | E-posta: info@peonycollective.com</p>
+              <p className="text-zinc-600">Mersis No: [Mersis No] | Vergi No: [Vergi No] ([Vergi Dairesi])</p>
             </div>
           </div>
 
