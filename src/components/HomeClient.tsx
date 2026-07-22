@@ -295,18 +295,16 @@ export default function HomeClient({ products, brands, brand, category, gender }
               >
                 Mevsimsel Seçki
               </button>
-              {bagsUnder15k.length > 0 && (
-                <button 
-                  onClick={() => setCuratedTab('smart')}
-                  className={`pb-4 text-xs tracking-widest uppercase sans-detail transition-all border-b-2 ${
-                    curatedTab === 'smart' 
-                      ? 'border-[#AF9164] text-black font-bold' 
-                      : 'border-transparent text-gray-400 hover:text-black'
-                  }`}
-                >
-                  Akıllı Lüks (15.000 ₺ Altı)
-                </button>
-              )}
+              <button 
+                onClick={() => setCuratedTab('smart')}
+                className={`pb-4 text-xs tracking-widest uppercase sans-detail transition-all border-b-2 ${
+                  curatedTab === 'smart' 
+                    ? 'border-[#AF9164] text-black font-bold' 
+                    : 'border-transparent text-gray-400 hover:text-black'
+                }`}
+              >
+                Akıllı Lüks (15.000 ₺ Altı)
+              </button>
             </div>
           </div>
 
@@ -384,24 +382,30 @@ export default function HomeClient({ products, brands, brand, category, gender }
               </div>
 
               <div className="lg:col-span-8 flex gap-6 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory">
-                {displayBagsUnder15k.slice(0, 3).map((bag) => (
-                  <div key={bag.id} className="group relative border border-gray-100 p-4 bg-white hover:shadow-xl transition-all duration-500 rounded-3xl w-[70vw] sm:w-[250px] shrink-0 snap-start">
-                    <Link href={`/product/${bag.id}`} className="block relative aspect-square w-full overflow-hidden bg-gray-50 rounded-2xl mb-4">
-                      <Image 
-                        src={bag.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=600'}
-                        alt={bag.brand}
-                        fill
-                        sizes="200px"
-                        className="object-cover group-hover:scale-105 transition-transform duration-[1.5s]"
-                      />
-                    </Link>
-                    <div className="text-center space-y-0.5">
-                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164]">{bag.brand}</p>
-                      <h4 className="text-xs serif-display italic text-gray-950 truncate">{bag.model_name}</h4>
-                      <p className="text-[11px] text-gray-500 font-light">{(bag.price ?? 0).toLocaleString('tr-TR')} ₺</p>
+                {displayBagsUnder15k.length > 0 ? (
+                  displayBagsUnder15k.slice(0, 3).map((bag) => (
+                    <div key={bag.id} className="group relative border border-gray-100 p-4 bg-white hover:shadow-xl transition-all duration-500 rounded-3xl w-[70vw] sm:w-[250px] shrink-0 snap-start">
+                      <Link href={`/product/${bag.id}`} className="block relative aspect-square w-full overflow-hidden bg-gray-50 rounded-2xl mb-4">
+                        <Image 
+                          src={bag.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=600'}
+                          alt={bag.brand}
+                          fill
+                          sizes="200px"
+                          className="object-cover group-hover:scale-105 transition-transform duration-[1.5s]"
+                        />
+                      </Link>
+                      <div className="text-center space-y-0.5">
+                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164]">{bag.brand}</p>
+                        <h4 className="text-xs serif-display italic text-gray-950 truncate">{bag.model_name}</h4>
+                        <p className="text-[11px] text-gray-500 font-light">{(bag.price ?? 0).toLocaleString('tr-TR')} ₺</p>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="w-full flex items-center justify-center py-12 text-gray-400 font-light text-sm italic">
+                    Bu seçki için henüz ürün bulunmamaktadır.
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}
