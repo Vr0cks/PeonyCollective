@@ -65,10 +65,10 @@ export default function Footer() {
 
       <div className="max-w-[1800px] mx-auto px-8">
         
-        {/* Üst Alan: 2 Kolonlu Grid (Linkler Temizlendi) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 pb-20 border-b border-white/10">
+        {/* Üst Alan: 3 Kolonlu Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-8 pb-20 border-b border-white/10">
           
-          {/* Kolon 1: Marka Tanıtımı */}
+          {/* Kolon 1: Marka Tanıtımı ve Şirket Bilgileri */}
           <div className="space-y-6">
             <Link href="/" className="block max-w-[200px] transition-all duration-300 hover:opacity-80">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -82,9 +82,44 @@ export default function Footer() {
             <p className="text-sm font-light leading-relaxed text-zinc-400 max-w-sm">
               Yarım milyonluk bir yatırımı şansa bırakamazsınız. Peony Collective, her parçayı 32 noktalı fiziksel ekspertiz ve 3D Spektral Analizden geçirerek orijinalliğini garantiler.
             </p>
+            <div className="text-[10px] text-zinc-500 font-light space-y-1 pt-4 border-t border-white/5">
+              <p className="font-bold text-zinc-400 uppercase tracking-wider mb-1">Peony Collective Moda ve Teknoloji A.Ş.</p>
+              <p>Adres: Harbiye Mah. Abdi İpekçi Cad. No: 12 Şişli / İstanbul</p>
+              <p>Mersis: 0729084729100001 | Vergi No: 7290847291 (Şişli V.D.)</p>
+              <p>KEP Adresi: peonycollective@hs01.kep.tr</p>
+              <p>E-posta: support@peonycollective.com</p>
+            </div>
           </div>
 
-          {/* Kolon 2: VIP Bülten Aboneliği */}
+          {/* Kolon 2: Hukuki & Yasal Metinler */}
+          <div className="space-y-6 lg:pl-12">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">Yasal Belgeler</h4>
+            <ul className="space-y-3 text-xs text-zinc-400 font-light">
+              <li>
+                <Link href="/legal/terms" className="hover:text-white transition-colors">Kullanım Koşulları</Link>
+              </li>
+              <li>
+                <Link href="/legal/privacy" className="hover:text-white transition-colors">Gizlilik Politikası</Link>
+              </li>
+              <li>
+                <Link href="/legal/kvkk" className="hover:text-white transition-colors">KVKK Aydınlatma Metni</Link>
+              </li>
+              <li>
+                <Link href="/legal/distance-sales" className="hover:text-white transition-colors">Mesafeli Satış Sözleşmesi</Link>
+              </li>
+              <li>
+                <Link href="/legal/pre-information" className="hover:text-white transition-colors">Ön Bilgilendirme Formu</Link>
+              </li>
+              <li>
+                <Link href="/legal/return-policy" className="hover:text-white transition-colors">İptal ve İade Koşulları</Link>
+              </li>
+              <li>
+                <Link href="/legal/delivery" className="hover:text-white transition-colors">Teslimat ve Kargo Politikası</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Kolon 3: VIP Bülten Aboneliği */}
           <div className="space-y-6 lg:pl-12">
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">Private List</h4>
             <p className="text-sm font-light text-zinc-400">
@@ -166,6 +201,15 @@ export default function Footer() {
                 <CheckCircle2 size={14} className="text-[#AF9164]" />
                 <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">VIP Sigortalı Teslimat</span>
               </div>
+            </div>
+            
+            {/* Ödeme Logoları */}
+            <div className="flex flex-wrap justify-center md:justify-end gap-2 items-center opacity-30 hover:opacity-60 transition-opacity duration-500 pt-2">
+              <span className="text-[8px] tracking-widest uppercase text-zinc-400 mr-1">GÜVENLİ ÖDEME:</span>
+              <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">PayTR</span>
+              <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">VISA</span>
+              <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">MASTERCARD</span>
+              <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">TROY</span>
             </div>
           </div>
 

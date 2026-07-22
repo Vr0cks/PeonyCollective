@@ -67,9 +67,15 @@ export default function CheckoutPage() {
   }
 
   const [paytrToken, setPaytrToken] = useState<string | null>(null)
+  const [acceptMss, setAcceptMss] = useState(false)
+  const [acceptKvkk, setAcceptKvkk] = useState(false)
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!acceptMss || !acceptKvkk) {
+      setCheckoutError('Lütfen ödeme yapabilmek için Mesafeli Satış Sözleşmesi, Ön Bilgilendirme Formu, Gizlilik Politikası ve KVKK aydınlatma metinlerini onaylayın.')
+      return
+    }
     setIsProcessing(true)
     setCheckoutError(null)
 
@@ -297,6 +303,34 @@ export default function CheckoutPage() {
                   <div className="flex justify-between items-center pt-4 border-t border-black">
                     <span className="font-bold">Ödenecek Tutar</span>
                     <span className="text-2xl serif-display">{cartTotal.toLocaleString('tr-TR')} ₺</span>
+                  </div>
+                </div>
+
+                {/* Yasal Onay Kutuları */}
+                <div className="mt-6 space-y-4 pt-6 border-t border-gray-100">
+                  <div className="flex items-start gap-3">
+                    <input 
+                      type="checkbox" 
+                      id="acceptMss" 
+                      checked={acceptMss}
+                      onChange={(e) => setAcceptMss(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 text-black border-gray-300 rounded focus:ring-black accent-black shrink-0"
+                    />
+                    <label htmlFor="acceptMss" className="text-xs text-gray-500 leading-normal cursor-pointer select-none">
+                      <Link href="/legal/distance-sales" target="_blank" className="underline hover:text-black font-medium">Mesafeli Satış Sözleşmesi</Link> ve <Link href="/legal/pre-information" target="_blank" className="underline hover:text-black font-medium">Ön Bilgilendirme Formu</Link>&apos;nu okudum, onaylıyorum.
+                    </label>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <input 
+                      type="checkbox" 
+                      id="acceptKvkk" 
+                      checked={acceptKvkk}
+                      onChange={(e) => setAcceptKvkk(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 text-black border-gray-300 rounded focus:ring-black accent-black shrink-0"
+                    />
+                    <label htmlFor="acceptKvkk" className="text-xs text-gray-500 leading-normal cursor-pointer select-none">
+                      <Link href="/legal/privacy" target="_blank" className="underline hover:text-black font-medium">Gizlilik Politikası</Link> ve <Link href="/legal/kvkk" target="_blank" className="underline hover:text-black font-medium">KVKK Aydınlatma Metni</Link> kapsamında verilerimin işlenmesini kabul ediyorum.
+                    </label>
                   </div>
                 </div>
 
