@@ -124,6 +124,8 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
         path: 'auth/callback',
       });
       
+      console.log("[Expo Go / OAuth Redirect URL]:", redirectUrl);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

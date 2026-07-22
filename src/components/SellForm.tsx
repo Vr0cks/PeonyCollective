@@ -1,3 +1,17 @@
+/**
+ * @file SellForm.tsx
+ * @description Peony Collective Lüks Ürün Satış/Konsinye Formu Bileşeni.
+ * 
+ * Bu bileşen kullanıcıların ve tedarikçilerin lüks ürün satışı veya konsinye talebi yapabilmesi için
+ * adım adım (Step-by-step) bir form sunar. 
+ * 
+ * Temel Bölümler ve İşlevler:
+ * 1. Kategori ve Ürün Detay Seçimi (Cinsiyet, Ana Kategori, Alt Kategori, Beden/Ebat)
+ * 2. Marka, Model ve Materyal Doğrulaması (Dinamik marka/model arama ve öneri yapısı)
+ * 3. Görsel ve Ekspertiz Belgelerinin Yüklenmesi (Fotoğraf ve Doğrulama Belgeleri)
+ * 4. Fiyat Teklifi ve Konsinye Şartları (Fiyatlandırma, Orijinallik Belgeleri)
+ */
+
 'use client'
 
 import { useState, useMemo, useEffect, useRef } from 'react'

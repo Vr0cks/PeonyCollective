@@ -1,3 +1,17 @@
+/**
+ * @file HomeClient.tsx
+ * @description Peony Collective İstemci Tarafı Ana Sayfa Bileşeni (Client-Side Master Page).
+ * 
+ * Bu bileşen ana sayfanın dinamik vitrinini, filtreleme mekanizmalarını, hero bölümünü ve
+ * ürün koleksiyon listelemesini yönetir.
+ * 
+ * Temel Modüller:
+ * 1. Hero Vitrini (Marka hikayesi ve ana eylem butonları)
+ * 2. Kategori Kartları Grid'i (Çanta, Kıyafet, Ayakkabı, Aksesuar yönlendirmeleri)
+ * 3. Dinamik Ürün Filtreleme & Arama (Cinsiyet, Kategori, Fiyat Sıralama, Marka Filtreleri)
+ * 4. Konsinye/Satış Pop-up Girişi ve VIP Hizmet Tanıtımları
+ */
+
 'use client'
 
 import { motion } from 'framer-motion'

@@ -26,6 +26,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from './src/lib/supabase';
 import { t, locale } from './src/lib/i18n';
+import { BASE_API_URL } from './src/lib/config';
 
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -117,7 +118,7 @@ export default function App() {
     // USE_BACKEND_API değerini true yaparak API'yi aktif edebilirsin.
     // Set to true to use real Claude Haiku AI Backend
     const USE_BACKEND_API = true;
-    const BACKEND_API_URL = 'http://192.168.1.82:3000/api/muse';
+    const BACKEND_API_URL = `${BASE_API_URL}/api/muse`;
 
     if (USE_BACKEND_API) {
       try {

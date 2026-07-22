@@ -122,9 +122,9 @@ export async function POST(request: Request) {
       }
     `
 
-    // Claude API'ye istek at (Hızlı 250 token kısıtlı Sonnet 4.5)
+    // Claude API'ye istek at (Hızlı 250 token kısıtlı Sonnet 3.5)
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
+      model: 'claude-3-5-sonnet-latest',
       max_tokens: 250,
       system: systemPrompt,
       messages: [

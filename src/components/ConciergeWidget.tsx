@@ -27,6 +27,7 @@ export default function ConciergeWidget() {
 
   // Peony Muse Chatbot States
   const [museInput, setMuseInput] = useState('')
+  const [museLoading, setMuseLoading] = useState(false)
   const [museMessages, setMuseMessages] = useState<Array<{
     id: string
     sender: 'user' | 'muse'
@@ -46,47 +47,66 @@ export default function ConciergeWidget() {
     }
   ])
 
-  const handleSendMuseMessage = () => {
-    if (!museInput.trim()) return
+  const handleSendMuseMessage = async () => {
+    if (!museInput.trim() || museLoading) return
     const text = museInput.trim()
     const msgId = Date.now().toString()
     setMuseMessages(prev => [...prev, { id: msgId, sender: 'user', text }])
     setMuseInput('')
+    setMuseLoading(true)
 
-    setTimeout(() => {
-      let reply = ''
-      let recs: any[] = []
-      const query = text.toLowerCase()
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
 
-      if (query.includes('tekne') || query.includes('yat') || query.includes('deniz') || query.includes('yacht') || query.includes('plaj') || query.includes('beach') || query.includes('bodrum') || query.includes('çeşme')) {
-        reply = 'Harika bir yaz planı! Deniz havası ve yat davetlerinin o rahat ama göz alıcı şıklığı için Loewe\'nin hasır detaylı ikonik el çantasını ve gün ışığında parlayacak Rolex altın saatini öneriyorum.'
-        recs = [
-          { id: 'loewe-tote', brand: 'LOEWE', model_name: 'Basket Raffia Bag Medium', price: 24500, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
-          { id: 'rolex-sub', brand: 'ROLEX', model_name: 'Submariner Date Gold', price: 685000, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300' }
-        ]
-      } else if (query.includes('akşam') || query.includes('yemek') || query.includes('davet') || query.includes('düğün') || query.includes('gece') || query.includes('party') || query.includes('dinner')) {
-        reply = 'Şık bir gece daveti! Gecenin tüm bakışlarını üzerinizde toplamak için siyah deri Chanel Flap bag ve altın detaylı Cartier kolyeyi öneriyorum. Bu klasik şıklık asla modası geçmeyen bir yatırımdır.'
-        recs = [
-          { id: 'chanel-flap', brand: 'CHANEL', model_name: 'Classic Double Flap Black', price: 345000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
-          { id: 'cartier-love', brand: 'CARTIER', model_name: 'Love Necklace Gold', price: 92000, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300' }
-        ]
+      const response = await fetch('/api/muse', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token || ''}`
+        },
+        body: JSON.stringify({
+          message: text,
+          locale: 'tr'
+        })
+      })
+
+      const data = await response.json()
+      
+      if (!response.ok) {
+        const errMsg = data.error || 'Bir hata oluştu.'
+        setMuseMessages(prev => [
+          ...prev,
+          {
+            id: `muse-err-${Date.now()}`,
+            sender: 'muse',
+            text: `⚠️ ${errMsg}`
+          }
+        ])
       } else {
-        reply = 'Her ortama uyum sağlayacak "Quiet Luxury" (Sessiz Lüks) stilini öneriyorum. Logolar yerine mükemmel dikişleri ve deri kalitesini öne çıkaran Bottega Veneta örgü deri çanta ve Loro Piana keten şıklığı bugün harika duracaktır.'
-        recs = [
-          { id: 'bottega-cassette', brand: 'BOTTEGA VENETA', model_name: 'Padded Cassette Bag', price: 145000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' }
-        ]
+        setMuseMessages(prev => [
+          ...prev,
+          {
+            id: `muse-${Date.now()}`,
+            sender: 'muse',
+            text: data.text || '',
+            products: data.products || []
+          }
+        ])
       }
-
+    } catch (err: any) {
+      console.error('Muse API error:', err)
       setMuseMessages(prev => [
         ...prev,
         {
-          id: `muse-${Date.now()}`,
+          id: `muse-err-${Date.now()}`,
           sender: 'muse',
-          text: reply,
-          products: recs
+          text: `⚠️ Bağlantı hatası oluştu: ${err.message || 'Sunucuya erişilemiyor.'}`
         }
       ])
-    }, 800)
+    } finally {
+      setMuseLoading(false)
+    }
   }
 
   const handleCheckStatus = async () => {
@@ -561,23 +581,33 @@ export default function ConciergeWidget() {
                         </div>
                       )
                     })}
+                    {museLoading && (
+                      <div className="flex flex-col items-start">
+                        <div className="bg-zinc-900 text-zinc-400 border border-zinc-800 rounded-xl rounded-tl-none p-2.5 flex items-center gap-2">
+                          <Loader2 className="w-3 h-3 animate-spin text-[#AF9164]" />
+                          <span>Muse yanıt hazırlıyor...</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Input area */}
                   <div className="pt-2 border-t border-zinc-800 flex gap-2 items-center">
                     <input 
                       type="text" 
-                      placeholder="Bugün nereye gidiyorsunuz?" 
+                      placeholder={museLoading ? "Lütfen bekleyin..." : "Bugün nereye gidiyorsunuz?"} 
                       value={museInput}
+                      disabled={museLoading}
                       onChange={(e) => setMuseInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendMuseMessage()}
-                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-[10px] text-white placeholder-zinc-500 focus:outline-none focus:border-[#AF9164] transition-all"
+                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-[10px] text-white placeholder-zinc-500 focus:outline-none focus:border-[#AF9164] transition-all disabled:opacity-50"
                     />
                     <button 
                       onClick={handleSendMuseMessage}
-                      className="text-[9px] font-bold text-[#AF9164] tracking-widest uppercase px-2 py-1.5 cursor-pointer hover:text-white transition-colors"
+                      disabled={museLoading}
+                      className="text-[9px] font-bold text-[#AF9164] tracking-widest uppercase px-2 py-1.5 cursor-pointer hover:text-white transition-colors disabled:opacity-50"
                     >
-                      SOR
+                      {museLoading ? '...' : 'SOR'}
                     </button>
                   </div>
 

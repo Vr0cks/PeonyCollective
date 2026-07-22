@@ -1,3 +1,11 @@
+/**
+ * @file HomeScreen.tsx
+ * @description Peony Collective Mobil Uygulaması Ana Ekranı.
+ * 
+ * Bu ekran kullanıcılara öne çıkan koleksiyonları, kategorileri, VIP vitrinini ve
+ * kişiselleştirilmiş ürün arama/filtreleme arayüzünü sunar.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
@@ -44,7 +52,8 @@ const COLORS = {
   border: '#E8E8E6', // Thin luxury dividers
   accent: '#10B981', // Emerald green
   bannerBg: '#E9EFEA', // Soft green
-  conciergeBg: '#F3ECE0' // Warm luxury beige for weather/location concierge
+  conciergeBg: '#F3ECE0', // Warm luxury beige for weather/location concierge
+  darkBar: '#1A1A1A', // Dark bar background
 };
 
 interface Product {
@@ -1240,7 +1249,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   lockOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     height: 120,
     backgroundColor: 'rgba(18, 19, 26, 0.65)',
     justifyContent: 'center',

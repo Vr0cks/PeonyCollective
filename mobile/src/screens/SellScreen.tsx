@@ -22,6 +22,7 @@ import {
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { t } from '../lib/i18n';
+import { BASE_API_URL } from '../lib/config';
 
 import * as FileSystem from 'expo-file-system/legacy';
 import { decode } from 'base64-arraybuffer';
@@ -376,7 +377,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
     if (!brand || !name) return;
     setLoadingEstimate(true);
     try {
-      const res = await fetch('https://www.peony-collective.com/api/price-estimate', {
+      const res = await fetch(`${BASE_API_URL}/api/price-estimate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -629,7 +630,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
 
       // Trigger Peony AI precheck asynchronously
       try {
-        fetch('https://peony-collective.com/api/vision-precheck', {
+        fetch(`${BASE_API_URL}/api/vision-precheck`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ productId: product.id })

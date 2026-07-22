@@ -40,6 +40,5 @@
     "node_modules",
     "scripts",
     "mobile"
-  ],
-  "extends": "expo/tsconfig.base"
+  ]
 }
