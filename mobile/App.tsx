@@ -27,6 +27,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from './src/lib/supabase';
 import { t, locale } from './src/lib/i18n';
 import { BASE_API_URL } from './src/lib/config';
+import Constants from 'expo-constants';
 
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -314,45 +315,58 @@ export default function App() {
     });
 
     // --- EXPO PUSH NOTIFICATIONS REGISTRATION ---
-    registerForPushNotificationsAsync().then(token => {
-      if (token && session?.user) {
-        savePushTokenToSupabase(session.user.id, token);
-      }
-    });
+    if (Constants.appOwnership !== 'expo') {
+      registerForPushNotificationsAsync().then(token => {
+        if (token && session?.user) {
+          savePushTokenToSupabase(session.user.id, token);
+        }
+      });
+    } else {
+      console.log('Skipping push notifications registration in Expo Go.');
+    }
   }, [session]);
 
   async function registerForPushNotificationsAsync() {
-    let token;
-    if (Platform.OS === 'android') {
-      const Notifications = require('expo-notifications');
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#AF9164',
-      });
-    }
+    try {
+      let token;
+      if (Platform.OS === 'android') {
+        const Notifications = require('expo-notifications');
+        if (Notifications && typeof Notifications.setNotificationChannelAsync === 'function') {
+          await Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#AF9164',
+          });
+        }
+      }
 
-    const Device = require('expo-device');
-    if (Device.isDevice) {
-      const Notifications = require('expo-notifications');
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
+      const Device = require('expo-device');
+      if (Device.isDevice) {
+        const Notifications = require('expo-notifications');
+        if (Notifications && typeof Notifications.getPermissionsAsync === 'function') {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+          }
+          if (finalStatus !== 'granted') {
+            console.log('Failed to get push token for push notification!');
+            return;
+          }
+          token = (await Notifications.getExpoPushTokenAsync({
+            projectId: 'peony-collective-project-id' // Placeholder Project ID matching Expo credentials
+          })).data;
+        }
+      } else {
+        console.log('Must use physical device for Push Notifications');
       }
-      if (finalStatus !== 'granted') {
-        console.log('Failed to get push token for push notification!');
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync({
-        projectId: 'peony-collective-project-id' // Placeholder Project ID matching Expo credentials
-      })).data;
-    } else {
-      console.log('Must use physical device for Push Notifications');
+      return token;
+    } catch (err) {
+      console.warn('Push notification registration is not supported in this environment (e.g. Expo Go SDK 53+):', err);
+      return undefined;
     }
-    return token;
   }
 
   async function savePushTokenToSupabase(userId: string, token: string) {

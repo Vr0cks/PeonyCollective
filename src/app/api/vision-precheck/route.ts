@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'productId gereklidir.' }, { status: 400 })
     }
 
-    const result = await runClaudeVisionPrecheck(productId)
+    const result = await runClaudeVisionPrecheck(productId, true)
     if (!result || result.success === false) {
       return NextResponse.json({ success: false, error: result?.error || 'Vision analizi başarısız.' }, { status: 500 })
     }

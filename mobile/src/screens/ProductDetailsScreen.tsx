@@ -33,6 +33,7 @@ interface Product {
   brand: string;
   price: number;
   image_urls?: string[];
+  public_images?: string[];
   entrupy_status: string;
   description?: string;
   material?: string;

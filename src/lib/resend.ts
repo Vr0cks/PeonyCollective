@@ -689,3 +689,102 @@ export async function sendEntrupyAppointmentEmail({
     return { success: false, error }
   }
 }
+
+interface EntrupyResultEmailProps {
+  sellerEmail: string;
+  sellerName: string;
+  productName: string;
+  certificateUrl?: string | null;
+}
+
+export async function sendEntrupyApprovedEmail({
+  sellerEmail,
+  sellerName,
+  productName,
+  certificateUrl
+}: EntrupyResultEmailProps) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('⚠️ RESEND_API_KEY tanımlı değil. Entrupy onay e-postası simüle edildi:', { sellerEmail, productName });
+    return { success: true, simulated: true };
+  }
+
+  const emailHtml = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 34px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
+        <p style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #AF9164; margin-top: 6px; font-weight: bold;">ENTRUPY AI VERIFICATION APPROVED</p>
+      </div>
+      <div style="background-color: #FFFFFF; padding: 40px; border: 1px solid #E2E8F0; border-radius: 8px;">
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Sayın ${sellerName},</p>
+        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #2D3748;">
+          Tebrikler! <strong>${productName}</strong> ürününüz için Entrupy mikroskobik doğrulama süreci tamamlanmış ve ürününüzün <strong>ORİJİNAL</strong> olduğu tescillenmiştir.
+        </p>
+        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 24px; color: #2D3748;">
+          Ürününüz an itibariyle vitrinimizde listelenmiş ve satışa sunulmuştur.
+        </p>
+        ${certificateUrl ? `
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${certificateUrl}" style="display: inline-block; background-color: #AF9164; color: #FFFFFF; text-decoration: none; padding: 14px 28px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px;">
+            DİJİTAL SERTİFİKAYI GÖRÜNTÜLE ✦
+          </a>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  try {
+    const data = await resend.emails.send({
+      from: 'Peony Verification <verification@peony-collective.com>',
+      to: [sellerEmail],
+      subject: `Ürününüz Orijinallik Onayı Aldı! 🎉 (${productName})`,
+      html: emailHtml,
+    });
+    return { success: true, data };
+  } catch (error) {
+    console.error('Entrupy approved email sending failed:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendEntrupyRejectedEmail({
+  sellerEmail,
+  sellerName,
+  productName
+}: EntrupyResultEmailProps) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('⚠️ RESEND_API_KEY tanımlı değil. Entrupy red e-postası simüle edildi:', { sellerEmail, productName });
+    return { success: true, simulated: true };
+  }
+
+  const emailHtml = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 40px 20px; background-color: #F7F7F7; color: #1A1A1A;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: normal; font-size: 34px; letter-spacing: 2px; margin: 0; color: #1A1A1A;">Peony Collective</h1>
+        <p style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #E53E3E; margin-top: 6px; font-weight: bold;">ENTRUPY AI VERIFICATION REJECTED</p>
+      </div>
+      <div style="background-color: #FFFFFF; padding: 40px; border: 1px solid #E2E8F0; border-radius: 8px;">
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Sayın ${sellerName},</p>
+        <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #2D3748;">
+          <strong>${productName}</strong> ürününüz için Entrupy mikroskobik doğrulama süreci tamamlanmıştır. Yapılan detaylı analizler sonucunda ürününüz maalesef orijinallik onayını <strong>geçememiştir</strong>.
+        </p>
+        <p style="font-size: 15px; line-height: 1.6; color: #4A5568;">
+          Ürününüzün listelemesi durdurulmuş olup, detaylı bilgilendirme ve teslimat süreci için ekibimiz sizinle iletişime geçecektir.
+        </p>
+      </div>
+    </div>
+  `;
+
+  try {
+    const data = await resend.emails.send({
+      from: 'Peony Verification <verification@peony-collective.com>',
+      to: [sellerEmail],
+      subject: `Ürününüz Orijinallik Kontrolünü Geçemedi (${productName})`,
+      html: emailHtml,
+    });
+    return { success: true, data };
+  } catch (error) {
+    console.error('Entrupy rejected email sending failed:', error);
+    return { success: false, error };
+  }
+}

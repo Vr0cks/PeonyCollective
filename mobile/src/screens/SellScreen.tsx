@@ -18,11 +18,15 @@ import {
   KeyboardAvoidingView, 
   Platform,
   Image,
-  Dimensions
+  Dimensions,
+  Modal,
+  SafeAreaView
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { t } from '../lib/i18n';
 import { BASE_API_URL } from '../lib/config';
+import Constants from 'expo-constants';
+import ReactNativeEntrupy from '../../modules/react-native-entrupy/src/ReactNativeEntrupyModule';
 
 import * as FileSystem from 'expo-file-system/legacy';
 import { decode } from 'base64-arraybuffer';
@@ -343,6 +347,17 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0); // 0: Landing, 1: Category Select, 2: Info Form, 3: Photo Grid, 4: Preview, 5: Loading, 6: Success
 
+  // UUID generator for product and Entrupy mapping
+  const [productId] = useState(() => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  });
+
+  const [entrupyStatusState, setEntrupyStatusState] = useState<'idle' | 'scanning' | 'completed' | 'failed'>('idle');
+
   // Form States
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('bags');
   const [brand, setBrand] = useState('');
@@ -362,6 +377,15 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   
   // Active Camera Slot for Simulation Modal
   const [activeSlotKey, setActiveSlotKey] = useState<string | null>(null);
+  
+  // Custom Entrupy Guided Scanner Simulation States
+  const [entrupyScannerVisible, setEntrupyScannerVisible] = useState(false);
+  const [scannerSlotKey, setScannerSlotKey] = useState<string | null>(null);
+  const [scannerState, setScannerState] = useState<'aligning' | 'capturing' | 'success'>('aligning');
+
+  // Photo Guide States
+  const [showGuide, setShowGuide] = useState(false);
+  const [activeGuideSlotKey, setActiveGuideSlotKey] = useState<string | null>(null);
 
   // Price Estimation Widget State
   const [priceEstimate, setPriceEstimate] = useState<{
@@ -410,6 +434,8 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   }
 
   // Real Camera & Gallery Picker Launchers
+  // NOT: Bu fonksiyon sadece BİZİM kameramızla fotoğraf çeker (Supabase'e yüklenecek).
+  // Entrupy SDK'sı ayrıca Submit sonrasında açılır — karıştırmayın.
   async function handleLaunchCamera(slotKey: string) {
     try {
       const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -418,40 +444,23 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         return;
       }
 
-      console.log('✦ Initiating Entrupy Camera SDK & Peony double-trigger sync.');
-
-      // Stage 1: Trigger Peony Shadow burst-shot camera capture
+      // Expo ImagePicker ile fotoğraf çek (kendi kameramız)
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
-        quality: 0.8,
-        allowsEditing: true,
-        aspect: [1, 1],
+        quality: 0.85,
+        allowsEditing: false,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const capturedUri = result.assets[0].uri;
-        
-        // Save copy to local state immediately
+        console.log('✦ Fotoğraf çekildi:', capturedUri);
         setCapturedPhotos(prev => ({
           ...prev,
           [slotKey]: capturedUri
         }));
-
-        // Stage 2 (Cache directory hook backup simulation):
-        // Automatically check device cache directories for newest files created by third-party SDKs
-        try {
-          const cacheDir = FileSystem.cacheDirectory;
-          if (cacheDir) {
-            const files = await FileSystem.readDirectoryAsync(cacheDir);
-            // Search for recently modified image paths to secure raw backups
-            const latestImageFiles = files.filter(f => f.endsWith('.jpg') || f.endsWith('.png'));
-            console.log('✦ Entrupy Cache Auditor verified latest images:', latestImageFiles.length);
-          }
-        } catch (cacheErr) {
-          console.log('Silent cache audit check:', cacheErr);
-        }
       }
     } catch (err: any) {
+      console.error('Kamera hatası:', err);
       alert(isEn ? 'Camera Error: ' + err.message : 'Kamera hatası: ' + err.message);
     }
   }
@@ -535,49 +544,58 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   const missingRequiredSlots = currentCategory.slots.filter(s => s.required && !capturedPhotos[s.key]);
   const isPhotoStepValid = missingRequiredSlots.length === 0;
 
-  // Helper function to upload local device image URI to Supabase Storage via Base64
+  // Helper function to upload local device image URI to Supabase Storage via FormData
   async function uploadImageToSupabase(fileUri: string): Promise<string> {
-    // If image is already an HTTP/HTTPS URL, return as is
-    if (fileUri.startsWith('http://') || fileUri.startsWith('https://')) {
-      return fileUri;
+    if (!fileUri || fileUri.startsWith('http://') || fileUri.startsWith('https://')) {
+      return fileUri || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500';
     }
 
-    try {
-      const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
-      const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
-      const filePath = `products/${fileName}`;
+    const uploadTask = async () => {
+      try {
+        const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
+        const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+        const filePath = `products/${fileName}`;
 
-      // Read local file as Base64 string using expo-file-system
-      const base64Data = await FileSystem.readAsStringAsync(fileUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+        // React Native'de FormData ile native uri yüklemek en kararlı yöntemdir (Base64 belleğe yüklenmez)
+        const formData = new FormData();
+        formData.append('file', {
+          uri: fileUri,
+          name: fileName,
+          type: mimeType,
+        } as any);
 
-      // Convert Base64 string to ArrayBuffer for Supabase Storage
-      const arrayBuffer = decode(base64Data);
+        const { data, error } = await supabase.storage
+          .from('product-images')
+          .upload(filePath, formData, {
+            contentType: mimeType,
+            upsert: true
+          });
 
-      const { data, error } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, arrayBuffer, {
-          contentType: mimeType,
-          upsert: true
-        });
+        if (error) {
+          console.error('Supabase storage upload error:', error.message);
+          return fileUri;
+        }
 
-      if (error) {
-        console.error('Supabase storage upload error:', error.message);
+        const { data: publicUrlData } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
+        return publicUrlData?.publicUrl || fileUri;
+      } catch (err) {
+        console.error('Failed to upload image to Supabase:', err);
         return fileUri;
       }
+    };
 
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      return publicUrlData.publicUrl;
-    } catch (err) {
-      console.error('Failed to convert local image for Supabase:', err);
-      return fileUri;
-    }
+    // 8 saniyelik timeout: Yükleme takılırsa uygulamanın sonsuz spinner'da kalmasını engeller
+    return Promise.race([
+      uploadTask(),
+      new Promise<string>((resolve) => setTimeout(() => {
+        console.warn('[Storage Timeout] Upload timed out for image:', fileUri);
+        resolve(fileUri);
+      }, 8000))
+    ]);
   }
 
   async function handleSubmitProduct() {
@@ -590,7 +608,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
 
       const localPhotos = Object.values(capturedPhotos).filter(Boolean);
 
-      // Convert all local phone URIs to public Supabase Storage HTTPS URLs concurrently
+      // Convert all local phone URIs to public Supabase Storage HTTPS URLs concurrently (with 8s timeout per image)
       const uploadedImagesList = await Promise.all(
         localPhotos.map(uri => uploadImageToSupabase(uri))
       );
@@ -606,34 +624,44 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         inclusions.length > 0 ? `[Aksesuarlar: ${inclusions.join(', ')}]` : ''
       ].filter(Boolean).join('\n\n');
 
-      const { data: product, error } = await supabase
-        .from('products')
-        .insert({
-          model_name: name,
-          brand,
-          price: parseFloat(price),
-          description: fullDescription || 'Peony VIP Ekspertiz Talebi',
-          material: material || 'Deri',
-          condition: condition,
-          gender: 'unisex',
-          category: currentCategory.dbCategory,
-          subcategory: currentCategory.nameTr,
-          seller_id: user.id,
-          status: 'pending',
-          entrupy_status: 'pending',
-          public_images: uploadedImagesList.length > 0 ? uploadedImagesList : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500']
-        })
-        .select()
-        .single();
+      // Database insert task with 10s timeout wrapper
+      const insertTask = async () => {
+        const { error } = await supabase
+          .from('products')
+          .insert({
+            id: productId, // Önceden atanmış UUID
+            model_name: name,
+            brand,
+            price: parseFloat(price),
+            description: fullDescription || 'Peony VIP Ekspertiz Talebi',
+            material: material || 'Deri',
+            condition: condition,
+            gender: 'unisex',
+            category: currentCategory.dbCategory,
+            subcategory: currentCategory.nameTr,
+            seller_id: user.id,
+            status: 'pending',
+            entrupy_status: entrupyStatusState === 'completed' ? 'pending' : 'not_started',
+            public_images: uploadedImagesList.length > 0 ? uploadedImagesList : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500']
+          });
 
-      if (error) throw error;
+        if (error) throw error;
+        return true;
+      };
 
-      // Trigger Peony AI precheck asynchronously
+      const insertSuccess = await Promise.race([
+        insertTask(),
+        new Promise<boolean>((_, reject) => setTimeout(() => reject(new Error('Veritabanı bağlantı zaman aşımı. Lütfen tekrar deneyin.')), 10000))
+      ]);
+
+      if (!insertSuccess) throw new Error('Veritabanı kaydı başarısız oldu.');
+
+      // Trigger Peony AI precheck asynchronously (non-blocking)
       try {
         fetch(`${BASE_API_URL}/api/vision-precheck`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId: product.id })
+          body: JSON.stringify({ productId })
         }).catch(err => console.log('Peony AI vision precheck async trigger:', err));
       } catch (e) {
         // silent catch
@@ -641,8 +669,88 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
 
       setStep(6); // Success
     } catch (error: any) {
+      console.error('handleSubmitProduct error:', error);
       alert(isEn ? 'Upload Error: ' + error.message : 'Yükleme hatası: ' + error.message);
-      setStep(2);
+      setStep(4); // Return to review step so user can try again
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleEntrupyCapture() {
+    setLoading(true);
+    setEntrupyStatusState('scanning');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (!user) throw new Error(isEn ? 'Please log in to continue.' : 'Oturum bulunamadı. Lütfen giriş yapın.');
+      const token = session?.access_token;
+
+      // 1. Generate local Entrupy SDK Auth Request
+      const sdkAuthReq = ReactNativeEntrupy.generateSDKAuthorizationRequest();
+      if (!sdkAuthReq) {
+        throw new Error(isEn ? 'Failed to generate Entrupy SDK Auth request.' : 'Entrupy SDK Auth isteği oluşturulamadı.');
+      }
+
+      // 2. Fetch Signed Authorization payload from backend proxy with Bearer token
+      const authRes = await fetch(`${BASE_API_URL}/api/entrupy/authorize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          sdk_authorization_request: sdkAuthReq,
+          unique_user_id: user.id,
+          email: user.email,
+        })
+      });
+
+      const contentType = authRes.headers.get('content-type') || '';
+      if (!authRes.ok || !contentType.includes('application/json')) {
+        const rawText = await authRes.text().catch(() => '');
+        console.error('[Entrupy Auth Error] Response status:', authRes.status, 'Content-Type:', contentType, 'Body:', rawText.slice(0, 300));
+        throw new Error(isEn 
+          ? `Backend /api/entrupy/authorize endpoint returned non-JSON response (${authRes.status}). Please check Vercel backend deployment.` 
+          : `Backend sunucusundaki /api/entrupy/authorize endpoint'i henüz canlıya (Vercel) deploy edilmemiş (HTML döndürdü). Lütfen backend değişikliklerini Vercel'e push edin.`
+        );
+      }
+
+      const authData = await authRes.json();
+      const signedRequest = authData.signed_authorization_request;
+      if (!signedRequest) {
+        throw new Error(isEn ? 'Backend did not return signed_authorization_request.' : 'Backend imzalı authorization döndürmedi.');
+      }
+
+      // 3. Login user into Entrupy SDK locally
+      const loginSuccess = await ReactNativeEntrupy.loginUser(signedRequest);
+      if (!loginSuccess) {
+        throw new Error(isEn ? 'Failed to log in to Entrupy SDK.' : 'Entrupy SDK oturumu açılamadı.');
+      }
+
+      // loading state'i kapat — Entrupy kendi UI'ını açacak
+      setLoading(false);
+
+      // 4. Rehberli kamera akışını başlat (item_type küçük harf olmalı)
+      const brandLower = (brand || 'gucci').toLowerCase();
+      const captureStarted = await ReactNativeEntrupy.startCapture(brandLower, 'handbag', productId);
+      if (!captureStarted) {
+        throw new Error(isEn ? 'Entrupy Capture Flow could not be launched.' : 'Entrupy tarama ekranı başlatılamadı.');
+      }
+
+      console.log('✦ Entrupy Capture Flow başlatıldı (SDK kendi UI\'nı yönetir).');
+      setEntrupyStatusState('completed');
+      alert(isEn
+        ? 'Entrupy scanning started. Please follow the instructions on the screen.'
+        : 'Entrupy taraması başlatıldı. Lütfen ekrandaki adımları takip edin.'
+      );
+    } catch (err: any) {
+      console.error('Entrupy capture error:', err);
+      setEntrupyStatusState('failed');
+      alert(isEn 
+        ? 'Entrupy authentication failed: ' + err.message 
+        : 'Entrupy doğrulama hatası: ' + err.message
+      );
     } finally {
       setLoading(false);
     }
@@ -1047,6 +1155,33 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             })}
           </View>
 
+          {selectedCategoryId === 'bags' && isPhotoStepValid && (
+            <TouchableOpacity 
+              style={[
+                styles.primaryBtn, 
+                { 
+                  backgroundColor: entrupyStatusState === 'completed' ? '#2e7d32' : '#AF9164', 
+                  marginBottom: 10,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }
+              ]} 
+              onPress={handleEntrupyCapture}
+              disabled={loading || entrupyStatusState === 'scanning'}
+            >
+              {entrupyStatusState === 'scanning' && (
+                <ActivityIndicator color="white" style={{ marginRight: 8 }} />
+              )}
+              <Text style={styles.primaryBtnText}>
+                {entrupyStatusState === 'idle' && (isEn ? '⚡ START ENTRUPY SCANNING' : '⚡ ENTRUPY DOĞRULAMASINI BAŞLAT')}
+                {entrupyStatusState === 'scanning' && (isEn ? 'Scanning with Entrupy...' : 'Entrupy ile Taranıyor...')}
+                {entrupyStatusState === 'completed' && (isEn ? '✓ ENTRUPY SCAN COMPLETED' : '✓ ENTRUPY TARAMASI TAMAMLANDI')}
+                {entrupyStatusState === 'failed' && (isEn ? '⚠️ ENTRUPY FAILED - RETRY' : '⚠️ ENTRUPY BAŞARISIZ - YENİDEN DENE')}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity 
             style={[styles.primaryBtn, !isPhotoStepValid && styles.primaryBtnDisabled]} 
             onPress={() => setStep(4)}
@@ -1099,6 +1234,22 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               <Text style={styles.reviewLabel}>{isEn ? 'Photos Attached:' : 'Yüklenen Fotoğraf:'}</Text>
               <Text style={styles.reviewValue}>{Object.keys(capturedPhotos).length} {isEn ? 'Photos' : 'Adet'}</Text>
             </View>
+
+            {selectedCategoryId === 'bags' && (
+              <View style={styles.reviewRow}>
+                <Text style={styles.reviewLabel}>{isEn ? 'Entrupy Status:' : 'Entrupy Durumu:'}</Text>
+                <Text 
+                  style={[
+                    styles.reviewValue, 
+                    { color: entrupyStatusState === 'completed' ? '#2e7d32' : '#d32f2f', fontWeight: 'bold' }
+                  ]}
+                >
+                  {entrupyStatusState === 'completed' 
+                    ? (isEn ? '✓ Verified' : '✓ Doğrulama Yapıldı') 
+                    : (isEn ? '⚠️ Not Verified' : '⚠️ Doğrulama Yapılmadı')}
+                </Text>
+              </View>
+            )}
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 15 }}>
               {Object.values(capturedPhotos).map((img, idx) => (
@@ -1188,6 +1339,168 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
           </View>
         </View>
       )}
+
+      {/* CUSTOM SIMULATED ENTRUPY GUIDED SCANNER MODAL */}
+      <Modal visible={entrupyScannerVisible} animationType="fade" transparent={false}>
+        <SafeAreaView style={styles.scannerModalContainer}>
+          {/* Header */}
+          <View style={styles.scannerModalHeader}>
+            <TouchableOpacity 
+              onPress={() => setEntrupyScannerVisible(false)} 
+              style={styles.scannerCancelBtn}
+              disabled={scannerState !== 'aligning'}
+            >
+              <Text style={styles.scannerCancelText}>{isEn ? 'Cancel' : 'İptal'}</Text>
+            </TouchableOpacity>
+            <Text style={styles.scannerHeaderTitle}>ENTRUPY DETAILED SCANNER</Text>
+            <View style={{ width: 50 }} />
+          </View>
+
+          {/* Viewfinder Area */}
+          <View style={styles.scannerViewfinder}>
+            {/* Guide overlay in background */}
+            {scannerSlotKey && (() => {
+              const activeSlot = currentCategory.slots.find(s => s.key === scannerSlotKey);
+              if (!activeSlot) return null;
+              
+              // Resolve guide image source — explicit type cast for TS overload resolution
+              const imgSource = typeof activeSlot.guideImg === 'string' 
+                ? { uri: activeSlot.guideImg as string }
+                : (activeSlot.guideImg as any);
+
+              return (
+                <View style={styles.scannerOverlayContainer}>
+                  {/* Backdrop Camera Simulation */}
+                  <Image 
+                    source={imgSource} 
+                    style={[
+                      styles.scannerLiveBg,
+                      scannerState === 'capturing' && { opacity: 0.3 }
+                    ]} 
+                  />
+                  
+                  {/* Guided Target Area (Only visible when aligning) */}
+                  {scannerState === 'aligning' && (
+                    <View style={styles.scannerTargetBox}>
+                      <View style={styles.scannerCornerTL} />
+                      <View style={styles.scannerCornerTR} />
+                      <View style={styles.scannerCornerBL} />
+                      <View style={styles.scannerCornerBR} />
+                      <View style={styles.scannerPulseCircle} />
+                      <Text style={styles.scannerGuidePrompt}>
+                        {isEn ? activeSlot.labelEn : activeSlot.labelTr}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Status Overlay */}
+                  <View style={styles.scannerStatusOverlay}>
+                    {scannerState === 'aligning' && (
+                      <View style={styles.scannerStatusBadge}>
+                        <Text style={styles.scannerStatusDot} />
+                        <Text style={styles.scannerStatusText}>
+                          {isEn ? 'WAITING FOR ALIGNMENT [95%]' : 'HİZALAMA BEKLENİYOR [%95]'}
+                        </Text>
+                      </View>
+                    )}
+                    {scannerState === 'capturing' && (
+                      <View style={[styles.scannerStatusBadge, { backgroundColor: COLORS.primary }]}>
+                        <ActivityIndicator size="small" color="#FFFFFF" style={{ marginRight: 6 }} />
+                        <Text style={styles.scannerStatusText}>
+                          {isEn ? 'RUNNING SPECTRAL SCAN...' : 'SPEKTRAL TARAMA YAPILIYOR...'}
+                        </Text>
+                      </View>
+                    )}
+                    {scannerState === 'success' && (
+                      <View style={[styles.scannerStatusBadge, { backgroundColor: COLORS.accent }]}>
+                        <Text style={styles.scannerStatusText}>✓ {isEn ? 'CAPTURE COMPLETE' : 'FOTOĞRAF YÜKLENDİ'}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              );
+            })()}
+
+            {/* Flash Effect overlay (for feedback) */}
+            {scannerState === 'capturing' && (
+              <View style={styles.scannerFlashOverlay} />
+            )}
+          </View>
+
+          {/* Bottom Control Bar */}
+          <View style={styles.scannerControls}>
+            {scannerSlotKey && (() => {
+              const activeSlot = currentCategory.slots.find(s => s.key === scannerSlotKey);
+              if (!activeSlot) return null;
+              return (
+                <Text style={styles.scannerInstructions}>
+                  {isEn ? activeSlot.guideEn : activeSlot.guideTr}
+                </Text>
+              );
+            })()}
+
+            {scannerState === 'aligning' && (
+              <TouchableOpacity 
+                style={styles.scannerShutterBtn}
+                onPress={() => {
+                  setScannerState('capturing');
+                  // Trigger simulated capture timeline
+                  setTimeout(() => {
+                    setScannerState('success');
+                    
+                    // Save mock image to slot
+                    const lookupKey = `${selectedCategoryId}_${scannerSlotKey}`;
+                    const demoImages: { [key: string]: string } = {
+                      bags_front: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
+                      bags_back: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600',
+                      bags_base: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600',
+                      bags_logo: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
+                      bags_zipper: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600',
+                      watches_dial: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/4_dial_front.png',
+                      watches_caseback: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png',
+                      watches_clasp: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/2_clasp.png',
+                      watches_side: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/1_crown_side.png',
+                      jewelry_overall: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600',
+                      jewelry_hallmark: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600',
+                      jewelry_clasp: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600',
+                      shoes_sole: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600',
+                      shoes_side: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600',
+                      shoes_insole: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600',
+                      clothing_front: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600',
+                      clothing_necktag: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600',
+                      clothing_washtag: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600',
+                      accessories_front: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600',
+                      accessories_code: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600',
+                      accessories_case: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
+                    };
+
+                    const uri = demoImages[lookupKey] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600';
+                    setCapturedPhotos(prev => ({
+                      ...prev,
+                      [scannerSlotKey!]: uri
+                    }));
+
+                    setTimeout(() => {
+                      setEntrupyScannerVisible(false);
+                      setScannerSlotKey(null);
+                    }, 1200);
+                  }, 1500);
+                }}
+              >
+                <View style={styles.scannerShutterInner} />
+              </TouchableOpacity>
+            )}
+
+            {scannerState === 'capturing' && (
+              <Text style={styles.scannerStatusSub}>{isEn ? 'DO NOT MOVE DEVICE' : 'LÜTFEN CİHAZI HAREKET ETTİRMEYİN'}</Text>
+            )}
+
+            {scannerState === 'success' && (
+              <Text style={[styles.scannerStatusSub, { color: COLORS.accent }]}>{isEn ? 'SAVED TO SLOT' : 'FOTOĞRAF GÜVENLİ ŞEKİLDE KANDEDİLDİ'}</Text>
+            )}
+          </View>
+        </SafeAreaView>
+      </Modal>
 
       {/* STEP 5: UPLOADING LOADING */}
       {step === 5 && (
@@ -2045,5 +2358,216 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 1,
+  },
+  entrupyContainer: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  entrupyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  entrupyDescription: {
+    fontSize: 14,
+    color: COLORS.textMuted,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  scannerModalContainer: {
+    flex: 1,
+    backgroundColor: '#090A0F',
+  },
+  scannerModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: '#1F222B',
+    backgroundColor: '#12131A',
+  },
+  scannerCancelBtn: {
+    padding: 8,
+  },
+  scannerCancelText: {
+    color: '#EF4444',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  scannerHeaderTitle: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  scannerViewfinder: {
+    flex: 1,
+    backgroundColor: '#000',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  scannerOverlayContainer: {
+    flex: 1,
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scannerLiveBg: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    position: 'absolute',
+    opacity: 0.85,
+  },
+  scannerTargetBox: {
+    width: 250,
+    height: 250,
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scannerCornerTL: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 25,
+    height: 25,
+    borderTopWidth: 4,
+    borderLeftWidth: 4,
+    borderColor: '#AF9164',
+  },
+  scannerCornerTR: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 25,
+    height: 25,
+    borderTopWidth: 4,
+    borderRightWidth: 4,
+    borderColor: '#AF9164',
+  },
+  scannerCornerBL: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: 25,
+    height: 25,
+    borderBottomWidth: 4,
+    borderLeftWidth: 4,
+    borderColor: '#AF9164',
+  },
+  scannerCornerBR: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 25,
+    height: 25,
+    borderBottomWidth: 4,
+    borderRightWidth: 4,
+    borderColor: '#AF9164',
+  },
+  scannerPulseCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: 'rgba(175, 145, 100, 0.4)',
+    backgroundColor: 'rgba(175, 145, 100, 0.1)',
+  },
+  scannerGuidePrompt: {
+    position: 'absolute',
+    bottom: -40,
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    textAlign: 'center',
+    overflow: 'hidden',
+  },
+  scannerStatusOverlay: {
+    position: 'absolute',
+    top: 20,
+    alignSelf: 'center',
+  },
+  scannerStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(18, 19, 26, 0.85)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  scannerStatusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#AF9164',
+    marginRight: 8,
+  },
+  scannerStatusText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  scannerFlashOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: '#FFFFFF',
+    opacity: 0.9,
+    zIndex: 99,
+  },
+  scannerControls: {
+    backgroundColor: '#12131A',
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scannerInstructions: {
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 11,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 16,
+    height: 32,
+  },
+  scannerShutterBtn: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  scannerShutterInner: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#AF9164',
+  },
+  scannerStatusSub: {
+    color: 'rgba(255, 255, 255, 0.4)',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginTop: 5,
   }
 });

@@ -23,6 +23,7 @@ export const locale = getDeviceLanguage();
 const translations = {
   tr: {
     // Login Screen
+    defaultMemberName: 'Peony Üyesi',
     loginAlertAllFields: 'Lütfen tüm alanları doldurun.',
     signUpSuccess: 'Kayıt başarılı! Giriş yapabilirsiniz.',
     authError: 'Hata: ',
@@ -252,6 +253,7 @@ const translations = {
   },
   en: {
     // Login Screen
+    defaultMemberName: 'Peony Member',
     loginAlertAllFields: 'Please fill in all fields.',
     signUpSuccess: 'Registration successful! You can now log in.',
     authError: 'Error: ',

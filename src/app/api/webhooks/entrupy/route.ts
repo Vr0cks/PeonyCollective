@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createAdminClient } from '@/src/utils/supabase/admin';
+import { sendEntrupyApprovedEmail, sendEntrupyRejectedEmail } from '@/src/lib/resend';
 
 const WEBHOOK_SECRET = process.env.ENTRUPY_WEBHOOK_SECRET;
 
@@ -109,6 +110,39 @@ export async function POST(req: Request) {
             metadata: { error: String(error), customerItemId, payload }
           });
           continue;
+        }
+
+        // Kullanıcıya onay/red e-postası gönder
+        try {
+          const { data: productData } = await supabase
+            .from('products')
+            .select('brand, model_name, seller_id, profiles(email, first_name, last_name)')
+            .eq('id', customerItemId)
+            .maybeSingle();
+
+          if (productData && productData.profiles) {
+            const profile = productData.profiles as any;
+            const sellerEmail = profile.email;
+            const sellerName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || 'Değerli Üyemiz';
+            const fullProductName = `${productData.brand} ${productData.model_name}`;
+
+            if (status === 'verified') {
+              await sendEntrupyApprovedEmail({
+                sellerEmail,
+                sellerName,
+                productName: fullProductName,
+                certificateUrl
+              });
+            } else if (status === 'rejected') {
+              await sendEntrupyRejectedEmail({
+                sellerEmail,
+                sellerName,
+                productName: fullProductName
+              });
+            }
+          }
+        } catch (emailErr) {
+          console.error('[ENTRUPY WEBHOOK] E-posta gönderme hatası:', emailErr);
         }
 
         // Sipariş durumunu güncelle

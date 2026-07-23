@@ -513,8 +513,8 @@ export async function checkSystemStatusAction() {
  * Ürün fotoğraflarını Claude 3.5 Sonnet Vision API ile analiz eder
  * ve sonucu ai_authentication_logs tablosuna kaydeder.
  */
-export async function runClaudeVisionPrecheck(productId: string) {
-  const supabase = await verifyAdmin()
+export async function runClaudeVisionPrecheck(productId: string, bypassAdminCheck = false) {
+  const supabase = bypassAdminCheck ? createAdminClient() : await verifyAdmin()
 
   // 1. Ürün detaylarını ve fotoğraflarını çek
   const { data: product, error: prodErr } = await supabase

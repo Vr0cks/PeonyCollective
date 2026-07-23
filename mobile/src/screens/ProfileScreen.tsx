@@ -40,6 +40,7 @@ interface ProfileScreenProps {
   onEnterOperations: () => void;
 }
 
+export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileScreenProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Dynamic Theme Colors Mapper

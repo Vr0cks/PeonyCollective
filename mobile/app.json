@@ -27,7 +27,8 @@
     "plugins": [
       "expo-secure-store",
       "expo-web-browser",
-      "expo-status-bar"
+      "expo-status-bar",
+      "./plugins/withEntrupyMaven.js"
     ],
     "extra": {
       "eas": {
