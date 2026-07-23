@@ -641,7 +641,11 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             subcategory: currentCategory.nameTr,
             seller_id: user.id,
             status: 'pending',
-            entrupy_status: entrupyStatusState === 'completed' ? 'pending' : 'not_started',
+            // entrupy_status: sadece geçerli DB değerleri (pending/analyzing/verified/rejected)
+            // 'not_started' CHECK constraint'ini ihlal eder — NULL bırakmak güvenli
+            entrupy_status: entrupyStatusState === 'completed' ? 'pending' : null,
+            // authenticity_docs NOT NULL — boş dizi göndermek zorunlu
+            authenticity_docs: [],
             public_images: uploadedImagesList.length > 0 ? uploadedImagesList : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500']
           });
 
