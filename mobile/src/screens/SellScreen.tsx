@@ -731,9 +731,10 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
       // loading state'i kapat — Entrupy kendi UI'ını açacak
       setLoading(false);
 
-      // 4. Rehberli kamera akışını başlat (item_type küçük harf olmalı)
+      // 4. Rehberli kamera akışını başlat (Entrupy çanta için 'bags' kategorisini bekler)
       const brandLower = (brand || 'gucci').toLowerCase();
-      const captureStarted = await ReactNativeEntrupy.startCapture(brandLower, 'handbag', productId);
+      const itemType = selectedCategoryId === 'bags' ? 'bags' : selectedCategoryId;
+      const captureStarted = await ReactNativeEntrupy.startCapture(brandLower, itemType, productId);
       if (!captureStarted) {
         throw new Error(isEn ? 'Entrupy Capture Flow could not be launched.' : 'Entrupy tarama ekranı başlatılamadı.');
       }
