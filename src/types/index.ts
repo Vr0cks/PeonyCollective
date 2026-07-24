@@ -59,7 +59,7 @@ export interface Product {
   locked_until?: string | null;
   locked_by?: string | null;
   is_peony_vip?: boolean | null;
-  entrupy_status?: 'pending' | 'analyzing' | 'verified' | 'rejected' | null;
+  entrupy_status?: 'pending' | 'analyzing' | 'verified' | 'unverified' | 'completed' | 'rejected' | null;
   entrupy_certificate_url?: string | null;
   supplier?: string | null;
   supplier_id?: string | null;
