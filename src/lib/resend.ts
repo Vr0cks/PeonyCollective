@@ -77,7 +77,7 @@ export async function sendOrderConfirmationEmail({
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Concierge <concierge@peony-collective.com>', // Doğrulanmış domain olmalı
+      from: 'Peony Concierge <onboarding@resend.dev>', // Doğrulanmış domain olmalı
       to: [buyerEmail],
       subject: `Peony Sipariş Onayı: ${productName}`,
       html: emailHtml,
@@ -238,7 +238,7 @@ export async function sendProductStatusEmail({
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Concierge <concierge@peony-collective.com>',
+      from: 'Peony Concierge <onboarding@resend.dev>',
       to: [sellerEmail],
       subject: `Peony Lab Bildirimi: ${title} (${fullProductName})`,
       html: emailHtml,
@@ -390,7 +390,7 @@ export async function sendEntrupyRequestAdminEmail({
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Concierge <concierge@peony-collective.com>',
+      from: 'Peony Concierge <onboarding@resend.dev>',
       to: ['info@peonycollective.com'],
       subject: `Entrupy Doğrulama Talebi: ${sellerName} - ${productName}`,
       html: emailHtml,
@@ -448,7 +448,7 @@ export async function sendNewOfferEmail({
   `;
 
   return resend.emails.send({
-    from: 'Peony VIP <vip@peony-collective.com>',
+    from: 'Peony Concierge <onboarding@resend.dev>',
     to: [sellerEmail],
     subject: `Peony VIP Teklif: ${productName} için yeni teklifiniz var!`,
     html: emailHtml,
@@ -500,7 +500,7 @@ export async function sendOfferUpdateEmail({
   `;
 
   return resend.emails.send({
-    from: 'Peony VIP <vip@peony-collective.com>',
+    from: 'Peony Concierge <onboarding@resend.dev>',
     to: [buyerEmail],
     subject: `Peony VIP Kararı: ${title}`,
     html: emailHtml,
@@ -539,7 +539,7 @@ export async function sendProductSoldEmail({
   `;
 
   return resend.emails.send({
-    from: 'Peony Hub <hub@peony-collective.com>',
+    from: 'Peony Concierge <onboarding@resend.dev>',
     to: [sellerEmail],
     subject: `Tebrikler, Ürününüz Satıldı! 🎉 (${productName})`,
     html: emailHtml,
@@ -588,7 +588,7 @@ export async function sendPasswordResetEmail({ userEmail, resetLink }: PasswordR
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Security <security@peony-collective.com>',
+      from: 'Peony Concierge <onboarding@resend.dev>',
       to: [userEmail],
       subject: 'Peony Collective — Şifre Yenileme Bağlantısı',
       html: emailHtml,
@@ -677,7 +677,7 @@ export async function sendEntrupyAppointmentEmail({
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Concierge <concierge@peony-collective.com>',
+      from: 'Peony Concierge <onboarding@resend.dev>',
       to: ['info@peonycollective.com'],
       subject: `[Entrupy VIP Randevusu] ${customerName} — ${productName || 'Lüks Çanta'}`,
       html: emailHtml,
@@ -735,7 +735,7 @@ export async function sendEntrupyApprovedEmail({
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Verification <verification@peony-collective.com>',
+      from: 'Peony Concierge <onboarding@resend.dev>',
       to: [sellerEmail],
       subject: `Ürününüz Orijinallik Onayı Aldı! 🎉 (${productName})`,
       html: emailHtml,
@@ -777,7 +777,7 @@ export async function sendEntrupyRejectedEmail({
 
   try {
     const data = await resend.emails.send({
-      from: 'Peony Verification <verification@peony-collective.com>',
+      from: 'Peony Concierge <onboarding@resend.dev>',
       to: [sellerEmail],
       subject: `Ürününüz Orijinallik Kontrolünü Geçemedi (${productName})`,
       html: emailHtml,

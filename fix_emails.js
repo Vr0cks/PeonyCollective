@@ -1,0 +1,1 @@
+const fs = require('fs'); let content = fs.readFileSync('src/lib/resend.ts', 'utf8'); content = content.replace(/from:\s*'[^']+'/g, 'from: \'Peony Concierge <onboarding@resend.dev>\''); fs.writeFileSync('src/lib/resend.ts', content);
