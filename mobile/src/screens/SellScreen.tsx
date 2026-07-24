@@ -1282,7 +1282,6 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
                     : (isEn ? '⚠️ Not Scanned' : '⚠️ Cihazla Taranmadı')}
                 </Text>
               </View>
-            )}
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 15 }}>
               {Object.values(capturedPhotos).map((img, idx) => (
