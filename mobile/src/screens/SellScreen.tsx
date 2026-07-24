@@ -1275,12 +1275,12 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
                 <Text 
                   style={[
                     styles.reviewValue, 
-                    { color: entrupyStatusState === 'completed' ? '#2e7d32' : '#d32f2f', fontWeight: 'bold' }
+                    { color: entrupyStatusState === 'completed' ? '#d97706' : '#9ca3af', fontWeight: 'bold' }
                   ]}
                 >
                   {entrupyStatusState === 'completed' 
-                    ? (isEn ? '✓ Verified' : '✓ Doğrulama Yapıldı') 
-                    : (isEn ? '⚠️ Not Verified' : '⚠️ Doğrulama Yapılmadı')}
+                    ? (isEn ? '⏳ Pending Result' : '⏳ Sonuç Bekleniyor') 
+                    : (isEn ? '⚠️ Not Scanned' : '⚠️ Cihazla Taranmadı')}
                 </Text>
               </View>
             )}

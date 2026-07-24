@@ -178,15 +178,32 @@ export default function HomeScreen({
 
   async function fetchProducts() {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProducts(data || []);
+      const dbResponse = await new Promise<any[]>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `${process.env.EXPO_PUBLIC_SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`);
+        xhr.setRequestHeader('apikey', process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string);
+        xhr.setRequestHeader('Authorization', `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`);
+        xhr.timeout = 15000;
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch (e) {
+              reject(e);
+            }
+          } else {
+            reject(new Error(`Status ${xhr.status}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('XHR error'));
+        xhr.ontimeout = () => reject(new Error('XHR timeout'));
+        xhr.send();
+      });
+      setProducts(dbResponse || []);
     } catch (e: any) {
-      console.error(e.message);
+      console.error('[HomeScreen] fetchProducts error:', e.message);
+      // Fallback in case XHR fails, just set empty array so it doesn't spin forever
+      setProducts([]);
     } finally {
       setLoading(false);
     }
