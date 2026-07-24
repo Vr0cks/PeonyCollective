@@ -1189,7 +1189,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             })}
           </View>
 
-          {selectedCategoryId === 'bags' && isPhotoStepValid && (
+          {(selectedCategoryId === 'bags' || selectedCategoryId === 'watches') && isPhotoStepValid && (
             <TouchableOpacity 
               style={[
                 styles.primaryBtn, 
@@ -1269,7 +1269,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               <Text style={styles.reviewValue}>{Object.keys(capturedPhotos).length} {isEn ? 'Photos' : 'Adet'}</Text>
             </View>
 
-            {selectedCategoryId === 'bags' && (
+            {(selectedCategoryId === 'bags' || selectedCategoryId === 'watches') && (
               <View style={styles.reviewRow}>
                 <Text style={styles.reviewLabel}>{isEn ? 'Entrupy Status:' : 'Entrupy Durumu:'}</Text>
                 <Text 
