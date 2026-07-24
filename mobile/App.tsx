@@ -25,10 +25,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User } from '@supabase/supabase-js';
-import { customFetch } from './src/lib/customFetch';
 
-// Override global fetch with our robust XHR polyfill to fix Expo Dev Client network hang
-global.fetch = customFetch as any;
+
 
 import { supabase } from './src/lib/supabase';
 import { t, locale } from './src/lib/i18n';
