@@ -1210,7 +1210,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               <Text style={styles.primaryBtnText}>
                 {entrupyStatusState === 'idle' && (isEn ? '⚡ START ENTRUPY SCANNING' : '⚡ ENTRUPY DOĞRULAMASINI BAŞLAT')}
                 {entrupyStatusState === 'scanning' && (isEn ? 'Scanning with Entrupy...' : 'Entrupy ile Taranıyor...')}
-                {entrupyStatusState === 'completed' && (isEn ? '✓ ENTRUPY SCAN COMPLETED' : '✓ ENTRUPY TARAMASI TAMAMLANDI')}
+                {entrupyStatusState === 'completed' && (isEn ? '✓ SCAN COMPLETED (TAP TO RETRY)' : '✓ TARAMA TAMAMLANDI (TEKRAR TARA)')}
                 {entrupyStatusState === 'failed' && (isEn ? '⚠️ ENTRUPY FAILED - RETRY' : '⚠️ ENTRUPY BAŞARISIZ - YENİDEN DENE')}
               </Text>
             </TouchableOpacity>
@@ -1574,6 +1574,22 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
           </TouchableOpacity>
         </View>
       )}
+
+      {/* FULL SCREEN LOADING OVERLAY TO ENGAGE USER DURING UPLOAD */}
+      {loading && step === 4 && (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(251, 251, 250, 0.95)', justifyContent: 'center', alignItems: 'center', zIndex: 999 }]}>
+          <ActivityIndicator size="large" color={COLORS.primary} style={{ transform: [{ scale: 1.5 }] }} />
+          <Text style={{ marginTop: 30, fontSize: 18, fontWeight: 'bold', color: COLORS.primary }}>
+            {isEn ? 'Processing your item...' : 'Ürününüz işleniyor...'}
+          </Text>
+          <Text style={{ marginTop: 10, fontSize: 14, color: COLORS.textMuted, textAlign: 'center', paddingHorizontal: 40 }}>
+            {isEn 
+              ? 'Uploading high-resolution photos and triggering Peony AI Visual Engine. This may take a few moments.' 
+              : 'Yüksek çözünürlüklü fotoğraflarınız yükleniyor ve Peony AI Görsel Motoru tetikleniyor. Lütfen bekleyin.'}
+          </Text>
+        </View>
+      )}
+
     </KeyboardAvoidingView>
   );
 }
