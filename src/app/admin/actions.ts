@@ -10,6 +10,7 @@ export async function updateProductStatus(
   reason?: string | FormData
 ) {
   const supabase = await createClient()
+  const adminSupabase = createAdminClient()
 
   // 1. İşlemi yapan kişi gerçekten Admin mi? (Güvenlik Kontrolü)
   const { data: { user } } = await supabase.auth.getUser()
@@ -26,18 +27,19 @@ export async function updateProductStatus(
   }
 
   // 1.5. Bildirim gönderebilmek için ürün detaylarını al
-  const { data: product } = await supabase
+  const { data: product, error: selectError } = await adminSupabase
     .from('products')
-    .select('seller_id, brand, model_name, price, category, ai_confidence')
+    .select('seller_id, brand, model_name, price, category')
     .eq('id', productId)
     .single()
 
-  if (!product) {
+  if (selectError || !product) {
+    console.error("Ürün bulma hatası:", selectError?.message)
     throw new Error("Ürün bulunamadı.")
   }
 
   // 2. Ürünün durumunu veritabanında güncelle
-  const { error } = await supabase
+  const { error } = await adminSupabase
     .from('products')
     .update({ status: newStatus })
     .eq('id', productId)
@@ -63,7 +65,7 @@ export async function updateProductStatus(
     ? `Tebrikler! ${product.brand} ${product.model_name} ürününüz uzmanlarımız tarafından onaylandı ve satışa sunuldu.`
     : `Maalesef ${product.brand} ${product.model_name} ürününüz kriterlerimize uymadığı için reddedildi.${actualReason ? ` Red gerekçesi: ${actualReason}` : ''}`
 
-  await supabase.from('notifications').insert({
+  await adminSupabase.from('notifications').insert({
     user_id: product.seller_id,
     type: newStatus === 'approved' ? 'product_approved' : 'product_rejected',
     title: notificationTitle,

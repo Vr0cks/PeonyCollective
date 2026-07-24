@@ -26,7 +26,22 @@ import { supabase } from '../lib/supabase';
 import { t } from '../lib/i18n';
 import { BASE_API_URL } from '../lib/config';
 import Constants from 'expo-constants';
-import ReactNativeEntrupy from '../../modules/react-native-entrupy/src/ReactNativeEntrupyModule';
+// Expo Go'da native modül yüklenemez — try/catch ile güvenli mock kullanılır
+let ReactNativeEntrupy: {
+  generateSDKAuthorizationRequest: () => string | null;
+  loginUser: (signedRequest: string) => Promise<boolean>;
+  startCapture: (brand: string, itemType: string, productId: string) => Promise<boolean>;
+} = {
+  generateSDKAuthorizationRequest: () => null,
+  loginUser: async () => false,
+  startCapture: async () => false,
+};
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  ReactNativeEntrupy = require('../../modules/react-native-entrupy/src/ReactNativeEntrupyModule').default;
+} catch (_e) {
+  console.warn('[SellScreen] ReactNativeEntrupy native module not available (Expo Go). Entrupy scanning will be skipped.');
+}
 
 import * as FileSystem from 'expo-file-system/legacy';
 import { decode } from 'base64-arraybuffer';
@@ -544,138 +559,152 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   const missingRequiredSlots = currentCategory.slots.filter(s => s.required && !capturedPhotos[s.key]);
   const isPhotoStepValid = missingRequiredSlots.length === 0;
 
-  // Helper function to upload local device image URI to Supabase Storage via FormData
-  async function uploadImageToSupabase(fileUri: string): Promise<string> {
+  // Fotoğrafı Supabase Storage'a yükle
+  // FileSystem.uploadAsync — native HTTP, JS SDK'nın iç fetch'ini bypass eder
+  // Expo Go + dev build'de güvenilir çalışır
+  const SUPABASE_PROJECT_URL = 'https://nnfjkauqghteqhbiqbzl.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZmprYXVxZ2h0ZXFoYmlxYnpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMDgwMTgsImV4cCI6MjA5MjY4NDAxOH0.EqEX3lIdCOZjyFFlS00BQOsAX-nBThlsj9kp00y2c8c';
+
+  async function uploadImageToSupabase(fileUri: string, sessionToken?: string): Promise<string> {
+    const PLACEHOLDER = 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500';
+
     if (!fileUri || fileUri.startsWith('http://') || fileUri.startsWith('https://')) {
-      return fileUri || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500';
+      return fileUri || PLACEHOLDER;
     }
 
-    const uploadTask = async () => {
-      try {
-        const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
-        const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
-        const filePath = `products/${fileName}`;
+    try {
+      const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
+      const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      const filePath = `products/${fileName}`;
+      const uploadUrl = `${SUPABASE_PROJECT_URL}/storage/v1/object/product-images/${filePath}`;
 
-        // React Native'de FormData ile native uri yüklemek en kararlı yöntemdir (Base64 belleğe yüklenmez)
-        const formData = new FormData();
-        formData.append('file', {
-          uri: fileUri,
-          name: fileName,
-          type: mimeType,
-        } as any);
+      console.log('[Upload] FileSystem.uploadAsync başlatılıyor...');
+      const result = await FileSystem.uploadAsync(uploadUrl, fileUri, {
+        httpMethod: 'POST',
+        uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+        headers: {
+          'Authorization': `Bearer ${sessionToken || SUPABASE_ANON_KEY}`,
+          'Content-Type': mimeType,
+          'x-upsert': 'true',
+        },
+      });
 
-        const { data, error } = await supabase.storage
-          .from('product-images')
-          .upload(filePath, formData, {
-            contentType: mimeType,
-            upsert: true
-          });
-
-        if (error) {
-          console.error('Supabase storage upload error:', error.message);
-          return fileUri;
-        }
-
-        const { data: publicUrlData } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(filePath);
-
-        return publicUrlData?.publicUrl || fileUri;
-      } catch (err) {
-        console.error('Failed to upload image to Supabase:', err);
-        return fileUri;
+      if (result.status < 200 || result.status >= 300) {
+        console.error('[Upload] HTTP hata:', result.status, result.body?.slice(0, 200));
+        return PLACEHOLDER;
       }
-    };
 
-    // 8 saniyelik timeout: Yükleme takılırsa uygulamanın sonsuz spinner'da kalmasını engeller
-    return Promise.race([
-      uploadTask(),
-      new Promise<string>((resolve) => setTimeout(() => {
-        console.warn('[Storage Timeout] Upload timed out for image:', fileUri);
-        resolve(fileUri);
-      }, 8000))
-    ]);
+      const publicUrl = `${SUPABASE_PROJECT_URL}/storage/v1/object/public/product-images/${filePath}`;
+      console.log('[Upload] ✓ Yüklendi:', publicUrl.slice(0, 80));
+      return publicUrl;
+    } catch (err: any) {
+      console.error('[Upload] Hata:', err?.message || err);
+      return PLACEHOLDER;
+    }
   }
 
   async function handleSubmitProduct() {
-    setStep(5); // Uploading loading
+    setStep(5);
     setLoading(true);
-
+    console.log('[Submit] ▶ Başladı');
     try {
-      const user = (await supabase.auth.getUser()).data.user;
+      // 1. Auth — getSession() local storage'dan okur, network isteği yapmaz
+      console.log('[Submit] 1/4 Session kontrol ediliyor...');
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) throw new Error(isEn ? 'Please log in to continue.' : 'Oturum bulunamadı. Lütfen giriş yapın.');
+      const sessionToken = session?.access_token;
+      console.log('[Submit] ✓ Session OK, user:', user.id.slice(0, 8));
 
-      const localPhotos = Object.values(capturedPhotos).filter(Boolean);
+      // 2. Fotoğrafları sırayla yükle (native FileSystem.uploadAsync)
+      const localPhotos = Object.values(capturedPhotos).filter(Boolean) as string[];
+      console.log('[Submit] 2/4 Fotoğraf yükleme başlıyor:', localPhotos.length, 'adet');
+      const uploadedImagesList: string[] = [];
+      for (let i = 0; i < localPhotos.length; i++) {
+        console.log(`[Submit] Fotoğraf ${i + 1}/${localPhotos.length} yükleniyor...`);
+        const url = await uploadImageToSupabase(localPhotos[i], sessionToken);
+        uploadedImagesList.push(url);
+        console.log(`[Submit] ✓ Fotoğraf ${i + 1} tamamlandı`);
+      }
 
-      // Convert all local phone URIs to public Supabase Storage HTTPS URLs concurrently (with 8s timeout per image)
-      const uploadedImagesList = await Promise.all(
-        localPhotos.map(uri => uploadImageToSupabase(uri))
-      );
-
-      // Build inclusion text description
+      // 3. Açıklama metni
       const inclusions = [];
       if (hasBox) inclusions.push(isEn ? 'Original Box' : 'Orijinal Kutu');
       if (hasInvoice) inclusions.push(isEn ? 'Original Invoice' : 'Orijinal Fatura');
       if (hasCertificate) inclusions.push(isEn ? 'Certificate' : 'Sertifika');
-
       const fullDescription = [
         description,
         inclusions.length > 0 ? `[Aksesuarlar: ${inclusions.join(', ')}]` : ''
       ].filter(Boolean).join('\n\n');
 
-      // Database insert task with 10s timeout wrapper
-      const insertTask = async () => {
-        const { error } = await supabase
-          .from('products')
-          .insert({
-            id: productId, // Önceden atanmış UUID
-            model_name: name,
-            brand,
-            price: parseFloat(price),
-            description: fullDescription || 'Peony VIP Ekspertiz Talebi',
-            material: material || 'Deri',
-            condition: condition,
-            gender: 'unisex',
-            category: currentCategory.dbCategory,
-            subcategory: currentCategory.nameTr,
-            seller_id: user.id,
-            status: 'pending',
-            // entrupy_status: sadece geçerli DB değerleri (pending/analyzing/verified/rejected)
-            // 'not_started' CHECK constraint'ini ihlal eder — NULL bırakmak güvenli
-            entrupy_status: entrupyStatusState === 'completed' ? 'pending' : null,
-            // authenticity_docs NOT NULL — boş dizi göndermek zorunlu
-            authenticity_docs: [],
-            public_images: uploadedImagesList.length > 0 ? uploadedImagesList : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500']
-          });
-
-        if (error) throw error;
-        return true;
+      // 4. DB insert via XHR (fetch() Expo Go'da asılıyor, XHR native stack kullanır)
+      console.log('[Submit] 3/4 Veritabanına kayıt yapılıyor...');
+      const insertPayload = {
+        id: productId,
+        model_name: name,
+        brand,
+        price: parseFloat(price),
+        description: fullDescription || 'Peony VIP Ekspertiz Talebi',
+        material: material || 'Deri',
+        condition: condition,
+        gender: 'unisex',
+        category: currentCategory.dbCategory,
+        subcategory: currentCategory.nameTr,
+        seller_id: user.id,
+        status: 'pending',
+        entrupy_status: entrupyStatusState === 'completed' ? 'pending' : null,
+        authenticity_docs: [],
+        public_images: uploadedImagesList.length > 0
+          ? uploadedImagesList
+          : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500']
       };
 
-      const insertSuccess = await Promise.race([
-        insertTask(),
-        new Promise<boolean>((_, reject) => setTimeout(() => reject(new Error('Veritabanı bağlantı zaman aşımı. Lütfen tekrar deneyin.')), 10000))
-      ]);
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${SUPABASE_PROJECT_URL}/rest/v1/products`);
+        xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+        xhr.setRequestHeader('Authorization', `Bearer ${sessionToken}`);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Prefer', 'return=minimal');
+        xhr.timeout = 60000; // 60s — XHR kendi timeout'unu yönetir
 
-      if (!insertSuccess) throw new Error('Veritabanı kaydı başarısız oldu.');
+        xhr.onload = () => {
+          console.log('[Submit] XHR status:', xhr.status);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            console.log('[Submit] ✓ DB kaydı başarılı (XHR)');
+            resolve();
+          } else {
+            console.error('[Submit] DB XHR hata:', xhr.status, xhr.responseText?.slice(0, 300));
+            reject(new Error(`DB insert başarısız (${xhr.status}): ${xhr.responseText?.slice(0, 100)}`));
+          }
+        };
+        xhr.onerror = () => {
+          console.error('[Submit] XHR network error');
+          reject(new Error('XHR network hatası'));
+        };
+        xhr.ontimeout = () => {
+          console.error('[Submit] XHR 60s timeout');
+          reject(new Error('Sunucu 60 saniyede yanıt vermedi. Lütfen tekrar deneyin.'));
+        };
 
-      // Trigger Peony AI precheck asynchronously (non-blocking)
-      try {
-        fetch(`${BASE_API_URL}/api/vision-precheck`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId })
-        }).catch(err => console.log('Peony AI vision precheck async trigger:', err));
-      } catch (e) {
-        // silent catch
-      }
+        xhr.send(JSON.stringify(insertPayload));
+      });
 
-      setStep(6); // Success
+      // 5. Peony AI precheck (non-blocking)
+      console.log('[Submit] 4/4 Peony AI precheck tetikleniyor...');
+      fetch(`${BASE_API_URL}/api/vision-precheck`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      }).catch(err => console.log('[Submit] Peony AI trigger error (non-blocking):', err));
+
+      console.log('[Submit] ✅ Tamamlandı — Step 6 gösteriliyor');
+      setStep(6);
     } catch (error: any) {
-      console.error('handleSubmitProduct error:', error);
+      console.error('[Submit] ✗ Hata:', error?.message || error);
       alert(isEn ? 'Upload Error: ' + error.message : 'Yükleme hatası: ' + error.message);
-      setStep(4); // Return to review step so user can try again
+      setStep(4);
     } finally {
       setLoading(false);
     }
@@ -1513,8 +1542,8 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>
             {isEn 
-              ? 'Uploading details & initializing Peony AI visual authentication...'
-              : 'Ürün detayları aktarılıyor ve Peony AI ön inceleme süreci başlatılıyor...'}
+              ? '[v3] Uploading & initializing Peony AI...'
+              : '[v3] Yükleniyor...'}
           </Text>
         </View>
       )}
