@@ -751,39 +751,3 @@ export async function triggerVisionAnalysisAction(productId: string) {
     console.error("triggerVisionAnalysisAction error:", err)
   }
 }
-export async function simulateEntrupyWebhook(productId: string, result: 'verified' | 'unverified') {
-  const supabase = await createClient()
-  const adminSupabase = createAdminClient()
-
-  // 1. Ýþlemi yapan kiþi gerçekten Admin mi? (Güvenlik Kontrolü)
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Oturum açmanýz gerekiyor.")
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role !== 'admin') {
-    throw new Error("Bu iþlemi yapmaya yetkiniz yok.")
-  }
-
-  // 2. Ürünün Entrupy durumunu güncelle
-  const { error } = await adminSupabase
-    .from('products')
-    .update({ 
-      entrupy_status: result,
-      entrupy_certificate_url: result === 'verified' ? 'https://cert.entrupy.com/TEST_CERTIFICATE_URL' : null
-    })
-    .eq('id', productId)
-
-  if (error) {
-    console.error("Entrupy simülasyon hatasý:", error.message)
-    throw new Error("Entrupy sonucu güncellenirken bir hata oluþtu.")
-  }
-
-  revalidatePath('/admin/pending')
-  revalidatePath(/admin/product/${'$'}{productId})
-  revalidatePath('/admin/products')
-}

@@ -1,7 +1,7 @@
 import { createClient } from '@/src/utils/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
-import { updateProductStatus, simulateEntrupyWebhook } from '../actions'
+import { updateProductStatus } from '../actions'
 import { Product, Profile } from '@/src/types'
 import ClaudeVisionCard from '@/src/components/ClaudeVisionCard'
 
@@ -49,17 +49,10 @@ export default async function AdminPendingPage() {
           <p className="text-white/30 text-sm">Şu an onay bekleyen ürün yok. Harika gidiyorsunuz.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {pendingProducts.map((product) => {
-            const approveAction = updateProductStatus.bind(null, product.id, 'approved', undefined)
-            const rejectAction = async (formData: FormData) => {
-              'use server'
-              const reason = formData.get('reason') as string
-              await updateProductStatus(product.id, 'rejected', reason)
-            }
-            const simulateVerifyAction = simulateEntrupyWebhook.bind(null, product.id, 'verified')
-            const simulateRejectAction = simulateEntrupyWebhook.bind(null, product.id, 'unverified')
-            
+            const approveAction = updateProductStatus.bind(null, product.id, 'approved')
+            const rejectAction = updateProductStatus.bind(null, product.id, 'rejected')
             const sellerName = product.profiles
               ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim()
               : 'Anonim Satıcı'
@@ -68,7 +61,7 @@ export default async function AdminPendingPage() {
             return (
               <div
                 key={product.id}
-                className="group relative bg-[#121214] rounded-3xl overflow-hidden border border-white/5 hover:border-[#AF9164]/30 transition-all duration-500 flex flex-col"
+                className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300 flex flex-col"
               >
                 {/* Visual Representation: Image Carousel */}
                 <div className="relative h-56 bg-black overflow-hidden">
@@ -78,7 +71,7 @@ export default async function AdminPendingPage() {
                       alt={product.model_name || ''}
                       fill
                       sizes="(max-width: 1280px) 100vw, 50vw"
-                      className="object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
+                      className="object-cover opacity-90"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -160,40 +153,24 @@ export default async function AdminPendingPage() {
 
                   {/* ✦ ENTRUPY KONTROL RAPORU */}
                   <div className="bg-black/30 border border-white/5 rounded-xl p-4 flex flex-col gap-3">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[#AF9164]">✦</span>
-                          <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                            Entrupy Orijinallik Kontrolü
-                          </h3>
-                        </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                          product.entrupy_status === 'verified' ? 'bg-emerald-500/20 text-emerald-400' :
-                          product.entrupy_status === 'rejected' || product.entrupy_status === 'unverified' ? 'bg-red-500/20 text-red-400' :
-                          product.entrupy_status === 'analyzing' || product.entrupy_status === 'completed' ? 'bg-amber-500/20 text-amber-400' :
-                          'bg-white/10 text-white/50'
-                        }`}>
-                          {product.entrupy_status === 'verified' ? 'Orijinal (Verified)' :
-                           product.entrupy_status === 'rejected' || product.entrupy_status === 'unverified' ? 'Orijinal Değil' :
-                           product.entrupy_status === 'analyzing' || product.entrupy_status === 'completed' ? 'Analiz Ediliyor' :
-                           'Talebi Bekleniyor'}
-                        </span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#AF9164]">✦</span>
+                        <h3 className="text-xs font-bold text-white uppercase tracking-widest">
+                          Entrupy Orijinallik Kontrolü
+                        </h3>
                       </div>
-                      
-                      {/* Simülasyon Butonları */}
-                      <div className="flex items-center justify-end gap-2 mt-1 border-t border-white/5 pt-2">
-                        <form action={simulateVerifyAction}>
-                          <button className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 text-[9px] font-bold uppercase tracking-wider rounded border border-emerald-500/20 transition-colors">
-                            TEST: Orijinal Yap
-                          </button>
-                        </form>
-                        <form action={simulateRejectAction}>
-                          <button className="px-2.5 py-1 bg-red-500/10 hover:bg-red-500/30 text-red-400 text-[9px] font-bold uppercase tracking-wider rounded border border-red-500/20 transition-colors">
-                            TEST: Sahte Yap
-                          </button>
-                        </form>
-                      </div>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                        product.entrupy_status === 'verified' ? 'bg-emerald-500/20 text-emerald-400' :
+                        product.entrupy_status === 'rejected' || product.entrupy_status === 'unverified' ? 'bg-red-500/20 text-red-400' :
+                        product.entrupy_status === 'analyzing' || product.entrupy_status === 'completed' ? 'bg-amber-500/20 text-amber-400' :
+                        'bg-white/10 text-white/50'
+                      }`}>
+                        {product.entrupy_status === 'verified' ? 'Orijinal (Verified)' :
+                         product.entrupy_status === 'rejected' || product.entrupy_status === 'unverified' ? 'Orijinal Değil' :
+                         product.entrupy_status === 'analyzing' || product.entrupy_status === 'completed' ? 'Analiz Ediliyor' :
+                         'Talebi Bekleniyor'}
+                      </span>
                     </div>
                     {product.entrupy_certificate_url && (
                       <a href={product.entrupy_certificate_url} target="_blank" rel="noreferrer" className="text-[11px] text-[#AF9164] hover:text-white underline inline-block">
