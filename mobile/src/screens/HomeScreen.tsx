@@ -181,6 +181,7 @@ export default function HomeScreen({
       const { data, error } = await supabase
         .from('products')
         .select('*')
+        .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
       if (error) {

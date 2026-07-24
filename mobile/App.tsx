@@ -514,29 +514,29 @@ export default function App() {
 
       {/* Screen Router */}
       <View style={styles.mainContainer}>
-        {currentTab === 'feed' && (
+        <View style={{ display: currentTab === 'feed' ? 'flex' : 'none', flex: 1 }}>
           <HomeScreen 
             onSelectProduct={handleSelectProduct} 
             likedIds={likedIds}
             onToggleLike={toggleLike}
             onOpenStylist={() => setStylistVisible(true)}
           />
-        )}
-        {currentTab === 'sell' && (
+        </View>
+        <View style={{ display: currentTab === 'sell' ? 'flex' : 'none', flex: 1 }}>
           <SellScreen onSuccess={() => setCurrentTab('feed')} />
-        )}
-        {currentTab === 'chats' && (
+        </View>
+        <View style={{ display: currentTab === 'chats' ? 'flex' : 'none', flex: 1 }}>
           <ChatListScreen onSelectChat={handleSelectChat} />
-        )}
-        {currentTab === 'support' && (
+        </View>
+        <View style={{ display: currentTab === 'support' ? 'flex' : 'none', flex: 1 }}>
           <SupportTicketsScreen onOpenStylist={() => setStylistVisible(true)} />
-        )}
-        {currentTab === 'profile' && (
+        </View>
+        <View style={{ display: currentTab === 'profile' ? 'flex' : 'none', flex: 1 }}>
           <ProfileScreen 
             onLogout={() => setCurrentTab('feed')}
             onEnterOperations={() => setCurrentTab('operations')}
           />
-        )}
+        </View>
         {currentTab === 'details' && selectedProduct && (
           <ProductDetailsScreen 
             product={selectedProduct} 
