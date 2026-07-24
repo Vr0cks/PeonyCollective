@@ -151,6 +151,34 @@ export default async function AdminPendingPage() {
                     )
                   })()}
 
+                  {/* ✦ ENTRUPY KONTROL RAPORU */}
+                  <div className="bg-black/30 border border-white/5 rounded-xl p-4 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#AF9164]">✦</span>
+                        <h3 className="text-xs font-bold text-white uppercase tracking-widest">
+                          Entrupy Orijinallik Kontrolü
+                        </h3>
+                      </div>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                        product.entrupy_status === 'verified' ? 'bg-emerald-500/20 text-emerald-400' :
+                        product.entrupy_status === 'rejected' || product.entrupy_status === 'unverified' ? 'bg-red-500/20 text-red-400' :
+                        product.entrupy_status === 'analyzing' || product.entrupy_status === 'completed' ? 'bg-amber-500/20 text-amber-400' :
+                        'bg-white/10 text-white/50'
+                      }`}>
+                        {product.entrupy_status === 'verified' ? 'Orijinal (Verified)' :
+                         product.entrupy_status === 'rejected' || product.entrupy_status === 'unverified' ? 'Orijinal Değil' :
+                         product.entrupy_status === 'analyzing' || product.entrupy_status === 'completed' ? 'Analiz Ediliyor' :
+                         'Talebi Bekleniyor'}
+                      </span>
+                    </div>
+                    {product.entrupy_certificate_url && (
+                      <a href={product.entrupy_certificate_url} target="_blank" rel="noreferrer" className="text-[11px] text-[#AF9164] hover:text-white underline inline-block">
+                        Sertifikayı Görüntüle ↗
+                      </a>
+                    )}
+                  </div>
+
                   {/* Seller Context Information */}
                   <div className="flex items-center justify-between border-t border-white/5 pt-4">
                     <div className="flex items-center gap-2">
