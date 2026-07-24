@@ -315,6 +315,8 @@ export default function App() {
     });
 
     // --- EXPO PUSH NOTIFICATIONS REGISTRATION ---
+    // DISABLED: Causes infinite warning spam in Expo Go without Firebase config
+    /*
     if (Constants.appOwnership !== 'expo') {
       registerForPushNotificationsAsync().then(token => {
         if (token && session?.user) {
@@ -324,6 +326,7 @@ export default function App() {
     } else {
       console.log('Skipping push notifications registration in Expo Go.');
     }
+    */
   }, [session]);
 
   async function registerForPushNotificationsAsync() {
