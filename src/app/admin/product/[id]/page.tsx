@@ -145,6 +145,45 @@ export default async function AdminProductDetailPage({
               </div>
             )}
 
+            {/* Entrupy Kimlik Doğrulama Sonucu */}
+            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Entrupy Ekspertiz Sonucu</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                    Durum: 
+                    {product.entrupy_status === 'verified' ? (
+                      <span className="text-emerald-600">Orijinal (Verified)</span>
+                    ) : product.entrupy_status === 'unverified' ? (
+                      <span className="text-red-600">Sahte (Unverified)</span>
+                    ) : product.entrupy_status === 'pending' || product.entrupy_status === 'completed' ? (
+                      <span className="text-amber-500">Sonuç Bekleniyor</span>
+                    ) : (
+                      <span className="text-gray-500">Cihazla Taranmamış</span>
+                    )}
+                  </h4>
+                  {product.entrupy_certificate_url && (
+                    <a 
+                      href={product.entrupy_certificate_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline mt-2 inline-block font-medium"
+                    >
+                      🔗 Sertifikayı Görüntüle
+                    </a>
+                  )}
+                </div>
+                <div className={`w-10 h-10 rounded-full border flex items-center justify-center text-lg ${
+                  product.entrupy_status === 'verified' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' :
+                  product.entrupy_status === 'unverified' ? 'bg-red-50 border-red-200 text-red-600' :
+                  'bg-white border-gray-200 text-gray-400'
+                }`}>
+                  {product.entrupy_status === 'verified' ? '✓' :
+                   product.entrupy_status === 'unverified' ? '✕' : '?'}
+                </div>
+              </div>
+            </div>
+
             {/* Teknik Detaylar Tablosu */}
             <div className="space-y-4">
               <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-2">Teknik Özellikler</h3>
