@@ -23,7 +23,7 @@ import {
   Modal
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase';
 import { t, locale } from '../lib/i18n';
 
 const getCategoryTranslation = (name: string): string => {
@@ -180,9 +180,9 @@ export default function HomeScreen({
     try {
       const dbResponse = await new Promise<any[]>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', `${process.env.EXPO_PUBLIC_SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`);
-        xhr.setRequestHeader('apikey', process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string);
-        xhr.setRequestHeader('Authorization', `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`);
+        xhr.open('GET', `${supabaseUrl}/rest/v1/products?select=*&order=created_at.desc`);
+        xhr.setRequestHeader('apikey', supabaseAnonKey);
+        xhr.setRequestHeader('Authorization', `Bearer ${supabaseAnonKey}`);
         xhr.timeout = 15000;
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
