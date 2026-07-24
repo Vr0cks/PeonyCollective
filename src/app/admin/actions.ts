@@ -103,8 +103,7 @@ export async function updateProductStatus(
             productId: productId,
             status: newStatus,
             reason: actualReason,
-            hasCompleteProfile: hasCompleteProfile,
-            aiConfidence: product.ai_confidence
+            hasCompleteProfile: hasCompleteProfile
           })
         } catch (emailSendErr) {
           console.error('Resend e-posta gönderme hatası:', emailSendErr)
