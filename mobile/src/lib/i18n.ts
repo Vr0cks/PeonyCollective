@@ -1,20 +1,35 @@
 import { Platform, NativeModules } from 'react-native';
+import Constants from 'expo-constants';
 
 const getDeviceLanguage = (): 'tr' | 'en' => {
-  let locale = 'en';
+  let locale = 'tr'; // Default to Turkish for Peony Collective
   try {
-    if (Platform.OS === 'ios') {
-      locale = NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] || NativeModules.SettingsManager?.settings?.AppleLocale || 'en';
+    // 1. Try Expo Localization if available in Constants / global
+    const expoLocale = (Constants as any)?.expoConfig?.extra?.locale 
+      || (Constants as any)?.manifest?.locale;
+    if (expoLocale) {
+      locale = expoLocale;
+    } else if (Platform.OS === 'ios') {
+      // iOS locale detection handles AppleLanguages array or AppleLocale string
+      const settings = NativeModules.SettingsManager?.settings;
+      const primaryLang = settings?.AppleLanguages?.[0] || settings?.AppleLocale;
+      if (primaryLang) locale = primaryLang;
     } else if (Platform.OS === 'android') {
-      locale = NativeModules.I18nManager?.localeIdentifier || 'en';
-    } else if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
-      locale = Intl.DateTimeFormat().resolvedOptions().locale;
+      // Android localeIdentifier or I18nManager
+      const androidLocale = NativeModules.I18nManager?.localeIdentifier;
+      if (androidLocale) locale = androidLocale;
+    }
+
+    // 2. Fallback to Intl if available
+    if ((!locale || locale === 'en') && typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+      const intlLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+      if (intlLocale) locale = intlLocale;
     }
   } catch (e) {
-    console.log('Locale detection fallback to default');
+    console.log('[i18n] Locale detection fallback to default TR');
   }
-  
-  const code = locale ? locale.split(/[-_]/)[0].toLowerCase() : 'en';
+
+  const code = locale ? String(locale).split(/[-_]/)[0].toLowerCase() : 'tr';
   return code === 'tr' ? 'tr' : 'en';
 };
 
