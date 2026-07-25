@@ -41,7 +41,7 @@ export default function CurrencyLanguageSelector() {
 
       {/* Dropdown Menüsü */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-3">
+        <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-3">
           
           {/* Dil Seçeneği */}
           <div>

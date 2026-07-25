@@ -20,9 +20,13 @@ export default function PeonyWeatherConcierge() {
   const [loading, setLoading] = useState(true)
   const [permissionDenied, setPermissionDenied] = useState(false)
 
-  useEffect(() => {
+  const requestLocation = () => {
+    setLoading(true)
+    setPermissionDenied(false)
+
     if (!navigator.geolocation) {
       setLoading(false)
+      setPermissionDenied(true)
       return
     }
 
@@ -32,24 +36,22 @@ export default function PeonyWeatherConcierge() {
           const lat = position.coords.latitude
           const lon = position.coords.longitude
 
-          // 1. Fetch weather data from free Open-Meteo API
           const weatherRes = await fetch(
             `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
           )
           const weatherJson = await weatherRes.json()
           const currentWeather = weatherJson.current_weather || {}
 
-          // 2. Fetch City / District name via Reverse Geocoding (BigDataCloud free API)
-          let city = 'İstanbul'
-          let district = 'Nişantaşı'
+          let city = 'Ankara'
+          let district = 'Çankaya'
 
           try {
             const geoRes = await fetch(
               `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`
             )
             const geoJson = await geoRes.json()
-            city = geoJson.city || geoJson.principalSubdivision || 'İstanbul'
-            district = geoJson.locality || geoJson.district || geoJson.city || 'Nişantaşı'
+            city = geoJson.city || geoJson.principalSubdivision || 'Ankara'
+            district = geoJson.locality || geoJson.district || geoJson.city || 'Çankaya'
           } catch (e) {
             console.log('Geocoding fallback used:', e)
           }
@@ -57,7 +59,6 @@ export default function PeonyWeatherConcierge() {
           const temp = Math.round(currentWeather.temperature ?? 22)
           const code = currentWeather.weathercode ?? 0
 
-          // Generate Concierge recommendations based on weather
           let desc = 'Açık & Güneşli'
           let recTr = 'Bugün harika bir hava var! Şık güneş gözlükleriniz ve ikonik omuz çantanızla şehir kombinini tamamlayın.'
           let recEn = 'Gorgeous weather today! Elevate your city look with statement sunglasses and an iconic shoulder bag.'
@@ -87,37 +88,48 @@ export default function PeonyWeatherConcierge() {
           })
         } catch (error) {
           console.error('Weather Concierge Error:', error)
+          setPermissionDenied(true)
         } finally {
           setLoading(false)
         }
       },
       (error) => {
-        console.warn('Geolocation permission denied or error:', error)
+        console.warn('Geolocation permission error:', error)
         setPermissionDenied(true)
         setLoading(false)
       },
-      { timeout: 10000 }
+      { timeout: 10000, enableHighAccuracy: true }
     )
+  }
+
+  useEffect(() => {
+    requestLocation()
   }, [])
 
   if (permissionDenied) {
     return (
-      <div className="w-full bg-[#111111] text-white py-6 px-8 rounded-3xl border border-white/10 my-8 shadow-xl flex items-center justify-between">
+      <div className="w-full bg-[#111111] text-white py-6 px-8 rounded-3xl border border-[#AF9164]/30 my-8 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#AF9164]/20 border border-[#AF9164]/30 flex items-center justify-center text-[#AF9164]">
-            <MapPin size={18} />
+          <div className="w-10 h-10 rounded-full bg-[#AF9164]/20 border border-[#AF9164]/30 flex items-center justify-center text-[#AF9164] shrink-0">
+            <Navigation size={18} />
           </div>
           <div>
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-[#AF9164]">
               📍 PEONY WEATHER CONCIERGE
             </h4>
-            <p className="text-xs text-white/50 mt-0.5">
+            <p className="text-xs text-white/70 mt-0.5">
               {language === 'en'
-                ? 'Allow location access to receive local weather-tailored luxury style recommendations.'
-                : 'Bulunduğunuz il/ilçeye özel stil ve kombin önerileri için konum izni verebilirsiniz.'}
+                ? 'Allow location access to receive real-time weather and city-tailored luxury style recommendations.'
+                : 'Bulunduğunuz il/ilçeye özel anlık hava durumu ve stil önerileri için konum izni verebilirsiniz.'}
             </p>
           </div>
         </div>
+        <button
+          onClick={requestLocation}
+          className="bg-[#AF9164] text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors shrink-0 cursor-pointer"
+        >
+          {language === 'en' ? 'Allow Location Access 📍' : 'Konum İzni Ver 📍'}
+        </button>
       </div>
     )
   }

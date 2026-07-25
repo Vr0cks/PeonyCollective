@@ -24,6 +24,7 @@ import SellPopup from '@/src/components/SellPopup'
 import CustomSelect from '@/src/components/CustomSelect'
 import FadeIn from '@/src/components/animations/FadeIn'
 import PeonyWeatherConcierge from '@/src/components/PeonyWeatherConcierge'
+import { useSettings } from '@/src/context/SettingsContext'
 import { Product } from '@/src/types'
 
 // Kategori kartları için veri
@@ -75,6 +76,7 @@ interface HomeClientProps {
 
 export default function HomeClient({ products, brands, brand, category, gender }: HomeClientProps) {
   const router = useRouter()
+  const { language, t } = useSettings()
   const hasFilter = brand || category || gender
   const [visibleCount, setVisibleCount] = useState(24)
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null)
@@ -212,16 +214,22 @@ export default function HomeClient({ products, brands, brand, category, gender }
         
         <div className="relative z-20 w-full px-6 md:px-12 pb-24 md:pb-32 flex flex-col items-center text-center">
           <FadeIn delay={0.2} direction="up">
-            <p className="sans-detail text-white/70 mb-6 tracking-[0.4em]">MİRASIN YENİ SAHİBİ</p>
+            <p className="sans-detail text-white/70 mb-6 tracking-[0.4em]">
+              {t('hero.tagline', 'MİRASIN YENİ SAHİBİ')}
+            </p>
             <h1 className="text-[clamp(3rem,12vw,10rem)] leading-[0.8] text-white serif-display tracking-tight">
-              Arzunun <br /> <span className="italic font-light">Objeleri</span>
+              {language === 'en' ? (
+                <>Objects of <br /> <span className="italic font-light">Desire</span></>
+              ) : (
+                <>Arzunun <br /> <span className="italic font-light">Objeleri</span></>
+              )}
             </h1>
             <div className="mt-12 md:mt-16 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 w-full max-w-sm md:max-w-none mx-auto">
               <Link href="#collection" className="w-full md:w-auto text-center sans-detail border border-white/30 px-6 md:px-10 py-4 text-white hover:bg-white hover:text-black transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs backdrop-blur-sm">
-                Koleksiyonu Keşfet
+                {t('hero.explore', 'Koleksiyonu Keşfet')}
               </Link>
               <Link href="/sell" className="w-full md:w-auto text-center sans-detail bg-[#AF9164] border border-[#AF9164] px-6 md:px-10 py-4 text-white hover:bg-transparent hover:text-[#AF9164] transition-all duration-500 uppercase tracking-widest text-[10px] md:text-xs">
-                Lüksü Nakde Çevir
+                {t('hero.consign', 'Lüksü Nakde Çevir')}
               </Link>
             </div>
           </FadeIn>
