@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ShieldCheck, CheckCircle2, Award, Loader2 } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
+import CurrencyLanguageSelector from './CurrencyLanguageSelector'
 
 export default function Footer() {
   const [email, setEmail] = useState('')
@@ -172,6 +173,9 @@ export default function Footer() {
               </div>
               <div className="text-[8px] font-medium tracking-[0.2em] text-zinc-600 text-center md:text-left">
                 CRAFTED BY <a href="https://www.vr0cks.com/en" target="_blank" rel="noopener noreferrer" className="text-[#AF9164] hover:text-white transition-colors">VR0CKS</a>
+              </div>
+              <div className="pt-2 flex justify-center md:justify-start">
+                <CurrencyLanguageSelector />
               </div>
             </div>
           </div>
