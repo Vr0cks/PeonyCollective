@@ -7,7 +7,7 @@ export default function CurrencyLanguageSelector() {
   const { currency, setCurrency, language, setLanguage } = useSettings()
 
   return (
-    <div className="hidden xl:flex items-center gap-2 bg-gray-50 border border-gray-200/80 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider shrink-0">
+    <div className="flex items-center gap-2 bg-gray-50 border border-gray-200/80 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider shrink-0 z-10">
       {/* Dil Seçici */}
       <div className="flex items-center gap-1">
         <Globe size={10} className="text-gray-400" />

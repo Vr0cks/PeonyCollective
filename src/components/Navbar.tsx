@@ -39,7 +39,7 @@ export default async function Navbar() {
           <MobileMenu user={user} profile={profile} />
 
           {/* Masaüstü Ekstra Linkler */}
-          <div className="hidden lg:flex items-center gap-10 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A] ml-6">
+          <div className="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A] ml-6">
             <Link href="/how-it-works" className="hover:text-[#AF9164] transition-colors duration-300">NASIL ÇALIŞIR?</Link>
             
             {user ? (
@@ -56,6 +56,9 @@ export default async function Navbar() {
                 SATIŞ YAP
               </Link>
             )}
+
+            {/* Dil ve Para Birimi Seçici */}
+            <CurrencyLanguageSelector />
           </div>
         </div>
 
@@ -64,9 +67,8 @@ export default async function Navbar() {
           PEONY<span className="italic font-light lowercase text-base sm:text-3xl lg:text-4xl ml-1 text-[#AF9164]">collective</span>
         </Link>
 
-        {/* Sağ: İkonlar, Arama, Para/Dil Seçici ve Profil */}
+        {/* Sağ: İkonlar, Arama ve Profil */}
         <div className="flex items-center gap-4 lg:gap-8">
-          <CurrencyLanguageSelector />
           <SearchTrigger />
           <CartTrigger />
           
