@@ -1,62 +1,67 @@
+'use client'
+
 import Link from 'next/link'
 import { ChevronDown, ChevronRight } from 'lucide-react'
-
-const categories = [
-  {
-    name: 'TÜM ÜRÜNLER',
-    href: '/#collection',
-  },
-  {
-    name: 'KADIN',
-    href: '/?gender=KADIN#collection',
-    subcategories: [
-      { name: 'Çanta', href: '/?gender=KADIN&category=Çanta#collection' },
-      { name: 'Ayakkabı', href: '/?gender=KADIN&category=Ayakkabı#collection' },
-      { name: 'Dış Giyim', href: '/?gender=KADIN&category=Dış Giyim#collection' },
-      { name: 'Üst Giyim', href: '/?gender=KADIN&category=Üst Giyim#collection' },
-      { name: 'Alt Giyim', href: '/?gender=KADIN&category=Alt Giyim#collection' },
-      { name: 'Elbise', href: '/?gender=KADIN&category=Kıyafet&subcategory=Elbise#collection' },
-    ]
-  },
-  {
-    name: 'ERKEK',
-    href: '/?gender=ERKEK#collection',
-    subcategories: [
-      { name: 'Alt Giyim', href: '/?gender=ERKEK&category=Alt Giyim#collection' },
-      { name: 'Dış Giyim', href: '/?gender=ERKEK&category=Dış Giyim#collection' },
-      { name: 'Üst Giyim', href: '/?gender=ERKEK&category=Üst Giyim#collection' },
-      { name: 'Ayakkabı', href: '/?gender=ERKEK&category=Ayakkabı#collection' },
-    ]
-  },
-  {
-    name: 'ÇOCUK',
-    href: '/?gender=KIZ ÇOCUK#collection', // Defaulting to one, or maybe just remove href and let them select
-    subcategories: [
-      { name: 'Kız Çocuk', href: '/?gender=KIZ ÇOCUK#collection' },
-      { name: 'Erkek Çocuk', href: '/?gender=ERKEK ÇOCUK#collection' },
-    ]
-  },
-  {
-    name: 'AKSESUAR',
-    href: '/?category=Aksesuar#collection',
-    subcategories: [
-      { name: 'Eşarp', href: '/?category=Aksesuar&subcategory=Eşarp#collection' },
-      { name: 'Bileklik', href: '/?category=Aksesuar&subcategory=Bileklik#collection' },
-      { name: 'Fular', href: '/?category=Aksesuar&subcategory=Fular#collection' },
-      { name: 'Şapka', href: '/?category=Aksesuar&subcategory=Şapka#collection' },
-      { name: 'Kemer', href: '/?category=Aksesuar&subcategory=Kemer#collection' },
-      { name: 'Gözlük', href: '/?category=Aksesuar&subcategory=Gözlük#collection' },
-      { name: 'Cüzdan', href: '/?category=Aksesuar&subcategory=Cüzdan#collection' },
-      { name: 'Takı', href: '/?category=Aksesuar&subcategory=Takı#collection' },
-    ]
-  },
-  {
-    name: 'YENİ GELENLER',
-    href: '/#collection',
-  }
-]
+import { useSettings } from '@/src/context/SettingsContext'
 
 export default function CategoryNav() {
+  const { t } = useSettings()
+
+  const categories = [
+    {
+      name: t('nav.allProducts', 'TÜM ÜRÜNLER'),
+      href: '/#collection',
+    },
+    {
+      name: t('nav.women', 'KADIN'),
+      href: '/?gender=KADIN#collection',
+      subcategories: [
+        { name: 'Çanta', href: '/?gender=KADIN&category=Çanta#collection' },
+        { name: 'Ayakkabı', href: '/?gender=KADIN&category=Ayakkabı#collection' },
+        { name: 'Dış Giyim', href: '/?gender=KADIN&category=Dış Giyim#collection' },
+        { name: 'Üst Giyim', href: '/?gender=KADIN&category=Üst Giyim#collection' },
+        { name: 'Alt Giyim', href: '/?gender=KADIN&category=Alt Giyim#collection' },
+        { name: 'Elbise', href: '/?gender=KADIN&category=Kıyafet&subcategory=Elbise#collection' },
+      ]
+    },
+    {
+      name: t('nav.men', 'ERKEK'),
+      href: '/?gender=ERKEK#collection',
+      subcategories: [
+        { name: 'Alt Giyim', href: '/?gender=ERKEK&category=Alt Giyim#collection' },
+        { name: 'Dış Giyim', href: '/?gender=ERKEK&category=Dış Giyim#collection' },
+        { name: 'Üst Giyim', href: '/?gender=ERKEK&category=Üst Giyim#collection' },
+        { name: 'Ayakkabı', href: '/?gender=ERKEK&category=Ayakkabı#collection' },
+      ]
+    },
+    {
+      name: t('nav.kids', 'ÇOCUK'),
+      href: '/?gender=KIZ ÇOCUK#collection',
+      subcategories: [
+        { name: 'Kız Çocuk', href: '/?gender=KIZ ÇOCUK#collection' },
+        { name: 'Erkek Çocuk', href: '/?gender=ERKEK ÇOCUK#collection' },
+      ]
+    },
+    {
+      name: t('nav.accessories', 'AKSESUAR'),
+      href: '/?category=Aksesuar#collection',
+      subcategories: [
+        { name: 'Eşarp', href: '/?category=Aksesuar&subcategory=Eşarp#collection' },
+        { name: 'Bileklik', href: '/?category=Aksesuar&subcategory=Bileklik#collection' },
+        { name: 'Fular', href: '/?category=Aksesuar&subcategory=Fular#collection' },
+        { name: 'Şapka', href: '/?category=Aksesuar&subcategory=Şapka#collection' },
+        { name: 'Kemer', href: '/?category=Aksesuar&subcategory=Kemer#collection' },
+        { name: 'Gözlük', href: '/?category=Aksesuar&subcategory=Gözlük#collection' },
+        { name: 'Cüzdan', href: '/?category=Aksesuar&subcategory=Cüzdan#collection' },
+        { name: 'Takı', href: '/?category=Aksesuar&subcategory=Takı#collection' },
+      ]
+    },
+    {
+      name: t('nav.newArrivals', 'YENİ GELENLER'),
+      href: '/#collection',
+    }
+  ]
+
   return (
     <div className="hidden lg:flex max-w-[1600px] mx-auto px-6 lg:px-12 h-14 items-center justify-center gap-14 text-[12px] font-bold uppercase tracking-[0.1em] text-[#1A1A1A] border-t border-gray-100">
       {categories.map((cat) => (
