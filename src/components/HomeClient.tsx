@@ -518,28 +518,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
             </div>
           </div>
 
-          {/* Geolocation & Weather Concierge Widget */}
-          <div className="mb-12 bg-[#F3ECE0]/60 border border-[#AF9164]/20 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164]">📍 PEONY WEATHER CONCIERGE</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
-                <span className="text-xs text-gray-500 font-medium">{locationName}, {temp}°C • {weatherDesc}</span>
-              </div>
-              <h3 className="text-xl md:text-2xl serif-display text-gray-950">{locationName} Havasına Özel Stil Kürasyonu</h3>
-              <p className="text-sm text-gray-500 font-light max-w-xl">{curationVibe}</p>
-            </div>
-            <button 
-              onClick={() => setSelectedPeriod(selectedPeriod === 'WeatherConcierge' ? null : 'WeatherConcierge')}
-              className={`sans-detail px-8 py-3.5 text-[10px] tracking-widest uppercase transition-all duration-300 rounded-lg shrink-0 cursor-pointer ${
-                selectedPeriod === 'WeatherConcierge'
-                  ? 'bg-black text-white hover:bg-gray-900'
-                  : 'bg-transparent text-black border border-black hover:bg-black hover:text-white'
-              }`}
-            >
-              {selectedPeriod === 'WeatherConcierge' ? '✓ GÖRÜNÜMÜ SIFIRLA' : 'GÖRÜNÜMÜ KEŞFET →'}
-            </button>
-          </div>
+
 
           {(hasFilter || selectedPeriod) && (
             <div className="mb-12 flex items-center gap-3">
