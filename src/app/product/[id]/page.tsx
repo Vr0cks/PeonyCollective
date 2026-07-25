@@ -53,9 +53,11 @@ export default async function ProductDetailPage({
 
   const { data: { user } } = await supabase.auth.getUser()
   let isOwnerOrAdmin = false
+  let isSeller = false
   if (user) {
     if (user.id === product.seller_id) {
       isOwnerOrAdmin = true
+      isSeller = true
     } else {
       const { data: adminProf } = await supabase.from('profiles').select('role').eq('id', user.id).single()
       if (adminProf?.role === 'admin') isOwnerOrAdmin = true
@@ -220,7 +222,7 @@ export default async function ProductDetailPage({
                 <ProductActionButtons 
                   productId={product.id}
                   productPrice={product.price}
-                  isOwner={isOwnerOrAdmin}
+                  isOwner={isSeller}
                   isSold={product.status === 'sold'}
                 />
               </FadeIn>
