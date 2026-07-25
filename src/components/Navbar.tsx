@@ -44,7 +44,7 @@ export default async function Navbar() {
             
             {user ? (
               <div className="flex items-center gap-6">
-                <Link href="/dashboard" className="bg-black text-white px-8 py-3 rounded-none hover:bg-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-widest border border-black hover:border-[#AF9164]">
+                <Link href="/dashboard" className="bg-black text-white px-8 py-3 rounded-none hover:bg-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-widest border border-[#1A1A1A] hover:border-[#AF9164]">
                   PANELİM
                 </Link>
                 <Link href="/orders" className="hover:text-[#AF9164] transition-colors duration-300 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]">
@@ -56,9 +56,6 @@ export default async function Navbar() {
                 SATIŞ YAP
               </Link>
             )}
-
-            {/* Dil ve Para Birimi Seçici */}
-            <CurrencyLanguageSelector />
           </div>
         </div>
 
@@ -67,8 +64,9 @@ export default async function Navbar() {
           PEONY<span className="italic font-light lowercase text-base sm:text-3xl lg:text-4xl ml-1 text-[#AF9164]">collective</span>
         </Link>
 
-        {/* Sağ: İkonlar, Arama ve Profil */}
-        <div className="flex items-center gap-4 lg:gap-8">
+        {/* Sağ: İkonlar, Arama, Dropdown Seçici ve Profil */}
+        <div className="flex items-center gap-3 lg:gap-6">
+          <CurrencyLanguageSelector />
           <SearchTrigger />
           <CartTrigger />
           
