@@ -10,7 +10,7 @@ export default async function AdminPendingPage() {
 
   const { data: pendingProductsRaw } = await supabase
     .from('products')
-    .select(`*, profiles:seller_id (first_name, last_name), ai_authentication_logs (claude_verdict, claude_confidence, claude_raw_response)`)
+    .select(`*, profiles:seller_id (first_name, last_name), suppliers:supplier_id (name), ai_authentication_logs (claude_verdict, claude_confidence, claude_raw_response)`)
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
 
@@ -56,6 +56,8 @@ export default async function AdminPendingPage() {
             const sellerName = product.profiles
               ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim()
               : 'Anonim Satıcı'
+            const supplierName = product.suppliers?.name || product.supplier || null
+            const ownerInfo = supplierName ? `Tedarikçi: ${supplierName}` : `Satıcı: ${sellerName}`
             const images = Array.isArray(product.public_images) ? product.public_images : []
 
             return (
@@ -123,6 +125,12 @@ export default async function AdminPendingPage() {
                       <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164] mb-1">{product.brand}</p>
                       <h2 className="text-lg font-semibold text-white leading-tight">{product.model_name}</h2>
                       <p className="text-white/40 text-xs mt-1">{product.category} • {product.condition}</p>
+                      
+                      {/* Ürünün kime ait olduğu */}
+                      <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#AF9164]/15 border border-[#AF9164]/30">
+                        <span className="text-[10px] font-bold text-[#AF9164]">Ait Olduğu:</span>
+                        <span className="text-[11px] font-semibold text-white/90">{ownerInfo}</span>
+                      </div>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-white">{(product.price || 0).toLocaleString('tr-TR')} ₺</p>
@@ -179,15 +187,18 @@ export default async function AdminPendingPage() {
                     )}
                   </div>
 
-                  {/* Seller Context Information */}
+                  {/* Seller & Supplier Context Information */}
                   <div className="flex items-center justify-between border-t border-white/5 pt-4">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                        <span className="text-[9px] font-bold text-white/50">{sellerName[0] || '?'}</span>
+                        <span className="text-[9px] font-bold text-white/50">{(supplierName || sellerName)[0] || '?'}</span>
                       </div>
                       <div>
-                        <p className="text-[9px] text-white/30 uppercase tracking-widest">Satıcı</p>
-                        <p className="text-xs font-semibold text-white/70">{sellerName}</p>
+                        <p className="text-[9px] text-white/30 uppercase tracking-widest">Ürün Sahibi / Tedarikçi</p>
+                        <p className="text-xs font-semibold text-white/80">{supplierName ? `Tedarikçi: ${supplierName}` : sellerName}</p>
+                        {supplierName && sellerName !== 'Anonim Satıcı' && (
+                          <p className="text-[10px] text-white/30">Ekleyen Satıcı: {sellerName}</p>
+                        )}
                       </div>
                     </div>
                     <p className="text-[9px] text-white/20">

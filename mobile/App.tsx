@@ -85,7 +85,7 @@ export default function App() {
   const [selectedChatProduct, setSelectedChatProduct] = useState<any>(null);
 
   // Favorites (Wishlist) tracking with simulated price reduction notifications
-  const [likedIds, setLikedIds] = useState<string[]>(['chanel-flap', 'rolex-sub']); 
+  const [likedIds, setLikedIds] = useState<string[]>([]); 
   const [favoritesVisible, setFavoritesVisible] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const [loadingFavorites, setLoadingFavorites] = useState(false);
@@ -416,30 +416,7 @@ export default function App() {
         if (data) fetchedData = data;
       }
 
-      // Add simulated mock product listings for local test showcase (Chanel & Rolex price drop simulations)
-      const mocks: Product[] = [];
-      if (likedIds.includes('chanel-flap')) {
-        mocks.push({
-          id: 'chanel-flap',
-          brand: 'Chanel',
-          model_name: 'Classic Double Flap Black Gold',
-          price: 345000,
-          public_images: ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300'],
-          entrupy_status: 'approved'
-        });
-      }
-      if (likedIds.includes('rolex-sub')) {
-        mocks.push({
-          id: 'rolex-sub',
-          brand: 'Rolex',
-          model_name: 'Submariner Date Starbucks',
-          price: 685000,
-          public_images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300'],
-          entrupy_status: 'approved'
-        });
-      }
-
-      setFavoriteProducts([...mocks, ...fetchedData]);
+      setFavoriteProducts(fetchedData);
     } catch (err: any) {
       console.error('Error fetching favorites:', err.message);
     } finally {

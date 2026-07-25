@@ -16,7 +16,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { t } from '../lib/i18n';
+import { t, locale } from '../lib/i18n';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,10 +41,17 @@ interface Ticket {
 }
 
 export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist: () => void }) {
+  const isEn = locale === 'en';
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Developer Feedback Modal States
+  const [devModalVisible, setDevModalVisible] = useState(false);
+  const [devCategory, setDevCategory] = useState<'feature' | 'bug' | 'idea'>('feature');
+  const [devMessage, setDevMessage] = useState('');
+  const [devSubmitting, setDevSubmitting] = useState(false);
 
   // Support ticket inputs
   const [subject, setSubject] = useState('');
@@ -118,6 +125,53 @@ export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist:
     }
   }
 
+  async function handleDevSubmit() {
+    if (!devMessage.trim()) {
+      alert(isEn ? 'Please enter your feedback message for the developer.' : 'Lütfen geliştiriciye iletmek istediğiniz notu yazın.');
+      return;
+    }
+    setDevSubmitting(true);
+
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error(isEn ? 'Session not found. Please log in.' : 'Oturum bulunamadı. Lütfen giriş yapın.');
+
+      const catTitle = devCategory === 'feature' ? (isEn ? '🚀 Feature Request' : '🚀 Yeni Özellik Talebi')
+        : devCategory === 'bug' ? (isEn ? '🐛 Bug Report' : '🐛 Hata Bildirimi')
+        : (isEn ? '💡 General Idea / Feedback' : '💡 Genel Görüş / Fikir');
+
+      const fullMessageText = `[GELİŞTİRİCİYE NOT: ${catTitle}] [Platform: ${Platform.OS.toUpperCase()}]\n\n${devMessage.trim()}`;
+
+      const session = (await supabase.auth.getSession()).data.session;
+      const accessToken = session?.access_token;
+
+      const response = await fetch('https://peony-collective.vercel.app/api/support', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ message: fullMessageText })
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json().catch(() => ({}));
+        throw new Error(errorJson.error || (isEn ? 'Failed to send note to developer.' : 'Geliştiriciye not iletilemedi.'));
+      }
+
+      alert(isEn 
+        ? '✦ Thank you! Your feedback has been transmitted directly to the lead developer.' 
+        : '✦ Teşekkürler! Notunuz doğrudan baş geliştiriciye iletildi.');
+      setDevModalVisible(false);
+      setDevMessage('');
+      fetchTickets();
+    } catch (e: any) {
+      alert(isEn ? 'Error: ' + e.message : 'Hata: ' + e.message);
+    } finally {
+      setDevSubmitting(false);
+    }
+  }
+
   return (
     <View style={styles.container}>
       
@@ -146,6 +200,24 @@ export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist:
                 <Text style={styles.stylistTitle}>{t('wishlistEmpty') === 'Your wishlist is empty.' ? 'Where are you visiting today?' : 'Bugün nereyi ziyaret edeceksiniz?'}</Text>
                 <Text style={styles.stylistDesc}>{t('wishlistEmpty') === 'Your wishlist is empty.' ? 'Tell us about your day, and we will match the perfect luxury pieces and custom curations for you.' : 'Gününüzü bize anlatın, size en uygun lüks parçaları ve özel kürasyonları anında eşleştirelim.'}</Text>
                 <Text style={styles.stylistAction}>{t('wishlistEmpty') === 'Your wishlist is empty.' ? 'Start Muse Curation Chat →' : 'Muse Kürasyon Sohbetini Başlat →'}</Text>
+              </TouchableOpacity>
+
+              {/* WRITE TO DEVELOPER VIP BANNER */}
+              <TouchableOpacity 
+                style={styles.devCard}
+                onPress={() => setDevModalVisible(true)}
+              >
+                <View style={styles.devHeader}>
+                  <Text style={styles.devTag}>{isEn ? '💡 DEVELOPER DIRECT' : '💡 GELİŞTİRİCİYE İLETİN'}</Text>
+                  <Text style={styles.devBadge}>{isEn ? 'BETA FEEDBACK' : 'CANLI GERİ BİLDİRİM'}</Text>
+                </View>
+                <Text style={styles.devTitle}>{isEn ? 'Shape the Future of Peony App' : 'Uygulamayı Birlikte Geliştirelim'}</Text>
+                <Text style={styles.devDesc}>
+                  {isEn 
+                    ? 'Share your ideas, feature requests, or report issues directly to our lead engineering team.'
+                    : 'Fikirlerinizi, yeni özellik isteklerinizi veya karşılaştığınız sorunları doğrudan kurucu geliştirici ekibimize iletin.'}
+                </Text>
+                <Text style={styles.devAction}>{isEn ? '✦ Write Note to Developer →' : '✦ Geliştiriciye Not İlet →'}</Text>
               </TouchableOpacity>
 
               <View style={styles.actionHeader}>
@@ -208,7 +280,7 @@ export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist:
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('newTicket') || 'Destek Talebi Oluştur'}</Text>
+              <Text style={styles.modalTitle}>{t('newTicket') || (isEn ? 'Create Support Ticket' : 'Destek Talebi Oluştur')}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Text style={styles.closeBtn}>✕</Text>
               </TouchableOpacity>
@@ -216,10 +288,10 @@ export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist:
 
             <ScrollView contentContainerStyle={styles.modalScroll}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('ticketSubject') || 'KONU / BAŞLIK'}</Text>
+                <Text style={styles.label}>{t('ticketSubject') || (isEn ? 'SUBJECT / TITLE' : 'KONU / BAŞLIK')}</Text>
                 <TextInput 
                   style={styles.input}
-                  placeholder={t('ticketPlaceholderSubject') || 'Yaşadığınız sorunu kısaca başlık olarak yazın...'}
+                  placeholder={t('ticketPlaceholderSubject') || (isEn ? 'Brief title of your issue...' : 'Yaşadığınız sorunu kısaca başlık olarak yazın...')}
                   placeholderTextColor={COLORS.textMuted}
                   value={subject}
                   onChangeText={setSubject}
@@ -227,10 +299,10 @@ export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist:
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('ticketMessage') || 'AÇIKLAMA / DETAYLAR'}</Text>
+                <Text style={styles.label}>{t('ticketMessage') || (isEn ? 'DESCRIPTION / DETAILS' : 'AÇIKLAMA / DETAYLAR')}</Text>
                 <TextInput 
                   style={[styles.input, styles.textArea]}
-                  placeholder={t('ticketPlaceholderMessage') || 'Detaylı açıklamayı buraya girin...'}
+                  placeholder={t('ticketPlaceholderMessage') || (isEn ? 'Enter detailed description here...' : 'Detaylı açıklamayı buraya girin...')}
                   placeholderTextColor={COLORS.textMuted}
                   value={message}
                   onChangeText={setMessage}
@@ -243,6 +315,80 @@ export default function SupportTicketsScreen({ onOpenStylist }: { onOpenStylist:
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
                   <Text style={styles.submitBtnText}>{t('ticketSubmit') || 'TALEBİ İLET'}</Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* WRITE TO DEVELOPER VIP MODAL */}
+      <Modal visible={devModalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <View>
+                <Text style={styles.modalTitle}>{isEn ? 'Write to Developer' : 'Geliştiriciye Not İlet'}</Text>
+                <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }}>
+                  {isEn ? 'Direct channel to lead engineering team' : 'Kurucu geliştirici ekibine doğrudan erişim hattı'}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setDevModalVisible(false)}>
+                <Text style={styles.closeBtn}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView contentContainerStyle={styles.modalScroll} keyboardShouldPersistTaps="handled">
+              <Text style={styles.label}>{isEn ? 'FEEDBACK CATEGORY' : 'BİLDİRİM KATEGORİSİ'}</Text>
+              <View style={{ flexDirection: 'row', gap: 6, marginBottom: 16 }}>
+                {[
+                  { id: 'feature', labelEn: '🚀 Feature', labelTr: '🚀 Özellik İstedi' },
+                  { id: 'bug', labelEn: '🐛 Bug Report', labelTr: '🐛 Hata Bildirimi' },
+                  { id: 'idea', labelEn: '💡 Idea', labelTr: '💡 Görüş / Fikir' },
+                ].map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={[
+                      styles.devCategoryChip,
+                      devCategory === item.id && styles.devCategoryChipActive
+                    ]}
+                    onPress={() => setDevCategory(item.id as any)}
+                  >
+                    <Text style={[
+                      styles.devCategoryChipText,
+                      devCategory === item.id && styles.devCategoryChipTextActive
+                    ]}>
+                      {isEn ? item.labelEn : item.labelTr}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>{isEn ? 'YOUR NOTE / FEEDBACK' : 'NOTUNUZ & AÇIKLAMA'}</Text>
+                <TextInput 
+                  style={[styles.input, styles.textArea, { minHeight: 110 }]}
+                  placeholder={isEn 
+                    ? "Share feature ideas, bug details, UI suggestions or things you'd like to see improved in Peony..." 
+                    : "Uygulamada olmasını istediğiniz özellikleri, karşılaştığınız hataları veya önerilerinizi detaylıca yazın..."}
+                  placeholderTextColor={COLORS.textMuted}
+                  value={devMessage}
+                  onChangeText={setDevMessage}
+                  multiline
+                />
+              </View>
+
+              <View style={styles.devDeviceInfoCard}>
+                <Text style={styles.devDeviceInfoText}>
+                  📱 {isEn ? 'Platform Info Attached Automatically' : 'Sistem Bilgisi Otomatik Eklenir'}: {Platform.OS.toUpperCase()} (v3.2)
+                </Text>
+              </View>
+
+              <TouchableOpacity style={styles.submitBtn} onPress={handleDevSubmit} disabled={devSubmitting}>
+                {devSubmitting ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.submitBtnText}>{isEn ? 'SEND NOTE TO DEVELOPER ✦' : 'GELİŞTİRİCİYE GÖNDER ✦'}</Text>
                 )}
               </TouchableOpacity>
             </ScrollView>
@@ -274,6 +420,95 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: 'rgba(175, 145, 100, 0.15)',
+  },
+  devCard: {
+    backgroundColor: '#181920', // Sleek dark luxury background
+    marginHorizontal: 15,
+    marginTop: 12,
+    marginBottom: 10,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(175, 145, 100, 0.3)',
+    shadowColor: '#AF9164',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  devHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  devTag: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#D97706',
+    letterSpacing: 1.5,
+  },
+  devBadge: {
+    fontSize: 8,
+    fontWeight: '700',
+    color: '#AF9164',
+    backgroundColor: 'rgba(175, 145, 100, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  devTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+  },
+  devDesc: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    lineHeight: 17,
+    marginBottom: 12,
+  },
+  devAction: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#AF9164',
+  },
+  devCategoryChip: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderRadius: 10,
+    backgroundColor: COLORS.bg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+  },
+  devCategoryChipActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  devCategoryChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  devCategoryChipTextActive: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  devDeviceInfoCard: {
+    backgroundColor: '#F3F4F6',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  devDeviceInfoText: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+    textAlign: 'center',
   },
   stylistHeader: {
     flexDirection: 'row',

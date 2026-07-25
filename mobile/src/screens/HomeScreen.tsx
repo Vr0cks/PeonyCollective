@@ -128,6 +128,19 @@ export default function HomeScreen({
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
 
+  // Live Bidding Auction States
+  const [biddingModalVisible, setBiddingModalVisible] = useState(false);
+  const [activeBiddingItem, setActiveBiddingItem] = useState<{
+    id: string;
+    brand: string;
+    name: string;
+    currentBid: number;
+    image: string;
+    totalBids: number;
+  } | null>(null);
+  const [biddingHistory, setBiddingHistory] = useState<Array<{ id: string; user: string; amount: number; time: string }>>([]);
+  const [customBidAmount, setCustomBidAmount] = useState('');
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -257,17 +270,21 @@ export default function HomeScreen({
 
   const handleVipCardPress = (item: any) => {
     if (vipEnabled) {
-      onSelectProduct({
+      // Open Live Bidding Auction Modal for Privé Members
+      setActiveBiddingItem({
         id: item.id,
         brand: item.brand,
-        model_name: item.name,
-        price: item.price,
-        public_images: [item.image],
-        entrupy_status: 'approved',
-        description: locale === 'tr' 
-          ? 'PEONY PRIVÉ Erken Erişim ürünüdür. Kondisyonu mükemmel durumdadır, orijinal kutusu ve fatura/sertifikası mevcuttur.'
-          : 'PEONY PRIVÉ Early Access item. Pristine condition, includes original box and invoice/certificate.'
+        name: item.name,
+        currentBid: item.price,
+        image: item.image,
+        totalBids: 14
       });
+      setBiddingHistory([
+        { id: '1', user: 'VIP Member #402', amount: item.price, time: 'Just now' },
+        { id: '2', user: 'VIP Member #118', amount: item.price - 5000, time: '3m ago' },
+        { id: '3', user: 'VIP Member #88', amount: item.price - 10000, time: '12m ago' }
+      ]);
+      setBiddingModalVisible(true);
       return;
     }
     setCardNumber('');
@@ -276,6 +293,21 @@ export default function HomeScreen({
     setCardCvv('');
     setCheckoutStage('info');
     setVipModalVisible(true);
+  };
+
+  const handlePlaceBid = (incrementAmount: number) => {
+    if (!activeBiddingItem) return;
+    const newBid = activeBiddingItem.currentBid + incrementAmount;
+    setActiveBiddingItem(prev => prev ? ({
+      ...prev,
+      currentBid: newBid,
+      totalBids: prev.totalBids + 1
+    }) : null);
+
+    setBiddingHistory(prev => [
+      { id: Date.now().toString(), user: 'YOU (Privé Member)', amount: newBid, time: 'Just now' },
+      ...prev
+    ]);
   };
 
   return (
@@ -559,6 +591,12 @@ export default function HomeScreen({
                     <View style={styles.priveInfo}>
                       <Text style={styles.priveBrand}>HERMÈS</Text>
                       <Text style={styles.priveName}>Birkin 30 Togo Black</Text>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: COLORS.primary }}>
+                          {locale === 'tr' ? 'Son Teklif:' : 'Top Bid:'} ₺845.000
+                        </Text>
+                        <Text style={{ fontSize: 10, color: COLORS.accent, fontWeight: 'bold' }}>🔥 Live</Text>
+                      </View>
                     </View>
                   </TouchableOpacity>
 
@@ -592,6 +630,12 @@ export default function HomeScreen({
                     <View style={styles.priveInfo}>
                       <Text style={styles.priveBrand}>CHANEL</Text>
                       <Text style={styles.priveName}>Classic Double Flap Gold</Text>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: COLORS.primary }}>
+                          {locale === 'tr' ? 'Son Teklif:' : 'Top Bid:'} ₺360.000
+                        </Text>
+                        <Text style={{ fontSize: 10, color: COLORS.accent, fontWeight: 'bold' }}>🔥 Live</Text>
+                      </View>
                     </View>
                   </TouchableOpacity>
                 </ScrollView>
@@ -891,6 +935,99 @@ export default function HomeScreen({
           )}
         </SafeAreaView>
       </Modal>
+
+      {/* LIVE BIDDING VIP AUCTION MODAL */}
+      <Modal visible={biddingModalVisible} animationType="slide" transparent>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'rgba(18, 19, 26, 0.95)' }}>
+          <View style={styles.biddingModalHeader}>
+            <View>
+              <Text style={styles.biddingHeaderTag}>👑 PEONY PRIVÉ LIVE AUCTION</Text>
+              <Text style={styles.biddingHeaderTitle}>{activeBiddingItem?.brand} - {activeBiddingItem?.name}</Text>
+            </View>
+            <TouchableOpacity onPress={() => setBiddingModalVisible(false)} style={styles.biddingCloseBtn}>
+              <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView contentContainerStyle={{ padding: 20 }}>
+            {/* Image & Live Status Card */}
+            <View style={styles.biddingImageCard}>
+              <Image source={{ uri: activeBiddingItem?.image }} style={styles.biddingImg} />
+              <View style={styles.biddingBadgeRow}>
+                <View style={styles.biddingStatusBadge}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#10B981', marginRight: 6 }} />
+                  <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' }}>
+                    {locale === 'tr' ? 'CANLI AÇIK ARTIRMA' : 'LIVE AUCTION'}
+                  </Text>
+                </View>
+                <View style={styles.biddingTimerBadge}>
+                  <Text style={{ color: '#D97706', fontSize: 11, fontWeight: 'bold' }}>
+                    ⏳ {formatTime(timeLeft)}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Current Top Bid Hero Display */}
+            <View style={styles.topBidCard}>
+              <Text style={styles.topBidLabel}>{locale === 'tr' ? 'GÜNCEL EN YÜKSEK TEKLİF' : 'CURRENT HIGHEST BID'}</Text>
+              <Text style={styles.topBidValue}>₺{activeBiddingItem?.currentBid.toLocaleString('tr-TR')}</Text>
+              <Text style={styles.topBidCount}>
+                {activeBiddingItem?.totalBids} {locale === 'tr' ? 'Toplam VIP Teklif Verildi' : 'Total VIP Bids Placed'}
+              </Text>
+            </View>
+
+            {/* Quick Bid Increment Buttons */}
+            <Text style={styles.biddingSectionTitle}>{locale === 'tr' ? 'TEKLİFİNİ ARTIR' : 'PLACE YOUR BID'}</Text>
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
+              {[
+                { label: '+5.000 ₺', amount: 5000 },
+                { label: '+10.000 ₺', amount: 10000 },
+                { label: '+25.000 ₺', amount: 25000 }
+              ].map(btn => (
+                <TouchableOpacity 
+                  key={btn.label}
+                  style={styles.bidIncrementBtn}
+                  onPress={() => handlePlaceBid(btn.amount)}
+                >
+                  <Text style={styles.bidIncrementBtnText}>{btn.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Custom Bid Button */}
+            <TouchableOpacity 
+              style={styles.customBidBtn}
+              onPress={() => handlePlaceBid(50000)}
+            >
+              <Text style={styles.customBidBtnText}>
+                {locale === 'tr' ? '✦ ÖZEL TEKLİF SUN (+50.000 ₺)' : '✦ CUSTOM VIP BID (+50,000 TL)'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Bidding Live History Stream */}
+            <Text style={[styles.biddingSectionTitle, { marginTop: 25 }]}>{locale === 'tr' ? 'CANLI TEKLİF GEÇMİŞİ' : 'LIVE BID STREAM'}</Text>
+            <View style={styles.biddingHistoryList}>
+              {biddingHistory.map(item => (
+                <View key={item.id} style={styles.biddingHistoryRow}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, marginRight: 8 }}>👑</Text>
+                    <View>
+                      <Text style={{ fontSize: 13, fontWeight: 'bold', color: item.user.includes('YOU') ? '#10B981' : '#FFFFFF' }}>
+                        {item.user}
+                      </Text>
+                      <Text style={{ fontSize: 10, color: '#9CA3AF' }}>{item.time}</Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#AF9164' }}>
+                    ₺{item.amount.toLocaleString('tr-TR')}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </View>
   );
 }
@@ -899,6 +1036,153 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
+  },
+
+  // Live Bidding Modal Styles
+  biddingModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  biddingHeaderTag: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#AF9164',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  biddingHeaderTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  biddingCloseBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  biddingImageCard: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+    position: 'relative',
+    height: 220,
+    backgroundColor: '#000',
+  },
+  biddingImg: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  biddingBadgeRow: {
+    position: 'absolute',
+    bottom: 12,
+    left: 12,
+    right: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  biddingStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  biddingTimerBadge: {
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  topBidCard: {
+    backgroundColor: '#1E202B',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(175, 145, 100, 0.3)',
+    marginBottom: 20,
+  },
+  topBidLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#AF9164',
+    letterSpacing: 2,
+    marginBottom: 6,
+  },
+  topBidValue: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 4,
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+  },
+  topBidCount: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  biddingSectionTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#AF9164',
+    letterSpacing: 1.5,
+    marginBottom: 10,
+  },
+  bidIncrementBtn: {
+    flex: 1,
+    backgroundColor: '#272936',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  bidIncrementBtnText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  customBidBtn: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: 'center',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  customBidBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 1,
+  },
+  biddingHistoryList: {
+    backgroundColor: '#1E202B',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  biddingHistoryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   centered: {
     flex: 1,

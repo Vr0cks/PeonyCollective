@@ -95,53 +95,123 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
     slots: [
       {
         key: 'front',
-        labelTr: 'Ön Yüzü',
+        labelTr: 'Ön Yüz',
         labelEn: 'Front View',
         required: true,
         icon: '👜',
-        guideTr: 'Çantanızı düz ve aydınlık bir zemine koyup tam karşıdan dik açıyla çekin.',
-        guideEn: 'Place bag on a flat surface and shoot straight on.',
+        guideTr: 'Çantayı düz, aydınlık bir zemine koyup tam karşıdan dik açıyla çekin. Tüm deri/kumaş yüzeyinin görünür olmasını sağlayın.',
+        guideEn: 'Place bag flat on a clean surface, shoot straight on. Full leather/fabric surface must be visible.',
         guideImg: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600'
       },
       {
         key: 'back',
-        labelTr: 'Arka Yüzü',
+        labelTr: 'Arka Yüz',
         labelEn: 'Back View',
         required: true,
         icon: '💼',
-        guideTr: 'Arka cep dikişlerinin ve derinin genel simetrisinin göründüğünden emin olun.',
-        guideEn: 'Ensure rear stitching and leather alignment are clear.',
+        guideTr: 'Arka yüzü tam karşıdan çekin. Arka cep dikişleri ve derinin simetrisinin net görünmesi gerekiyor.',
+        guideEn: 'Full back view straight on. Rear stitching and leather symmetry must be clear.',
         guideImg: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600'
+      },
+      {
+        key: 'side_left',
+        labelTr: 'Sol Profil',
+        labelEn: 'Left Side Profile',
+        required: true,
+        icon: '◀️',
+        guideTr: 'Çantanın sol yanını tam profilden çekin. Dikiş ve köşe yapısı görünür olmalı.',
+        guideEn: 'Left side profile shot. Seams and corner structure must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600'
+      },
+      {
+        key: 'side_right',
+        labelTr: 'Sağ Profil',
+        labelEn: 'Right Side Profile',
+        required: true,
+        icon: '▶️',
+        guideTr: 'Çantanın sağ yanını tam profilden çekin. Fermuar veya kilit varsa bu açıda görünmeli.',
+        guideEn: 'Right side profile. Any zipper or lock on this side must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600'
       },
       {
         key: 'base',
         labelTr: 'Taban / Alt',
         labelEn: 'Base / Bottom',
-        required: false,
-        icon: '📏',
-        guideTr: 'Tabandaki koruyucu metal ayaklar ve köşe dikişlerini net çekin.',
-        guideEn: 'Capture metal feet and bottom corner wear clearly.',
+        required: true,
+        icon: '📐',
+        guideTr: 'Çantayı ters çevirerek tabanı çekin. Metal ayaklar, taban dikişleri ve köşe aşınmaları net görünmeli.',
+        guideEn: 'Flip bag and shoot the bottom. Metal feet, base seams, and corner wear must be clear.',
         guideImg: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600'
       },
       {
-        key: 'logo',
-        labelTr: 'İç Marka Logosu & Kod',
-        labelEn: 'Inner Brand Logo & Code',
+        key: 'interior_open',
+        labelTr: 'Açık İç Görünüm',
+        labelEn: 'Open Interior View',
+        required: true,
+        icon: '🔓',
+        guideTr: 'Çantayı tamamen açarak içini çekin. Tüm cepler, astar rengi ve iç yapı görünmeli.',
+        guideEn: 'Fully open the bag and shoot the interior. All pockets, lining color, and inner structure must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600'
+      },
+      {
+        key: 'interior_logo',
+        labelTr: 'İç Marka Logosu',
+        labelEn: 'Interior Brand Logo',
         required: true,
         icon: '🏷️',
-        guideTr: 'Çantanın içindeki yaldızlı marka damgası ve seri kod etiketini makro çekin.',
-        guideEn: 'Close-up of internal gold stamp & date/serial code.',
+        guideTr: 'İçteki yaldızlı marka damgasını veya deri logoyu makro çekin. Yazı net okunabilmeli.',
+        guideEn: 'Macro close-up of interior gold stamp or leather logo. Text must be clearly readable.',
         guideImg: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600'
       },
       {
-        key: 'zipper',
+        key: 'serial_code',
+        labelTr: 'Seri / Üretim Kodu',
+        labelEn: 'Serial / Date Code',
+        required: true,
+        icon: '🔢',
+        guideTr: 'Çantanın içindeki seri numarası veya üretim kodunu makro çekin. Tüm haneler okunaklı olmalı.',
+        guideEn: 'Macro shot of the date code or serial number inside. All digits must be legible.',
+        guideImg: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600'
+      },
+      {
+        key: 'zipper_hardware',
         labelTr: 'Fermuar & Metal Aksam',
         labelEn: 'Zipper & Hardware',
         required: true,
         icon: '🔩',
-        guideTr: 'Fermuar başlığı üzerindeki marka kazıması ve kilit detaylarını çekin.',
-        guideEn: 'Capture hardware engravings and zipper pulls.',
+        guideTr: 'Fermuar başlığı ve kilit üzerindeki marka kazımasını yakın çekin. D ring, toka ve tüm metal aksam görünmeli.',
+        guideEn: 'Close-up of zipper pull and lock engravings. D-ring, buckle, and all hardware must be shown.',
         guideImg: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600'
+      },
+      {
+        key: 'corner_wear',
+        labelTr: 'Köşe Detayı',
+        labelEn: 'Corner Detail',
+        required: true,
+        icon: '🔎',
+        guideTr: 'En çok aşınan köşeyi yakın çekin. Deri piping, dikiş bütünlüğü ve olası aşınma görünmeli.',
+        guideEn: 'Close-up of the most worn corner. Leather piping, stitch integrity, and any wear must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600'
+      },
+      {
+        key: 'handle_strap',
+        labelTr: 'Sap / Askı Detayı',
+        labelEn: 'Handle / Strap Detail',
+        required: false,
+        icon: '🖐️',
+        guideTr: 'Sap veya omuz askısını, bağlantı noktaları ve deri tünellerini gösterecek şekilde çekin.',
+        guideEn: 'Shoot handle or shoulder strap showing attachment points and leather loops.',
+        guideImg: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600'
+      },
+      {
+        key: 'extras',
+        labelTr: 'Ek Aksesuar / Kutu',
+        labelEn: 'Extras / Box & Dustbag',
+        required: false,
+        icon: '📦',
+        guideTr: 'Varsa orijinal kutu, toz torbası, kart, kilit ve anahtarları birlikte çekin.',
+        guideEn: 'If available, photograph original box, dustbag, care card, lock & key together.',
+        guideImg: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
       }
     ]
   },
@@ -155,11 +225,11 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
       {
         key: 'dial',
         labelTr: 'Kadran & Ön Yüz',
-        labelEn: 'Dial & Front',
+        labelEn: 'Dial & Front Face',
         required: true,
         icon: '⌚',
-        guideTr: 'Saatin ön kadranını camda yansıma olmadan makro şekilde çekin.',
-        guideEn: 'Capture the front dial clearly without glass glare.',
+        guideTr: 'Saatin ön kadranını, camda yansıma olmadan makro şekilde çekin. Tüm indeksler ve alanlar net görünmeli.',
+        guideEn: 'Macro of the front dial without glass glare. All indices and subdials must be sharp.',
         guideImg: require('../../assets/guides/watch_dial.jpeg')
       },
       {
@@ -168,29 +238,69 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         labelEn: 'Caseback & Serial No',
         required: true,
         icon: '🔍',
-        guideTr: 'Arka kapaktaki seri numarası ve çelik/altın gravürünü makro çekin.',
-        guideEn: 'Macro shot of serial number and caseback engraving.',
+        guideTr: 'Arka kapaktaki seri numarası, model referansı ve çelik/altın gravürünü makro çekin.',
+        guideEn: 'Macro of caseback serial number, model reference, and engravings.',
         guideImg: require('../../assets/guides/watch_caseback.jpeg')
       },
       {
         key: 'clasp',
-        labelTr: 'Klips & Toka',
-        labelEn: 'Clasp & Buckle',
+        labelTr: 'Klips & Deployant',
+        labelEn: 'Clasp & Deployant',
         required: true,
         icon: '🔗',
-        guideTr: 'Kordondaki tokada yer alan marka amblemini çekin.',
-        guideEn: 'Photograph the brand logo stamp on the clasp.',
+        guideTr: 'Kordondaki toka veya deployant klipsi açın, içindeki marka amblemini ve seri numarasını çekin.',
+        guideEn: 'Open the clasp/deployant and photograph the brand engraving and any serial markings.',
         guideImg: require('../../assets/guides/watch_clasp.jpeg')
       },
       {
-        key: 'side',
-        labelTr: 'Ayar Kolu / Çerçeve',
-        labelEn: 'Crown & Bezel Side',
-        required: false,
+        key: 'side_crown',
+        labelTr: 'Ayar Kolu & Yan Kasa',
+        labelEn: 'Crown & Case Side',
+        required: true,
         icon: '⚙️',
-        guideTr: 'Saatin kurma kolundaki amblemi ve yan kasa profilini fotoğraflayın.',
-        guideEn: 'Capture the crown emblem and side profile.',
+        guideTr: 'Kurma kolunu (crown) ve yan kasa profilini çekin. Vaka kalınlığı ve koruyucu vidalar görünmeli.',
+        guideEn: 'Shoot the crown and side case profile. Case thickness and crown guards must be visible.',
         guideImg: require('../../assets/guides/watch_crown_side.jpeg')
+      },
+      {
+        key: 'lugs_detail',
+        labelTr: 'Kulak & Bant Bağlantısı',
+        labelEn: 'Lugs & Band Attachment',
+        required: true,
+        icon: '📌',
+        guideTr: 'Kordon kulakları (lugs) ve bant bağlantı noktalarını yakın çekin. Çizik veya aşınma net görünmeli.',
+        guideEn: 'Close-up of lugs and band attachment points. Any scratches or wear must be clearly shown.',
+        guideImg: require('../../assets/guides/watch_caseback.jpeg')
+      },
+      {
+        key: 'strap_top',
+        labelTr: 'Kordon Üst Yüzü',
+        labelEn: 'Strap / Bracelet Top',
+        required: true,
+        icon: '📿',
+        guideTr: 'Kordon veya bilezik üst yüzünü tam boyuyla çekin. Marka logosu ve genel kondisyon görünmeli.',
+        guideEn: 'Full shot of strap/bracelet top side. Brand logo and overall condition must be visible.',
+        guideImg: require('../../assets/guides/watch_clasp.jpeg')
+      },
+      {
+        key: 'strap_bottom',
+        labelTr: 'Kordon Alt & Damga',
+        labelEn: 'Strap Underside & Stamp',
+        required: true,
+        icon: '🔖',
+        guideTr: 'Kordon altındaki marka damgasını, boyut kodunu ve üretim tarihini makro çekin.',
+        guideEn: 'Macro of strap underside showing brand stamp, size code, and production date.',
+        guideImg: require('../../assets/guides/watch_caseback.jpeg')
+      },
+      {
+        key: 'box_papers',
+        labelTr: 'Kutu & Belgeler',
+        labelEn: 'Box & Papers',
+        required: false,
+        icon: '📋',
+        guideTr: 'Varsa orijinal kutu, garanti kartı, servis belgesi ve aksesuarları birlikte çekin.',
+        guideEn: 'If available, photograph original box, warranty card, service records, and accessories together.',
+        guideImg: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
       }
     ]
   },
@@ -207,28 +317,58 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         labelEn: 'Full Overview',
         required: true,
         icon: '💎',
-        guideTr: 'Takının tüm kıvrım ve taşlarını net bir zeminde çekin.',
-        guideEn: 'Full shot of the jewelry piece on neutral background.',
+        guideTr: 'Takının tamamını düz, nötr bir zeminde çekin. Tüm kıvrım, taş ve detaylar görünür olmalı.',
+        guideEn: 'Full shot of entire piece on a neutral surface. All curves, stones, and details must be visible.',
         guideImg: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600'
       },
       {
         key: 'hallmark',
-        labelTr: 'Damga & Ayar Kodu',
-        labelEn: 'Hallmark & Stamp',
+        labelTr: 'Ayar Damgası & Marka',
+        labelEn: 'Hallmark & Brand Stamp',
         required: true,
         icon: '🔍',
-        guideTr: 'Altın/Platin ayar damgası (750, 18K vb.) ve marka imzasını çekin.',
-        guideEn: 'Close-up of metal hallmark, karat stamp & brand logo.',
+        guideTr: 'Altın/Platin ayar damgasını (750, 950, 18K vb.) ve marka imzasını makro çekin. Tüm rakamlar okunabilmeli.',
+        guideEn: 'Macro of metal hallmark (750, 950, 18K etc.) and brand signature. All digits must be legible.',
         guideImg: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600'
       },
       {
         key: 'clasp',
-        labelTr: 'Kilit & Bağlantı',
-        labelEn: 'Lock & Clasp',
+        labelTr: 'Kilit & Bağlantı Mekanizması',
+        labelEn: 'Lock & Clasp Mechanism',
         required: true,
         icon: '🔒',
-        guideTr: 'Klips veya kilit mekanizmasının detayını çekin.',
-        guideEn: 'Show the clasp or locking mechanism detail.',
+        guideTr: 'Klips, kilit veya bağlantı mekanizmasını çekin. Marka kazıması görünmeli.',
+        guideEn: 'Shoot clasp or lock mechanism. Brand engraving must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600'
+      },
+      {
+        key: 'stone_detail',
+        labelTr: 'Taş / Elmas Yakın Çekim',
+        labelEn: 'Stone / Diamond Close-Up',
+        required: true,
+        icon: '✨',
+        guideTr: 'Taşları makro çekin. Kesim, berraklık ve masa yüzeyi görünmeli. Birden fazla taş varsa hepsini kadraj içine alın.',
+        guideEn: 'Macro of stones. Cut, clarity, and table surface must be visible. Include all stones in frame.',
+        guideImg: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600'
+      },
+      {
+        key: 'back_detail',
+        labelTr: 'Arka Yüz Detayı',
+        labelEn: 'Back Side Detail',
+        required: true,
+        icon: '🔄',
+        guideTr: 'Takının arka yüzünü çekin. Pençe ayarları, kertik ve lehim noktaları görünmeli.',
+        guideEn: 'Shoot the reverse side. Prong settings, notches, and solder points must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600'
+      },
+      {
+        key: 'size_detail',
+        labelTr: 'Beden / Çap Detayı',
+        labelEn: 'Size / Diameter Detail',
+        required: false,
+        icon: '📏',
+        guideTr: 'Yüzük için iç çap, bilezik için boy ölçüsünü cetvel yanında gösterin ya da beden damgasını makro çekin.',
+        guideEn: 'For rings show inner diameter with ruler; for bracelets show length or macro of size stamp.',
         guideImg: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600'
       }
     ]
@@ -241,34 +381,74 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
     icon: '👠',
     slots: [
       {
-        key: 'sole',
-        labelTr: 'Dış Taban / Alt',
-        labelEn: 'Outsole / Bottom',
+        key: 'side_pair',
+        labelTr: 'Çift Yan Profil',
+        labelEn: 'Pair Side Profile',
         required: true,
         icon: '👟',
-        guideTr: 'Ayakkabının alt tabanındaki marka ve beden damgasını çekin.',
-        guideEn: 'Capture outsole pattern, brand stamp, and size code.',
-        guideImg: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600'
-      },
-      {
-        key: 'side',
-        labelTr: 'Yan Profil',
-        labelEn: 'Side Profile',
-        required: true,
-        icon: '👠',
-        guideTr: 'Çift halindeki yan duruşunu fotoğraflayın.',
-        guideEn: 'Photograph the pair from the side profile.',
+        guideTr: 'İki ayakkabıyı yan yana koyup tam profilden çekin. Taban köşesi, üst yüz ve topuk görünmeli.',
+        guideEn: 'Place both shoes side by side and shoot from the side. Sole edge, upper, and heel must be visible.',
         guideImg: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600'
       },
       {
+        key: 'top_pair',
+        labelTr: 'Çiftin Üstten Görünümü',
+        labelEn: 'Pair Top View',
+        required: true,
+        icon: '👠',
+        guideTr: 'Her iki ayakkabıyı üstten, tam kuşbakışından çekin. Ayak burnu ve üst yüz detayları görünmeli.',
+        guideEn: 'Bird\'s-eye shot of both shoes together. Toe box and upper surface details must be clear.',
+        guideImg: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600'
+      },
+      {
+        key: 'sole',
+        labelTr: 'Dış Taban',
+        labelEn: 'Outsole / Bottom',
+        required: true,
+        icon: '👟',
+        guideTr: 'Her iki ayakkabının alt tabanını yan yana gösterin. Marka logosu, beden damgası ve taban aşınması net görünmeli.',
+        guideEn: 'Show both outsoles side by side. Brand logo, size stamp, and sole wear must be clearly visible.',
+        guideImg: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600'
+      },
+      {
         key: 'insole',
-        labelTr: 'İç Taban & Beden',
-        labelEn: 'Insole & Size Tag',
+        labelTr: 'İç Taban & Beden Etiketi',
+        labelEn: 'Insole & Size Label',
         required: true,
         icon: '🏷️',
-        guideTr: 'İç tabandaki yaldız baskıyı ve iç etiketi çekin.',
-        guideEn: 'Show insole logo print and inner size label.',
+        guideTr: 'İç tabandaki marka baskısını ve beden/model etiketini makro çekin. Yazı net okunabilmeli.',
+        guideEn: 'Macro of insole brand print and size/model label. All text must be legible.',
         guideImg: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600'
+      },
+      {
+        key: 'heel_detail',
+        labelTr: 'Topuk Detayı',
+        labelEn: 'Heel Detail',
+        required: true,
+        icon: '📍',
+        guideTr: 'Topuğun arka yüzünü yakın çekin. Topuk kapağı, marka logosu ve aşınma durumu görünmeli.',
+        guideEn: 'Close-up of the heel back. Heel cap, brand logo, and wear condition must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600'
+      },
+      {
+        key: 'tongue_label',
+        labelTr: 'Dil & İç Etiket',
+        labelEn: 'Tongue & Interior Label',
+        required: true,
+        icon: '🔖',
+        guideTr: 'Ayakkabı dilini açarak iç etiketi çekin. Model numarası, üretim kodu ve boyut bilgisi görünmeli.',
+        guideEn: 'Open the tongue and shoot the interior label. Model number, production code, and size info must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600'
+      },
+      {
+        key: 'box_tag',
+        labelTr: 'Orijinal Kutu & Etiket',
+        labelEn: 'Original Box & Label',
+        required: false,
+        icon: '📦',
+        guideTr: 'Varsa orijinal kutuyu ve üzerindeki beden/model etiketini çekin.',
+        guideEn: 'If available, photograph the original box and its size/model label.',
+        guideImg: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
       }
     ]
   },
@@ -282,12 +462,22 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
       {
         key: 'front',
         labelTr: 'Ön Görünüm',
-        labelEn: 'Front Overview',
+        labelEn: 'Front View',
         required: true,
         icon: '👗',
-        guideTr: 'Kıyafeti askıda veya düz zeminde tam boy çekin.',
-        guideEn: 'Full frontal shot on a hanger or flat surface.',
+        guideTr: 'Kıyafeti askıda veya düz zeminde tam boy çekin. Tüm ön yüzey, düğme ve baskılar görünmeli.',
+        guideEn: 'Full front shot on hanger or flat surface. Entire front, buttons, and prints must be visible.',
         guideImg: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600'
+      },
+      {
+        key: 'back',
+        labelTr: 'Arka Görünüm',
+        labelEn: 'Back View',
+        required: true,
+        icon: '🔄',
+        guideTr: 'Kıyafetin arka yüzünü tam boy çekin. Arka dikiş, grafik veya detaylar görünmeli.',
+        guideEn: 'Full back shot. Rear seams, graphics, or details must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600'
       },
       {
         key: 'necktag',
@@ -295,19 +485,29 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         labelEn: 'Neck / Brand Tag',
         required: true,
         icon: '🏷️',
-        guideTr: 'Yakada bulunan ana marka etiketini yakın çekin.',
-        guideEn: 'Close-up of main neck brand tag and stitching.',
+        guideTr: 'Yakadaki ana marka etiketini makro çekin. Marka adı, beden ve üretim yeri okunabilmeli.',
+        guideEn: 'Macro of neck brand tag. Brand name, size, and country of origin must be legible.',
         guideImg: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600'
       },
       {
         key: 'washtag',
-        labelTr: 'İç Yıkama Etiketi',
-        labelEn: 'Care & Wash Tag',
+        labelTr: 'İç Bakım & Üretim Etiketi',
+        labelEn: 'Care & Production Label',
         required: true,
         icon: '📄',
-        guideTr: 'Kumaş kompozisyonu ve seri kodunun olduğu iç etiketi çekin.',
-        guideEn: 'Capture inner wash tag with serial & fabric details.',
+        guideTr: 'Kumaş kompozisyonu, yıkama talimatları, seri kodu ve üretim ülkesini gösteren iç etiketi makro çekin.',
+        guideEn: 'Macro of care label showing fabric content, washing instructions, serial code, and country of manufacture.',
         guideImg: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600'
+      },
+      {
+        key: 'stitching_detail',
+        labelTr: 'Dikiş & Kumaş Detayı',
+        labelEn: 'Stitching & Fabric Detail',
+        required: false,
+        icon: '🧵',
+        guideTr: 'Karakteristik bir dikiş noktasını veya kumaş dokusunu yakın çekin. Sırt dikişi, kol birleşimi veya logolu dikiş olabilir.',
+        guideEn: 'Close-up of a characteristic seam or fabric texture. Can be back seam, sleeve join, or logo stitching.',
+        guideImg: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600'
       }
     ]
   },
@@ -320,22 +520,52 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
     slots: [
       {
         key: 'front',
-        labelTr: 'Genel Görünüm',
-        labelEn: 'Full Overview',
+        labelTr: 'Ön Yüz Genel',
+        labelEn: 'Front Overview',
         required: true,
         icon: '🕶️',
-        guideTr: 'Ürünün ön cepheden açısını çekin.',
-        guideEn: 'Capture product from straight ahead.',
+        guideTr: 'Ürünü düz bir zeminde tam ön cepheden çekin. Çerçeve, cam ve logo net görünmeli.',
+        guideEn: 'Place product on a flat surface and shoot straight on. Frame, lenses, and logo must be clear.',
         guideImg: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600'
       },
       {
-        key: 'code',
-        labelTr: 'Sap / Seri Kod Baskısı',
-        labelEn: 'Temple Serial Stamp',
+        key: 'back_detail',
+        labelTr: 'Arka Yüz Detayı',
+        labelEn: 'Back Side Detail',
+        required: true,
+        icon: '🔄',
+        guideTr: 'Ürünün arka yüzünü çekin. Burun köprüsü, menteşe ve iç yüzey detayları görünmeli.',
+        guideEn: 'Shoot the back side. Nose bridge, hinges, and inner surface details must be visible.',
+        guideImg: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
+      },
+      {
+        key: 'temple_code',
+        labelTr: 'Sap & Seri Kod Baskısı',
+        labelEn: 'Temple Arm & Serial Code',
         required: true,
         icon: '🔍',
-        guideTr: 'Gözlük sapındaki veya aksesuarın içindeki model ve renk kodunu çekin.',
-        guideEn: 'Photograph serial/model stamp inside the temple arm.',
+        guideTr: 'Gözlük sapının (temple arm) iç yüzündeki model adı, renk kodu ve seri numarasını makro çekin.',
+        guideEn: 'Macro of the temple arm inner side showing model name, color code, and serial number.',
+        guideImg: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600'
+      },
+      {
+        key: 'brand_logo',
+        labelTr: 'Marka Logo Detayı',
+        labelEn: 'Brand Logo Close-Up',
+        required: true,
+        icon: '🏷️',
+        guideTr: 'Çerçeve üzerindeki marka logosunu veya kazımasını makro çekin. Gerçeklik tespiti için kritik.',
+        guideEn: 'Macro of the brand logo or engraving on the frame. Critical for authenticity verification.',
+        guideImg: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600'
+      },
+      {
+        key: 'lens_detail',
+        labelTr: 'Cam & Lens Detayı',
+        labelEn: 'Lens Detail',
+        required: true,
+        icon: '🔭',
+        guideTr: 'Camın/lensin genel durumunu, çizik veya UV renk katmanını görecek şekilde çekin. Doğal ışık altında yapın.',
+        guideEn: 'Shoot lens condition, any scratches, or UV tint layer under natural light.',
         guideImg: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600'
       },
       {
@@ -344,18 +574,26 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         labelEn: 'Box & Case',
         required: false,
         icon: '📦',
-        guideTr: 'Orijinal kılıf, temizleme bezi veya sertifikayı çekin.',
-        guideEn: 'Show original case, cloth, and inclusions.',
+        guideTr: 'Varsa orijinal kılıf, temizleme bezi, sertifika ve kutuyu birlikte çekin.',
+        guideEn: 'If available, photograph original case, cleaning cloth, certificate, and box together.',
         guideImg: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
       }
     ]
   }
 ];
 
-// Popular Brands Quick Chips
+// Entrupy Destekli Markalar — Platformumuzda Kabul Edilen Resmi Marka Listesi
 const POPULAR_BRANDS = [
-  'Chanel', 'Hermès', 'Louis Vuitton', 'Rolex', 'Cartier', 
-  'Bottega Veneta', 'Gucci', 'Prada', 'Dior', 'Saint Laurent', 'Audemars Piguet'
+  'Adidas', 'Alexander McQueen', 'Asics', 'Balenciaga', 'Bape', 'Bottega Veneta',
+  'Burberry', 'Canada Goose', 'Céline', 'Chanel', 'Chloé', 'Christian Louboutin',
+  'Chrome Hearts', 'Coach', 'Converse', 'Denim Tears', 'Dior', 'Dolce & Gabbana',
+  'Eric Emanuel', 'Fear of God Essentials', 'Fendi', 'Givenchy', 'Goyard', 'Gucci',
+  'GV Gallery', 'Hellstar', 'Hermès', 'Hoka', 'Loewe', 'Louis Vuitton',
+  'MCM', 'Miu Miu', 'Moncler', 'New Balance', 'Nike', 'Off-White',
+  'On', 'Palace', 'Polo Ralph Lauren', 'Prada', 'Readymade', 'Reebok',
+  'Saint Laurent', 'Saint Michael', 'Salomon', 'Salvatore Ferragamo', 'Saucony', 'Skylrk',
+  'Sp5der', 'Stussy', 'Supreme', 'The North Face', 'Travis Scott', 'Vale Forever',
+  'Valentino', 'Vans', 'Veja'
 ];
 
 export default function SellScreen({ onSuccess }: SellScreenProps) {
@@ -382,6 +620,38 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   const [material, setMaterial] = useState('Deri / Deri Aksam');
   const [condition, setCondition] = useState<'new_with_tags' | 'very_good' | 'good' | 'fair'>('very_good');
   
+  // Custom Peony Luxury Alert State
+  const [customAlert, setCustomAlert] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+    type?: 'warning' | 'error' | 'success' | 'info';
+    icon?: string;
+  }>({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'warning'
+  });
+
+  const showLuxuryAlert = (title: string, message: string, type: 'warning' | 'error' | 'success' | 'info' = 'warning', icon?: string) => {
+    setCustomAlert({
+      visible: true,
+      title,
+      message,
+      type,
+      icon
+    });
+  };
+  
+  // Extra Detailed Specs (Color, Dimensions, Hardware)
+  const [color, setColor] = useState('');
+  const [dimensions, setDimensions] = useState('');
+  const [hardware, setHardware] = useState('');
+
+  // Brand Autocomplete dropdown state
+  const [showBrandDropdown, setShowBrandDropdown] = useState(false);
+
   // Inclusions (Box, Invoice, Certificate)
   const [hasBox, setHasBox] = useState(false);
   const [hasInvoice, setHasInvoice] = useState(false);
@@ -455,15 +725,19 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
     try {
       const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
       if (!permissionResult.granted) {
-        alert(isEn ? 'Camera permission is required to take photo.' : 'Fotoğraf çekebilmek için kamera izni vermeniz gerekmektedir.');
+        showLuxuryAlert(
+          isEn ? 'Camera Access Required' : 'Kamera İzni Gerekli',
+          isEn ? 'Camera permission is required to photograph your luxury item.' : 'Fotoğraf çekebilmek için kamera izni vermeniz gerekmektedir.',
+          'warning'
+        );
         return;
       }
 
       // Expo ImagePicker ile fotoğraf çek (kendi kameramız)
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
-        quality: 0.85,
-        allowsEditing: false,
+        allowsEditing: true,
+        quality: 0.8,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -475,8 +749,11 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         }));
       }
     } catch (err: any) {
-      console.error('Kamera hatası:', err);
-      alert(isEn ? 'Camera Error: ' + err.message : 'Kamera hatası: ' + err.message);
+      showLuxuryAlert(
+        isEn ? 'Camera Error' : 'Kamera Hatası',
+        err.message,
+        'error'
+      );
     }
   }
 
@@ -484,7 +761,11 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permissionResult.granted) {
-        alert(isEn ? 'Gallery permission is required.' : 'Fotoğraf seçebilmek için galeri izni vermeniz gerekmektedir.');
+        showLuxuryAlert(
+          isEn ? 'Gallery Access Required' : 'Galeri İzni Gerekli',
+          isEn ? 'Gallery permission is required to choose photos.' : 'Fotoğraf seçebilmek için galeri izni vermeniz gerekmektedir.',
+          'warning'
+        );
         return;
       }
 
@@ -517,31 +798,60 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
     
     // Demo realistic luxury images mapping based on category & slot
     const demoImages: { [key: string]: string } = {
+      // BAGS — 12 slots
       bags_front: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
       bags_back: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600',
+      bags_side_left: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
+      bags_side_right: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600',
       bags_base: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600',
-      bags_logo: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
-      bags_zipper: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600',
+      bags_interior_open: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
+      bags_interior_logo: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
+      bags_serial_code: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
+      bags_zipper_hardware: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600',
+      bags_corner_wear: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600',
+      bags_handle_strap: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
+      bags_extras: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
 
+      // WATCHES — 8 slots
       watches_dial: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/4_dial_front.png',
       watches_caseback: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png',
       watches_clasp: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/2_clasp.png',
-      watches_side: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/1_crown_side.png',
+      watches_side_crown: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/1_crown_side.png',
+      watches_lugs_detail: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png',
+      watches_strap_top: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/2_clasp.png',
+      watches_strap_bottom: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png',
+      watches_box_papers: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
 
+      // JEWELRY — 6 slots
       jewelry_overall: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600',
       jewelry_hallmark: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600',
       jewelry_clasp: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600',
+      jewelry_stone_detail: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600',
+      jewelry_back_detail: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600',
+      jewelry_size_detail: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600',
 
+      // SHOES — 7 slots
+      shoes_side_pair: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600',
+      shoes_top_pair: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600',
       shoes_sole: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600',
-      shoes_side: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600',
       shoes_insole: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600',
+      shoes_heel_detail: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600',
+      shoes_tongue_label: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600',
+      shoes_box_tag: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
 
+      // CLOTHING — 5 slots
       clothing_front: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600',
+      clothing_back: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600',
       clothing_necktag: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600',
       clothing_washtag: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600',
+      clothing_stitching_detail: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600',
 
+      // ACCESSORIES — 6 slots
       accessories_front: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600',
-      accessories_code: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600',
+      accessories_back_detail: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
+      accessories_temple_code: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600',
+      accessories_brand_logo: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600',
+      accessories_lens_detail: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600',
       accessories_case: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
     };
 
@@ -628,14 +938,21 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         console.log(`[Submit] ✓ Fotoğraf ${i + 1} tamamlandı`);
       }
 
-      // 3. Açıklama metni
+      // 3. Açıklama metni ve detaylı lüks özellikler
       const inclusions = [];
       if (hasBox) inclusions.push(isEn ? 'Original Box' : 'Orijinal Kutu');
       if (hasInvoice) inclusions.push(isEn ? 'Original Invoice' : 'Orijinal Fatura');
       if (hasCertificate) inclusions.push(isEn ? 'Certificate' : 'Sertifika');
+      
+      const specDetails = [];
+      if (color) specDetails.push(`🎨 ${isEn ? 'Color' : 'Renk'}: ${color}`);
+      if (dimensions) specDetails.push(`📏 ${isEn ? 'Size/Dimensions' : 'Boyut/Ebat'}: ${dimensions}`);
+      if (hardware) specDetails.push(`✨ ${isEn ? 'Hardware' : 'Donanım/Metal'}: ${hardware}`);
+
       const fullDescription = [
         description,
-        inclusions.length > 0 ? `[Aksesuarlar: ${inclusions.join(', ')}]` : ''
+        specDetails.length > 0 ? specDetails.join('\n') : '',
+        inclusions.length > 0 ? `[${isEn ? 'Inclusions' : 'Aksesuarlar'}: ${inclusions.join(', ')}]` : ''
       ].filter(Boolean).join('\n\n');
 
       // 4. DB insert via XHR (fetch() Expo Go'da asılıyor, XHR native stack kullanır)
@@ -945,28 +1262,88 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             </View>
           </View>
 
-          {/* Quick Brand Select Chips */}
-          <View style={styles.formSectionCard}>
-            <Text style={styles.label}>{isEn ? 'BRAND' : 'MARKA'}</Text>
+          {/* Brand Autocomplete Input & Trending Chips */}
+          <View style={[styles.formSectionCard, { zIndex: 10 }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={styles.label}>{isEn ? 'BRAND' : 'MARKA'}</Text>
+              <Text style={styles.trendingBadgeText}>{isEn ? '🔥 Top Earning Brands' : '🔥 Bu Hafta En Çok Kazandıranlar'}</Text>
+            </View>
+            
+            {/* Quick Chips for Top Earning & Fast Selling Luxury Brands */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsScroll}>
-              {POPULAR_BRANDS.map(b => (
+              {[
+                { name: 'Chanel', tagEn: '💎 92% Earn', tagTr: '💎 %92 Kazanç' },
+                { name: 'Hermès', tagEn: '🔥 98% Earn', tagTr: '🔥 %98 Kazanç' },
+                { name: 'Louis Vuitton', tagEn: '⚡ 5 Days Sale', tagTr: '⚡ 5 Gün Satış' },
+                { name: 'Rolex', tagEn: '⌚ Top Trend', tagTr: '⌚ Top Trend' },
+                { name: 'Goyard', tagEn: '✨ Iconic', tagTr: '✨ İkonik' },
+                { name: 'Cartier', tagEn: '💎 High Demand', tagTr: '💎 Yüksek Talep' },
+                { name: 'Bottega Veneta', tagEn: '⚡ Fast Sale', tagTr: '⚡ Hızlı Satış' },
+                { name: 'Prada', tagEn: '🔥 Trending', tagTr: '🔥 Trend' },
+                { name: 'Dior', tagEn: '✨ Popular', tagTr: '✨ Popüler' },
+                { name: 'Balenciaga', tagEn: '⚡ Trending', tagTr: '⚡ Trend' }
+              ].map(item => (
                 <TouchableOpacity 
-                  key={b} 
-                  style={[styles.brandChip, brand === b && styles.brandChipActive]}
-                  onPress={() => setBrand(b)}
+                  key={item.name} 
+                  style={[styles.brandChip, brand === item.name && styles.brandChipActive]}
+                  onPress={() => {
+                    setBrand(item.name);
+                    setShowBrandDropdown(false);
+                  }}
                 >
-                  <Text style={[styles.brandChipText, brand === b && styles.brandChipTextActive]}>{b}</Text>
+                  <Text style={[styles.brandChipText, brand === item.name && styles.brandChipTextActive]}>
+                    {item.name} <Text style={{ fontSize: 10, opacity: 0.8 }}>({isEn ? item.tagEn : item.tagTr})</Text>
+                  </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
 
-            <TextInput 
-              style={styles.input}
-              placeholder={isEn ? "Or enter brand name (e.g. Bottega Veneta)" : "Veya marka adını yazın (Örn. Chanel, Rolex)"}
-              placeholderTextColor={COLORS.textMuted}
-              value={brand}
-              onChangeText={setBrand}
-            />
+            <View style={{ position: 'relative' }}>
+              <TextInput 
+                style={styles.input}
+                placeholder={isEn ? "Type brand name (e.g. Bottega Veneta, Goyard)..." : "Marka adı yazın (Örn. Chanel, Goyard, Rolex)..."}
+                placeholderTextColor={COLORS.textMuted}
+                value={brand}
+                onChangeText={(text) => {
+                  setBrand(text);
+                  setShowBrandDropdown(text.trim().length > 0);
+                }}
+                onFocus={() => {
+                  if (brand.trim().length > 0) setShowBrandDropdown(true);
+                }}
+              />
+
+              {/* Brand Autocomplete Suggestions List */}
+              {showBrandDropdown && (
+                <View style={styles.brandDropdownOverlay}>
+                  <ScrollView style={{ maxHeight: 180 }} keyboardShouldPersistTaps="handled">
+                    {POPULAR_BRANDS.filter(b => b.toLowerCase().includes(brand.toLowerCase())).length > 0 ? (
+                      POPULAR_BRANDS.filter(b => b.toLowerCase().includes(brand.toLowerCase())).map(b => (
+                        <TouchableOpacity
+                          key={b}
+                          style={styles.brandDropdownItem}
+                          onPress={() => {
+                            setBrand(b);
+                            setShowBrandDropdown(false);
+                          }}
+                        >
+                          <Text style={styles.brandDropdownText}>✦ {b}</Text>
+                        </TouchableOpacity>
+                      ))
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.brandDropdownItem}
+                        onPress={() => setShowBrandDropdown(false)}
+                      >
+                        <Text style={[styles.brandDropdownText, { color: COLORS.textMuted }]}>
+                          "{brand}" {isEn ? '(Custom Brand)' : '(Özel Marka Ekle)'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
           </View>
 
           {/* Model Name & Price */}
@@ -974,7 +1351,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             <Text style={styles.label}>{isEn ? 'MODEL NAME / LINE' : 'MODEL ADI / SERİ'}</Text>
             <TextInput 
               style={styles.input}
-              placeholder={isEn ? "e.g. Submariner, Classic Flap, Birkin" : "Örn. Submariner, Classic Flap, Birkin 30"}
+              placeholder={isEn ? "e.g. Submariner, Classic Flap, Birkin 30" : "Örn. Submariner, Classic Flap, Birkin 30"}
               placeholderTextColor={COLORS.textMuted}
               value={name}
               onChangeText={setName}
@@ -1012,10 +1389,10 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               </View>
             )}
 
-            <Text style={[styles.label, { marginTop: 15 }]}>{isEn ? 'ESTIMATED PRICE (TL)' : 'HEDEF SATIŞ FİYATI (TL)'}</Text>
+            <Text style={[styles.label, { marginTop: 15 }]}>{isEn ? 'TARGET SELLING PRICE (TL)' : 'HEDEF SATIŞ FİYATI (TL)'}</Text>
             <TextInput 
               style={styles.input}
-              placeholder="Örn. 145000"
+              placeholder={isEn ? "e.g. 145000" : "Örn. 145000"}
               placeholderTextColor={COLORS.textMuted}
               keyboardType="numeric"
               value={price}
@@ -1025,15 +1402,52 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             {/* Overpricing Alert Notice */}
             {priceEstimate && Number(price) > priceEstimate.estimatedMax * 1.35 && (
               <View style={styles.overpriceAlertCard}>
-                <Text style={styles.overpriceAlertTitle}>⚠️ YÜKSEK FİYAT UYARISI</Text>
+                <Text style={styles.overpriceAlertTitle}>{isEn ? '⚠️ HIGH PRICE WARNING' : '⚠️ YÜKSEK FİYAT UYARISI'}</Text>
                 <Text style={styles.overpriceAlertText}>
-                  Girdiğiniz fiyat Peony AI piyasa değerinin üzerindedir. Ürününüz onaylansa bile vitrin önceliğinde geride kalabilir ve Muse tarafından önerilmeyebilir.
+                  {isEn 
+                    ? 'The price you entered is above the Peony AI market valuation. Even if approved, your item may rank lower in showcase listings.'
+                    : 'Girdiğiniz fiyat Peony AI piyasa değerinin üzerindedir. Ürününüz onaylansa bile vitrin önceliğinde geride kalabilir.'}
                 </Text>
               </View>
             )}
           </View>
 
-          {/* Condition Select */}
+          {/* Detailed Luxury Specifications (Color, Size, Hardware) */}
+          <View style={styles.formSectionCard}>
+            <Text style={styles.label}>{isEn ? 'COLOR & FINISH' : 'RENK & RENK KODU'}</Text>
+            <TextInput 
+              style={styles.input}
+              placeholder={isEn ? "e.g. Black (Noir), Gold Accent, Beige" : "Örn. Siyah (Noir), Bej / Gold Aksam, Tabak"}
+              placeholderTextColor={COLORS.textMuted}
+              value={color}
+              onChangeText={setColor}
+            />
+
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 15 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>{isEn ? 'SIZE / DIMENSIONS' : 'BOYUT / EBAT'}</Text>
+                <TextInput 
+                  style={styles.input}
+                  placeholder={isEn ? "e.g. Medium (25cm), 40 EU" : "Örn. Medium (25 cm), 40 EU"}
+                  placeholderTextColor={COLORS.textMuted}
+                  value={dimensions}
+                  onChangeText={setDimensions}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>{isEn ? 'HARDWARE / METAL' : 'DONANIM / METAL'}</Text>
+                <TextInput 
+                  style={styles.input}
+                  placeholder={isEn ? "e.g. Gold, Palladium, Silver" : "Örn. Gold (Altın), Gümüş, Çelik"}
+                  placeholderTextColor={COLORS.textMuted}
+                  value={hardware}
+                  onChangeText={setHardware}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Condition & Material Select */}
           <View style={styles.formSectionCard}>
             <Text style={styles.label}>{isEn ? 'CONDITION' : 'KONDİSYON'}</Text>
             <View style={styles.conditionRow}>
@@ -1058,7 +1472,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             <Text style={[styles.label, { marginTop: 15 }]}>{isEn ? 'MATERIAL / FABRIC' : 'MATERYAL / METALS / KUMAŞ'}</Text>
             <TextInput 
               style={styles.input}
-              placeholder={isEn ? "e.g. 18k Gold, Caviar Leather, Stainless Steel" : "Örn. Kuzu Derisi, 18K Çelik-Altın, İpek"}
+              placeholder={isEn ? "e.g. Lambskin Leather, Caviar Leather, 18K Gold" : "Örn. Kuzu Derisi, Caviar Leather, 18K Çelik-Altın"}
               placeholderTextColor={COLORS.textMuted}
               value={material}
               onChangeText={setMaterial}
@@ -1067,7 +1481,7 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
 
           {/* Inclusions Toggle Chips */}
           <View style={styles.formSectionCard}>
-            <Text style={styles.label}>{isEn ? 'MEVCUT AKSESUAR & BELGELER' : 'MEVCUT AKSESUAR & BELGELER'}</Text>
+            <Text style={styles.label}>{isEn ? 'INCLUSIONS & ACCESSORIES' : 'MEVCUT AKSESUAR & BELGELER'}</Text>
             <View style={styles.inclusionRow}>
               <TouchableOpacity 
                 style={[styles.inclusionChip, hasBox && styles.inclusionChipActive]}
@@ -1113,7 +1527,14 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             style={styles.primaryBtn} 
             onPress={() => {
               if (!brand || !name || !price) {
-                alert(isEn ? 'Please fill in brand, model name and price.' : 'Lütfen marka, model adı ve fiyat alanlarını doldurun.');
+                showLuxuryAlert(
+                  isEn ? 'Required Information Missing' : 'Eksik Bilgi',
+                  isEn 
+                    ? 'Please provide the Brand, Model Name, and Target Selling Price to continue.'
+                    : 'Lütfen devam etmek için Marka, Model Adı ve Hedef Fiyat alanlarını doldurun.',
+                  'warning',
+                  '✦'
+                );
                 return;
               }
               setStep(3);
@@ -1483,26 +1904,55 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
                     // Save mock image to slot
                     const lookupKey = `${selectedCategoryId}_${scannerSlotKey}`;
                     const demoImages: { [key: string]: string } = {
+                      // BAGS — 12 slots
                       bags_front: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
                       bags_back: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600',
+                      bags_side_left: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
+                      bags_side_right: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600',
                       bags_base: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600',
-                      bags_logo: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
-                      bags_zipper: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600',
+                      bags_interior_open: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
+                      bags_interior_logo: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
+                      bags_serial_code: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600',
+                      bags_zipper_hardware: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=600',
+                      bags_corner_wear: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600',
+                      bags_handle_strap: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
+                      bags_extras: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
+                      // WATCHES — 8 slots
                       watches_dial: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/4_dial_front.png',
                       watches_caseback: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png',
                       watches_clasp: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/2_clasp.png',
-                      watches_side: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/1_crown_side.png',
+                      watches_side_crown: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/1_crown_side.png',
+                      watches_lugs_detail: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png',
+                      watches_strap_top: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/2_clasp.png',
+                      watches_strap_bottom: 'https://images.gemini.google.com/antigravity/user_uploads/0e47b08b-e5bf-449e-98e6-4e296989a3b2/3_caseback.png',
+                      watches_box_papers: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
+                      // JEWELRY — 6 slots
                       jewelry_overall: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600',
                       jewelry_hallmark: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600',
                       jewelry_clasp: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600',
+                      jewelry_stone_detail: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600',
+                      jewelry_back_detail: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600',
+                      jewelry_size_detail: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600',
+                      // SHOES — 7 slots
+                      shoes_side_pair: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600',
+                      shoes_top_pair: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600',
                       shoes_sole: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600',
-                      shoes_side: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600',
                       shoes_insole: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600',
+                      shoes_heel_detail: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600',
+                      shoes_tongue_label: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600',
+                      shoes_box_tag: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
+                      // CLOTHING — 5 slots
                       clothing_front: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600',
+                      clothing_back: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600',
                       clothing_necktag: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600',
                       clothing_washtag: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600',
+                      clothing_stitching_detail: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600',
+                      // ACCESSORIES — 6 slots
                       accessories_front: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600',
-                      accessories_code: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600',
+                      accessories_back_detail: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600',
+                      accessories_temple_code: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600',
+                      accessories_brand_logo: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600',
+                      accessories_lens_detail: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600',
                       accessories_case: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=600'
                     };
 
@@ -1587,6 +2037,39 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
           </Text>
         </View>
       )}
+
+      {/* CUSTOM PEONY LUXURY ALERT MODAL */}
+      <Modal
+        visible={customAlert.visible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCustomAlert(prev => ({ ...prev, visible: false }))}
+      >
+        <View style={styles.customAlertOverlay}>
+          <View style={styles.customAlertCard}>
+            <View style={styles.customAlertIconWrapper}>
+              <Text style={styles.customAlertIcon}>
+                {customAlert.icon || (
+                  customAlert.type === 'error' ? '❌' :
+                  customAlert.type === 'success' ? '✨' :
+                  customAlert.type === 'info' ? 'ℹ️' : '✦'
+                )}
+              </Text>
+            </View>
+
+            <Text style={styles.customAlertBrandBadge}>PEONY APPRAISE</Text>
+            <Text style={styles.customAlertTitle}>{customAlert.title}</Text>
+            <Text style={styles.customAlertMessage}>{customAlert.message}</Text>
+
+            <TouchableOpacity 
+              style={styles.customAlertBtn}
+              onPress={() => setCustomAlert(prev => ({ ...prev, visible: false }))}
+            >
+              <Text style={styles.customAlertBtnText}>{isEn ? 'GOT IT' : 'ANLADIM'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
     </KeyboardAvoidingView>
   );
@@ -1852,6 +2335,84 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
 
+  // Custom Peony Luxury Alert Modal Styles
+  customAlertOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(18, 19, 26, 0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  customAlertCard: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E8E2D5',
+    shadowColor: '#AF9164',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  customAlertIconWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#F5ECE1',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#E6D7C3',
+  },
+  customAlertIcon: {
+    fontSize: 24,
+  },
+  customAlertBrandBadge: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: COLORS.primary,
+    letterSpacing: 2.5,
+    marginBottom: 6,
+  },
+  customAlertTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 10,
+    fontFamily: Platform.OS === 'ios' ? 'Playfair Display' : 'serif',
+  },
+  customAlertMessage: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    lineHeight: 19,
+    marginBottom: 22,
+  },
+  customAlertBtn: {
+    width: '100%',
+    backgroundColor: COLORS.primary,
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  customAlertBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 1.5,
+  },
+
   // Step 2 Form
   formSectionCard: {
     backgroundColor: COLORS.card,
@@ -1887,6 +2448,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 10,
   },
+  trendingBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#D97706', // Warm Amber/Gold
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
   brandChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -1904,6 +2475,34 @@ const styles = StyleSheet.create({
   },
   brandChipTextActive: {
     color: '#FFFFFF',
+  },
+  brandDropdownOverlay: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 9999,
+    overflow: 'hidden',
+  },
+  brandDropdownItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  brandDropdownText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
   },
   conditionRow: {
     flexDirection: 'row',

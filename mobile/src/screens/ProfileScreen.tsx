@@ -536,38 +536,56 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
                   const statusBadgeBg = p.status === 'approved' ? '#ECFDF5' : p.status === 'pending' ? '#FEF3C7' : '#FFF5F5';
                   const statusBadgeColor = p.status === 'approved' ? '#059669' : p.status === 'pending' ? '#D97706' : '#EF4444';
 
+                  const imageUri = p.public_images?.[0] || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300';
+
                   return (
                     <View key={p.id} style={[styles.trackerCard, { backgroundColor: THEME.card, borderColor: THEME.border, marginBottom: 14 }]}>
-                      <View style={[styles.trackerHeader, { borderColor: THEME.border }]}>
-                        <Text style={[styles.trackerProdName, { color: THEME.text }]}>{p.brand} {p.model_name}</Text>
-                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: THEME.primary }}>
-                          ₺{Number(p.price || 0).toLocaleString('tr-TR')}
-                        </Text>
-                      </View>
+                      <View style={{ flexDirection: 'row', gap: 12 }}>
+                        {/* Product Image Thumbnail */}
+                        <Image 
+                          source={{ uri: imageUri }} 
+                          style={{ width: 64, height: 64, borderRadius: 10, backgroundColor: THEME.border }} 
+                        />
 
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 10 }}>
-                        <View style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: statusBadgeBg, borderRadius: 4 }}>
-                          <Text style={{ fontSize: 10, fontWeight: 'bold', color: statusBadgeColor }}>{statusBadgeText}</Text>
+                        <View style={{ flex: 1 }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Text style={[styles.trackerProdName, { color: THEME.text, flex: 1, marginRight: 6 }]} numberOfLines={1}>
+                              {p.brand} {p.model_name}
+                            </Text>
+                            <Text style={{ fontSize: 13, fontWeight: 'bold', color: THEME.primary }}>
+                              ₺{Number(p.price || 0).toLocaleString('tr-TR')}
+                            </Text>
+                          </View>
+
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                            <View style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: statusBadgeBg, borderRadius: 4 }}>
+                              <Text style={{ fontSize: 10, fontWeight: 'bold', color: statusBadgeColor }}>{statusBadgeText}</Text>
+                            </View>
+                            {p.ai_confidence && (
+                              <Text style={{ fontSize: 10, color: THEME.textMuted, marginLeft: 10 }}>
+                                Peony AI: %{p.ai_confidence}
+                              </Text>
+                            )}
+                          </View>
                         </View>
-                        {p.ai_confidence && (
-                          <Text style={{ fontSize: 10, color: THEME.textMuted, marginLeft: 10 }}>
-                            Peony AI Skoru: %{p.ai_confidence}
-                          </Text>
-                        )}
                       </View>
 
                       {/* 7 Days Unsold Price Reduce Suggestion Alert & Button */}
                       {isUnsold7Days && (
                         <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: THEME.border }}>
                           <Text style={{ fontSize: 11, color: '#D97706', fontWeight: '600', marginBottom: 6 }}>
-                            ⚠️ Ürününüz {daysDiff} gündür satılmadı. Peony AI fiyatınızı %10 düşürerek hızlı satmanızı öneriyor.
+                            {isEn 
+                              ? `⚠️ Your item hasn't sold in ${daysDiff} days. Peony AI recommends a 10% price drop to boost sale.`
+                              : `⚠️ Ürününüz ${daysDiff} gündür satılmadı. Peony AI fiyatınızı %10 düşürerek hızlı satmanızı öneriyor.`}
                           </Text>
                           <TouchableOpacity 
                             style={{ backgroundColor: THEME.primary, paddingVertical: 8, borderRadius: 6, alignItems: 'center' }}
                             onPress={() => handleReducePrice(p.id, p.price)}
                           >
                             <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 'bold' }}>
-                              Fiyatı ₺{Math.round(p.price * 0.9).toLocaleString('tr-TR')} Yap & Vitrinde Yükselt
+                              {isEn 
+                                ? `Drop Price to ₺${Math.round(p.price * 0.9).toLocaleString('tr-TR')} & Boost Showcase`
+                                : `Fiyatı ₺${Math.round(p.price * 0.9).toLocaleString('tr-TR')} Yap & Vitrinde Yükselt`}
                             </Text>
                           </TouchableOpacity>
                         </View>

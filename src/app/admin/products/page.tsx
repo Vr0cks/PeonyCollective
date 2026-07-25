@@ -16,7 +16,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
   let query = supabase
     .from('products')
-    .select(`*, profiles:seller_id (first_name, last_name)`)
+    .select(`*, profiles:seller_id (first_name, last_name), suppliers:supplier_id (name)`)
     .order('created_at', { ascending: false })
 
   if (statusFilter !== 'all') {
@@ -79,11 +79,13 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
               const sellerName = product.profiles
                 ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim() || 'Anonim'
                 : 'Anonim'
+              const supplierName = product.suppliers?.name || product.supplier || null
+              const ownerInfo = supplierName ? `Tedarikçi: ${supplierName}` : `Satıcı: ${sellerName}`
               const st = statusStyle[product.status] || { label: product.status, cls: 'bg-white/10 text-white/50 border-white/10' }
 
               return (
                 <div key={product.id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/3 transition-colors">
-                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 relative">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 relative border border-white/5">
                     {firstImage ? (
                       <Image src={firstImage} alt="" fill sizes="56px" className="object-cover" />
                     ) : (
@@ -93,12 +95,25 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold text-[#AF9164] uppercase tracking-wider">{product.brand}</p>
-                    <p className="text-sm text-white/80 truncate">{product.model_name}</p>
-                    <p className="text-[10px] text-white/20 mt-0.5">{product.category} · {product.condition}</p>
+                    <p className="text-sm font-semibold text-white/90 truncate">{product.model_name}</p>
+                    <p className="text-[10px] text-white/30 mt-0.5">{product.category} · {product.condition}</p>
+                    {/* Kime ait olduğunu ürünün hemen altında göster */}
+                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-medium text-white/40">Ait Olduğu:</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-[#AF9164]/15 text-[#AF9164] border border-[#AF9164]/30">
+                        {ownerInfo}
+                      </span>
+                      {supplierName && sellerName !== 'Anonim' && (
+                        <span className="text-[9px] text-white/30">
+                          (Ekleyen: {sellerName})
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="hidden lg:block w-32 shrink-0">
-                    <p className="text-xs text-white/30">{sellerName}</p>
+                  <div className="hidden lg:block w-40 shrink-0">
+                    <p className="text-[10px] text-white/30 uppercase tracking-wider font-semibold">Sahibi / Tedarikçi</p>
+                    <p className="text-xs text-white/70 font-medium truncate">{supplierName || sellerName}</p>
                   </div>
 
                   <div className="hidden md:block w-24 shrink-0 text-right">

@@ -46,7 +46,7 @@ export default async function AdminDashboardPage() {
   // Son 8 ürün
   const { data: recentRaw } = await supabase
     .from('products')
-    .select(`*, profiles:seller_id (first_name, last_name)`)
+    .select(`*, profiles:seller_id (first_name, last_name), suppliers:supplier_id (name)`)
     .order('created_at', { ascending: false })
     .limit(8)
 
@@ -150,12 +150,14 @@ export default async function AdminDashboardPage() {
             const sellerName = product.profiles
               ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim() || 'Anonim'
               : 'Anonim'
+            const supplierName = product.suppliers?.name || product.supplier || null
+            const ownerInfo = supplierName ? `Tedarikçi: ${supplierName}` : `Satıcı: ${sellerName}`
             const st = statusStyle[product.status] || { label: product.status, cls: 'bg-white/10 text-white/50 border-white/10' }
 
             return (
               <div key={product.id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/3 transition-colors">
                 {/* Küçük görsel */}
-                <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 relative">
+                <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 relative border border-white/5">
                   {firstImage ? (
                     <Image src={firstImage} alt="" fill sizes="48px" className="object-cover" />
                   ) : (
@@ -167,11 +169,17 @@ export default async function AdminDashboardPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-[#AF9164] uppercase tracking-wider truncate">{product.brand}</p>
                   <p className="text-sm text-white/70 truncate">{product.model_name}</p>
+                  <div className="mt-0.5 flex items-center gap-1.5">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#AF9164]/10 text-[#AF9164] border border-[#AF9164]/20">
+                      {ownerInfo}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Satıcı */}
-                <div className="hidden md:block w-32 shrink-0">
-                  <p className="text-xs text-white/30 truncate">{sellerName}</p>
+                {/* Satıcı / Tedarikçi */}
+                <div className="hidden md:block w-36 shrink-0">
+                  <p className="text-[10px] text-white/30 font-semibold uppercase tracking-wider">Ait Olduğu</p>
+                  <p className="text-xs text-white/60 truncate">{supplierName || sellerName}</p>
                 </div>
 
                 {/* Fiyat */}

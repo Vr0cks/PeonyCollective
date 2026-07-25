@@ -26,7 +26,8 @@ export default async function AdminProductDetailPage({
     .from('products')
     .select(`
       *,
-      profiles:seller_id (*)
+      profiles:seller_id (*),
+      suppliers:supplier_id (*)
     `)
     .eq('id', id)
     .single()
@@ -34,6 +35,8 @@ export default async function AdminProductDetailPage({
   if (error || !productData) return notFound()
   const product = productData as Product
   const sellerProfile = product.profiles as Profile
+  const supplierObj = (product as any).suppliers
+  const supplierName = supplierObj?.name || product.supplier || null
 
   // Action binding
   const approveAction = updateProductStatus.bind(null, product.id, 'approved')
@@ -119,13 +122,33 @@ export default async function AdminProductDetailPage({
             {/* Başlık ve Fiyat */}
             <div>
               <h1 className="text-4xl font-light text-gray-900 mb-2 uppercase tracking-tighter serif-display">{product.brand}</h1>
-              <p className="text-xl text-gray-500 font-light mb-4">{product.model_name}</p>
+              <p className="text-xl text-gray-500 font-light mb-2">{product.model_name}</p>
+              
+              {/* Kime Ait Olduğu Rozeti */}
+              <div className="mb-4 inline-flex items-center gap-2 bg-[#AF9164]/10 border border-[#AF9164]/30 px-3 py-1 rounded-lg">
+                <span className="text-xs font-bold text-[#AF9164]">Ait Olduğu:</span>
+                <span className="text-xs font-semibold text-gray-900">
+                  {supplierName ? `Tedarikçi (${supplierName})` : sellerProfile ? `Satıcı (${sellerProfile.first_name || ''} ${sellerProfile.last_name || ''})`.trim() : 'Anonim'}
+                </span>
+              </div>
+
               <div className="text-3xl font-bold text-black tabular-nums">
                 {product.price.toLocaleString('tr-TR')} ₺
               </div>
             </div>
 
-            {/* Satıcı Kartı (Div olarak güncellendi - Dead link düzeltildi) */}
+            {/* Tedarikçi Kartı */}
+            {supplierName && (
+              <div className="p-6 bg-amber-500/5 rounded-2xl border border-amber-500/20">
+                <p className="text-[10px] font-bold text-[#AF9164] uppercase tracking-widest mb-2">Ait Olduğu Tedarikçi</p>
+                <h4 className="text-lg font-bold text-gray-900">{supplierName}</h4>
+                {supplierObj?.email && <p className="text-xs text-gray-600 mt-1">E-posta: {supplierObj.email}</p>}
+                {supplierObj?.phone && <p className="text-xs text-gray-600 mt-0.5">Telefon: {supplierObj.phone}</p>}
+                {supplierObj?.iban && <p className="text-xs text-gray-500 mt-1 font-mono">IBAN: {supplierObj.iban}</p>}
+              </div>
+            )}
+
+            {/* Satıcı Kartı */}
             {sellerProfile && (
               <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Satıcı Bilgileri</p>
