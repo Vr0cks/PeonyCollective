@@ -10,6 +10,7 @@ import VirtualTryOnButton from '@/src/components/VirtualTryOnButton'
 import ProductGallery from '@/src/components/ProductGallery'
 import FadeIn from '@/src/components/animations/FadeIn'
 import ProductActionButtons from '@/src/components/ProductActionButtons'
+import DynamicPriceDisplay from '@/src/components/DynamicPriceDisplay'
 
 export async function generateMetadata({
   params,
@@ -130,9 +131,7 @@ export default async function ProductDetailPage({
                 <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-8">
                   {product.model_name}
                 </h2>
-                <div className="text-3xl font-light tracking-widest text-[#AF9164]">
-                  {product.price.toLocaleString('tr-TR')} ₺
-                </div>
+                <DynamicPriceDisplay price={product.price} />
               </FadeIn>
 
               {/* Teknik Detaylar Özeti */}

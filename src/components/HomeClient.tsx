@@ -23,6 +23,7 @@ import ProductCard from '@/src/components/ProductCard'
 import SellPopup from '@/src/components/SellPopup'
 import CustomSelect from '@/src/components/CustomSelect'
 import FadeIn from '@/src/components/animations/FadeIn'
+import PeonyWeatherConcierge from '@/src/components/PeonyWeatherConcierge'
 import { Product } from '@/src/types'
 
 // Kategori kartları için veri
@@ -228,6 +229,12 @@ export default function HomeClient({ products, brands, brand, category, gender }
       </section>
 
       {/* EDITORIAL MANIFESTO & METRICS (Merged & Compacted) */}
+      <section className="py-12 bg-white border-y border-gray-100 px-6">
+        <div className="max-w-[1400px] mx-auto">
+          <PeonyWeatherConcierge />
+        </div>
+      </section>
+
       <section className="py-20 md:py-28 bg-white border-y border-gray-100 px-6">
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           {/* Sol: Manifesto Metni ve Görsel */}

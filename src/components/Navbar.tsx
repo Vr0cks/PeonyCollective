@@ -6,6 +6,7 @@ import MobileMenu from './MobileMenu'
 import SearchTrigger from './SearchTrigger'
 import CartTrigger from './CartTrigger'
 import CategoryNav from './CategoryNav'
+import CurrencyLanguageSelector from './CurrencyLanguageSelector'
 import { User, MessageSquare } from 'lucide-react'
 import { Profile } from '@/src/types'
 
@@ -63,8 +64,9 @@ export default async function Navbar() {
           PEONY<span className="italic font-light lowercase text-base sm:text-3xl lg:text-4xl ml-1 text-[#AF9164]">collective</span>
         </Link>
 
-        {/* Sağ: İkonlar, Arama ve Profil */}
-        <div className="flex items-center gap-6 lg:gap-10">
+        {/* Sağ: İkonlar, Arama, Para/Dil Seçici ve Profil */}
+        <div className="flex items-center gap-4 lg:gap-8">
+          <CurrencyLanguageSelector />
           <SearchTrigger />
           <CartTrigger />
           

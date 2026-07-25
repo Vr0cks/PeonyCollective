@@ -5,6 +5,7 @@ import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import ConciergeWidget from "@/src/components/ConciergeWidget";
 import { CartProvider } from "@/src/context/CartContext";
+import { SettingsProvider } from "@/src/context/SettingsContext";
 import CartDrawer from "@/src/components/CartDrawer";
 import BottomTabBar from "@/src/components/BottomTabBar";
 import PwaInstallPrompt from "@/src/components/PwaInstallPrompt";
@@ -127,14 +128,16 @@ export default function RootLayout({
           }}
         />
         <CartProvider>
-          <Navbar />
-          <CartDrawer />
-          <div className="flex-grow">{children}</div>
-          <Footer />
-          <ConciergeWidget />
-          <BottomTabBar />
-          <PwaInstallPrompt />
-          <ScrollToTop />
+          <SettingsProvider>
+            <Navbar />
+            <CartDrawer />
+            <div className="flex-grow">{children}</div>
+            <Footer />
+            <ConciergeWidget />
+            <BottomTabBar />
+            <PwaInstallPrompt />
+            <ScrollToTop />
+          </SettingsProvider>
         </CartProvider>
       </body>
     </html>

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Product } from '@/src/types'
 import { useCart } from '@/src/context/CartContext'
+import { useSettings } from '@/src/context/SettingsContext'
 
 interface ProductCardProps {
   product: Product
@@ -11,6 +12,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart()
+  const { formatPrice, t } = useSettings()
   const validImages = Array.isArray(product.public_images) ? product.public_images : []
   const firstImage = validImages.find(img => typeof img === 'string' && img.length > 5)
   const imageUrl = firstImage || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=600'
@@ -48,7 +50,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </p>
           </Link>
           <div className="pt-2 text-sm text-gray-500 font-light group-hover:opacity-0 transition-opacity duration-300">
-            {(product.price ?? 0).toLocaleString('tr-TR')} ₺
+            {formatPrice(product.price || 0)}
           </div>
           
           {/* Add to Cart Button (appears on hover) */}
@@ -60,7 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               }}
               className="text-[10px] font-bold uppercase tracking-[0.2em] border-b border-black pb-0.5 hover:text-[#AF9164] hover:border-[#AF9164] transition-colors"
             >
-              Sepete Ekle
+              {t('nav.cart', 'Sepete Ekle')}
             </button>
           </div>
       </div>
