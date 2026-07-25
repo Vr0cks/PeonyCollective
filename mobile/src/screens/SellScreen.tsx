@@ -649,6 +649,25 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   const [dimensions, setDimensions] = useState('');
   const [hardware, setHardware] = useState('');
 
+  // Admin & Supplier States
+  const [userRole, setUserRole] = useState<string>('buyer');
+  const [productOwnerType, setProductOwnerType] = useState<'peony' | 'supplier'>('peony');
+  const [suppliersList, setSuppliersList] = useState<any[]>([]);
+  const [selectedSupplierId, setSelectedSupplierId] = useState<string>('');
+  
+  // New Supplier Modal & Form (Admin only)
+  const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
+  const [newSupName, setNewSupName] = useState('');
+  const [newSupEmail, setNewSupEmail] = useState('');
+  const [newSupPhone, setNewSupPhone] = useState('');
+  const [newSupIban, setNewSupIban] = useState('');
+  const [newSupType, setNewSupType] = useState<'bireysel' | 'kurumsal'>('bireysel');
+  const [newSupTckn, setNewSupTckn] = useState('');
+  const [newSupVkn, setNewSupVkn] = useState('');
+  const [newSupCompanyTitle, setNewSupCompanyTitle] = useState('');
+  const [newSupAddress, setNewSupAddress] = useState('');
+  const [savingSupplier, setSavingSupplier] = useState(false);
+
   // Brand Autocomplete dropdown state
   const [showBrandDropdown, setShowBrandDropdown] = useState(false);
 
@@ -708,6 +727,70 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
   }
 
   const isEn = t('wishlistEmpty') === 'Your wishlist is empty.';
+
+  React.useEffect(() => {
+    async function loadUserDataAndSuppliers() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+          if (profile?.role) {
+            setUserRole(profile.role);
+            if (profile.role === 'admin') {
+              const { data: sups } = await supabase.from('suppliers').select('*').order('name');
+              if (sups) setSuppliersList(sups);
+            }
+          }
+        }
+      } catch (e) {
+        console.log('Error loading user role/suppliers:', e);
+      }
+    }
+    loadUserDataAndSuppliers();
+  }, []);
+
+  async function handleSaveNewSupplier() {
+    if (!newSupName || !newSupIban) {
+      showLuxuryAlert(
+        isEn ? 'Required Fields Missing' : 'Eksik Alanlar',
+        isEn ? 'Supplier name and IBAN are required.' : 'Tedarikçi adı ve IBAN alanları zorunludur.',
+        'warning'
+      );
+      return;
+    }
+    setSavingSupplier(true);
+    try {
+      const { data, error } = await supabase.from('suppliers').insert({
+        name: newSupName,
+        email: newSupEmail || null,
+        phone: newSupPhone || null,
+        iban: newSupIban.toUpperCase().replace(/\s+/g, ''),
+        submerchant_type: newSupType,
+        tckn: newSupTckn || null,
+        vkn: newSupVkn || null,
+        company_title: newSupCompanyTitle || null,
+        address: newSupAddress || null
+      }).select().single();
+
+      if (error) throw error;
+
+      showLuxuryAlert(
+        isEn ? 'Supplier Added' : 'Tedarikçi Eklendi',
+        isEn ? 'New supplier saved successfully.' : 'Yeni tedarikçi başarıyla kaydedildi.',
+        'success'
+      );
+      setShowAddSupplierModal(false);
+      setSuppliersList(prev => [...prev, data]);
+      setSelectedSupplierId(data.id);
+      // Reset form
+      setNewSupName(''); setNewSupEmail(''); setNewSupPhone(''); setNewSupIban('');
+      setNewSupTckn(''); setNewSupVkn(''); setNewSupCompanyTitle(''); setNewSupAddress('');
+    } catch (e: any) {
+      showLuxuryAlert('Hata', e.message || 'Tedarikçi eklenemedi.', 'error');
+    } finally {
+      setSavingSupplier(false);
+    }
+  }
 
   // Current category config
   const currentCategory = CATEGORY_CONFIGS.find(c => c.id === selectedCategoryId) || CATEGORY_CONFIGS[0];
@@ -957,7 +1040,12 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
 
       // 4. DB insert via XHR (fetch() Expo Go'da asılıyor, XHR native stack kullanır)
       console.log('[Submit] 3/4 Veritabanına kayıt yapılıyor...');
-      const insertPayload = {
+      
+      const chosenSupplierObj = userRole === 'admin' && productOwnerType === 'supplier'
+        ? suppliersList.find(s => s.id === selectedSupplierId)
+        : null;
+
+      const insertPayload: any = {
         id: productId,
         model_name: name,
         brand,
@@ -972,6 +1060,9 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
         status: 'pending',
         entrupy_status: entrupyStatusState === 'completed' ? 'pending' : null,
         authenticity_docs: [],
+        supplier: chosenSupplierObj?.name || null,
+        supplier_id: chosenSupplierObj?.id || null,
+        is_peony_vip: productOwnerType === 'peony',
         public_images: uploadedImagesList.length > 0
           ? uploadedImagesList
           : ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500']
@@ -1261,6 +1352,107 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
               </Text>
             </View>
           </View>
+
+          {/* Admin Owner / Supplier Selection Section */}
+          {userRole === 'admin' && (
+            <View style={[styles.formSectionCard, { borderLeftWidth: 3, borderLeftColor: COLORS.primary }]}>
+              <Text style={[styles.label, { color: COLORS.primary, fontWeight: '700' }]}>
+                {isEn ? '👑 ADMIN: PRODUCT OWNERSHIP' : '👑 ADMİN: ÜRÜN SAHİPLİĞİ DÜZENLEME'}
+              </Text>
+              <Text style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 12 }}>
+                {isEn 
+                  ? 'Specify if this product belongs directly to Peony or to an external supplier.' 
+                  : 'Bu ürünün doğrudan Peony VIP ürünü mü yoksa harici bir tedarikçiye mi ait olduğunu belirtin.'}
+              </Text>
+
+              {/* Toggle Buttons */}
+              <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: productOwnerType === 'peony' ? COLORS.primary : COLORS.border,
+                    backgroundColor: productOwnerType === 'peony' ? '#FDFBF7' : '#FFFFFF',
+                    alignItems: 'center'
+                  }}
+                  onPress={() => setProductOwnerType('peony')}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: 'bold', color: productOwnerType === 'peony' ? COLORS.primary : COLORS.text }}>
+                    {isEn ? '👑 Peony Collective VIP' : '👑 Peony Collective VIP'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: productOwnerType === 'supplier' ? COLORS.primary : COLORS.border,
+                    backgroundColor: productOwnerType === 'supplier' ? '#FDFBF7' : '#FFFFFF',
+                    alignItems: 'center'
+                  }}
+                  onPress={() => setProductOwnerType('supplier')}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: 'bold', color: productOwnerType === 'supplier' ? COLORS.primary : COLORS.text }}>
+                    {isEn ? '🏢 External Supplier' : '🏢 Tedarikçiye Ait'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Supplier Selector */}
+              {productOwnerType === 'supplier' && (
+                <View style={{ marginTop: 8 }}>
+                  <Text style={styles.label}>{isEn ? 'SELECT SUPPLIER' : 'TEDARİKÇİ SEÇİN'}</Text>
+                  
+                  {suppliersList.length > 0 ? (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 6 }}>
+                      {suppliersList.map(sup => (
+                        <TouchableOpacity
+                          key={sup.id}
+                          style={{
+                            paddingVertical: 8,
+                            paddingHorizontal: 14,
+                            borderRadius: 20,
+                            backgroundColor: selectedSupplierId === sup.id ? COLORS.primary : COLORS.chipBg,
+                            marginRight: 8
+                          }}
+                          onPress={() => setSelectedSupplierId(sup.id)}
+                        >
+                          <Text style={{ fontSize: 12, fontWeight: 'bold', color: selectedSupplierId === sup.id ? '#FFFFFF' : COLORS.text }}>
+                            {sup.name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  ) : (
+                    <Text style={{ fontSize: 11, color: COLORS.danger, marginVertical: 4 }}>
+                      {isEn ? 'No supplier defined yet.' : 'Henüz sisteme tanımlı tedarikçi bulunmuyor.'}
+                    </Text>
+                  )}
+
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 8,
+                      paddingVertical: 8
+                    }}
+                    onPress={() => setShowAddSupplierModal(true)}
+                  >
+                    <Text style={{ fontSize: 12, fontWeight: 'bold', color: COLORS.primary }}>
+                      {isEn ? '+ Add New Supplier' : '+ Yeni Tedarikçi Oluştur & Bilgilerini Gir'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Brand Autocomplete Input & Trending Chips */}
           <View style={[styles.formSectionCard, { zIndex: 10 }]}>
@@ -2069,6 +2261,169 @@ export default function SellScreen({ onSuccess }: SellScreenProps) {
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+
+      {/* NEW SUPPLIER MODAL (ADMIN ONLY) */}
+      <Modal
+        visible={showAddSupplierModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowAddSupplierModal(false)}
+      >
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 16 }}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <View style={{ backgroundColor: '#FFFFFF', borderRadius: 16, padding: 20, maxHeight: '90%' }}>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: COLORS.text }}>
+                    {isEn ? '🏢 Add New Supplier' : '🏢 Yeni Tedarikçi Oluştur'}
+                  </Text>
+                  <TouchableOpacity onPress={() => setShowAddSupplierModal(false)}>
+                    <Text style={{ fontSize: 18, color: COLORS.textMuted }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.label}>{isEn ? 'SUPPLIER NAME' : 'TEDARİKÇİ ADI / UNVANI'}</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={isEn ? "e.g. Luxury Vintage Istanbul" : "Örn. Ahmet Yılmaz / Tedarikçi A"}
+                  value={newSupName}
+                  onChangeText={setNewSupName}
+                />
+
+                <Text style={[styles.label, { marginTop: 10 }]}>IBAN</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="TR..."
+                  autoCapitalize="characters"
+                  value={newSupIban}
+                  onChangeText={setNewSupIban}
+                />
+
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.label}>{isEn ? 'EMAIL' : 'E-POSTA'}</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="info@..."
+                      keyboardType="email-address"
+                      value={newSupEmail}
+                      onChangeText={setNewSupEmail}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.label}>{isEn ? 'PHONE' : 'TELEFON'}</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="05..."
+                      keyboardType="phone-pad"
+                      value={newSupPhone}
+                      onChangeText={setNewSupPhone}
+                    />
+                  </View>
+                </View>
+
+                <Text style={[styles.label, { marginTop: 10 }]}>{isEn ? 'SUPPLIER TYPE' : 'TEDARİKÇİ TÜRÜ'}</Text>
+                <View style={{ flexDirection: 'row', gap: 10, marginVertical: 6 }}>
+                  <TouchableOpacity
+                    style={{
+                      flex: 1,
+                      paddingVertical: 8,
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: newSupType === 'bireysel' ? COLORS.primary : COLORS.border,
+                      backgroundColor: newSupType === 'bireysel' ? '#FDFBF7' : '#FFFFFF',
+                      alignItems: 'center'
+                    }}
+                    onPress={() => setNewSupType('bireysel')}
+                  >
+                    <Text style={{ fontSize: 12, fontWeight: 'bold', color: newSupType === 'bireysel' ? COLORS.primary : COLORS.text }}>
+                      {isEn ? 'Individual' : 'Bireysel'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      flex: 1,
+                      paddingVertical: 8,
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: newSupType === 'kurumsal' ? COLORS.primary : COLORS.border,
+                      backgroundColor: newSupType === 'kurumsal' ? '#FDFBF7' : '#FFFFFF',
+                      alignItems: 'center'
+                    }}
+                    onPress={() => setNewSupType('kurumsal')}
+                  >
+                    <Text style={{ fontSize: 12, fontWeight: 'bold', color: newSupType === 'kurumsal' ? COLORS.primary : COLORS.text }}>
+                      {isEn ? 'Corporate' : 'Kurumsal'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {newSupType === 'bireysel' ? (
+                  <View style={{ marginTop: 6 }}>
+                    <Text style={styles.label}>TC KİMLİK NO (TCKN)</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="11 haneli TCKN"
+                      keyboardType="numeric"
+                      maxLength={11}
+                      value={newSupTckn}
+                      onChangeText={setNewSupTckn}
+                    />
+                  </View>
+                ) : (
+                  <View style={{ marginTop: 6 }}>
+                    <Text style={styles.label}>VERGİ KİMLİK NO (VKN)</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="10 haneli VKN"
+                      keyboardType="numeric"
+                      maxLength={10}
+                      value={newSupVkn}
+                      onChangeText={setNewSupVkn}
+                    />
+                    <Text style={[styles.label, { marginTop: 10 }]}>RESMİ ŞİRKET UNVANI</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Lüks Tekstil A.Ş."
+                      value={newSupCompanyTitle}
+                      onChangeText={setNewSupCompanyTitle}
+                    />
+                  </View>
+                )}
+
+                <Text style={[styles.label, { marginTop: 10 }]}>{isEn ? 'ADDRESS' : 'YASAL FATURA ADRESİ'}</Text>
+                <TextInput
+                  style={[styles.input, { height: 60 }]}
+                  placeholder={isEn ? "Full legal address" : "Fatura / Yasal tebligat adresi"}
+                  multiline
+                  value={newSupAddress}
+                  onChangeText={setNewSupAddress}
+                />
+
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: COLORS.primary,
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                    marginTop: 20
+                  }}
+                  disabled={savingSupplier}
+                  onPress={handleSaveNewSupplier}
+                >
+                  {savingSupplier ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 13 }}>
+                      {isEn ? 'SAVE SUPPLIER & SELECT' : 'KAYDET VE SEÇ'}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
 
     </KeyboardAvoidingView>

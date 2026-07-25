@@ -136,6 +136,16 @@ export default async function ProductDetailPage({
               {/* Teknik Detaylar Özeti */}
               <FadeIn delay={0.3} direction="left" className="grid grid-cols-2 gap-y-8 pt-4">
                 <div>
+                  <h4 className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-2">SATICI</h4>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#AF9164]">
+                    {product.is_peony_vip
+                      ? 'PEONY COLLECTIVE VIP'
+                      : sellerProfile
+                      ? `${sellerProfile.first_name || ''} ${sellerProfile.last_name || ''}`.trim() || 'PEONY COLLECTIVE'
+                      : 'PEONY COLLECTIVE'}
+                  </p>
+                </div>
+                <div>
                   <h4 className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-2">KONDİSYON</h4>
                   <p className="text-[11px] font-bold uppercase tracking-widest text-black">{product.condition}</p>
                 </div>
@@ -144,7 +154,7 @@ export default async function ProductDetailPage({
                   <p className="text-[11px] font-bold uppercase tracking-widest text-black">{product.purchase_year || 'BİLİNMİYOR'}</p>
                 </div>
                 {product.dimensions && (
-                  <div className="col-span-2">
+                  <div>
                     <h4 className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-2">BOYUTLAR</h4>
                     <p className="text-[11px] font-bold uppercase tracking-widest text-black">{product.dimensions}</p>
                   </div>

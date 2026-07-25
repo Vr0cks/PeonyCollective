@@ -97,15 +97,18 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     <p className="text-[10px] font-bold text-[#AF9164] uppercase tracking-wider">{product.brand}</p>
                     <p className="text-sm font-semibold text-white/90 truncate">{product.model_name}</p>
                     <p className="text-[10px] text-white/30 mt-0.5">{product.category} · {product.condition}</p>
-                    {/* Kime ait olduğunu ürünün hemen altında göster */}
-                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-medium text-white/40">Ait Olduğu:</span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-[#AF9164]/15 text-[#AF9164] border border-[#AF9164]/30">
-                        {ownerInfo}
+                    {/* Kime ait olduğunu ürünün hemen altında açıkça göster */}
+                    <div className="mt-1 flex items-center gap-2 flex-wrap text-[10px]">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-semibold bg-[#AF9164]/15 text-[#AF9164] border border-[#AF9164]/30">
+                        Satıcı: {product.is_peony_vip ? 'Peony Collective VIP' : sellerName}
                       </span>
-                      {supplierName && sellerName !== 'Anonim' && (
-                        <span className="text-[9px] text-white/30">
-                          (Ekleyen: {sellerName})
+                      {supplierName ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                          Tedarikçi: {supplierName}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-medium bg-white/5 text-white/40 border border-white/10">
+                          Tedarikçi: Yok (Doğrudan Satıcı)
                         </span>
                       )}
                     </div>

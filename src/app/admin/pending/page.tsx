@@ -126,10 +126,20 @@ export default async function AdminPendingPage() {
                       <h2 className="text-lg font-semibold text-white leading-tight">{product.model_name}</h2>
                       <p className="text-white/40 text-xs mt-1">{product.category} • {product.condition}</p>
                       
-                      {/* Ürünün kime ait olduğu */}
-                      <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#AF9164]/15 border border-[#AF9164]/30">
-                        <span className="text-[10px] font-bold text-[#AF9164]">Ait Olduğu:</span>
-                        <span className="text-[11px] font-semibold text-white/90">{ownerInfo}</span>
+                      {/* Ürünün Satıcı / Tedarikçi bilgisi */}
+                      <div className="mt-2 flex items-center gap-2 flex-wrap text-[10px]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-semibold bg-[#AF9164]/15 text-[#AF9164] border border-[#AF9164]/30">
+                          Satıcı: {product.is_peony_vip ? 'Peony Collective VIP' : sellerName}
+                        </span>
+                        {supplierName ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                            Tedarikçi: {supplierName}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-medium bg-white/5 text-white/40 border border-white/10">
+                            Tedarikçi: Yok
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="text-right">
