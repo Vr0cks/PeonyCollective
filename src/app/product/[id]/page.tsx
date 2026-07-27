@@ -12,6 +12,81 @@ import FadeIn from '@/src/components/animations/FadeIn'
 import ProductActionButtons from '@/src/components/ProductActionButtons'
 import DynamicPriceDisplay from '@/src/components/DynamicPriceDisplay'
 
+// Helper to parse **bold** text inside lines
+function parseBoldText(text: string) {
+  const parts = text.split(/\*\*([^*]+)\*\*/g)
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+      return <strong key={i} className="font-semibold text-black">{part}</strong>
+    }
+    return part
+  })
+}
+
+// Markdown Formatter Helper
+function renderFormattedDescription(text: string) {
+  if (!text) return null
+  
+  // Normalize newlines and split into lines
+  const lines = text.replace(/\\n/g, '\n').split('\n')
+  
+  return (
+    <div className="space-y-6 text-sm text-gray-700 leading-relaxed font-sans max-w-full">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim()
+        if (!trimmed) return <div key={idx} className="h-2" />
+        
+        // Horizontal rule
+        if (trimmed === '---') {
+          return <hr key={idx} className="my-8 border-gray-100" />
+        }
+        
+        // Headers
+        if (trimmed.startsWith('# ')) {
+          return (
+            <h2 key={idx} className="text-xl font-playfair font-normal text-black mt-8 mb-4 tracking-wide uppercase border-b border-gray-100 pb-2">
+              {trimmed.substring(2)}
+            </h2>
+          )
+        }
+        if (trimmed.startsWith('## ')) {
+          return (
+            <h3 key={idx} className="text-lg font-playfair font-normal text-black mt-6 mb-3 tracking-wide uppercase">
+              {trimmed.substring(3)}
+            </h3>
+          )
+        }
+        if (trimmed.startsWith('### ')) {
+          return (
+            <h4 key={idx} className="text-xs font-bold text-gray-900 mt-8 mb-4 tracking-widest uppercase">
+              {trimmed.substring(4)}
+            </h4>
+          )
+        }
+        
+        // List items
+        if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+          const content = trimmed.substring(2)
+          return (
+            <ul key={idx} className="list-disc pl-5 my-2">
+              <li className="text-gray-600 font-light">
+                {parseBoldText(content)}
+              </li>
+            </ul>
+          )
+        }
+        
+        // Regular paragraph
+        return (
+          <p key={idx} className="text-gray-600 font-light leading-relaxed">
+            {parseBoldText(trimmed)}
+          </p>
+        )
+      })}
+    </div>
+  )
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -101,6 +176,55 @@ export default async function ProductDetailPage({
               />
             </FadeIn>
 
+            {/* PEONY UZMAN RAPORU */}
+            <FadeIn delay={0.3} className="mt-8 border border-gray-200 p-8 glass w-full">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black mb-6">
+                PEONY UZMAN RAPORU
+              </h4>
+              
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-end mb-2">
+                    <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em]">KOKU SKORU</span>
+                    <span className="text-[10px] font-bold tracking-widest text-black">{product.odor_score || 10}/10</span>
+                  </div>
+                  <div className="w-full bg-gray-100 h-[1px]">
+                    <div className="bg-black h-[2px] -mt-[0.5px]" style={{ width: `${(product.odor_score || 10) * 10}%` }}></div>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em] block mb-2">BAKIM GEÇMİŞİ</span>
+                  {product.has_spa_treatment ? (
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-800">
+                      ORİJİNAL DIŞI MÜDAHALE/BOYA
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-black">
+                      %100 FABRİKA KONDİSYONU
+                    </span>
+                  )}
+                </div>
+
+                <div className="pt-4">
+                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em] block mb-3">İÇERİK (FULL SET)</span>
+                  <div className="flex flex-wrap gap-2">
+                    {product.full_set_items && product.full_set_items.length > 0 ? (
+                      product.full_set_items.map((item: string, i: number) => (
+                        <span key={i} className="text-[9px] font-bold px-3 py-1.5 border border-gray-200 text-black uppercase tracking-[0.2em]">
+                          {item}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                        SADECE ÜRÜN
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+
             {/* KUSUR VE DEFO GALERİSİ (Varsa) */}
             {product.flaw_images && product.flaw_images.length > 0 && (
               <FadeIn delay={0.2} className="mt-20 p-8 border border-gray-200">
@@ -162,59 +286,9 @@ export default async function ProductDetailPage({
                 )}
               </FadeIn>
 
-              {/* UZMAN RAPORU */}
-              <FadeIn delay={0.4} direction="left" className="border border-gray-200 p-8 glass">
-                <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black mb-6">
-                  PEONY UZMAN RAPORU
-                </h4>
-                
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex justify-between items-end mb-2">
-                      <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em]">KOKU SKORU</span>
-                      <span className="text-[10px] font-bold tracking-widest text-black">{product.odor_score || 10}/10</span>
-                    </div>
-                    <div className="w-full bg-gray-100 h-[1px]">
-                      <div className="bg-black h-[2px] -mt-[0.5px]" style={{ width: `${(product.odor_score || 10) * 10}%` }}></div>
-                    </div>
-                  </div>
 
-                  <div className="pt-4">
-                    <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em] block mb-2">BAKIM GEÇMİŞİ</span>
-                    {product.has_spa_treatment ? (
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-800">
-                        ORİJİNAL DIŞI MÜDAHALE/BOYA
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-black">
-                        %100 FABRİKA KONDİSYONU
-                      </span>
-                    )}
-                  </div>
 
-                  <div className="pt-4">
-                    <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em] block mb-3">İÇERİK (FULL SET)</span>
-                    <div className="flex flex-wrap gap-2">
-                      {product.full_set_items && product.full_set_items.length > 0 ? (
-                        product.full_set_items.map((item: string, i: number) => (
-                          <span key={i} className="text-[9px] font-bold px-3 py-1.5 border border-gray-200 text-black uppercase tracking-[0.2em]">
-                            {item}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                          SADECE ÜRÜN
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </FadeIn>
 
-              {/* Açıklama */}
-              <FadeIn delay={0.5} direction="left" className="text-[12px] leading-loose text-gray-600 font-light italic font-playfair border-l-2 border-[#AF9164] pl-6 my-10">
-                "{product.description}"
-              </FadeIn>
 
               {/* Butonlar & AR */}
               <FadeIn delay={0.6} direction="left" className="flex flex-col gap-3 pt-6 border-t border-gray-200">
@@ -238,6 +312,16 @@ export default async function ProductDetailPage({
             </div>
           </div>
         </div>
+
+        {/* Açıklama Alanı (Geniş Yerleşim) */}
+        {product.description && (
+          <div className="mt-28 pt-20 border-t border-gray-100 max-w-3xl mx-auto">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-10 text-center">
+              ÜRÜN DETAYLARI & HİKAYESİ
+            </h3>
+            {renderFormattedDescription(product.description)}
+          </div>
+        )}
       </div>
     </main>
   )
