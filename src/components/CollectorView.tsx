@@ -8,23 +8,14 @@ import { useState } from 'react'
 import { approveOrder } from '@/src/app/orders/actions'
 import { createConversation, getAdminIdAction } from '@/src/app/messages/actions'
 
+import { useSettings } from '@/src/context/SettingsContext'
+
 interface CollectorViewProps {
   orders: Order[]
   reservedOffers?: any[]
   conciergeRequests?: any[]
 }
 
-// Sipariş adımları
-const orderSteps = [
-  { key: 'paid',              label: 'Ödeme Alındı',   icon: CreditCard },
-  { key: 'shipped_to_lab',   label: "Lab'a Yolda",     icon: Truck },
-  { key: 'inspecting',       label: 'İnceleniyor',      icon: FlaskConical },
-  { key: 'lab_approved',     label: 'Onaylandı',        icon: CheckCircle2 },
-  { key: 'shipped_to_buyer', label: 'Kargoda',          icon: Package },
-  { key: 'delivered',        label: 'Teslim Edildi',    icon: MapPin },
-]
-
-// Hangi adıma kadar tamamlanmış?
 const stepOrder = ['pending_payment', 'paid', 'shipped_to_lab', 'inspecting', 'lab_approved', 'shipped_to_buyer', 'delivered', 'completed']
 
 function getCurrentStepIndex(status: string): number {
@@ -33,9 +24,19 @@ function getCurrentStepIndex(status: string): number {
 }
 
 export default function CollectorView({ orders, reservedOffers, conciergeRequests }: CollectorViewProps) {
+  const { t, formatPrice } = useSettings()
   const totalSpend = orders.reduce((s, o) => s + (o.total_price || 0), 0)
   const activeOrders = orders.filter(o => !['completed', 'delivered', 'cancelled', 'refunded'].includes(o.order_status))
   const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null)
+
+  const orderSteps = [
+    { key: 'paid',              label: t('dash.stepPaid', 'Ödeme Alındı'),   icon: CreditCard },
+    { key: 'shipped_to_lab',   label: t('dash.stepLab', "Lab'a Yolda"),     icon: Truck },
+    { key: 'inspecting',       label: t('dash.stepInspect', 'İnceleniyor'),      icon: FlaskConical },
+    { key: 'lab_approved',     label: t('dash.stepApprove', 'Onaylandı'),        icon: CheckCircle2 },
+    { key: 'shipped_to_buyer', label: t('dash.stepShipping', 'Kargoda'),          icon: Package },
+    { key: 'delivered',        label: t('dash.stepDelivered', 'Teslim Edildi'),    icon: MapPin },
+  ]
 
   const handleStartSupportChat = async () => {
     const adminRes = await getAdminIdAction()
@@ -69,18 +70,18 @@ export default function CollectorView({ orders, reservedOffers, conciergeRequest
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 mb-2">COLLECTOR DASHBOARD</p>
-          <h1 className="text-4xl serif-display italic text-gray-900">Koleksiyon Panelim</h1>
+          <h1 className="text-4xl serif-display italic text-gray-900">{t('dash.collectorTitle', 'Koleksiyon Panelim')}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Link 
             href="/settings" 
             className="text-[10px] font-bold uppercase tracking-widest border border-gray-200 text-gray-600 hover:text-black hover:border-black px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer"
           >
-            Hesap Ayarlarım
+            {t('nav.settings', 'Hesap Ayarlarım')}
           </Link>
           <div className="flex items-center gap-2 bg-zinc-900 text-white px-5 py-2.5 rounded-full">
             <Star size={12} className="text-yellow-400 fill-yellow-400" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Koleksiyoner Üyeliği Aktif</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">{t('dash.collectorActive', 'Koleksiyoner Üyeliği Aktif')}</span>
           </div>
         </div>
       </div>
@@ -89,21 +90,21 @@ export default function CollectorView({ orders, reservedOffers, conciergeRequest
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           {
-            label: 'Toplam Harcama',
-            value: `${totalSpend.toLocaleString('tr-TR')} ₺`,
-            sub: 'Tüm zamanlar',
+            label: t('dash.totalSpend', 'Toplam Harcama'),
+            value: formatPrice(totalSpend),
+            sub: t('dash.allTime', 'Tüm zamanlar'),
             color: 'text-gray-900',
           },
           {
-            label: 'Sahip Olunan Parça',
+            label: t('dash.itemsOwned', 'Sahip Olunan Parça'),
             value: `${orders.length}`,
-            sub: 'Koleksiyonunuzda',
+            sub: t('dash.inCollection', 'Koleksiyonunuzda'),
             color: 'text-gray-900',
           },
           {
-            label: 'Aktif Sipariş',
+            label: t('dash.activeOrders', 'Aktif Sipariş'),
             value: `${activeOrders.length}`,
-            sub: 'İşlem devam ediyor',
+            sub: t('dash.onTheWay', 'Teslimat aşamasında'),
             color: activeOrders.length > 0 ? 'text-amber-500' : 'text-emerald-500',
           },
         ].map((m) => (

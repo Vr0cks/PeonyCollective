@@ -1,6 +1,6 @@
 import { createClient } from '@/src/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import SettingsForm from '@/src/components/SettingsForm'
+import SettingsClientPage from './SettingsClientPage'
 import { decrypt } from '@/src/utils/crypto'
 
 export default async function SettingsPage() {
@@ -17,13 +17,5 @@ export default async function SettingsPage() {
     profile.vkn = decrypt(profile.vkn)
   }
 
-  return (
-    <main className="min-h-screen bg-white py-20 px-6">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-light uppercase tracking-widest mb-12 border-b pb-6">Hesap Ayarları</h1>
-        
-        <SettingsForm profile={profile} />
-      </div>
-    </main>
-  )
+  return <SettingsClientPage profile={profile} />
 }

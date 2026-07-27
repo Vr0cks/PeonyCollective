@@ -798,11 +798,12 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                 <input 
                   type="text" 
                   className={getInputClasses('brand')} 
-                  placeholder="Marka arayın (örn: Hermès, Chanel)..." 
+                  placeholder="Marka arayın veya yeni marka yazın (örn: Hermès, Chanel)..." 
                   value={brandSearchQuery} 
                   onChange={(e) => {
-                    setBrandSearchQuery(e.target.value)
-                    setSelectedBrand('')
+                    const val = e.target.value
+                    setBrandSearchQuery(val)
+                    setSelectedBrand(val)
                     setSelectedModel('')
                     setModelSearchQuery('')
                   }}
@@ -810,7 +811,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                   onBlur={() => setTimeout(() => setBrandDropdownOpen(false), 200)}
                   required
                 />
-                {brandDropdownOpen && filteredBrands.length > 0 && (
+                {brandDropdownOpen && (
                   <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
                     {filteredBrands.map(b => (
                       <button
@@ -826,6 +827,19 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                         {b.name}
                       </button>
                     ))}
+                    {brandSearchQuery.trim().length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedBrand(brandSearchQuery.trim())
+                          setBrandSearchQuery(brandSearchQuery.trim())
+                          setBrandDropdownOpen(false)
+                        }}
+                        className="w-full text-left px-5 py-3 text-sm bg-gray-50 hover:bg-[#AF9164]/20 text-[#AF9164] font-bold uppercase tracking-wider border-none cursor-pointer"
+                      >
+                        ➕ &quot;{brandSearchQuery.trim().toUpperCase()}&quot; Markasını Manuel Ekle / Yaz
+                      </button>
+                    )}
                   </div>
                 )}
                 {renderErrorMsg('brand')}
@@ -836,11 +850,12 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                 <input 
                   type="text" 
                   className={getInputClasses('model')} 
-                  placeholder={selectedBrand ? "Model arayın (örn: Birkin 30)..." : "Önce marka seçiniz"} 
+                  placeholder={selectedBrand ? "Model arayın veya yazın (örn: Birkin 30)..." : "Önce marka seçiniz veya yazınız"} 
                   value={modelSearchQuery} 
                   onChange={(e) => {
-                    setModelSearchQuery(e.target.value)
-                    setSelectedModel('')
+                    const val = e.target.value
+                    setModelSearchQuery(val)
+                    setSelectedModel(val)
                   }}
                   onFocus={() => {
                     if (selectedBrand) setModelDropdownOpen(true)
@@ -870,11 +885,12 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                         type="button"
                         onClick={() => {
                           setSelectedModel(modelSearchQuery.trim())
+                          setModelSearchQuery(modelSearchQuery.trim())
                           setModelDropdownOpen(false)
                         }}
                         className="w-full text-left px-5 py-3 text-sm bg-gray-50 hover:bg-[#AF9164]/20 text-[#AF9164] font-bold uppercase tracking-wider border-none cursor-pointer"
                       >
-                        ➕ &quot;{modelSearchQuery.trim().toUpperCase()}&quot; Modelini Manuel Yaz
+                        ➕ &quot;{modelSearchQuery.trim().toUpperCase()}&quot; Modelini Manuel Yaz / Ekle
                       </button>
                     )}
                   </div>

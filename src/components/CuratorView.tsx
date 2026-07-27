@@ -4,6 +4,7 @@ import { Package, Clock, TrendingUp, Sparkles, Plus, ArrowUpRight } from 'lucide
 import Link from 'next/link'
 import Image from 'next/image'
 import { Product } from '@/src/types'
+import { useSettings } from '@/src/context/SettingsContext'
 
 interface CuratorViewProps {
   myProducts: Product[]
@@ -12,16 +13,17 @@ interface CuratorViewProps {
   pendingApproval: number
 }
 
-const statusConfig: Record<string, { label: string; dot: string; badge: string }> = {
-  pending:  { label: 'Onay Bekliyor',     dot: 'bg-amber-400',  badge: 'bg-amber-400/10 text-amber-400 border-amber-400/20' },
-  approved: { label: 'Aktif / Piyasada', dot: 'bg-emerald-400', badge: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20' },
-  rejected: { label: 'Reddedildi',        dot: 'bg-red-400',    badge: 'bg-red-400/10 text-red-400 border-red-400/20' },
-  sold:     { label: 'Satıldı',           dot: 'bg-[#AF9164]',  badge: 'bg-[#AF9164]/10 text-[#AF9164] border-[#AF9164]/20' },
-}
-
 export default function CuratorView({ myProducts, totalEarnings, activeSales, pendingApproval }: CuratorViewProps) {
+  const { t, formatPrice } = useSettings()
   const soldCount  = myProducts.filter(p => p.status === 'sold').length
   const totalCount = myProducts.length
+
+  const statusConfig: Record<string, { label: string; dot: string; badge: string }> = {
+    pending:  { label: t('dash.pendingApproval', 'Onay Bekliyor'),     dot: 'bg-amber-400',  badge: 'bg-amber-400/10 text-amber-400 border-amber-400/20' },
+    approved: { label: t('dash.inMarket', 'Aktif / Piyasada'), dot: 'bg-emerald-400', badge: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20' },
+    rejected: { label: 'Reddedildi',        dot: 'bg-red-400',    badge: 'bg-red-400/10 text-red-400 border-red-400/20' },
+    sold:     { label: t('dash.soldItems', 'Satıldı'),           dot: 'bg-[#AF9164]',  badge: 'bg-[#AF9164]/10 text-[#AF9164] border-[#AF9164]/20' },
+  }
 
   return (
     <div className="space-y-10">
@@ -30,14 +32,14 @@ export default function CuratorView({ myProducts, totalEarnings, activeSales, pe
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 mb-2">CURATOR DASHBOARD</p>
-          <h1 className="text-4xl serif-display italic text-gray-900">Mağaza Terminali</h1>
+          <h1 className="text-4xl serif-display italic text-gray-900">{t('dash.curatorTitle', 'Mağaza Terminali')}</h1>
         </div>
         <Link
           href="/sell"
           className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3 rounded-full hover:bg-[#AF9164] transition-all duration-300 text-xs font-bold uppercase tracking-widest group"
         >
           <Plus size={14} />
-          Yeni Ürün Ekle
+          {t('dash.addNewProduct', 'Yeni Ürün Ekle')}
           <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
         </Link>
       </div>
@@ -46,30 +48,30 @@ export default function CuratorView({ myProducts, totalEarnings, activeSales, pe
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           {
-            label: 'Toplam Kazanç',
-            value: `${totalEarnings.toLocaleString('tr-TR')} ₺`,
-            sub: 'Tamamlanan satışlar',
+            label: t('dash.totalEarnings', 'Toplam Kazanç'),
+            value: formatPrice(totalEarnings),
+            sub: t('dash.completedSales', 'Tamamlanan satışlar'),
             icon: <TrendingUp size={20} strokeWidth={1.5} className="text-[#AF9164]" />,
             accent: 'border-[#AF9164]/20',
           },
           {
-            label: 'Aktif İlanlar',
+            label: t('dash.activeListings', 'Aktif İlanlar'),
             value: `${activeSales}`,
-            sub: 'Piyasada bekliyor',
+            sub: t('dash.inMarket', 'Piyasada bekliyor'),
             icon: <Package size={20} strokeWidth={1.5} className="text-emerald-500" />,
             accent: 'border-emerald-200',
           },
           {
-            label: 'Onay Bekliyor',
+            label: t('dash.pendingApproval', 'Onay Bekliyor'),
             value: `${pendingApproval}`,
-            sub: 'Peony Lab inceliyor',
+            sub: t('dash.labInspecting', 'Peony Lab inceliyor'),
             icon: <Clock size={20} strokeWidth={1.5} className="text-amber-500" />,
             accent: pendingApproval > 0 ? 'border-amber-300' : 'border-gray-100',
           },
           {
-            label: 'Satılan Ürün',
+            label: t('dash.soldItems', 'Satılan Ürün'),
             value: `${soldCount}`,
-            sub: `${totalCount} üründen`,
+            sub: `${totalCount} ${t('product.inCollection', 'üründen')}`,
             icon: <Sparkles size={20} strokeWidth={1.5} className="text-gray-400" />,
             accent: 'border-gray-100',
           },
