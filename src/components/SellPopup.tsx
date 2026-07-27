@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { X, Sparkles, ArrowRight } from 'lucide-react'
+import { useSettings } from '@/src/context/SettingsContext'
 
 export default function SellPopup() {
   const [isOpen, setIsOpen] = useState(false)
+  const { t, language } = useSettings()
 
   useEffect(() => {
     // Sadece ana sayfada ilk girişte bir kez göster (veya session'da tut)
@@ -39,7 +41,7 @@ export default function SellPopup() {
             {/* Kapat Butonu */}
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-black bg-white/50 rounded-full hover:bg-gray-100 transition-all"
+              className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-black bg-white/50 rounded-full hover:bg-gray-100 transition-all cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -51,32 +53,35 @@ export default function SellPopup() {
                <div className="absolute bottom-6 left-8">
                   <div className="flex items-center gap-2 text-[#AF9164] mb-2">
                     <Sparkles size={16} />
-                    <span className="sans-detail">PREMIUM İKİNCİ EL</span>
+                    <span className="sans-detail">{t('popup.badge', language === 'en' ? 'PREMIUM PRE-OWNED' : 'PREMIUM İKİNCİ EL')}</span>
                   </div>
-                  <h2 className="text-3xl md:text-4xl text-white serif-display">Dolabınızdaki <br/><span className="italic">Lüksü Nakde Çevirin</span></h2>
+                  <h2 className="text-3xl md:text-4xl text-white serif-display">
+                    {t('popup.titleLine1', language === 'en' ? 'Turn Your Closet' : 'Dolabınızdaki')} <br/>
+                    <span className="italic">{t('popup.titleLine2', language === 'en' ? 'Luxury Into Cash' : 'Lüksü Nakde Çevirin')}</span>
+                  </h2>
                </div>
             </div>
 
             {/* İçerik */}
             <div className="p-8">
               <p className="text-gray-500 font-light leading-relaxed text-sm mb-8">
-                Kullanmadığınız tasarımcı çantalarınızı, kıyafetlerinizi veya ayakkabılarınızı Peony Collective güvencesiyle hemen satın. Süreci biz yönetelim, kazanç hesabınıza yatsın.
+                {t('popup.desc', language === 'en' ? 'Sell your unused designer bags, clothing, or shoes with Peony Collective guarantee. We manage the process and send your earnings straight to your account.' : 'Kullanmadığınız tasarımcı çantalarınızı, kıyafetlerinizi veya ayakkabılarınızı Peony Collective güvencesiyle hemen satın. Süreci biz yönetelim, kazanç hesabınıza yatsın.')}
               </p>
 
               <div className="flex flex-col gap-3">
                 <Link 
                   href="/sell-with-us" 
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-4 px-6 hover:bg-[#AF9164] transition-colors duration-300 sans-detail"
+                  className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-4 px-6 hover:bg-[#AF9164] transition-colors duration-300 sans-detail font-bold tracking-wider"
                 >
-                  Hemen Satışa Başla
+                  {t('popup.startSelling', language === 'en' ? 'START SELLING NOW' : 'HEMEN SATIŞA BAŞLA')}
                   <ArrowRight size={16} />
                 </Link>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="py-3 text-xs text-gray-400 hover:text-black uppercase tracking-widest font-bold mt-2"
+                  className="py-3 text-xs text-gray-400 hover:text-black uppercase tracking-widest font-bold mt-2 cursor-pointer transition-colors"
                 >
-                  Daha Sonra
+                  {t('popup.later', language === 'en' ? 'MAYBE LATER' : 'DAHA SONRA')}
                 </button>
               </div>
             </div>

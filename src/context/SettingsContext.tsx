@@ -269,7 +269,13 @@ const translations: Record<Language, Record<string, string>> = {
     'dash.stepInspect': 'İnceleniyor',
     'dash.stepApprove': 'Onaylandı',
     'dash.stepShipping': 'Kargoda',
-    'dash.stepDelivered': 'Teslim Edildi'
+    'dash.stepDelivered': 'Teslim Edildi',
+    'popup.badge': 'PREMIUM İKİNCİ EL',
+    'popup.titleLine1': 'Dolabınızdaki',
+    'popup.titleLine2': 'Lüksü Nakde Çevirin',
+    'popup.desc': 'Kullanmadığınız tasarımcı çantalarınızı, kıyafetlerinizi veya ayakkabılarınızı Peony Collective güvencesiyle hemen satın. Süreci biz yönetelim, kazanç hesabınıza yatsın.',
+    'popup.startSelling': 'HEMEN SATIŞA BAŞLA',
+    'popup.later': 'DAHA SONRA'
   },
   en: {
     'topbar.announcement': '✦ 100% VERIFIED AUTHENTICITY & SAME-DAY CONCIERGE DELIVERY IN ISTANBUL',
@@ -512,7 +518,13 @@ const translations: Record<Language, Record<string, string>> = {
     'dash.stepInspect': 'Under Inspection',
     'dash.stepApprove': 'Approved',
     'dash.stepShipping': 'Shipped',
-    'dash.stepDelivered': 'Delivered'
+    'dash.stepDelivered': 'Delivered',
+    'popup.badge': 'PREMIUM PRE-OWNED',
+    'popup.titleLine1': 'Turn Your Closet',
+    'popup.titleLine2': 'Luxury Into Cash',
+    'popup.desc': 'Sell your unused designer bags, clothing, or shoes with Peony Collective guarantee. We manage the process and send your earnings straight to your account.',
+    'popup.startSelling': 'START SELLING NOW',
+    'popup.later': 'MAYBE LATER'
   }
 }
 
