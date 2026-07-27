@@ -1130,90 +1130,138 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
             <div className="pt-10 border-t border-gray-100">
               <div className="max-w-xl mx-auto space-y-6">
                 
-                {/* ADMIN ÖZEL KONTROL PANELİ */}
+                {/* ADMIN ÖZEL YÖNETİM & KAR HESAPLAMA PANELİ */}
                 {userRole === 'admin' && (
-                  <div className="bg-[#1A1A1A] text-white p-6 rounded-2xl border border-emerald-500/30 space-y-6 text-left shadow-xl mb-8">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="bg-white p-6 sm:p-7 rounded-2xl border-2 border-[#AF9164]/30 space-y-6 text-left shadow-lg mb-8">
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                       <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">⚡ ADMIN ÖZEL KONTROL VE HESAPLAMA PANELİ</h4>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#AF9164] animate-pulse" />
+                        <h4 className="text-xs font-bold uppercase tracking-[0.25em] text-[#AF9164]">YÖNETİCİ KONTROL VE FİNANSAL HESAPLAMA PANELİ</h4>
                       </div>
-                      <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-mono uppercase">Role: Admin</span>
+                      <span className="text-[9px] font-bold bg-[#AF9164]/10 text-[#AF9164] border border-[#AF9164]/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Admin Yetkisi
+                      </span>
                     </div>
 
-                    {/* 1. Ürün Durumu & Yayın Kontrolü */}
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Ürün Yayın Durumu</label>
+                    {/* 1. Ürün Yayın Durumu */}
+                    <div className="space-y-2.5">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ürün Yayın Durumu</label>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {[
-                          { key: 'approved', label: '⚡ Vitrine Çıkar', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' },
-                          { key: 'pending', label: '⏳ Onay Bekliyor', color: 'bg-amber-500/20 text-amber-400 border-amber-500/40' },
-                          { key: 'sold', label: '🏷️ Satıldı', color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
-                          { key: 'rejected', label: '❌ Reddet', color: 'bg-red-500/20 text-red-400 border-red-500/40' }
-                        ].map(item => (
-                          <button
-                            key={item.key}
-                            type="button"
-                            onClick={() => setAdminStatus(item.key as any)}
-                            className={`px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border transition-all text-center ${
-                              adminStatus === item.key ? item.color + ' ring-2 ring-emerald-500' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
-                            }`}
-                          >
-                            {item.label}
-                          </button>
-                        ))}
+                          { key: 'approved', label: '✦ Vitrine Çıkar', desc: 'Sitede Yayında' },
+                          { key: 'pending', label: '⏳ Onay Bekliyor', desc: 'İnceleme Aşamasında' },
+                          { key: 'sold', label: '🏷️ Satıldı', desc: 'Vitrin Dışı / Satıldı' },
+                          { key: 'rejected', label: '❌ Reddet', desc: 'Pasif İlan' }
+                        ].map(item => {
+                          const isSelected = adminStatus === item.key
+                          return (
+                            <button
+                              key={item.key}
+                              type="button"
+                              onClick={() => setAdminStatus(item.key as any)}
+                              className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
+                                isSelected 
+                                  ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-md' 
+                                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-[#AF9164]'
+                              }`}
+                            >
+                              <p className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-[#AF9164]' : ''}`}>{item.label}</p>
+                              <p className="text-[9px] text-gray-400 mt-0.5">{item.desc}</p>
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
 
-                    {/* 2. Satıcı Hak Edişi & Kar Marjı Hesabı */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Satıcı Hak Edişi / Alış Fiyatı (TL)</label>
-                        <input
-                          type="number"
-                          placeholder="Örn: 80000"
-                          value={sellerPayout}
-                          onChange={(e) => setSellerPayout(e.target.value)}
-                          className="w-full bg-zinc-900 border border-zinc-800 focus:border-emerald-500 text-white px-4 py-2.5 rounded-xl text-sm focus:outline-none"
-                        />
+                    {/* 2. Fiyatlandırma & Kar Marjı Açıklamalı Hesaplayıcı */}
+                    <div className="space-y-3 pt-4 border-t border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Fiyatlandırma & Kar Marjı Hesabı</label>
+                        <span className="text-[10px] text-gray-400 italic">Canlı Otomatik Hesaplama</span>
                       </div>
 
-                      {/* Otomatik Marj Kartı */}
-                      <div className="bg-zinc-900 border border-zinc-800 p-3.5 rounded-xl flex flex-col justify-between">
-                        <div className="flex justify-between items-center text-[10px] uppercase font-bold text-zinc-400">
-                          <span>Platform Brüt Karı:</span>
-                          <span className="text-emerald-400 text-xs font-mono">
-                            {formPrice && sellerPayout 
-                              ? `${(parseFloat(formPrice) - parseFloat(sellerPayout)).toLocaleString('tr-TR')} ₺`
-                              : '0 ₺'}
-                          </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Müşteri Satış Fiyatı */}
+                        <div className="space-y-1.5 bg-[#FAF8F5] p-4 rounded-xl border border-[#AF9164]/20">
+                          <label className="text-[10px] font-bold text-[#AF9164] uppercase tracking-wider block">1. Müşteri Satış Fiyatı (TL)</label>
+                          <input
+                            type="number"
+                            placeholder="Örn: 400000"
+                            value={formPrice}
+                            onChange={(e) => setFormPrice(e.target.value)}
+                            className="w-full bg-white border border-gray-200 focus:border-[#AF9164] text-black font-bold px-3.5 py-2 rounded-lg text-base focus:outline-none"
+                          />
+                          <p className="text-[9px] text-gray-400">Sitede ziyaretçilere gösterilecek nihai satış tutarı.</p>
                         </div>
-                        <div className="flex justify-between items-center text-[10px] uppercase font-bold text-zinc-400 mt-2">
-                          <span>Kar Marjı Oranı:</span>
-                          <span className="text-[#AF9164] text-xs font-mono">
-                            {formPrice && sellerPayout && parseFloat(formPrice) > 0
-                              ? `%${(((parseFloat(formPrice) - parseFloat(sellerPayout)) / parseFloat(formPrice)) * 100).toFixed(1)}`
-                              : '%0.0'}
-                          </span>
+
+                        {/* Satıcı Hak Edişi */}
+                        <div className="space-y-1.5 bg-[#FAF8F5] p-4 rounded-xl border border-[#AF9164]/20">
+                          <label className="text-[10px] font-bold text-[#AF9164] uppercase tracking-wider block">2. Satıcı Hak Edişi / Maliyet (TL)</label>
+                          <input
+                            type="number"
+                            placeholder="Örn: 300000"
+                            value={sellerPayout}
+                            onChange={(e) => setSellerPayout(e.target.value)}
+                            className="w-full bg-white border border-gray-200 focus:border-[#AF9164] text-black font-bold px-3.5 py-2 rounded-lg text-base focus:outline-none"
+                          />
+                          <p className="text-[9px] text-gray-400">Satış tamamlandığında ürün sahibine ödenecek tutar.</p>
                         </div>
                       </div>
+
+                      {/* Canlı Kar Analizi Kutusu */}
+                      {(() => {
+                        const priceNum = parseFloat(formPrice) || 0
+                        const payoutNum = parseFloat(sellerPayout) || 0
+                        const profit = priceNum - payoutNum
+                        const marginPercent = priceNum > 0 ? ((profit / priceNum) * 100).toFixed(1) : '0.0'
+                        const isProfitPositive = profit >= 0
+
+                        return (
+                          <div className={`p-4 rounded-xl border transition-all ${
+                            priceNum > 0 && payoutNum > 0
+                              ? isProfitPositive ? 'bg-emerald-50/60 border-emerald-200' : 'bg-red-50/60 border-red-200'
+                              : 'bg-gray-50 border-gray-200'
+                          }`}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                              <div>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Platform Net Brüt Karı</p>
+                                <p className={`text-2xl font-bold font-mono ${isProfitPositive ? 'text-emerald-700' : 'text-red-600'}`}>
+                                  {priceNum > 0 && payoutNum > 0 
+                                    ? `${profit.toLocaleString('tr-TR')} ₺` 
+                                    : '0 ₺'}
+                                </p>
+                                <p className="text-[10px] text-gray-400 mt-0.5">Satış Fiyatı − Satıcı Payı = Net Kazanç</p>
+                              </div>
+
+                              <div className="sm:border-l sm:border-gray-200 sm:pl-4">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Kar Marjı Oranı</p>
+                                <p className={`text-2xl font-bold font-mono ${isProfitPositive ? 'text-[#AF9164]' : 'text-red-600'}`}>
+                                  %{marginPercent}
+                                </p>
+                                <p className="text-[10px] text-gray-400 mt-0.5">(Brüt Kar / Satış Fiyatı) × 100</p>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })()}
                     </div>
 
-                    {/* 3. Vitrin & Öne Çıkarma Etiketleri */}
-                    <div className="space-y-2 pt-2 border-t border-white/10">
-                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Vitrin & Özel Etiketler</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <label className="flex items-center gap-2.5 bg-zinc-900 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
-                          <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
-                          <span className="text-[11px] font-bold text-white">🌟 Hero Banner</span>
+                    {/* 3. Vitrin & Özel Etiketler */}
+                    <div className="space-y-2.5 pt-4 border-t border-gray-100">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Vitrin & Özel Etiketler</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <label className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${isFeatured ? 'bg-[#AF9164]/10 border-[#AF9164] text-black font-bold' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
+                          <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="accent-[#AF9164] w-4 h-4" />
+                          <span className="text-xs">🌟 Hero Banner (Manşet)</span>
                         </label>
-                        <label className="flex items-center gap-2.5 bg-zinc-900 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
-                          <input type="checkbox" checked={isVipExclusive} onChange={(e) => setIsVipExclusive(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
-                          <span className="text-[11px] font-bold text-[#AF9164]">👑 VIP Concierge</span>
+                        <label className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${isVipExclusive ? 'bg-[#AF9164]/10 border-[#AF9164] text-black font-bold' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
+                          <input type="checkbox" checked={isVipExclusive} onChange={(e) => setIsVipExclusive(e.target.checked)} className="accent-[#AF9164] w-4 h-4" />
+                          <span className="text-xs">👑 VIP Concierge Kataloğu</span>
                         </label>
-                        <label className="flex items-center gap-2.5 bg-zinc-900 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
-                          <input type="checkbox" checked={isDealBadge} onChange={(e) => setIsDealBadge(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
-                          <span className="text-[11px] font-bold text-amber-400">🔥 Fırsat Ürünü</span>
+                        <label className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${isDealBadge ? 'bg-[#AF9164]/10 border-[#AF9164] text-black font-bold' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
+                          <input type="checkbox" checked={isDealBadge} onChange={(e) => setIsDealBadge(e.target.checked)} className="accent-[#AF9164] w-4 h-4" />
+                          <span className="text-xs">🔥 Fırsat Ürünü Etiketi</span>
                         </label>
                       </div>
                     </div>
