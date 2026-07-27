@@ -43,10 +43,18 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
   return (
     <div className="p-8 min-h-full">
-      <div className="mb-10">
-        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Admin Panel</p>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Tüm Ürünler</h1>
-        <p className="text-white/40 text-sm mt-1">{products.length} ürün listeleniyor</p>
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/30 mb-2">Admin Panel</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Tüm Ürünler</h1>
+          <p className="text-white/40 text-sm mt-1">{products.length} ürün listeleniyor</p>
+        </div>
+        <Link
+          href="/sell"
+          className="bg-emerald-500 hover:bg-emerald-400 text-black px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10 flex items-center gap-2 cursor-pointer"
+        >
+          + YENİ ÜRÜN EKLE
+        </Link>
       </div>
 
       {/* Filtre Sekmeleri */}

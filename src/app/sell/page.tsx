@@ -19,6 +19,28 @@ export default async function SellPage({
     .eq('id', user.id)
     .single()
 
+  const isAdmin = profile?.role === 'admin'
+
+  // Admin kullanıcılar için detaylı web yükleme formunu aktif et
+  if (isAdmin) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] py-16 px-4 sm:px-6 lg:px-8 selection:bg-[#AF9164] selection:text-white">
+        <div className="max-w-4xl mx-auto mb-10 text-center space-y-3">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-[0.25em] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-sm">
+            ⚡ ADMIN HIZLI ÜRÜN YÜKLEME FORMU
+          </span>
+          <h1 className="text-4xl md:text-5xl serif-display italic text-black">Yeni Ürün Ekle & Konsinye Kaydı</h1>
+          <p className="text-gray-500 text-sm max-w-xl mx-auto font-light leading-relaxed">
+            Yönetici hesabı ile detaylı ürün yükleme, 32 noktalı ekspertiz belgeleri, tedarikçi eşleştirmesi ve fiyatlandırma.
+          </p>
+        </div>
+
+        <SellForm userEmail={user.email} userRole={profile?.role} />
+      </div>
+    )
+  }
+
+  // Normal müşteriler için Mobil Uygulama Yönlendirmesi
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-20 px-4 sm:px-6 lg:px-8 selection:bg-[#AF9164] selection:text-white">
       
