@@ -211,12 +211,19 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
   const [hasSpaTreatment, setHasSpaTreatment] = useState<boolean>(false)
   const [fullSetItems, setFullSetItems] = useState<string[]>([])
 
-  // ─── Peony VIP (Kargo Hizmeti) ───
+  // ─── Peony VIP (Kargo Hizmeti) & Tedarikçi ───
   const [isPeonyVip, setIsPeonyVip] = useState<boolean>(false)
   const [supplier, setSupplier] = useState('')
   const [supplierId, setSupplierId] = useState('')
   const [suppliersList, setSuppliersList] = useState<any[]>([])
   const [showNewSupplierForm, setShowNewSupplierForm] = useState(false)
+
+  // ─── Admin Özel Kontrol State'leri ───
+  const [adminStatus, setAdminStatus] = useState<'approved' | 'pending' | 'rejected' | 'sold'>('approved')
+  const [sellerPayout, setSellerPayout] = useState('')
+  const [isFeatured, setIsFeatured] = useState<boolean>(false)
+  const [isVipExclusive, setIsVipExclusive] = useState<boolean>(false)
+  const [isDealBadge, setIsDealBadge] = useState<boolean>(false)
   
   // New Supplier fields
   const [newSupName, setNewSupName] = useState('')
@@ -684,7 +691,12 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
         public_images: publicUrls,
         authenticity_docs: authUrls,
         flaw_images: flawUrls,
-        video_url: videoUrl || undefined
+        video_url: videoUrl || undefined,
+        status: userRole === 'admin' ? adminStatus : 'pending',
+        seller_payout: sellerPayout ? parseFloat(sellerPayout) : undefined,
+        is_featured: isFeatured,
+        is_vip_exclusive: isVipExclusive,
+        is_deal: isDealBadge
       }
 
       const result = await addProductAction(payload as any)
@@ -1116,7 +1128,97 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
             </div>
 
             <div className="pt-10 border-t border-gray-100">
-              <div className="max-w-md mx-auto space-y-6">
+              <div className="max-w-xl mx-auto space-y-6">
+                
+                {/* ADMIN ÖZEL KONTROL PANELİ */}
+                {userRole === 'admin' && (
+                  <div className="bg-[#1A1A1A] text-white p-6 rounded-2xl border border-emerald-500/30 space-y-6 text-left shadow-xl mb-8">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">⚡ ADMIN ÖZEL KONTROL VE HESAPLAMA PANELİ</h4>
+                      </div>
+                      <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-mono uppercase">Role: Admin</span>
+                    </div>
+
+                    {/* 1. Ürün Durumu & Yayın Kontrolü */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Ürün Yayın Durumu</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {[
+                          { key: 'approved', label: '⚡ Vitrine Çıkar', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' },
+                          { key: 'pending', label: '⏳ Onay Bekliyor', color: 'bg-amber-500/20 text-amber-400 border-amber-500/40' },
+                          { key: 'sold', label: '🏷️ Satıldı', color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
+                          { key: 'rejected', label: '❌ Reddet', color: 'bg-red-500/20 text-red-400 border-red-500/40' }
+                        ].map(item => (
+                          <button
+                            key={item.key}
+                            type="button"
+                            onClick={() => setAdminStatus(item.key as any)}
+                            className={`px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border transition-all text-center ${
+                              adminStatus === item.key ? item.color + ' ring-2 ring-emerald-500' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                            }`}
+                          >
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 2. Satıcı Hak Edişi & Kar Marjı Hesabı */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Satıcı Hak Edişi / Alış Fiyatı (TL)</label>
+                        <input
+                          type="number"
+                          placeholder="Örn: 80000"
+                          value={sellerPayout}
+                          onChange={(e) => setSellerPayout(e.target.value)}
+                          className="w-full bg-zinc-900 border border-zinc-800 focus:border-emerald-500 text-white px-4 py-2.5 rounded-xl text-sm focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Otomatik Marj Kartı */}
+                      <div className="bg-zinc-900 border border-zinc-800 p-3.5 rounded-xl flex flex-col justify-between">
+                        <div className="flex justify-between items-center text-[10px] uppercase font-bold text-zinc-400">
+                          <span>Platform Brüt Karı:</span>
+                          <span className="text-emerald-400 text-xs font-mono">
+                            {formPrice && sellerPayout 
+                              ? `${(parseFloat(formPrice) - parseFloat(sellerPayout)).toLocaleString('tr-TR')} ₺`
+                              : '0 ₺'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] uppercase font-bold text-zinc-400 mt-2">
+                          <span>Kar Marjı Oranı:</span>
+                          <span className="text-[#AF9164] text-xs font-mono">
+                            {formPrice && sellerPayout && parseFloat(formPrice) > 0
+                              ? `%${(((parseFloat(formPrice) - parseFloat(sellerPayout)) / parseFloat(formPrice)) * 100).toFixed(1)}`
+                              : '%0.0'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Vitrin & Öne Çıkarma Etiketleri */}
+                    <div className="space-y-2 pt-2 border-t border-white/10">
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Vitrin & Özel Etiketler</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <label className="flex items-center gap-2.5 bg-zinc-900 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                          <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
+                          <span className="text-[11px] font-bold text-white">🌟 Hero Banner</span>
+                        </label>
+                        <label className="flex items-center gap-2.5 bg-zinc-900 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                          <input type="checkbox" checked={isVipExclusive} onChange={(e) => setIsVipExclusive(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
+                          <span className="text-[11px] font-bold text-[#AF9164]">👑 VIP Concierge</span>
+                        </label>
+                        <label className="flex items-center gap-2.5 bg-zinc-900 p-3 rounded-xl border border-zinc-800 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                          <input type="checkbox" checked={isDealBadge} onChange={(e) => setIsDealBadge(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
+                          <span className="text-[11px] font-bold text-amber-400">🔥 Fırsat Ürünü</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Tedarikçi Bilgisi */}
                 {showSupplierField && (

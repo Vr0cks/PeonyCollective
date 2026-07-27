@@ -44,6 +44,15 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
     }
 
     // 2. Veritabanı Kaydı
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const isAdmin = profile?.role === 'admin';
+    const targetStatus = (isAdmin && data.status) ? data.status : 'pending';
+
     const { data: insertedProduct, error: insertError } = await supabase.from('products').insert({
       seller_id: user.id,
       gender: data.gender,
@@ -69,8 +78,8 @@ export async function addProductAction(payload: z.infer<typeof productSchema>) {
       supplier: resolvedSupplier,
       supplier_id: resolvedSupplierId,
       full_set_items: data.full_set_items,
-      status: 'pending',
-      entrupy_status: 'pending'
+      status: targetStatus,
+      entrupy_status: targetStatus === 'approved' ? 'verified' : 'pending'
     }).select('id').single()
 
     if (insertError) {

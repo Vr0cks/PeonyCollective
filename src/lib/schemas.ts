@@ -32,6 +32,13 @@ export const productSchema = z.object({
   authenticity_docs: z.array(z.string()),
   flaw_images: z.array(z.string()).default([]),
   video_url: z.string().max(500, 'URL çok uzun.').optional().nullable(),
+
+  // Admin Optional Overrides
+  status: z.enum(['pending', 'approved', 'rejected', 'sold']).optional().nullable(),
+  seller_payout: z.coerce.number().optional().nullable(),
+  is_featured: z.boolean().optional().nullable(),
+  is_vip_exclusive: z.boolean().optional().nullable(),
+  is_deal: z.boolean().optional().nullable(),
 });
 
 export const conciergeOfferSchema = z.object({
