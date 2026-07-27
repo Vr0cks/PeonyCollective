@@ -728,7 +728,7 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
           image_urls: [],
           claude_verdict: 'suspicious',
           claude_confidence: 0,
-          claude_raw_response: `⚠️ Claude Vision analizi gerçekleştirilemedi: ${error.message || 'Bilinmeyen sunucu hatası'}`
+          claude_raw_response: `⚠️ Peony AI Vision analizi gerçekleştirilemedi: ${error.message || 'Bilinmeyen sunucu hatası'}`
         })
       
       revalidatePath('/admin/lab')
