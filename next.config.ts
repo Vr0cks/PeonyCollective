@@ -53,7 +53,7 @@ const nextConfig: NextConfig = {
           // Gereksiz tarayıcı özelliklerine erişimi kısıtlar
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), payment=(self "https://www.paytr.com")',
+            value: 'camera=(), microphone=(), geolocation=(self), payment=(self "https://www.paytr.com")',
           },
           // XSS Koruması — Content Security Policy
           // PayTR iframe, Supabase storage ve Google Fonts'a izin verildi
@@ -66,7 +66,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://plus.unsplash.com https://cdn.shopify.com https://www.peony-collective.com",
               "frame-src 'self' https://www.paytr.com",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.tryoto.com https://www.paytr.com https://api.entrupy.com https://api.telegram.org https://api.resend.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.tryoto.com https://www.paytr.com https://api.entrupy.com https://api.telegram.org https://api.resend.com https://ipapi.co https://api.open-meteo.com https://images.unsplash.com https://plus.unsplash.com",
               "media-src 'self' https://*.supabase.co",
               "object-src 'none'",
               "base-uri 'self'",
