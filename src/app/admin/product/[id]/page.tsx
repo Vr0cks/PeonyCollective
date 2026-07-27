@@ -53,17 +53,56 @@ export default async function AdminProductDetailPage({
           <Link href="/admin" className="text-xs uppercase tracking-widest text-gray-500 hover:text-black transition-colors flex items-center gap-2">
             ← Panele Dön
           </Link>
-          <div className="flex gap-3">
-            <form action={rejectAction}>
-              <button className="px-6 py-2.5 border border-red-200 text-red-600 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-50 transition-all cursor-pointer">
-                Reddet
-              </button>
-            </form>
-            <form action={approveAction}>
-              <button className="px-8 py-2.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all cursor-pointer">
-                Onayla ve Yayınla
-              </button>
-            </form>
+          <div className="flex items-center gap-3">
+            {product.status === 'approved' && (
+              <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-widest border border-emerald-200">
+                ✓ BU ÜRÜN ONAYLI VE YAYINDA
+              </span>
+            )}
+            {product.status === 'rejected' && (
+              <span className="px-4 py-2 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-widest border border-red-200">
+                ✕ BU ÜRÜN REDDEDİLMİŞ
+              </span>
+            )}
+            {product.status === 'sold' && (
+              <span className="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-xs font-bold uppercase tracking-widest border border-amber-200">
+                ✦ BU ÜRÜN SATILDI
+              </span>
+            )}
+
+            {/* Aksiyon Butonları */}
+            {product.status === 'pending' && (
+              <>
+                <form action={rejectAction}>
+                  <button className="px-6 py-2.5 border border-red-200 text-red-600 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-50 transition-all cursor-pointer">
+                    Reddet
+                  </button>
+                </form>
+                <form action={approveAction}>
+                  <button className="px-8 py-2.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all cursor-pointer">
+                    Onayla ve Yayınla
+                  </button>
+                </form>
+              </>
+            )}
+
+            {/* Zaten onaylıysa yayından kaldırma seçeneği sun */}
+            {product.status === 'approved' && (
+              <form action={rejectAction}>
+                <button className="px-6 py-2.5 border border-red-200 text-red-600 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-50 transition-all cursor-pointer">
+                  Yayından Kaldır (Reddet)
+                </button>
+              </form>
+            )}
+
+            {/* Zaten reddedilmişse tekrar onaylama seçeneği sun */}
+            {product.status === 'rejected' && (
+              <form action={approveAction}>
+                <button className="px-8 py-2.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all cursor-pointer">
+                  Yeniden Onayla ve Yayınla
+                </button>
+              </form>
+            )}
           </div>
         </div>
 
