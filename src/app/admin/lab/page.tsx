@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { transitionOrderToInspecting, approveOrderInLab, rejectOrderInLab } from '../actions'
+import AdminGuidedPhotoCapture from '@/src/components/AdminGuidedPhotoCapture'
+
 
 export default async function AuthenticationLabPage({
   searchParams,
@@ -217,7 +219,7 @@ export default async function AuthenticationLabPage({
             </div>
           </div>
         ) : (
-          <div className="lg:col-span-9 bg-white border border-gray-100 rounded-3xl p-24 text-center space-y-4 shadow-sm">
+          <div className="lg:col-span-9 bg-white border border-gray-100 rounded-3xl p-16 text-center space-y-4 shadow-sm">
             <h3 className="serif-display text-2xl text-black italic">Laboratuvar İnceleme Kuyruğu Temiz</h3>
             <p className="text-sm text-gray-400 font-light max-w-sm mx-auto">
               Onay bekleyen veya incelemesi devam eden lüks C2C siparişi bulunmamaktadır.
@@ -225,6 +227,16 @@ export default async function AuthenticationLabPage({
           </div>
         )}
       </div>
+
+      {/* ENTRUPY TARZI AÇI BAZLI FOTOĞRAF ÇEKİMİ VE CLAUDE VISION İNCELEME BİLEŞENİ */}
+      <div className="pt-8 border-t border-gray-200">
+        <AdminGuidedPhotoCapture 
+          productId={currentOrder?.product_id || product?.id}
+          productTitle={product ? `${product.brand} - ${product.model_name}` : 'Peony Lab Doğrulama'}
+        />
+      </div>
     </div>
   )
 }
+
+

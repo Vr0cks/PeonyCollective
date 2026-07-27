@@ -26,13 +26,64 @@ import {
   type Gender, type MainCategory,
 } from '@/src/utils/categoryData'
 
-// ─── Onay Fotoğrafları Kategorileri ───
+// ─── Onay Fotoğrafları Kategorileri (Entrupy Tarzı Detaylı Açı Çekimleri) ───
 const verificationCategories = [
-  { key: 'logo', label: 'Logo Detayı', desc: '3 farklı açıdan logonun yakın çekimi', min: 3 },
-  { key: 'stitching', label: 'Dikiş Detayı', desc: '3 farklı açıdan dikiş kalitesi', min: 3 },
-  { key: 'hardware', label: 'Metal Aksam', desc: '3 farklı açıdan fermuar, toka', min: 3 },
-  { key: 'serial', label: 'Seri Numarası', desc: 'Kodun okunaklı fotoğrafı', min: 1 },
-  { key: 'receipt', label: 'Fatura / Belge', desc: 'İsteğe bağlı belge', min: 0 },
+  { 
+    key: 'front', 
+    icon: '👜', 
+    label: 'Ön Yüz (Genel Simetri)', 
+    desc: 'Çantayı düz, aydınlık bir zemine koyup tam karşıdan dik açıyla çekin. Tüm gövde görünmeli.', 
+    min: 1 
+  },
+  { 
+    key: 'back', 
+    icon: '💼', 
+    label: 'Arka Yüz (Dikiş Hizası)', 
+    desc: 'Arka yüzü dik açıyla çekin. Dikiş hizası ve cep yapısı net görünmeli.', 
+    min: 1 
+  },
+  { 
+    key: 'base', 
+    icon: '📐', 
+    label: 'Taban & Köşeler', 
+    desc: 'Çantanın alt kısmını ve köşe aşınmalarını çekin. Metal ayaklar ve taban dikişleri net olmalı.', 
+    min: 1 
+  },
+  { 
+    key: 'stamp', 
+    icon: '🏷️', 
+    label: 'Sıcak Baskı / İç Logo Stamp', 
+    desc: 'Derideki sıcak baskı veya metal marka plakasını tam dikten, parlamasız makro çekin.', 
+    min: 1 
+  },
+  { 
+    key: 'serial', 
+    icon: '🔢', 
+    label: 'Seri Kodu / Date Code', 
+    desc: 'İç etiketteki veya deri flaptaki seri numarasını/tarih kodunu okunaklı açıyla çekin.', 
+    min: 1 
+  },
+  { 
+    key: 'hardware', 
+    icon: '🔩', 
+    label: 'Metal Aksam & Gravürler', 
+    desc: 'Fermuar elciği, kilit, halkanın üzerindeki gravür yazısını yakın plandan çekin.', 
+    min: 1 
+  },
+  { 
+    key: 'stitching', 
+    icon: '🧵', 
+    label: 'Makro Dikiş Yakın Çekimi', 
+    desc: 'Dikişlerin eğim açısını (örn: Hermès 18° eğik dikiş kalıbı) göstermek için 5-10cm mesafeden makro çekin.', 
+    min: 1 
+  },
+  { 
+    key: 'receipt', 
+    icon: '📄', 
+    label: 'Fatura / Sertifika / Belge', 
+    desc: 'Varsa orijinal fatura, kutu veya sertifika belgesi.', 
+    min: 0 
+  },
 ]
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
@@ -1137,46 +1188,65 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
             <div className="bg-[#AF9164]/5 border border-[#AF9164]/20 p-6 rounded-2xl flex items-start gap-4">
               <ShieldCheck className="text-[#AF9164] shrink-0" size={24} strokeWidth={1.5} />
               <div>
-                <h4 className="text-sm font-bold text-gray-900 mb-1">Peony Lab™ Gizli Doğrulama</h4>
+                <h4 className="text-sm font-bold text-gray-900 mb-1">Peony Lab™ Gizli Doğrulama (Claude AI Vision & Uzman İncelemesi)</h4>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  Buraya yükleyeceğiniz makro fotoğraflar sadece uzmanlarımız ve 3D Spektral analiz sistemimiz tarafından görülecek, sitede yayınlanmayacaktır. 
-                  Lütfen istenilen detayların net olduğuna emin olun.
+                  Buraya yükleyeceğiniz makro fotoğraflar <strong>sitede müşterilere asla gösterilmez (gizlidir)</strong>. Sadece Peony Orijinallik Uzmanları ve <strong>Claude AI Vision Orijinallik Analiz Motoru</strong> tarafından kullanılır. Lütfen fotoğrafların net ve aydınlık çekildiğinden emin olun.
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {verificationCategories.map(cat => (
-                <div key={cat.key} className={`border rounded-xl p-5 hover:border-gray-200 transition-colors ${fieldErrors[cat.key] ? 'border-red-200 bg-red-50/10' : 'border-gray-100'}`}>
-                  <div className="mb-4">
-                    <h5 className="text-xs font-bold uppercase tracking-widest text-black mb-1">{cat.label}</h5>
-                    <p className="text-[10px] text-gray-400">{cat.desc}</p>
+                <div key={cat.key} className={`border rounded-2xl p-5 hover:border-[#AF9164]/50 transition-all bg-white flex flex-col justify-between ${fieldErrors[cat.key] ? 'border-red-200 bg-red-50/10' : 'border-gray-200 shadow-sm'}`}>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{cat.icon}</span>
+                        <h5 className="text-xs font-bold uppercase tracking-wider text-black">{cat.label}</h5>
+                      </div>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 uppercase tracking-widest">
+                        {cat.min > 0 ? 'Zorunlu' : 'Opsiyonel'}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-gray-500 leading-relaxed mb-4 bg-gray-50 p-2.5 rounded-xl border border-gray-100 italic">
+                      "{cat.desc}"
+                    </p>
+
+                    {cat.key === 'serial' && (
+                      <div className="mb-4">
+                        <input className={`${getInputClasses('serial')} px-3 py-2 bg-gray-50 text-center font-mono text-xs rounded-xl border border-gray-200`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu / Date Code..." />
+                        {renderErrorMsg('serial')}
+                        <p className="text-[9px] text-gray-400 text-center mt-1 italic">Kodu bulamadıysanız &apos;none&apos; yazabilirsiniz.</p>
+                      </div>
+                    )}
                   </div>
-                  
-                  {cat.key === 'serial' && (
-                    <div className="mb-4">
-                      <input className={`${getInputClasses('serial')} px-0 bg-transparent text-center`} value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="Seri Kodu..." />
-                      {renderErrorMsg('serial')}
-                      <p className="text-[9px] text-gray-400 text-center mt-2 italic">Kodu bulamadıysanız &apos;none&apos; yazabilirsiniz.</p>
-                    </div>
-                  )}
 
-                  <label className="flex items-center justify-center gap-2 border border-gray-200 hover:border-black text-gray-500 hover:text-black py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-colors">
-                    <UploadCloud size={14} /> Fotoğraf Seç
-                    <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleVerificationFilesChange(cat.key, e)} />
-                  </label>
-                  {renderErrorMsg(cat.key)}
+                  <div className="space-y-3 pt-2">
+                    <label className="flex items-center justify-center gap-2 border border-gray-200 hover:border-black bg-gray-50 hover:bg-black text-gray-700 hover:text-white py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-all">
+                      <UploadCloud size={15} /> Fotoğraf Yükle / Çek
+                      <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleVerificationFilesChange(cat.key, e)} />
+                    </label>
+                    {renderErrorMsg(cat.key)}
 
-                  {verificationPreviews[cat.key]?.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {verificationPreviews[cat.key].map((url, i) => (
-                        <div key={i} className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} className="w-full h-full object-cover" alt="" />
-                        </div>
-                      ))}
+                    {verificationPreviews[cat.key]?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3 pt-2 border-t border-gray-100">
+                        {verificationPreviews[cat.key].map((url, i) => (
+                          <div key={i} className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 relative group">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={url} className="w-full h-full object-cover" alt="" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[9px] font-bold">
+                              ✓ Yüklendi
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="text-[9px] text-gray-400 text-center flex items-center justify-center gap-1">
+                      <span>🔒 Sadece Admin & AI Vision Görür</span>
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>

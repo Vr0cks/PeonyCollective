@@ -528,9 +528,9 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
     throw new Error("Ürün bulunamadı.")
   }
 
-  // Analiz edilecek fotoğrafları belirle (Dökümanlar veya vitrin görselleri)
+  // Analiz edilecek fotoğrafları belirle (Öncelikle Gizli Lab fotoğrafları + Vitrin görselleri)
   const imagesToAnalyze = product.authenticity_docs && product.authenticity_docs.length > 0 
-    ? product.authenticity_docs 
+    ? [...product.authenticity_docs, ...product.public_images]
     : product.public_images
 
   if (!imagesToAnalyze || imagesToAnalyze.length === 0) {
@@ -549,9 +549,9 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.peony-collective.com'
 
-    // Claude API'sine görselleri base64 formatında besle (Maksimum 5 fotoğraf)
+    // Claude API'sine görselleri base64 formatında besle (Maksimum 10 fotoğraf)
     const imageBlocks = await Promise.all(
-      imagesToAnalyze.slice(0, 5).map(async (url: string) => {
+      imagesToAnalyze.slice(0, 10).map(async (url: string) => {
         try {
           const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : url
           const res = await fetch(fullUrl)
