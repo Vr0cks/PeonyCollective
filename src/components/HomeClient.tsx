@@ -76,7 +76,7 @@ interface HomeClientProps {
 
 export default function HomeClient({ products, brands, brand, category, gender }: HomeClientProps) {
   const router = useRouter()
-  const { language, t } = useSettings()
+  const { language, t, formatPrice } = useSettings()
   const hasFilter = brand || category || gender
   const [visibleCount, setVisibleCount] = useState(24)
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null)
@@ -250,12 +250,10 @@ export default function HomeClient({ products, brands, brand, category, gender }
             <div className="space-y-6">
               <p className="sans-detail text-[#AF9164]">THE MANIFESTO</p>
               <h2 className="text-3xl md:text-4xl serif-display text-[#1A1A1A] leading-tight">
-                Sadece bir ürün değil, bir <span className="italic font-light">miras devrediyorsunuz.</span>
+                {t('manifesto.title', 'Sadece bir ürün değil, bir miras devrediyorsunuz.')}
               </h2>
               <p className="text-gray-500 font-light text-sm leading-relaxed">
-                Peony Collective'de lüks sadece bir etiket değil, bir güvencedir. 
-                Uzman küratörlerimiz ve laboratuvar hassasiyetindeki ekspertiz sürecimizle, 
-                orijinallik artık bir soru işareti değil, garantidir.
+                {t('manifesto.desc', 'Peony Collective\'de lüks sadece bir etiket değil, bir güvencedir. Uzman küratörlerimiz ve laboratuvar hassasiyetindeki ekspertiz sürecimizle, orijinallik artık bir soru işareti değil, garantidir.')}
               </p>
             </div>
             <FadeIn delay={0.4} direction="left">
@@ -274,10 +272,10 @@ export default function HomeClient({ products, brands, brand, category, gender }
           {/* Sağ: Kompakt Metrikler */}
           <div className="lg:col-span-5 grid grid-cols-2 gap-4 bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100">
             {[
-              { value: '1.2B', unit: '₺', label: 'Portföy Değeri', sub: 'Onaylı & Bekleyen' },
-              { value: '%0', unit: '', label: 'Sahte Ürün', sub: 'Kuruluşumuzdan Bugüne' },
-              { value: '32', unit: '', label: 'Kontrol Noktası', sub: 'Fiziksel Ekspertiz' },
-              { value: '72', unit: 'SA', label: 'Ortalama Onay', sub: 'Hızlı İşlem Süresi' },
+              { value: '1.2B', unit: '₺', label: t('metric.portfolioValue', 'Portföy Değeri'), sub: t('metric.portfolioSub', 'Onaylı & Bekleyen') },
+              { value: '%0', unit: '', label: t('metric.counterfeit', 'Sahte Ürün'), sub: t('metric.counterfeitSub', 'Kuruluşumuzdan Bugüne') },
+              { value: '32', unit: '', label: t('metric.controlPoints', 'Kontrol Noktası'), sub: t('metric.controlSub', 'Fiziksel Ekspertiz') },
+              { value: '72', unit: t('metric.hours', 'SA'), label: t('metric.approval', 'Ortalama Onay'), sub: t('metric.approvalSub', 'Hızlı İşlem Süresi') },
             ].map((m) => (
               <div key={m.label} className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col justify-between min-h-[110px]">
                 <p className="text-2xl md:text-3xl serif-display text-[#1A1A1A] leading-none">
@@ -308,17 +306,17 @@ export default function HomeClient({ products, brands, brand, category, gender }
                     : 'border-transparent text-gray-400 hover:text-black'
                 }`}
               >
-                Mevsimsel Seçki
+                {t('curated.seasonal', 'Mevsimsel Seçki')}
               </button>
               <button 
                 onClick={() => setCuratedTab('smart')}
                 className={`pb-4 text-xs tracking-widest uppercase sans-detail transition-all border-b-2 ${
                   curatedTab === 'smart' 
-                    ? 'border-[#AF9164] text-black font-bold' 
-                    : 'border-transparent text-gray-400 hover:text-black'
+                    ? 'border-[#AF9164] text-[#1A1A1A] font-bold' 
+                    : 'border-transparent text-gray-400 hover:text-[#1A1A1A]'
                 }`}
               >
-                Akıllı Lüks (15.000 ₺ Altı)
+                {t('curated.smart', 'Akıllı Lüks (15.000 ₺ Altı)')}
               </button>
             </div>
           </div>
@@ -327,16 +325,17 @@ export default function HomeClient({ products, brands, brand, category, gender }
           {curatedTab === 'seasonal' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-5 space-y-6">
-                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164] bg-[#AF9164]/10 px-3.5 py-1.5 rounded-full inline-block">Mevsimsel Seçki</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164] bg-[#AF9164]/10 px-3.5 py-1.5 rounded-full inline-block">
+                  {t('curated.seasonal', 'Mevsimsel Seçki')}
+                </span>
                 <h2 className="text-3xl md:text-5xl serif-display leading-tight text-gray-900">
-                  Yaz İndirimi: <br />
-                  <span className="italic font-light">Zıtlıkların Uyumu</span>
+                  {t('curated.summerTitle', 'Yaz İndirimi: Zıtlıkların Uyumu')}
                 </h2>
                 <p className="text-gray-500 font-light text-sm leading-relaxed">
-                  Lüks, gündelik konfor ile arzunun en üst zirvesini buluşturur. Sahilde adımlarınıza eşlik edecek en şık terliklerden, davetlerin en sofistike yıldızı Kelly çantalara uzanan zıt kutuplar bir arada.
+                  {t('curated.summerDesc', 'Lüks, gündelik konfor ile arzunun en üst zirvesini buluşturur. Sahilde adımlarınıza eşlik edecek en şık terliklerden, davetlerin en sofistike yıldızı Kelly çantalara uzanan zıt kutuplar bir arada.')}
                 </p>
                 <Link href="#collection" className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 hover:bg-[#AF9164] transition-all duration-500 sans-detail text-[10px] tracking-widest uppercase font-bold">
-                  Seçkiyi İncele →
+                  {t('curated.explore', 'Seçkiyi İncele →')}
                 </Link>
               </div>
 
@@ -434,7 +433,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
           <div className="text-center mb-12 space-y-2">
             <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">SHOP BY CATEGORY</span>
             <h2 className="text-3xl md:text-4xl serif-display text-gray-900">
-              Kategorilere Göre <span className="italic font-light">Alışveriş Yapın</span>
+              {t('home.shopByCategory', 'Kategorilere Göre Alışveriş Yapın')}
             </h2>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -454,7 +453,9 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent transition-all duration-700" />
                 <div className="absolute bottom-6 left-6 z-10">
                   <p className="sans-detail text-white/70 mb-0.5 text-[9px] tracking-widest">{cat.subtitle}</p>
-                  <h3 className="text-xl md:text-2xl serif-display italic text-white group-hover:-translate-y-0.5 transition-transform duration-500">{cat.title}</h3>
+                  <h3 className="text-xl md:text-2xl serif-display italic text-white group-hover:-translate-y-0.5 transition-transform duration-500">
+                    {cat.title === 'Çanta' ? t('category.bags', 'Çanta') : cat.title === 'Kıyafet' ? t('category.clothing', 'Kıyafet') : cat.title === 'Ayakkabı' ? t('category.shoes', 'Ayakkabı') : t('category.accessories', 'Aksesuar')}
+                  </h3>
                 </div>
               </Link>
             ))}
@@ -478,7 +479,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
                 <CustomSelect
                   value={gender || ''}
-                  placeholder="Tüm Cinsiyetler"
+                  placeholder={t('home.allGenders', 'Tüm Cinsiyetler')}
                   options={genderFilters.map(g => ({ value: g.value, label: g.label }))}
                   onChange={(val) => {
                     if (val) {
@@ -491,7 +492,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 
                 <CustomSelect
                   value={brand || ''}
-                  placeholder="Tüm Markalar"
+                  placeholder={t('home.allBrands', 'Tüm Markalar')}
                   options={brands.map(b => ({ value: b, label: b }))}
                   onChange={(val) => {
                     if (val) {
@@ -506,10 +507,10 @@ export default function HomeClient({ products, brands, brand, category, gender }
 
             <div className="flex flex-wrap gap-2.5 pb-2">
               {[
-                { id: null, label: 'Tüm Koleksiyon' },
-                { id: 'Plaj Şıklığı', label: 'Plaj Şıklığı 🏖️' },
-                { id: 'Şehir Esintisi', label: 'Şehir Esintisi 🏙️' },
-                { id: 'Gece Daveti', label: 'Gece Daveti 🌌' },
+                { id: null, label: t('home.allCollection', 'Tüm Koleksiyon') },
+                { id: 'Plaj Şıklığı', label: t('home.beachVibe', 'Plaj Şıklığı ⛵') },
+                { id: 'Şehir Esintisi', label: t('home.cityBreeze', 'Şehir Esintisi 🏙️') },
+                { id: 'Gece Daveti', label: t('home.eveningEvent', 'Gece Daveti 🍸') },
               ].map((p) => (
                 <button
                   key={p.label}
@@ -585,27 +586,27 @@ export default function HomeClient({ products, brands, brand, category, gender }
           <div className="text-center mb-16 space-y-4">
             <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">PEONY STANDARDS</span>
             <h2 className="text-3xl md:text-5xl serif-display leading-tight">
-              Güven Zinciri & <span className="italic font-light text-[#AF9164]">Ekspertiz</span>
+              {t('trust.title', 'Güven Zinciri & Ekspertiz')}
             </h2>
             
             {/* Trust Tabs Selector */}
             <div className="flex flex-wrap justify-center gap-2 md:gap-4 pt-6">
               {[
-                { id: 'how', label: 'Nasıl Çalışır?' },
-                { id: 'lab', label: 'Peony Lab & Entrupy' },
-                { id: 'certificate', label: 'Orijinallik Sertifikası' },
-                { id: 'stories', label: 'Objelerin Hikayesi' },
-              ].map((t) => (
+                { id: 'how', label: t('trust.tabHow', 'NASIL ÇALIŞIR?') },
+                { id: 'lab', label: t('trust.tabLab', 'PEONY LAB & ENTRUPY') },
+                { id: 'certificate', label: t('trust.tabCert', 'ORİJİNALLİK SERTİFİKASI') },
+                { id: 'stories', label: t('trust.tabStories', 'OBJELERİN HİKAYESİ') },
+              ].map((tItem) => (
                 <button
-                  key={t.id}
-                  onClick={() => setTrustTab(t.id as any)}
+                  key={tItem.id}
+                  onClick={() => setTrustTab(tItem.id as any)}
                   className={`sans-detail px-5 py-2 text-[9px] md:text-[10px] tracking-widest uppercase border transition-all duration-300 ${
-                    trustTab === t.id
+                    trustTab === tItem.id
                       ? 'bg-white text-black border-white font-bold'
                       : 'bg-transparent text-gray-400 border-white/20 hover:text-white hover:border-white'
                   }`}
                 >
-                  {t.label}
+                  {tItem.label}
                 </button>
               ))}
             </div>
@@ -615,10 +616,10 @@ export default function HomeClient({ products, brands, brand, category, gender }
           {trustTab === 'how' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { step: '01', title: 'Satıcı Başvurur', desc: 'Ürününü fotoğraflayıp platforma yükler. Fiyat önerisi alır.', icon: '↑' },
-                { step: '02', title: 'Escrow & Kurye', desc: 'Alıcı ödemesi bloke edilir. Özel kurye ürünü satıcıdan alır.', icon: '⟳' },
-                { step: '03', title: 'Lab Ekspertizi', desc: '32 nokta fiziksel + Entrupy teknoloji doğrulaması yapılır.', icon: '⊕' },
-                { step: '04', title: 'Teslimat & Ödeme', desc: 'Onaylı ürün alıcıya gider, satıcı ödemesini alır.', icon: '✓' },
+                { step: '01', title: t('trust.step1Title', 'Satıcı Başvurur'), desc: t('trust.step1Desc', 'Ürününü fotoğraflayıp platforma yükler. Fiyat önerisi alır.'), icon: '↑' },
+                { step: '02', title: t('trust.step2Title', 'Escrow & Kurye'), desc: t('trust.step2Desc', 'Alıcı ödemesi bloke edilir. Özel kurye ürünü satıcıdan alır.'), icon: '⟳' },
+                { step: '03', title: t('trust.step3Title', 'Lab Ekspertizi'), desc: t('trust.step3Desc', '32 nokta fiziksel + Entrupy teknoloji doğrulaması yapılır.'), icon: '⊕' },
+                { step: '04', title: t('trust.step4Title', 'Teslimat & Ödeme'), desc: t('trust.step4Desc', 'Onaylı ürün alıcıya gider, satıcı ödemesini alır.'), icon: '✓' },
               ].map((item) => (
                 <div key={item.step} className="text-center group bg-white/5 p-6 rounded-2xl border border-white/10">
                   <div className="w-14 h-14 rounded-full border border-white/20 flex items-center justify-center mx-auto mb-4">
@@ -639,11 +640,16 @@ export default function HomeClient({ products, brands, brand, category, gender }
                 <div className="lg:col-span-5 space-y-4">
                   <p className="text-2xl serif-display">Peony <span className="italic font-light text-[#AF9164]">Lab™ & Entrupy™</span></p>
                   <p className="text-gray-400 font-light text-sm leading-relaxed">
-                    Her ürün, insan gözünün göremediği mikroskobik düzeyde fiber analiz, ışık spektrum taraması ve 32 noktalı fiziksel ekspertizden geçirilmektedir. Küresel iş ortağımız Entrupy altyapısı ile doğruluk payımız %99.1'dir.
+                    {language === 'en' 
+                      ? 'Every item undergoes microscopic fiber analysis, light spectrum scanning, and a 32-point physical audit. Powered by our global partner Entrupy, our accuracy rate is 99.1%.'
+                      : 'Her ürün, insan gözünün göremediği mikroskobik düzeyde fiber analiz, ışık spektrum taraması ve 32 noktalı fiziksel ekspertizden geçirilmektedir. Küresel iş ortağımız Entrupy altyapısı ile doğruluk payımız %99.1\'dir.'
+                    }
                   </p>
                   <div className="border border-white/10 px-6 py-4 rounded-xl inline-flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-300">Resmi Teknoloji Ortağı</span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-300">
+                      {language === 'en' ? 'Official Technology Partner' : 'Resmi Teknoloji Ortağı'}
+                    </span>
                   </div>
                 </div>
                 <div className="lg:col-span-7 grid grid-cols-2 gap-4">
@@ -658,9 +664,9 @@ export default function HomeClient({ products, brands, brand, category, gender }
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-white/10">
                 {[
-                  { title: 'Mikroskobik Doku Taraması', desc: 'Gözenek yapısı ve lif yoğunluğu referanslarla karşılaştırılır.', stat: '10M+' },
-                  { title: 'Işık Spektrum Taraması', desc: 'Malzemenin absorbsiyon ve yansıma spektrumu ölçülür.', stat: '99.1%' },
-                  { title: 'Blockchain Destekli Kayıt', desc: 'Orijinal bulunan her ürüne değiştirilemez dijital kimlik.', stat: '100%' },
+                  { title: language === 'en' ? 'Microscopic Texture Scan' : 'Mikroskobik Doku Taraması', desc: language === 'en' ? 'Pore pattern and fiber density are matched against references.' : 'Gözenek yapısı ve lif yoğunluğu referanslarla karşılaştırılır.', stat: '10M+' },
+                  { title: language === 'en' ? 'Light Spectrum Analysis' : 'Işık Spektrum Taraması', desc: language === 'en' ? 'Absorption and reflectance spectra of materials measured.' : 'Malzemenin absorbsiyon ve yansıma spektrumu ölçülür.', stat: '99.1%' },
+                  { title: language === 'en' ? 'Blockchain-Backed Audit' : 'Blockchain Destekli Kayıt', desc: language === 'en' ? 'Immutable digital passport issued for every authenticated piece.' : 'Orijinal bulunan her ürüne değiştirilemez dijital kimlik.', stat: '100%' },
                 ].map((tech) => (
                   <div key={tech.title} className="bg-white/5 p-6 rounded-xl border border-white/5">
                     <h4 className="text-sm font-semibold text-white mb-2">{tech.title}</h4>
@@ -677,14 +683,21 @@ export default function HomeClient({ products, brands, brand, category, gender }
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-6 space-y-6">
                 <h3 className="text-2xl sm:text-3xl serif-display">
-                  Fiziksel <span className="italic text-[#AF9164] font-light">Orijinallik Sertifikası</span>
+                  {language === 'en' ? 'Physical Certificate of Authenticity' : 'Fiziksel Orijinallik Sertifikası'}
                 </h3>
                 <p className="text-gray-400 font-light text-sm leading-relaxed">
-                  Peony Lab™ tarafından onaylanan tüm ürünler, alıcıya özel tescillenmiş fiziki Orijinallik Sertifikası ile gönderilir. Bu sertifika, ürünün orijinalliğini ömür boyu garanti altına alır ve değer koruma sağlar.
+                  {language === 'en'
+                    ? 'All items verified by Peony Lab™ are delivered with an embossed physical Certificate of Authenticity. This document guarantees genuine luxury heritage for life.'
+                    : 'Peony Lab™ tarafından onaylanan tüm ürünler, alıcıya özel tescillenmiş fiziki Orijinallik Sertifikası ile gönderilir. Bu sertifika, ürünün orijinalliğini ömür boyu garanti altına alır ve değer koruma sağlar.'
+                  }
                 </p>
                 <div className="flex gap-2">
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-white bg-white/10 px-3 py-1.5 rounded">✓ QR Kodlu Takip</span>
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-white bg-white/10 px-3 py-1.5 rounded">✓ Islak İmzalı</span>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-white bg-white/10 px-3 py-1.5 rounded">
+                    {language === 'en' ? '✓ QR Tracking' : '✓ QR Kodlu Takip'}
+                  </span>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-white bg-white/10 px-3 py-1.5 rounded">
+                    {language === 'en' ? '✓ Hand-Signed' : '✓ Islak İmzalı'}
+                  </span>
                 </div>
               </div>
               
@@ -697,7 +710,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                   
                   <div className="space-y-2 my-4 text-[7px] tracking-wider text-gray-600">
                     <div className="flex justify-between border-b border-gray-50 pb-0.5">
-                      <span>MARKA:</span>
+                      <span>{language === 'en' ? 'BRAND:' : 'MARKA:'}</span>
                       <span className="font-bold text-gray-900">HERMÈS</span>
                     </div>
                     <div className="flex justify-between border-b border-gray-50 pb-0.5">
@@ -705,7 +718,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                       <span className="font-bold text-gray-900">Kelly 28 Togo</span>
                     </div>
                     <div className="flex justify-between border-b border-gray-50 pb-0.5">
-                      <span>METOD:</span>
+                      <span>{language === 'en' ? 'METHOD:' : 'METOD:'}</span>
                       <span className="font-bold text-gray-900">32-Point & Entrupy™</span>
                     </div>
                   </div>
@@ -715,7 +728,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                       <p>PEONY LAB™ APPROVED</p>
                       <p className="font-mono">ID: #920-XF8</p>
                     </div>
-                    <div className="text-gray-800 italic font-serif">Küratör İmzası</div>
+                    <div className="text-gray-800 italic font-serif">{language === 'en' ? 'Curator Signature' : 'Küratör İmzası'}</div>
                   </div>
                 </div>
               </div>
@@ -728,23 +741,23 @@ export default function HomeClient({ products, brands, brand, category, gender }
               {[
                 {
                   brand: 'Hermès',
-                  item: 'Birkin 35 — Togo Deri',
-                  price: '₺ 480.000',
-                  quote: 'Dokuz yıl önce Paris\'ten alınan bir çanta, bugün İstanbul\'da yeni sahibini buldu. Orijinalliği, değerini korudu.',
+                  item: 'Birkin 35 — Togo Leather',
+                  price: formatPrice(480000),
+                  quote: language === 'en' ? 'Purchased nine years ago in Paris, found its new owner in Istanbul today. Retained full value.' : 'Dokuz yıl önce Paris\'ten alınan bir çanta, bugün İstanbul\'da yeni sahibini buldu. Orijinalliği, değerini korudu.',
                   image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=600',
                 },
                 {
                   brand: 'Chanel',
-                  item: 'Classic Flap — Siyah Kaviyer',
-                  price: '₺ 265.000',
-                  quote: 'Alıcı dört farklı platformda aradı, güven bulamadı. Peony\'de aldı — üç gün içinde teslimde.',
+                  item: 'Classic Flap — Black Caviar',
+                  price: formatPrice(265000),
+                  quote: language === 'en' ? 'Buyer searched across four platforms without trust. Found confidence at Peony — delivered in 3 days.' : 'Alıcı dört farklı platformda aradı, güven bulamadı. Peony\'de aldı — üç gün içinde teslimde.',
                   image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=600',
                 },
                 {
                   brand: 'Louis Vuitton',
                   item: 'Neverfull MM — Monogram',
-                  price: '₺ 68.000',
-                  quote: 'Satıcı, kurye koldan aldı ve ödeme T+5 günde hesabına geçti. Tek soru bile sormadı.',
+                  price: formatPrice(68000),
+                  quote: language === 'en' ? 'Retrieved directly from consignor by VIP courier. Payout released on T+5 with zero hassle.' : 'Satıcı, kurye koldan aldı ve ödeme T+5 günde hesabına geçti. Tek soru bile sormadı.',
                   image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=600',
                 },
               ].map((story) => (
@@ -761,7 +774,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                       &ldquo;{story.quote}&rdquo;
                     </p>
                     <div className="flex justify-between items-center text-[11px] pt-3 border-t border-white/5">
-                      <span className="text-gray-500">İşlem Bedeli</span>
+                      <span className="text-gray-500">{language === 'en' ? 'Valuation' : 'İşlem Bedeli'}</span>
                       <span className="font-bold text-white">{story.price}</span>
                     </div>
                   </div>
@@ -778,9 +791,11 @@ export default function HomeClient({ products, brands, brand, category, gender }
         <div className="max-w-[1400px] mx-auto px-6 md:px-12">
           
           <div className="text-center mb-12">
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164] mb-2 block">PARTNER WITH PEONY</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164] mb-2 block">
+              {t('partner.tagline', 'PARTNER WITH PEONY')}
+            </span>
             <h2 className="text-3xl md:text-4xl serif-display leading-tight text-gray-900">
-              Lüksü Nakde <span className="italic font-light">Çevirin</span>
+              {t('partner.title', 'Lüksü Nakde Çevirin')}
             </h2>
             
             {/* Sell Option Toggles */}
@@ -793,7 +808,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                     : 'bg-white text-gray-500 border-gray-200 hover:text-black hover:border-black'
                 }`}
               >
-                Kurucu Tedarikçi Programı (%0)
+                {t('partner.tabSupplier', 'Kurucu Tedarikçi Programı (%0)')}
               </button>
               <button 
                 onClick={() => setSellTab('vip')}
@@ -803,7 +818,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                     : 'bg-white text-gray-500 border-gray-200 hover:text-black hover:border-black'
                 }`}
               >
-                Peony VIP (Concierge)
+                {t('partner.tabVip', 'Peony VIP (Concierge)')}
               </button>
             </div>
           </div>
@@ -812,15 +827,19 @@ export default function HomeClient({ products, brands, brand, category, gender }
             <div className="bg-[#1A1A1A] text-white p-8 md:p-12 rounded-3xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative overflow-hidden">
               <div className="absolute -right-20 -top-20 w-60 h-60 rounded-full bg-[#AF9164]/10 blur-3xl" />
               <div className="lg:col-span-8 space-y-4">
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164] bg-[#AF9164]/10 px-3 py-1 rounded">Özel Lansman Avantajı</span>
-                <h3 className="text-2xl md:text-3xl serif-display">%0&apos;dan Başlayan Komisyon Oranları</h3>
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164] bg-[#AF9164]/10 px-3 py-1 rounded">
+                  {t('partner.launchTag', 'ÖZEL LANSMAN AVANTAJI')}
+                </span>
+                <h3 className="text-2xl md:text-3xl serif-display">
+                  {t('partner.commissionTitle', '%0\'dan Başlayan Komisyon Oranları')}
+                </h3>
                 <p className="text-xs md:text-sm text-gray-400 leading-relaxed font-light">
-                  Peony lansman dönemine özel sınırlı sayıdaki kurucu tedarikçiden biri olun, lüks parçalarınızı en yüksek değerle ve komisyonsuz avantajlarla nakde çevirin.
+                  {t('partner.commissionDesc', 'Peony lansman dönemine özel sınırlı sayıdaki kurucu tedarikçiden biri olun, lüks parçalarınızı en yüksek değerle ve komisyonsuz avantajlarla nakde çevirin.')}
                 </p>
               </div>
               <div className="lg:col-span-4 text-center lg:text-right shrink-0">
                 <Link href="/sell" className="inline-block bg-[#AF9164] px-8 py-3 text-white hover:bg-white hover:text-black transition-all text-xs tracking-wider uppercase font-bold rounded-lg shadow-lg">
-                  Hemen Başvur
+                  {t('partner.applyBtn', 'HEMEN BAŞVUR')}
                 </Link>
               </div>
             </div>
@@ -830,9 +849,14 @@ export default function HomeClient({ products, brands, brand, category, gender }
             <div className="bg-zinc-50 border border-gray-200 p-8 md:p-12 rounded-3xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-4">
                 <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164] bg-[#AF9164]/10 px-3 py-1 rounded">White Glove Service</span>
-                <h3 className="text-2xl md:text-3xl serif-display text-gray-900">Peony VIP ile Zahmetsiz Satış</h3>
+                <h3 className="text-2xl md:text-3xl serif-display text-gray-900">
+                  {language === 'en' ? 'Effortless Selling with Peony VIP' : 'Peony VIP ile Zahmetsiz Satış'}
+                </h3>
                 <p className="text-xs md:text-sm text-gray-500 leading-relaxed font-light">
-                  Ürünlerinizi evinizden teslim alıyoruz; profesyonel fotoğraf çekimi, fiyatlandırma, ekspertiz ve alıcı iletişimini tamamen biz yönetiyoruz. Ürün satıldığında tutar doğrudan hesabınızda.
+                  {language === 'en'
+                    ? 'We pick up items from your doorstep; handle professional photography, pricing, authentication, and buyer inquiries. Once sold, funds are wired directly to your account.'
+                    : 'Ürünlerinizi evinizden teslim alıyoruz; profesyonel fotoğraf çekimi, fiyatlandırma, ekspertiz ve alıcı iletişimini tamamen biz yönetiyoruz. Ürün satıldığında tutar doğrudan hesabınızda.'
+                  }
                 </p>
               </div>
               <div className="lg:col-span-4 text-center lg:text-right shrink-0">
@@ -842,7 +866,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 border border-[#AF9164] text-[#AF9164] px-6 py-3 hover:bg-[#AF9164] hover:text-white transition-all duration-300 text-xs tracking-wider uppercase font-bold rounded-lg"
                 >
-                  WhatsApp'tan Yazın →
+                  {language === 'en' ? 'WhatsApp Advisor →' : 'WhatsApp\'tan Yazın →'}
                 </a>
               </div>
             </div>
@@ -863,12 +887,14 @@ export default function HomeClient({ products, brands, brand, category, gender }
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         
         <div className="relative z-10 max-w-2xl px-6 space-y-6">
-          <p className="sans-detail text-[#AF9164] tracking-[0.3em] text-[10px]">UNLOCK YOUR WARDROBE'S VALUE</p>
+          <p className="sans-detail text-[#AF9164] tracking-[0.3em] text-[10px]">
+            {t('partner.treasureTag', 'UNLOCK YOUR WARDROBE\'S VALUE')}
+          </p>
           <h2 className="text-3xl md:text-5xl serif-display text-white leading-tight">
-            Kullanmadığınız lüks, <br/> <span className="italic font-light text-[#AF9164]">başkası için bir hazine.</span>
+            {t('partner.treasureTitle', 'Kullanmadığınız lüks, başkası için bir hazine.')}
           </h2>
           <Link href="/sell" className="inline-block px-10 py-4 bg-white text-black hover:bg-[#AF9164] hover:text-white transition-all text-xs tracking-widest uppercase font-bold shadow-2xl rounded-full">
-            HEMEN SATIŞ YAP
+            {t('partner.sellNowBtn', 'HEMEN SATIŞ YAP')}
           </Link>
         </div>
       </section>

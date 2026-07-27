@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, User, LogOut, MessageSquare, Settings } from 'lucide-react'
 import { logout } from '@/src/app/login/actions'
+import { useSettings } from '@/src/context/SettingsContext'
+import CurrencyLanguageSelector from './CurrencyLanguageSelector'
 
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { Profile } from '@/src/types'
@@ -16,6 +18,7 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ user, profile }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useSettings()
 
   const toggleMenu = () => setIsOpen(!isOpen)
 
@@ -89,11 +92,11 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
               animate="open"
               exit="closed"
               variants={drawerVariants}
-              className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[360px] bg-white z-[10000] flex flex-col shadow-2xl overflow-y-auto"
+              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[360px] bg-white z-[10000] flex flex-col shadow-2xl overflow-y-auto"
             >
               
               {/* Çekmece Header (Logo ve Kapat Butonu) */}
-              <div className="h-24 px-6 flex items-center justify-between border-b border-gray-100">
+              <div className="h-20 px-6 flex items-center justify-between border-b border-gray-100 shrink-0">
                 <Link href="/" onClick={toggleMenu} className="text-lg font-playfair tracking-[0.2em] uppercase">
                   PEONY<span className="italic font-light text-[#AF9164]">C.</span>
                 </Link>
@@ -107,12 +110,24 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
               </div>
 
               {/* Menü Linkleri */}
-              <div className="flex-grow py-8 px-6 space-y-8 flex flex-col justify-start">
+              <div className="flex-grow py-6 px-6 space-y-6 flex flex-col justify-start">
                 
+                {/* Dil ve Para Birimi Seçici */}
+                <div className="bg-gray-50/80 p-3 rounded-2xl flex items-center justify-between border border-gray-100">
+                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                    {t('footer.languageCurrency', 'DİL VE PARA BİRİMİ')}
+                  </span>
+                  <CurrencyLanguageSelector dropUp={false} variant="light" />
+                </div>
+
+                <div className="h-[1px] bg-gray-100" />
+
                 {/* 1. Markalar */}
-                <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Markalar</p>
-                  <div className="flex flex-col gap-4 text-sm font-medium uppercase tracking-[0.15em] text-gray-800">
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                    {t('nav.brands', 'MARKALAR')}
+                  </p>
+                  <div className="flex flex-col gap-3 text-xs font-semibold uppercase tracking-[0.15em] text-gray-800">
                     <Link href="/?brand=Hermès#collection" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">Hermès</Link>
                     <Link href="/?brand=Chanel#collection" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">Chanel</Link>
                     <Link href="/?brand=Dior#collection" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">Dior</Link>
@@ -122,39 +137,47 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
                 <div className="h-[1px] bg-gray-100" />
 
                 {/* 2. Concierge & Satış */}
-                <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Kullanıcı Servisleri</p>
-                  <div className="flex flex-col gap-4 text-sm font-medium uppercase tracking-[0.15em] text-gray-800">
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                    {t('nav.userServices', 'KULLANICI SERVİSLERİ')}
+                  </p>
+                  <div className="flex flex-col gap-3 text-xs font-semibold uppercase tracking-[0.15em] text-gray-800">
                     {user ? (
                       <>
                         <Link href="/dashboard" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
-                          <User size={16} strokeWidth={1.5} />
-                          Panelim
+                          <User size={15} strokeWidth={1.5} />
+                          {t('nav.myPanel', 'PANELİM')}
                         </Link>
                         <Link href="/settings" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
-                          <Settings size={16} strokeWidth={1.5} />
-                          Hesap Ayarlarım
+                          <Settings size={15} strokeWidth={1.5} />
+                          {t('nav.settings', 'HESAP AYARLARIM')}
                         </Link>
                         <Link href="/messages" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors flex items-center gap-2">
-                          <MessageSquare size={16} strokeWidth={1.5} />
-                          Mesajlarım
+                          <MessageSquare size={15} strokeWidth={1.5} />
+                          {t('nav.messages', 'MESAJLARIM')}
                         </Link>
                       </>
                     ) : (
-                      <Link href="/sell" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">Satış Yap</Link>
+                      <Link href="/sell" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">
+                        {t('nav.sell', 'SATIŞ YAP')}
+                      </Link>
                     )}
-                    <Link href="/how-it-works" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">Nasıl Çalışır?</Link>
+                    <Link href="/how-it-works" onClick={toggleMenu} className="hover:text-[#AF9164] transition-colors">
+                      {t('nav.howItWorks', 'NASIL ÇALIŞIR?')}
+                    </Link>
                   </div>
                 </div>
 
                 <div className="h-[1px] bg-gray-100" />
 
                 {/* 3. Hesap Bilgileri */}
-                <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Hesap</p>
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                    {t('nav.account', 'HESAP')}
+                  </p>
                   {user ? (
-                    <div className="space-y-4">
-                      <div className="bg-gray-50 p-4 rounded-xl flex items-center gap-3">
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 p-3.5 rounded-xl flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white text-xs font-bold text-gray-700">
                           {profile?.first_name?.[0] || 'U'}
                         </div>
@@ -173,7 +196,7 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
                           className="w-full text-left text-xs font-bold text-red-400 hover:text-red-600 transition-colors uppercase tracking-widest flex items-center gap-2 px-1 cursor-pointer"
                         >
                           <LogOut size={14} strokeWidth={1.5} />
-                          Çıkış Yap
+                          {t('nav.logout', 'ÇIKIŞ')}
                         </button>
                       </form>
                     </div>
@@ -183,7 +206,7 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
                       onClick={toggleMenu}
                       className="inline-block text-xs font-bold uppercase tracking-[0.2em] border-b border-black pb-1 hover:text-gray-400 hover:border-gray-400 transition-colors"
                     >
-                      Üye Girişi / Kayıt
+                      {t('nav.login', 'ÜYE GİRİŞİ / KAYIT')}
                     </Link>
                   )}
                 </div>
@@ -191,9 +214,9 @@ export default function MobileMenu({ user, profile }: MobileMenuProps) {
               </div>
 
               {/* Çekmece Footer */}
-              <div className="p-6 border-t border-gray-100 bg-gray-50 text-center">
+              <div className="p-5 border-t border-gray-100 bg-gray-50 text-center shrink-0">
                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">PEONY COLLECTIVE</p>
-                <p className="text-[8px] italic font-light text-[#AF9164]">Mirasın Yeni Sahibi</p>
+                <p className="text-[8px] italic font-light text-[#AF9164]">{t('hero.tagline', 'Mirasın Yeni Sahibi')}</p>
               </div>
 
             </motion.div>

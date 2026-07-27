@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ShieldCheck, CheckCircle2, Award, Loader2 } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
+import { useSettings } from '@/src/context/SettingsContext'
 import CurrencyLanguageSelector from './CurrencyLanguageSelector'
 
 export default function Footer() {
+  const { t } = useSettings()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -22,7 +24,7 @@ export default function Footer() {
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !email.includes('@')) {
-      setError('Lütfen geçerli bir e-posta adresi giriniz.')
+      setError(t('footer.subscribeError', 'Lütfen geçerli bir e-posta adresi giriniz.'))
       return
     }
 
@@ -48,11 +50,11 @@ export default function Footer() {
         }
       }
 
-      setMessage("Özel listemize başarıyla kaydoldunuz. VIP ayrıcalıklar yakında e-postanızda.")
+      setMessage(t('footer.subscribeSuccess', 'Özel listemize başarıyla kaydoldunuz. VIP ayrıcalıklar yakında e-postanızda.'))
       setEmail('')
     } catch (err) {
       console.error(err)
-      setError('Bir hata oluştu. Lütfen daha sonra tekrar deneyin.')
+      setError(t('footer.subscribeError', 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.'))
     } finally {
       setLoading(false)
     }
@@ -79,51 +81,71 @@ export default function Footer() {
                 className="h-10 sm:h-12 w-auto object-contain invert opacity-90 hover:opacity-100 transition-opacity duration-300" 
               />
             </Link>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#AF9164] font-bold">Mirasın Yeni Sahibi</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[#AF9164] font-bold">
+              {t('footer.tagline', 'Mirasın Yeni Sahibi')}
+            </p>
             <p className="text-sm font-light leading-relaxed text-zinc-400 max-w-sm">
-              Yarım milyonluk bir yatırımı şansa bırakamazsınız. Peony Collective, her parçayı 32 noktalı fiziksel ekspertiz ve 3D Spektral Analizden geçirerek orijinalliğini garantiler.
+              {t('footer.aboutText', 'Yarım milyonluk bir yatırımı şansa bırakamazsınız. Peony Collective, her parçayı 32 noktalı fiziksel ekspertiz ve 3D Spektral Analizden geçirerek orijinalliğini garantiler.')}
             </p>
             <div className="text-[10px] text-zinc-500 font-light space-y-1 pt-4 border-t border-white/5">
               <p className="font-bold text-zinc-400 uppercase tracking-wider mb-1">Peony Collective</p>
-              <p>Adres: Mehmet Akif Mah. Şahinbey Cd. Hacı Tevfikoğulları İş Merkezi No:59, 34774 Çekmeköy/İstanbul</p>
-              <p>Telefon: 0850 885 4110 | E-posta: info@peonycollective.com</p>
-              <p className="text-zinc-600">Mersis No: [Mersis No] | Vergi No: [Vergi No] ([Vergi Dairesi])</p>
+              <p>{t('footer.companyAddress', 'Adres: Mehmet Akif Mah. Şahinbey Cd. Hacı Tevfikoğulları İş Merkezi No:59, 34774 Çekmeköy/İstanbul')}</p>
+              <p>{t('footer.companyPhone', 'Telefon: 0850 885 4110 | E-posta: info@peonycollective.com')}</p>
+              <p className="text-zinc-600">{t('footer.companyTax', 'Mersis No: [Mersis No] | Vergi No: [Vergi No] ([Vergi Dairesi])')}</p>
             </div>
           </div>
 
           {/* Kolon 2: Hukuki & Yasal Metinler */}
           <div className="space-y-6 lg:pl-12">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">Yasal Belgeler</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">
+              {t('footer.legalTitle', 'Yasal Belgeler')}
+            </h4>
             <ul className="space-y-3 text-xs text-zinc-400 font-light">
               <li>
-                <Link href="/legal/terms" className="hover:text-white transition-colors">Kullanım Koşulları</Link>
+                <Link href="/legal/terms" className="hover:text-white transition-colors">
+                  {t('footer.terms', 'Kullanım Koşulları')}
+                </Link>
               </li>
               <li>
-                <Link href="/legal/privacy" className="hover:text-white transition-colors">Gizlilik Politikası</Link>
+                <Link href="/legal/privacy" className="hover:text-white transition-colors">
+                  {t('footer.privacy', 'Gizlilik Politikası')}
+                </Link>
               </li>
               <li>
-                <Link href="/legal/kvkk" className="hover:text-white transition-colors">KVKK Aydınlatma Metni</Link>
+                <Link href="/legal/kvkk" className="hover:text-white transition-colors">
+                  {t('footer.kvkk', 'KVKK Aydınlatma Metni')}
+                </Link>
               </li>
               <li>
-                <Link href="/legal/distance-sales" className="hover:text-white transition-colors">Mesafeli Satış Sözleşmesi</Link>
+                <Link href="/legal/distance-sales" className="hover:text-white transition-colors">
+                  {t('footer.distanceSales', 'Mesafeli Satış Sözleşmesi')}
+                </Link>
               </li>
               <li>
-                <Link href="/legal/pre-information" className="hover:text-white transition-colors">Ön Bilgilendirme Formu</Link>
+                <Link href="/legal/pre-information" className="hover:text-white transition-colors">
+                  {t('footer.preInfo', 'Ön Bilgilendirme Formu')}
+                </Link>
               </li>
               <li>
-                <Link href="/legal/return-policy" className="hover:text-white transition-colors">İptal ve İade Koşulları</Link>
+                <Link href="/legal/return-policy" className="hover:text-white transition-colors">
+                  {t('footer.returnPolicy', 'İptal ve İade Koşulları')}
+                </Link>
               </li>
               <li>
-                <Link href="/legal/delivery" className="hover:text-white transition-colors">Teslimat ve Kargo Politikası</Link>
+                <Link href="/legal/delivery" className="hover:text-white transition-colors">
+                  {t('footer.delivery', 'Teslimat ve Kargo Politikası')}
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Kolon 3: VIP Bülten Aboneliği */}
           <div className="space-y-6 lg:pl-12">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">Private List</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">
+              {t('footer.privateListTitle', 'Private List')}
+            </h4>
             <p className="text-sm font-light text-zinc-400">
-              Özel kürasyonlardan, gizli butik satışlarından ve VIP davetlerden ilk siz haberdar olun.
+              {t('footer.privateListDesc', 'Özel kürasyonlardan, gizli butik satışlarından ve VIP davetlerden ilk siz haberdar olun.')}
             </p>
             <form onSubmit={handleSubscribe} className="relative mt-4 group">
               <input
@@ -131,7 +153,7 @@ export default function Footer() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="E-POSTA ADRESİNİZ"
+                placeholder={t('footer.emailPlaceholder', 'E-POSTA ADRESİNİZ')}
                 className="w-full bg-zinc-900 border-b border-zinc-700 focus:border-[#AF9164] py-3.5 px-0 text-xs font-bold tracking-widest uppercase text-white placeholder-zinc-500 focus:outline-none transition-colors duration-500"
               />
               <button
@@ -165,17 +187,17 @@ export default function Footer() {
         {/* Alt Alan: Güven Rozetleri ve Copyright */}
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
           
-          {/* Sol: Copyright, Credit */}
+          {/* Sol: Copyright, Credit ve Dil/Para Birimi Seçici */}
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
-                © 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.
+                {t('footer.copyright', '© 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.')}
               </div>
               <div className="text-[8px] font-medium tracking-[0.2em] text-zinc-600 text-center md:text-left">
                 CRAFTED BY <a href="https://www.vr0cks.com/en" target="_blank" rel="noopener noreferrer" className="text-[#AF9164] hover:text-white transition-colors">VR0CKS</a>
               </div>
-              <div className="pt-2 flex justify-center md:justify-start">
-                <CurrencyLanguageSelector />
+              <div className="pt-3 flex justify-center md:justify-start">
+                <CurrencyLanguageSelector dropUp={true} variant="dark" align="left" />
               </div>
             </div>
           </div>
@@ -194,21 +216,29 @@ export default function Footer() {
             <div className="flex flex-wrap justify-center gap-8 opacity-40 hover:opacity-75 transition-opacity duration-500">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={14} className="text-[#AF9164]" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Orijinallik Garantisi</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                  {t('footer.authenticity', 'Orijinallik Garantisi')}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Award size={14} className="text-[#AF9164]" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Peony Lab™ Onaylı</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                  {t('footer.labApproved', 'Peony Lab™ Onaylı')}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-[#AF9164]" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">VIP Sigortalı Teslimat</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                  {t('footer.insuredDelivery', 'VIP Sigortalı Teslimat')}
+                </span>
               </div>
             </div>
             
             {/* Ödeme Logoları */}
             <div className="flex flex-wrap justify-center md:justify-end gap-2 items-center opacity-30 hover:opacity-60 transition-opacity duration-500 pt-2">
-              <span className="text-[8px] tracking-widest uppercase text-zinc-400 mr-1">GÜVENLİ ÖDEME:</span>
+              <span className="text-[8px] tracking-widest uppercase text-zinc-400 mr-1">
+                {t('footer.securePayment', 'GÜVENLİ ÖDEME:')}
+              </span>
               <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">PayTR</span>
               <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">VISA</span>
               <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">MASTERCARD</span>

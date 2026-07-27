@@ -3,12 +3,14 @@
 import { useState, useRef } from 'react'
 import { updateProfile } from '@/src/app/settings/actions'
 import { Camera, User, Phone, CreditCard, Shield, Briefcase, MapPin } from 'lucide-react'
+import { useSettings } from '@/src/context/SettingsContext'
 
 interface SettingsFormProps {
   profile: any
 }
 
 export default function SettingsForm({ profile }: SettingsFormProps) {
+  const { t } = useSettings()
   const [isPending, setIsPending] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -81,7 +83,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
                 className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white text-[9px] font-bold uppercase tracking-wider cursor-pointer"
               >
                 <Camera size={20} className="text-[#AF9164]" />
-                <span>Değiştir</span>
+                <span>{t('settings.changeAvatar', 'Değiştir')}</span>
               </div>
             </div>
             {/* Gizli Dosya Seçici */}
@@ -96,10 +98,10 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
 
           <div className="flex-1 text-center sm:text-left">
             <h2 className="text-2xl font-semibold text-gray-900 serif-display italic">
-              {profile?.first_name || 'Peony'} {profile?.last_name || 'Üyesi'}
+              {profile?.first_name || 'Peony'} {profile?.last_name || ''}
             </h2>
             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#AF9164] mt-1.5 flex items-center justify-center sm:justify-start gap-1.5">
-              <Shield size={11} className="fill-[#AF9164]/10" /> Onaylı Üye & Koleksiyoner
+              <Shield size={11} className="fill-[#AF9164]/10" /> {t('settings.approvedMember', 'Onaylı Üye & Koleksiyoner')}
             </p>
           </div>
         </div>
@@ -120,13 +122,13 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
       {/* KARTLAR: İletişim & Ödeme Bilgileri */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-left space-y-6">
         <h3 className="text-xs font-bold uppercase tracking-widest text-[#AF9164] flex items-center gap-2 border-b border-gray-100 pb-4">
-          <User size={14} /> Kişisel Bilgiler & Ödemeler
+          <User size={14} /> {t('settings.title', 'Kişisel Bilgiler & Ödemeler')}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest flex items-center gap-1.5">
-              <Phone size={10} /> Telefon Numarası
+              <Phone size={10} /> {t('settings.phone', 'Telefon Numarası')}
             </label>
             <input 
               name="phone_number" 
@@ -138,7 +140,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest flex items-center gap-1.5 text-red-500">
-              <CreditCard size={10} /> IBAN (Ödemeleriniz İçin)
+              <CreditCard size={10} /> {t('settings.iban', 'IBAN (Ödemeleriniz İçin)')}
             </label>
             <input 
               name="iban" 
@@ -153,23 +155,23 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
       {/* KARTLAR: Pazaryeri & Satıcı Bilgileri */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-left space-y-6">
         <h3 className="text-xs font-bold uppercase tracking-widest text-[#AF9164] flex items-center gap-2 border-b border-gray-100 pb-4">
-          <Briefcase size={14} /> Pazaryeri (Satıcı) Bilgileri
+          <Briefcase size={14} /> {t('settings.marketplace', 'Pazaryeri (Satıcı) Bilgileri')}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Hesap Tipi</label>
+            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">{t('settings.accountType', 'Hesap Tipi')}</label>
             <select 
               name="submerchant_type" 
               defaultValue={profile?.submerchant_type || 'bireysel'} 
               className="px-4 py-3.5 border border-gray-100 rounded-xl bg-gray-50 focus:bg-white focus:border-[#AF9164] transition-all outline-none text-black text-sm"
             >
-              <option value="bireysel">Bireysel (Şahıs)</option>
-              <option value="kurumsal">Kurumsal (Şirket)</option>
+              <option value="bireysel">{t('settings.individual', 'Bireysel (Şahıs)')}</option>
+              <option value="kurumsal">{t('settings.corporate', 'Kurumsal (Şirket)')}</option>
             </select>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">TC Kimlik No (Bireysel)</label>
+            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">{t('settings.tckn', 'TC Kimlik No (Bireysel)')}</label>
             <input 
               name="tckn" 
               defaultValue={profile?.tckn || ''} 
@@ -179,7 +181,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Vergi No (Kurumsal)</label>
+            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">{t('settings.vkn', 'Vergi No (Kurumsal)')}</label>
             <input 
               name="vkn" 
               defaultValue={profile?.vkn || ''} 
@@ -189,7 +191,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Firma Ünvanı (Kurumsal)</label>
+            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">{t('settings.companyTitle', 'Firma Ünvanı (Kurumsal)')}</label>
             <input 
               name="company_title" 
               defaultValue={profile?.company_title || ''} 
@@ -203,10 +205,10 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
       {/* KARTLAR: Teslimat Adresi */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-left space-y-6">
         <h3 className="text-xs font-bold uppercase tracking-widest text-[#AF9164] flex items-center gap-2 border-b border-gray-100 pb-4">
-          <MapPin size={14} /> Teslimat Adresim
+          <MapPin size={14} /> {t('settings.deliveryAddress', 'Teslimat Adresim')}
         </h3>
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Varsayılan Adres</label>
+          <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">{t('settings.defaultAddress', 'Varsayılan Adres')}</label>
           <textarea 
             name="address" 
             defaultValue={profile?.address || ''} 
@@ -222,7 +224,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
         disabled={isPending}
         className={`w-full text-white py-4.5 rounded-xl font-bold uppercase tracking-[0.25em] text-[10px] transition-all cursor-pointer ${isPending ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-black hover:bg-zinc-800 shadow-lg shadow-black/10 hover:shadow-none'}`}
       >
-        {isPending ? 'Güncelleniyor...' : 'Bilgileri Güncelle'}
+        {isPending ? t('settings.updating', 'Güncelleniyor...') : t('settings.updateBtn', 'Bilgileri Güncelle')}
       </button>
     </form>
   )

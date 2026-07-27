@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Search, ArrowRight } from 'lucide-react'
 import { createClient } from '@/src/utils/supabase/client'
 import { Product } from '@/src/types'
+import { useSettings } from '@/src/context/SettingsContext'
 
 interface SearchModalProps {
   isOpen: boolean
@@ -14,6 +15,7 @@ interface SearchModalProps {
 }
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
+  const { t, formatPrice } = useSettings()
   const [query, setQuery] = useState('')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
@@ -28,7 +30,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  // Veritabanındaki aktif tüm ürünleri önbelleğe alıp hızlı arama yapmak
   const loadProducts = async () => {
     setLoading(true)
     const supabase = createClient()
@@ -43,7 +44,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     setLoading(false)
   }
 
-  // Modal açıldığında inputa odaklanma
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -55,7 +55,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }
   }, [isOpen])
 
-  // Arama filtresi (derived state)
   const lowerQuery = query.toLocaleLowerCase('tr-TR')
   const filtered = query.trim()
     ? products.filter(p => 
@@ -108,14 +107,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="ARAMAYA BAŞLAYIN..."
+                  placeholder={t('search.placeholder', 'ARAMAYA BAŞLAYIN...')}
                   className="w-full pl-6 pr-12 bg-transparent text-xl md:text-3xl font-playfair tracking-[0.15em] text-white placeholder-zinc-500 focus:outline-none uppercase"
                 />
                 
                 <button
                   onClick={onClose}
                   className="absolute right-0 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                  aria-label="Kapat"
+                  aria-label="Close"
                 >
                   <X size={28} strokeWidth={1} />
                 </button>
@@ -129,12 +128,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <div className="min-h-[200px]">
               {query.trim() ? (
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#AF9164] mb-6">Arama Sonuçları ({filtered.length})</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#AF9164] mb-6">
+                    {t('search.results', 'Arama Sonuçları')} ({filtered.length})
+                  </h4>
                   
                   {loading ? (
-                    <p className="text-zinc-500 text-sm font-light italic">Aranıyor...</p>
+                    <p className="text-zinc-500 text-sm font-light italic">{t('search.searching', 'Aranıyor...')}</p>
                   ) : filtered.length === 0 ? (
-                    <p className="text-zinc-500 text-sm font-light italic">&quot;{query}&quot; ile eşleşen seçkin bir parça bulunamadı.</p>
+                    <p className="text-zinc-500 text-sm font-light italic">&quot;{query}&quot; {t('search.notFound', 'ile eşleşen seçkin bir parça bulunamadı.')}</p>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {filtered.map(p => (
@@ -159,7 +160,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             <p className="text-[10px] text-zinc-500 uppercase tracking-tighter">{p.category} / {p.subcategory}</p>
                           </div>
                           <div className="text-right flex-shrink-0 pl-2">
-                            <p className="text-xs font-bold text-white mb-2">{p.price.toLocaleString('tr-TR')} ₺</p>
+                            <p className="text-xs font-bold text-white mb-2">{formatPrice(p.price || 0)}</p>
                             <ArrowRight size={14} className="text-zinc-600 group-hover:text-[#AF9164] group-hover:translate-x-1 transition-all inline-block" />
                           </div>
                         </Link>
@@ -170,7 +171,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               ) : (
                 /* Başlangıç Durumu: Popüler Aramalar */
                 <div className="space-y-6">
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Popüler Aramalar</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">{t('search.popular', 'Popüler Aramalar')}</h4>
                   <div className="flex flex-wrap gap-3">
                     {popularSearches.map(s => (
                       <button

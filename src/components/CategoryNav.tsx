@@ -16,44 +16,44 @@ export default function CategoryNav() {
       name: t('nav.women', 'KADIN'),
       href: '/?gender=KADIN#collection',
       subcategories: [
-        { name: 'Çanta', href: '/?gender=KADIN&category=Çanta#collection' },
-        { name: 'Ayakkabı', href: '/?gender=KADIN&category=Ayakkabı#collection' },
-        { name: 'Dış Giyim', href: '/?gender=KADIN&category=Dış Giyim#collection' },
-        { name: 'Üst Giyim', href: '/?gender=KADIN&category=Üst Giyim#collection' },
-        { name: 'Alt Giyim', href: '/?gender=KADIN&category=Alt Giyim#collection' },
-        { name: 'Elbise', href: '/?gender=KADIN&category=Kıyafet&subcategory=Elbise#collection' },
+        { name: t('category.bags', 'Çanta'), href: '/?gender=KADIN&category=Çanta#collection' },
+        { name: t('category.shoes', 'Ayakkabı'), href: '/?gender=KADIN&category=Ayakkabı#collection' },
+        { name: t('category.outerwear', 'Dış Giyim'), href: '/?gender=KADIN&category=Dış Giyim#collection' },
+        { name: t('category.topwear', 'Üst Giyim'), href: '/?gender=KADIN&category=Üst Giyim#collection' },
+        { name: t('category.bottomwear', 'Alt Giyim'), href: '/?gender=KADIN&category=Alt Giyim#collection' },
+        { name: t('category.dress', 'Elbise'), href: '/?gender=KADIN&category=Kıyafet&subcategory=Elbise#collection' },
       ]
     },
     {
       name: t('nav.men', 'ERKEK'),
       href: '/?gender=ERKEK#collection',
       subcategories: [
-        { name: 'Alt Giyim', href: '/?gender=ERKEK&category=Alt Giyim#collection' },
-        { name: 'Dış Giyim', href: '/?gender=ERKEK&category=Dış Giyim#collection' },
-        { name: 'Üst Giyim', href: '/?gender=ERKEK&category=Üst Giyim#collection' },
-        { name: 'Ayakkabı', href: '/?gender=ERKEK&category=Ayakkabı#collection' },
+        { name: t('category.bottomwear', 'Alt Giyim'), href: '/?gender=ERKEK&category=Alt Giyim#collection' },
+        { name: t('category.outerwear', 'Dış Giyim'), href: '/?gender=ERKEK&category=Dış Giyim#collection' },
+        { name: t('category.topwear', 'Üst Giyim'), href: '/?gender=ERKEK&category=Üst Giyim#collection' },
+        { name: t('category.shoes', 'Ayakkabı'), href: '/?gender=ERKEK&category=Ayakkabı#collection' },
       ]
     },
     {
       name: t('nav.kids', 'ÇOCUK'),
       href: '/?gender=KIZ ÇOCUK#collection',
       subcategories: [
-        { name: 'Kız Çocuk', href: '/?gender=KIZ ÇOCUK#collection' },
-        { name: 'Erkek Çocuk', href: '/?gender=ERKEK ÇOCUK#collection' },
+        { name: t('category.girls', 'Kız Çocuk'), href: '/?gender=KIZ ÇOCUK#collection' },
+        { name: t('category.boys', 'Erkek Çocuk'), href: '/?gender=ERKEK ÇOCUK#collection' },
       ]
     },
     {
       name: t('nav.accessories', 'AKSESUAR'),
       href: '/?category=Aksesuar#collection',
       subcategories: [
-        { name: 'Eşarp', href: '/?category=Aksesuar&subcategory=Eşarp#collection' },
-        { name: 'Bileklik', href: '/?category=Aksesuar&subcategory=Bileklik#collection' },
-        { name: 'Fular', href: '/?category=Aksesuar&subcategory=Fular#collection' },
-        { name: 'Şapka', href: '/?category=Aksesuar&subcategory=Şapka#collection' },
-        { name: 'Kemer', href: '/?category=Aksesuar&subcategory=Kemer#collection' },
-        { name: 'Gözlük', href: '/?category=Aksesuar&subcategory=Gözlük#collection' },
-        { name: 'Cüzdan', href: '/?category=Aksesuar&subcategory=Cüzdan#collection' },
-        { name: 'Takı', href: '/?category=Aksesuar&subcategory=Takı#collection' },
+        { name: t('category.scarf', 'Eşarp'), href: '/?category=Aksesuar&subcategory=Eşarp#collection' },
+        { name: t('category.bracelet', 'Bileklik'), href: '/?category=Aksesuar&subcategory=Bileklik#collection' },
+        { name: t('category.foulard', 'Fular'), href: '/?category=Aksesuar&subcategory=Fular#collection' },
+        { name: t('category.hat', 'Şapka'), href: '/?category=Aksesuar&subcategory=Şapka#collection' },
+        { name: t('category.belt', 'Kemer'), href: '/?category=Aksesuar&subcategory=Kemer#collection' },
+        { name: t('category.glasses', 'Gözlük'), href: '/?category=Aksesuar&subcategory=Gözlük#collection' },
+        { name: t('category.wallet', 'Cüzdan'), href: '/?category=Aksesuar&subcategory=Cüzdan#collection' },
+        { name: t('category.jewelry', 'Takı'), href: '/?category=Aksesuar&subcategory=Takı#collection' },
       ]
     },
     {

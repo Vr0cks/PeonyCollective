@@ -3,11 +3,13 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Trash2, ArrowRight, ShoppingBag } from 'lucide-react'
 import { useCart } from '@/src/context/CartContext'
+import { useSettings } from '@/src/context/SettingsContext'
 import Image from 'next/image'
 import Link from 'next/link'
 
 export default function CartDrawer() {
   const { isCartOpen, setIsCartOpen, cartItems, removeFromCart, cartTotal } = useCart()
+  const { t, formatPrice } = useSettings()
 
   return (
     <AnimatePresence>
@@ -34,7 +36,7 @@ export default function CartDrawer() {
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
                 <ShoppingBag size={20} className="text-[#AF9164]" />
-                <h2 className="text-xl serif-display">Sepetiniz</h2>
+                <h2 className="text-xl serif-display">{t('cart.title', 'Sepetiniz')}</h2>
                 <span className="text-xs bg-black text-white px-2 py-0.5 rounded-full">{cartItems.length}</span>
               </div>
               <button 
@@ -50,7 +52,7 @@ export default function CartDrawer() {
               {cartItems.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50">
                   <ShoppingBag size={48} strokeWidth={1} />
-                  <p className="sans-detail tracking-widest text-gray-500">SEPETINIZ BOŞ</p>
+                  <p className="sans-detail tracking-widest text-gray-500 uppercase">{t('cart.empty', 'SEPETİNİZ BOŞ')}</p>
                 </div>
               ) : (
                 cartItems.map((item) => (
@@ -70,7 +72,7 @@ export default function CartDrawer() {
                       </div>
                       
                       <div className="flex items-end justify-between mt-4">
-                        <p className="text-lg serif-display text-black">{item.price?.toLocaleString('tr-TR')} ₺</p>
+                        <p className="text-lg serif-display text-black">{formatPrice(item.price || 0)}</p>
                         <button 
                           onClick={() => removeFromCart(item.id)}
                           className="text-gray-400 hover:text-red-500 transition-colors p-1"
@@ -88,8 +90,8 @@ export default function CartDrawer() {
             {cartItems.length > 0 && (
               <div className="p-6 border-t border-gray-100 bg-gray-50/50">
                 <div className="flex justify-between items-center mb-6">
-                  <span className="text-gray-500 text-sm font-medium">Ara Toplam</span>
-                  <span className="text-2xl serif-display">{cartTotal.toLocaleString('tr-TR')} ₺</span>
+                  <span className="text-gray-500 text-sm font-medium">{t('cart.subtotal', 'Ara Toplam')}</span>
+                  <span className="text-2xl serif-display">{formatPrice(cartTotal)}</span>
                 </div>
                 
                 <Link 
@@ -97,11 +99,11 @@ export default function CartDrawer() {
                   onClick={() => setIsCartOpen(false)}
                   className="w-full flex items-center justify-center gap-3 bg-black text-white py-4 hover:bg-[#AF9164] transition-colors duration-300 sans-detail"
                 >
-                  Güvenli Ödemeye Geç
+                  {t('cart.checkout', 'Güvenli Ödemeye Geç')}
                   <ArrowRight size={18} />
                 </Link>
                 <div className="mt-4 flex justify-center gap-2">
-                  <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">100% Güvenli Ödeme</span>
+                  <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">{t('cart.shippingInfo', '100% Güvenli Ödeme')}</span>
                 </div>
               </div>
             )}

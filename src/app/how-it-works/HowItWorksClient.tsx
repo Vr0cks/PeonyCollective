@@ -3,35 +3,38 @@
 import { motion } from 'framer-motion'
 import { ShieldCheck, Truck, Search, CreditCard, Award } from 'lucide-react'
 import Image from 'next/image'
-
-const steps = [
-  {
-    title: "Güvenli Ödeme & Rezervasyon",
-    desc: "Alıcı ödemeyi yapar, ancak para satıcıya gitmez. Peony'nin güvenli emanet havuzunda (Escrow) bloke edilir.",
-    icon: <CreditCard className="w-8 h-8" strokeWidth={1} />,
-    color: "bg-blue-50"
-  },
-  {
-    title: "Peony Lab'e Gönderim",
-    desc: "Satıcı, ürünü incelenmek üzere özel kurye ile İstanbul'daki onay merkezimize (The Lab) gönderir.",
-    icon: <Truck className="w-8 h-8" strokeWidth={1} />,
-    color: "bg-zinc-50"
-  },
-  {
-    title: "32 Noktalı Ekspertiz & Makroskobik Tarama",
-    desc: "Uzmanlarımız derinin dikişinden, donanım ağırlığına kadar ürünü fiziksel olarak inceler ve global referans veritabanımızla karşılaştırır.",
-    icon: <Search className="w-8 h-8" strokeWidth={1} />,
-    color: "bg-orange-50"
-  },
-  {
-    title: "Dijital Pasaport & Teslimat",
-    desc: "Ürün onaylanırsa, NFC özellikli Dijital Pasaportu ile mühürlenir ve alıcıya sigortalı olarak gönderilir. Para satıcıya geçer.",
-    icon: <Award className="w-8 h-8" strokeWidth={1} />,
-    color: "bg-green-50"
-  }
-]
+import { useSettings } from '@/src/context/SettingsContext'
 
 export default function HowItWorksClient() {
+  const { t } = useSettings()
+
+  const steps = [
+    {
+      title: t('howItWorks.step1Title', 'Güvenli Ödeme & Rezervasyon'),
+      desc: t('howItWorks.step1Desc', "Alıcı ödemeyi yapar, ancak para satıcıya gitmez. Peony'nin güvenli emanet havuzunda (Escrow) bloke edilir."),
+      icon: <CreditCard className="w-8 h-8" strokeWidth={1} />,
+      color: "bg-blue-50"
+    },
+    {
+      title: t('howItWorks.step2Title', "Peony Lab'e Gönderim"),
+      desc: t('howItWorks.step2Desc', "Satıcı, ürünü incelenmek üzere özel kurye ile İstanbul'daki onay merkezimize (The Lab) gönderir."),
+      icon: <Truck className="w-8 h-8" strokeWidth={1} />,
+      color: "bg-zinc-50"
+    },
+    {
+      title: t('howItWorks.step3Title', "32 Noktalı Ekspertiz & Makroskobik Tarama"),
+      desc: t('howItWorks.step3Desc', "Uzmanlarımız derinin dikişinden, donanım ağırlığına kadar ürünü fiziksel olarak inceler ve global referans veritabanımızla karşılaştırır."),
+      icon: <Search className="w-8 h-8" strokeWidth={1} />,
+      color: "bg-orange-50"
+    },
+    {
+      title: t('howItWorks.step4Title', "Dijital Pasaport & Teslimat"),
+      desc: t('howItWorks.step4Desc', "Ürün onaylanırsa, NFC özellikli Dijital Pasaportu ile mühürlenir ve alıcıya sigortalı olarak gönderilir. Para satıcıya geçer."),
+      icon: <Award className="w-8 h-8" strokeWidth={1} />,
+      color: "bg-green-50"
+    }
+  ]
+
   return (
     <div className="max-w-6xl mx-auto">
       
@@ -42,18 +45,17 @@ export default function HowItWorksClient() {
           whileInView={{ opacity: 1 }}
           className="text-[10px] font-bold uppercase tracking-[0.6em] text-[#AF9164]"
         >
-          Trust Infrastructure
+          {t('howItWorks.headerTag', 'TRUST INFRASTRUCTURE')}
         </motion.h2>
         <motion.h1 
           initial={{ opacity: 0, y: 20 }} 
           whileInView={{ opacity: 1, y: 0 }}
           className="text-5xl md:text-7xl serif-display italic leading-tight text-gray-900"
         >
-          Lüksün Yeni <br /> <span className="not-italic font-light">Güven Standartı</span>
+          {t('howItWorks.headerTitle', 'Lüksün Yeni')} <br /> <span className="not-italic font-light">{t('howItWorks.headerTitleSub', 'Güven Standartı')}</span>
         </motion.h1>
         <p className="text-gray-500 max-w-xl mx-auto text-sm font-light leading-relaxed">
-          Yarım milyonluk bir yatırım yaparken riskleri biz üstleniyoruz. <br />
-          Peony Lab ile her işlem, kurumsal güvence altındadır.
+          {t('howItWorks.headerSub', 'Yarım milyonluk bir yatırım yaparken riskleri biz üstleniyoruz. Peony Lab ile her işlem, kurumsal güvence altındadır.')}
         </p>
       </div>
 
@@ -76,7 +78,7 @@ export default function HowItWorksClient() {
               </div>
               <div className="space-y-3">
                 <h3 className="text-lg serif-display font-bold leading-tight">
-                  <span className="text-[10px] block font-bold text-[#AF9164] mb-1 font-inter uppercase tracking-widest">Adım 0{i+1}</span>
+                  <span className="text-[10px] block font-bold text-[#AF9164] mb-1 font-inter uppercase tracking-widest">{t('howItWorks.stepLabel', 'Adım')} 0{i+1}</span>
                   {step.title}
                 </h3>
                 <p className="text-xs text-gray-400 leading-loose font-light">
@@ -93,19 +95,18 @@ export default function HowItWorksClient() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#AF9164]/10 blur-[120px] -z-0" />
         
         <div className="space-y-8 relative z-10">
-          <h2 className="text-4xl md:text-5xl serif-display italic">Peony Lab™</h2>
+          <h2 className="text-4xl md:text-5xl serif-display italic">{t('howItWorks.labTitle', 'Peony Lab™')}</h2>
           <p className="text-gray-400 font-light leading-relaxed">
-            Fiziksel onay merkezimiz, Türkiye&apos;nin ilk ve tek lüks çanta ekspertiz laboratuvarıdır. 
-            3D tarama teknolojisi ve spektral analiz ile deri gözeneklerine kadar iniyoruz.
+            {t('howItWorks.labDesc', "Fiziksel onay merkezimiz, Türkiye'nin ilk ve tek lüks çanta ekspertiz laboratuvarıdır. 3D tarama teknolojisi ve spektral analiz ile deri gözeneklerine kadar iniyoruz.")}
           </p>
           <div className="space-y-4">
              <div className="flex items-center gap-4">
                 <ShieldCheck className="text-[#AF9164]" size={20} />
-                <span className="text-xs font-bold uppercase tracking-widest">Sertifikalı Ekspertiz Heyeti</span>
+                <span className="text-xs font-bold uppercase tracking-widest">{t('howItWorks.labFeature1', 'Sertifikalı Ekspertiz Heyeti')}</span>
              </div>
              <div className="flex items-center gap-4">
                 <ShieldCheck className="text-[#AF9164]" size={20} />
-                <span className="text-xs font-bold uppercase tracking-widest">Mikroskobik Dikiş Analizi</span>
+                <span className="text-xs font-bold uppercase tracking-widest">{t('howItWorks.labFeature2', 'Mikroskobik Dikiş Analizi')}</span>
              </div>
           </div>
         </div>

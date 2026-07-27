@@ -1,8 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-
 import { Conversation } from '@/src/types'
+import { useSettings } from '@/src/context/SettingsContext'
 
 interface ConversationListProps {
   conversations: Conversation[]
@@ -11,15 +11,17 @@ interface ConversationListProps {
 }
 
 export default function ConversationList({ conversations, activeId, onSelect }: ConversationListProps) {
+  const { t, formatPrice } = useSettings()
+
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-        <h2 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Görüşmelerim</h2>
+        <h2 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('msg.conversations', 'Görüşmelerim')}</h2>
       </div>
       <div className="flex-grow overflow-y-auto divide-y divide-gray-50">
         {conversations.length === 0 ? (
           <div className="p-12 text-center text-xs text-gray-400 italic font-light">
-            Henüz bir mesajlaşma kaydı bulunmuyor.
+            {t('msg.noConversations', 'Henüz bir mesajlaşma kaydı bulunmuyor.')}
           </div>
         ) : (
           conversations.map((conv) => {

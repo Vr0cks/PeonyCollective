@@ -4,10 +4,10 @@ import { useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Send, Loader2 } from 'lucide-react'
-
 import { Conversation, Message } from '@/src/types'
 import OfferChatWidget from './OfferChatWidget'
 import { maskContactInfo } from '@/src/utils/security'
+import { useSettings } from '@/src/context/SettingsContext'
 
 interface MessageThreadProps {
   messages: Message[]
@@ -30,7 +30,8 @@ export default function MessageThread({
   onSend,
   sending,
 }: MessageThreadProps) {
-  // Scroll to bottom of message box container only (not body window scroll)
+  const { t, formatPrice } = useSettings()
+
   const scrollRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (scrollRef.current) {
@@ -38,7 +39,6 @@ export default function MessageThread({
     }
   }, [messages])
 
-  // Smart multi-message phone number reconstruction filter (prevents split number trickery)
   const processedMessages = useMemo(() => {
     if (!messages) return []
     const processed = messages.map(m => ({ ...m }))
@@ -53,21 +53,18 @@ export default function MessageThread({
         j++
       }
 
-      // Reconstruct combined text of consecutive messages
       const combinedText = group.map(m => m.content).join(' ')
       const digits = combinedText.replace(/\D/g, '')
 
-      // If combined digits form a typical Turkish mobile/landline number or consecutive digits sum to 10-12
       const isPhonePattern = /0?5\d{9}/.test(digits) || (digits.length >= 10 && digits.length <= 12)
 
       if (isPhonePattern) {
         group.forEach(m => {
           if (/\d+/.test(m.content)) {
-            // Replace if message is pure numbers
             if (m.content.replace(/[\s\.-]/g, '').match(/^\d+$/)) {
-              m.content = '[İLETİŞİM BİLGİSİ GİZLENDİ]'
+              m.content = t('msg.hiddenContact', '[İLETİŞİM BİLGİSİ GİZLENDİ]')
             } else {
-              m.content = m.content.replace(/\d+[\s\d\.-]*/g, '[İLETİŞİM BİLGİSİ GİZLENDİ]')
+              m.content = m.content.replace(/\d+[\s\d\.-]*/g, t('msg.hiddenContact', '[İLETİŞİM BİLGİSİ GİZLENDİ]'))
             }
           }
         })
@@ -75,7 +72,7 @@ export default function MessageThread({
       i = j
     }
     return processed
-  }, [messages])
+  }, [messages, t])
 
   const other = conversation?.other_profile || {}
   const otherName = `${other.first_name || 'Kullanıcı'} ${other.last_name || ''}`.trim()
@@ -84,14 +81,14 @@ export default function MessageThread({
   return (
     <div className="flex flex-col h-full bg-white text-[#1A1A1A]">
       {/* Header */}
-      <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+      <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/55">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-xs font-bold text-[#AF9164] uppercase border border-gray-100">
             {other.first_name ? other.first_name[0] : 'K'}
           </div>
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-gray-900">{otherName}</h4>
-            <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">Aktif Görüşme</p>
+            <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">{t('msg.activeConversation', 'Aktif Görüşme')}</p>
           </div>
         </div>
 
@@ -112,7 +109,7 @@ export default function MessageThread({
             </div>
             <div className="min-w-0 text-left">
               <p className="text-[9px] font-bold uppercase tracking-wider text-black truncate">{product.brand}</p>
-              <p className="text-[8px] text-[#AF9164] font-bold truncate">{(product.price ?? 0).toLocaleString('tr-TR')} ₺</p>
+              <p className="text-[8px] text-[#AF9164] font-bold truncate">{formatPrice(product.price || 0)}</p>
             </div>
           </Link>
         )}
@@ -131,9 +128,9 @@ export default function MessageThread({
       <div className="bg-amber-50/60 border-b border-amber-100/50 px-4 md:px-6 py-2.5 flex items-center justify-between text-[10px] text-amber-800 tracking-wide font-light">
         <div className="flex items-center gap-2">
           <span>⚠️</span>
-          <span>Güvenliğiniz için telefon numarası, e-posta veya harici link paylaşmayınız.</span>
+          <span>{t('msg.safetyNotice', 'Güvenliğiniz için telefon numarası, e-posta veya harici link paylaşmayınız.')}</span>
         </div>
-        <span className="font-bold text-amber-900 shrink-0">Peony Güvencesi</span>
+        <span className="font-bold text-amber-900 shrink-0">{t('msg.safetyBadge', 'Peony Güvencesi')}</span>
       </div>
 
       {/* Messages list */}
@@ -144,7 +141,7 @@ export default function MessageThread({
           </div>
         ) : messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center">
-            <p className="text-xs text-gray-400 italic font-light">Sohbeti başlatmak için aşağıdan mesaj gönderin.</p>
+            <p className="text-xs text-gray-400 italic font-light">{t('msg.selectPrompt', 'Sohbeti başlatmak için aşağıdan mesaj gönderin.')}</p>
           </div>
         ) : (
           processedMessages.map((msg) => {
@@ -170,7 +167,7 @@ export default function MessageThread({
                     {new Date(msg.created_at).toLocaleTimeString('tr-TR', {
                       hour: '2-digit',
                       minute: '2-digit',
-                      })}
+                    })}
                   </span>
                 </div>
               </div>
@@ -186,14 +183,14 @@ export default function MessageThread({
             type="text"
             value={inputText}
             onChange={(e) => onChangeInput(e.target.value)}
-            placeholder="Mesajınızı buraya yazın..."
+            placeholder={t('msg.placeholder', 'Mesajınızı buraya yazın...')}
             className="flex-grow bg-transparent text-xs py-1.5 focus:outline-none placeholder-gray-400 text-gray-800 font-light"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || sending}
             className="w-8 h-8 rounded-full bg-black hover:bg-[#AF9164] disabled:bg-gray-100 text-white disabled:text-gray-300 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed transition-colors"
-            aria-label="Gönder"
+            aria-label="Send"
           >
             {sending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

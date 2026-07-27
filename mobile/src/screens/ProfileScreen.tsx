@@ -58,7 +58,7 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
   const isEn = t('wishlistEmpty') === 'Your wishlist is empty.';
   const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [profileMode, setProfileMode] = useState<'buyer' | 'seller' | 'vault'>('buyer'); // Switch between Buyer, Seller, and Vault profiles
   const [activeAdPackage, setActiveAdPackage] = useState<string | null>(null);
   

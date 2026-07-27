@@ -6,10 +6,12 @@ import { MessageSquare, X, Send, Crown, CheckCircle2, Shield, Loader2, Terminal,
 import { createClient } from '@/src/utils/supabase/client'
 import { usePathname } from 'next/navigation'
 import { sendItSupportPingAction, createConciergeRequestAction, checkSystemStatusAction } from '@/src/app/admin/actions'
+import { useSettings } from '@/src/context/SettingsContext'
 
 export default function ConciergeWidget() {
   const pathname = usePathname()
   const isAdmin = pathname?.startsWith('/admin')
+  const { t, language, formatPrice } = useSettings()
 
   const [isOpen, setIsOpen] = useState(false)
   const [chatStep, setChatStep] = useState<'welcome' | 'spectral' | 'offer' | 'whatsapp' | 'offer_success' | 'admin_welcome' | 'admin_status' | 'admin_support_form' | 'muse'>('welcome')
@@ -39,13 +41,17 @@ export default function ConciergeWidget() {
       price: number
       image: string
     }>
-  }>>([
-    {
-      id: 'welcome',
-      sender: 'muse',
-      text: 'Merhaba ben Peony stil küratörünüz Muse. Bugün nereyi ziyaret edeceksiniz veya nasıl bir davete katılacaksınız? Size oranın havasına ve dokusuna en uygun lüks parçaları önereyim.'
-    }
-  ])
+  }>>([])
+
+  useEffect(() => {
+    setMuseMessages([
+      {
+        id: 'welcome',
+        sender: 'muse',
+        text: t('concierge.museWelcome', 'Merhaba ben Peony stil küratörünüz Muse. Bugün nereyi ziyaret edeceksiniz veya nasıl bir davete katılacaksınız? Size oranın havasına ve dokusuna en uygun lüks parçaları önereyim.')
+      }
+    ])
+  }, [language])
 
   const handleSendMuseMessage = async () => {
     if (!museInput.trim() || museLoading) return
@@ -67,14 +73,14 @@ export default function ConciergeWidget() {
         },
         body: JSON.stringify({
           message: text,
-          locale: 'tr'
+          locale: language
         })
       })
 
       const data = await response.json()
       
       if (!response.ok) {
-        const errMsg = data.error || 'Bir hata oluştu.'
+        const errMsg = data.error || (language === 'en' ? 'An error occurred.' : 'Bir hata oluştu.')
         setMuseMessages(prev => [
           ...prev,
           {
@@ -101,7 +107,7 @@ export default function ConciergeWidget() {
         {
           id: `muse-err-${Date.now()}`,
           sender: 'muse',
-          text: `⚠️ Bağlantı hatası oluştu: ${err.message || 'Sunucuya erişilemiyor.'}`
+          text: `⚠️ ${err.message || (language === 'en' ? 'Connection error' : 'Bağlantı hatası oluştu.')}`
         }
       ])
     } finally {
@@ -126,16 +132,10 @@ export default function ConciergeWidget() {
     })
   }
 
-  // Checkout (ödeme) ekranında dikkat dağıtmamak için widget'ı gizle
   if (pathname?.startsWith('/checkout')) {
     return null;
   }
 
-  /**
-   * Supabase Realtime Subscription
-   * Subscribes to INSERT events on the 'concierge_requests' table.
-   * This ensures administrators receive live updates for VIP offers without polling.
-   */
   useEffect(() => {
     if (isAdmin) {
       const supabase = createClient()
@@ -155,10 +155,6 @@ export default function ConciergeWidget() {
     }
   }, [isAdmin])
 
-  /**
-   * State Initialization
-   * Resets the chat interface to the appropriate root view based on the user's role authorization.
-   */
   useEffect(() => {
     if (isOpen) {
       setChatStep(isAdmin ? 'admin_welcome' : 'welcome')
@@ -196,7 +192,6 @@ export default function ConciergeWidget() {
     }
   }
 
-  // Dynamic Theming: Applies administrative styling conventions if the user possesses the 'admin' role.
   const themeColor = isAdmin ? 'emerald-500' : '#AF9164'
   const ThemeIcon = isAdmin ? Terminal : Crown
 
@@ -223,14 +218,14 @@ export default function ConciergeWidget() {
                     {isAdmin ? 'Systems & Ops' : 'Peony Concierge'}
                   </h4>
                   <p className="text-[9px] text-zinc-400 uppercase tracking-widest">
-                    {isAdmin ? 'IT Destek & Altyapı' : 'VIP Destek & Teklif Hattı'}
+                    {isAdmin ? 'IT Destek & Altyapı' : t('concierge.sub', 'VIP DESTEK & TEKLİF HATTI')}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => { setIsOpen(false); resetChat(); }}
                 className="text-zinc-500 hover:text-white transition-colors cursor-pointer p-1"
-                aria-label="Kapat"
+                aria-label="Close"
               >
                 <X size={16} />
               </button>
@@ -360,7 +355,7 @@ export default function ConciergeWidget() {
                 <div className="space-y-6 flex-grow flex flex-col justify-between">
                   <div className="space-y-4">
                     <div className="bg-zinc-900 border border-zinc-800/80 p-4 rounded-2xl text-xs font-light leading-relaxed text-zinc-300">
-                      Merhaba, ben Peony VIP Danışmanınız. Seçkin koleksiyonumuz ve hizmetlerimizle ilgili size nasıl yardımcı olabilirim?
+                      {t('concierge.welcome', 'Merhaba, ben Peony VIP Danışmanınız. Seçkin koleksiyonumuz ve hizmetlerimizle ilgili size nasıl yardımcı olabilirim?')}
                     </div>
                   </div>
 
@@ -369,26 +364,26 @@ export default function ConciergeWidget() {
                       onClick={() => setChatStep('muse')}
                       className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-850 hover:border-[#AF9164]/50 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-white flex items-center justify-between group"
                     >
-                      <span className="flex items-center gap-2">✨ <span>Peony Muse Stil Sohbeti</span></span>
-                      <span className="text-[8px] bg-[#AF9164]/10 text-[#AF9164] group-hover:bg-[#AF9164] group-hover:text-black px-1.5 py-0.5 rounded transition-all">YENİ</span>
+                      <span className="flex items-center gap-2">✨ <span>{t('concierge.museBtn', 'Peony Muse Stil Sohbeti')}</span></span>
+                      <span className="text-[8px] bg-[#AF9164]/10 text-[#AF9164] group-hover:bg-[#AF9164] group-hover:text-black px-1.5 py-0.5 rounded transition-all">{t('concierge.newBadge', 'YENİ')}</span>
                     </button>
                     <button
                       onClick={() => setChatStep('spectral')}
                       className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-white"
                     >
-                      🛡️ 3D Spektral Orijinallik Sorgula
+                      🛡️ {t('concierge.spectralBtn', '3D Spektral Orijinallik Sorgula')}
                     </button>
                     <button
                       onClick={() => setChatStep('offer')}
                       className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-white"
                     >
-                      👑 Özel VIP Teklif Ver (100K+)
+                      👑 {t('concierge.offerBtn', 'Özel VIP Teklif Ver (100K+)')}
                     </button>
                     <button
                       onClick={() => setChatStep('whatsapp')}
                       className="w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-[#AF9164]/30 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer text-white"
                     >
-                      💬 Temsilci ile Canlı Görüş
+                      💬 {t('concierge.liveChatBtn', 'Temsilci ile Canlı Görüş')}
                     </button>
                   </div>
                 </div>
@@ -397,69 +392,69 @@ export default function ConciergeWidget() {
               {/* USER: Orijinallik Bilgisi */}
               {chatStep === 'spectral' && (
                 <div className="space-y-6">
-                  <div className="bg-zinc-900 border border-zinc-800/80 p-4 rounded-2xl text-xs font-light leading-relaxed text-zinc-300 space-y-3">
+                  <div className="bg-zinc-900 border border-zinc-800/80 p-4 rounded-2xl text-xs font-light leading-relaxed text-zinc-300 space-y-3 text-left">
                     <p className="font-bold text-[#AF9164] flex items-center gap-1.5 uppercase text-[9px] tracking-widest">
-                      <Shield size={12} /> Peony Lab™ Güvencesi
+                      <Shield size={12} /> {t('concierge.labTitle', 'Peony Lab™ Güvencesi')}
                     </p>
                     <p>
-                      Sistemimizdeki tüm arşiv parçaları 32 noktalı fiziksel inceleme ve 3D Spektral Analizden geçirilmektedir.
+                      {t('concierge.labP1', 'Sistemimizdeki tüm arşiv parçaları 32 noktalı fiziksel inceleme ve 3D Spektral Analizden geçirilmektedir.')}
                     </p>
                     <p>
-                      İlgilendiğiniz ürünün sayfasında bulunan <strong>&quot;Dijital Pasaportu Görüntüle&quot;</strong> butonuna tıklayarak laboratuvar raporunu, orijinallik puanını ve blokzincir kontrat kayıtlarını canlı olarak inceleyebilirsiniz.
+                      {t('concierge.labP2', 'İlgilendiğiniz ürünün sayfasında bulunan "Dijital Pasaportu Görüntüle" butonuna tıklayarak laboratuvar raporunu, orijinallik puanını ve blokzincir kontrat kayıtlarını canlı olarak inceleyebilirsiniz.')}
                     </p>
                   </div>
                   <button
                     onClick={() => setChatStep('welcome')}
                     className="text-[10px] font-bold text-[#AF9164] hover:text-white uppercase tracking-widest border-b border-[#AF9164]/30 pb-0.5 transition-colors cursor-pointer"
                   >
-                    ← Ana Menüye Dön
+                    {t('concierge.backMenu', '← Ana Menüye Dön')}
                   </button>
                 </div>
               )}
 
               {/* USER: VIP Teklif Formu */}
               {chatStep === 'offer' && (
-                <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">VIP Özel Teklif Formu</p>
+                <div className="space-y-4 text-left">
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">{t('concierge.offerFormTitle', 'VIP ÖZEL TEKLİF FORMU')}</p>
                   <form onSubmit={handleOfferSubmit} className="space-y-3 text-xs">
                     <div>
                       <input
                         type="text"
-                        placeholder="ADINIZ SOYADINIZ"
+                        placeholder={t('concierge.placeholderName', 'ADINIZ SOYADINIZ')}
                         required
                         value={offerData.name}
                         onChange={e => setOfferData({ ...offerData, name: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none uppercase"
                       />
                     </div>
                     <div>
                       <input
                         type="text"
-                        placeholder="İLETİŞİM (E-POSTA VEYA TELEFON)"
+                        placeholder={t('concierge.placeholderContact', 'İLETİŞİM (E-POSTA VEYA TELEFON)')}
                         required
                         value={offerData.contact}
                         onChange={e => setOfferData({ ...offerData, contact: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none uppercase"
                       />
                     </div>
                     <div>
                       <input
                         type="text"
-                        placeholder="İLGİLENDİĞİNİZ ÜRÜN (örn: Rolex Kermit)"
+                        placeholder={t('concierge.placeholderProduct', 'İLGİLENDİĞİNİZ ÜRÜN (örn: Rolex Kermit)')}
                         required
                         value={offerData.product}
                         onChange={e => setOfferData({ ...offerData, product: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none uppercase"
                       />
                     </div>
                     <div>
                       <input
                         type="text"
-                        placeholder="TEKLİFİNİZ (örn: 450.000 ₺)"
+                        placeholder={t('concierge.placeholderOffer', 'TEKLİFİNİZ (örn: 450.000 ₺)')}
                         required
                         value={offerData.price}
                         onChange={e => setOfferData({ ...offerData, price: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none"
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-[#AF9164] px-4 py-2.5 rounded-lg text-white text-[10px] tracking-widest placeholder-zinc-600 focus:outline-none uppercase"
                       />
                     </div>
                     <button
@@ -472,14 +467,14 @@ export default function ConciergeWidget() {
                       ) : (
                         <Send size={12} />
                       )}
-                      Teklifi Concierge&apos;e İlet
+                      {t('concierge.submitOffer', "Teklifi Concierge'e İlet")}
                     </button>
                   </form>
                   <button
                     onClick={() => setChatStep('welcome')}
                     className="text-[10px] font-bold text-zinc-500 hover:text-white uppercase tracking-widest border-b border-zinc-800 pb-0.5 transition-colors cursor-pointer"
                   >
-                    ← İptal Et
+                    {t('concierge.cancel', '← İptal Et')}
                   </button>
                 </div>
               )}
@@ -491,27 +486,26 @@ export default function ConciergeWidget() {
                     <CheckCircle2 size={24} strokeWidth={1.5} />
                   </div>
                   <div className="space-y-2">
-                    <h5 className="text-xs font-bold uppercase tracking-[0.2em] text-[#AF9164]">Teklifiniz Alındı</h5>
+                    <h5 className="text-xs font-bold uppercase tracking-[0.2em] text-[#AF9164]">{t('concierge.offerSuccessTitle', 'Teklifiniz Alındı')}</h5>
                     <p className="text-[11px] font-light text-zinc-400 leading-relaxed px-4">
-                      Sayın {offerData.name.toUpperCase()}, <strong>{offerData.product.toUpperCase()}</strong> için yaptığınız <strong>{offerData.price}</strong> tutarındaki teklifiniz Concierge ekibimiz tarafından satıcıya iletilmiştir. Sonuç kayıtlı e-postanıza gönderilecektir. <br/>
-                      <span className="text-[9px] text-[#AF9164] mt-1.5 block font-light italic">ℹ Danışmanlarımızın cevap vermesi 2 saati bulabilir.</span>
+                      {offerData.name.toUpperCase()} - <strong>{offerData.product.toUpperCase()}</strong> ({offerData.price})
                     </p>
                   </div>
                   <button
                     onClick={resetChat}
                     className="bg-zinc-900 border border-zinc-800 px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest text-zinc-300 hover:text-[#AF9164] transition-colors cursor-pointer"
                   >
-                    Harika
+                    {t('concierge.great', 'Harika')}
                   </button>
                 </div>
               )}
 
               {/* USER: WhatsApp Yönlendirme */}
               {chatStep === 'whatsapp' && (
-                <div className="space-y-6">
+                <div className="space-y-6 text-left">
                   <div className="bg-zinc-900 border border-zinc-800/80 p-4 rounded-2xl text-xs font-light leading-relaxed text-zinc-300 space-y-4">
                     <p>
-                      VIP Satış Danışmanlarımızla doğrudan görüşmek, canlı görsel talep etmek ya da özel kurye randevusu oluşturmak için lütfen Concierge hattımızla iletişime geçin.
+                      {t('concierge.whatsappDesc', 'VIP Satış Danışmanlarımızla doğrudan görüşmek, canlı görsel talep etmek ya da özel kurye randevusu oluşturmak için lütfen Concierge hattımızla iletişime geçin.')}
                     </p>
                     <p className="font-bold text-white text-[13px] tracking-widest text-center py-2 border-y border-zinc-800">
                       +90 552 365 20 93
@@ -524,13 +518,13 @@ export default function ConciergeWidget() {
                       rel="noopener noreferrer"
                       className="bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-lg transition-all"
                     >
-                      WhatsApp&apos;ı Aç
+                      {t('concierge.openWhatsapp', "WhatsApp'ı Aç")}
                     </a>
                     <button
                       onClick={() => setChatStep('welcome')}
                       className="text-[10px] font-bold text-zinc-500 hover:text-white uppercase tracking-widest transition-colors cursor-pointer"
                     >
-                      Ana Menü
+                      {t('concierge.backMenu', '← Ana Menüye Dön')}
                     </button>
                   </div>
                 </div>
@@ -556,7 +550,7 @@ export default function ConciergeWidget() {
                           {/* Recs */}
                           {msg.products && msg.products.length > 0 && (
                             <div className="mt-2 w-full space-y-1.5">
-                              <p className="text-[8px] font-bold text-[#AF9164] uppercase tracking-wider">Küratörün Seçtikleri:</p>
+                              <p className="text-[8px] font-bold text-[#AF9164] uppercase tracking-wider">{t('concierge.curatorPicks', 'Küratörün Seçtikleri:')}</p>
                               <div className="flex gap-2 overflow-x-auto pb-1">
                                 {msg.products.map((prod) => (
                                   <a 
@@ -571,7 +565,7 @@ export default function ConciergeWidget() {
                                     <div className="p-1.5 space-y-0.5">
                                       <p className="text-[7px] font-bold text-[#AF9164] tracking-wider uppercase">{prod.brand}</p>
                                       <h5 className="text-[8px] text-white truncate">{prod.model_name}</h5>
-                                      <p className="text-[8px] text-zinc-400">{(prod.price ?? 0).toLocaleString('tr-TR')} ₺</p>
+                                      <p className="text-[8px] text-zinc-400">{formatPrice(prod.price || 0)}</p>
                                     </div>
                                   </a>
                                 ))}
@@ -585,7 +579,7 @@ export default function ConciergeWidget() {
                       <div className="flex flex-col items-start">
                         <div className="bg-zinc-900 text-zinc-400 border border-zinc-800 rounded-xl rounded-tl-none p-2.5 flex items-center gap-2">
                           <Loader2 className="w-3 h-3 animate-spin text-[#AF9164]" />
-                          <span>Muse yanıt hazırlıyor...</span>
+                          <span>{language === 'en' ? 'Muse is crafting a response...' : 'Muse yanıt hazırlıyor...'}</span>
                         </div>
                       </div>
                     )}
@@ -595,7 +589,7 @@ export default function ConciergeWidget() {
                   <div className="pt-2 border-t border-zinc-800 flex gap-2 items-center">
                     <input 
                       type="text" 
-                      placeholder={museLoading ? "Lütfen bekleyin..." : "Bugün nereye gidiyorsunuz?"} 
+                      placeholder={museLoading ? (language === 'en' ? 'Please wait...' : 'Lütfen bekleyin...') : t('concierge.musePlaceholder', 'Bugün nereye gidiyorsunuz?')} 
                       value={museInput}
                       disabled={museLoading}
                       onChange={(e) => setMuseInput(e.target.value)}
@@ -607,7 +601,7 @@ export default function ConciergeWidget() {
                       disabled={museLoading}
                       className="text-[9px] font-bold text-[#AF9164] tracking-widest uppercase px-2 py-1.5 cursor-pointer hover:text-white transition-colors disabled:opacity-50"
                     >
-                      {museLoading ? '...' : 'SOR'}
+                      {museLoading ? '...' : t('concierge.ask', 'SOR')}
                     </button>
                   </div>
 
@@ -615,7 +609,7 @@ export default function ConciergeWidget() {
                     onClick={() => setChatStep('welcome')}
                     className="text-[9px] font-bold text-zinc-500 hover:text-white uppercase tracking-widest border-b border-zinc-800 pb-0.5 transition-colors cursor-pointer self-start mt-1"
                   >
-                    ← Menüye Dön
+                    {t('concierge.backToMenu', '← Menüye Dön')}
                   </button>
                 </div>
               )}
@@ -633,7 +627,7 @@ export default function ConciergeWidget() {
         className={`w-14 h-14 rounded-full text-black shadow-2xl flex items-center justify-center border relative cursor-pointer focus:outline-none transition-colors ${
           isAdmin ? 'bg-emerald-500 hover:bg-emerald-400 border-emerald-400/20' : 'bg-[#AF9164] hover:bg-[#96794F] border-black/20'
         }`}
-        aria-label="Destek Aç"
+        aria-label="Support"
       >
         <span className="absolute inset-0.5 rounded-full border border-black/10 animate-ping opacity-25" />
         {isOpen ? <X size={22} strokeWidth={1.5} /> : <ThemeIcon size={22} strokeWidth={1.5} />}

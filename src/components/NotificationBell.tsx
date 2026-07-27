@@ -4,8 +4,10 @@ import { useEffect, useState, useRef, useMemo } from 'react'
 import { createClient } from '@/src/utils/supabase/client'
 import { Bell, Trash2 } from 'lucide-react'
 import { Notification } from '@/src/types'
+import { useSettings } from '@/src/context/SettingsContext'
 
 export default function NotificationBell({ userId }: { userId: string }) {
+  const { t } = useSettings()
   const [unreadCount, setUnreadCount] = useState(0)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -26,7 +28,6 @@ export default function NotificationBell({ userId }: { userId: string }) {
 
   // Load and listen to notifications
   useEffect(() => {
-    // 1. Fetch initial notifications
     async function loadNotifications() {
       try {
         const { data, error } = await supabase
@@ -49,7 +50,6 @@ export default function NotificationBell({ userId }: { userId: string }) {
 
     loadNotifications()
 
-    // 2. Setup realtime channel
     const channel = supabase
       .channel(`user-notifications-${userId}`)
       .on(
@@ -78,7 +78,6 @@ export default function NotificationBell({ userId }: { userId: string }) {
       setIsOpen(true)
       if (unreadCount > 0) {
         setUnreadCount(0)
-        // Mark all as read in DB
         try {
           await supabase
             .from('notifications')
@@ -109,7 +108,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
       <button 
         onClick={handleToggle}
         className="relative p-2 text-gray-500 hover:text-black transition-colors cursor-pointer"
-        aria-label="Bildirimler"
+        aria-label="Notifications"
       >
         <Bell className="w-5 h-5 stroke-[1.5]" />
         {unreadCount > 0 && (
@@ -122,21 +121,21 @@ export default function NotificationBell({ userId }: { userId: string }) {
       {isOpen && (
         <div className="absolute right-0 mt-3 w-80 bg-white border border-gray-100 rounded-2xl shadow-xl z-[100] overflow-hidden">
           <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/55">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Bildirimler</h3>
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-600">{t('notif.title', 'BİLDİRİMLER')}</h3>
             {notifications.length > 0 && (
               <button 
                 onClick={handleClear} 
                 className="text-[9px] text-gray-400 hover:text-red-500 uppercase font-bold flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <Trash2 className="w-3 h-3" />
-                Temizle
+                {t('notif.clear', 'Temizle')}
               </button>
             )}
           </div>
           <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
             {notifications.length === 0 ? (
               <div className="py-12 px-4 text-center">
-                <p className="text-xs text-gray-400 italic font-light">Henüz bildirim bulunmuyor.</p>
+                <p className="text-xs text-gray-400 italic font-light">{t('notif.empty', 'Henüz bildirim bulunmuyor.')}</p>
               </div>
             ) : (
               notifications.map((n) => (

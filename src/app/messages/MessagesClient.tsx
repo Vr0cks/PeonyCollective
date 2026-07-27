@@ -7,6 +7,8 @@ import ConversationList from '@/src/components/ConversationList'
 import MessageThread from '@/src/components/MessageThread'
 import { Conversation, Message } from '@/src/types'
 
+import { useSettings } from '@/src/context/SettingsContext'
+
 interface MessagesClientProps {
   userId: string
   initialConversations: Conversation[]
@@ -14,6 +16,7 @@ interface MessagesClientProps {
 }
 
 export default function MessagesClient({ userId, initialConversations, activeId }: MessagesClientProps) {
+  const { t } = useSettings()
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
   const [activeConversationId, setActiveConversationId] = useState(activeId)
   const [messages, setMessages] = useState<Message[]>([])
@@ -151,7 +154,7 @@ export default function MessagesClient({ userId, initialConversations, activeId 
           />
         ) : (
           <div className="flex-grow flex flex-col items-center justify-center text-center p-8 bg-gray-50/20">
-            <p className="text-sm text-gray-400 font-light italic">Sohbet seçin veya bir satıcı ile konuşma başlatın.</p>
+            <p className="text-sm text-gray-400 font-light italic">{t('msg.selectPrompt', 'Sohbet seçin veya bir satıcı ile konuşma başlatın.')}</p>
           </div>
         )}
       </div>
