@@ -209,7 +209,7 @@ export default async function AdminProductDetailPage({
               </div>
             </div>
 
-            {/* Claude AI Vision Analizi */}
+            {/* Peony AI Vision Analizi */}
             {(() => {
               const aiLogs = (product as any).ai_authentication_logs
               const validLogs = Array.isArray(aiLogs) 
