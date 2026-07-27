@@ -2,6 +2,7 @@
 
 import { createClient, createAdminClient } from '@/src/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import Jimp from 'jimp'
 
 // Ürünün durumunu değiştiren fonksiyon
 export async function updateProductStatus(
@@ -556,25 +557,23 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
       imagesToAnalyze.map(async (url: string) => {
         try {
           const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : url
-          
-          // Supabase görsel boyutlandırma servisini kullanarak görsel boyutlarını küçült (413 Payload Too Large hatasını önlemek için)
-          let fetchUrl = fullUrl
-          if (fullUrl.includes('/storage/v1/object/public/')) {
-            fetchUrl = fullUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + '?width=800&quality=70'
-          }
-
-          let res = await fetch(fetchUrl)
-
-          // Eğer Supabase render servisinde hata oluşursa orijinal görseli indir
-          if (!res.ok && fetchUrl !== fullUrl) {
-            console.warn('Supabase render servisi hata verdi, orijinal görsel indiriliyor:', fetchUrl)
-            res = await fetch(fullUrl)
-          }
-
+          const res = await fetch(fullUrl)
           if (!res.ok) return null
           const arrayBuffer = await res.arrayBuffer()
-          const buffer = Buffer.from(arrayBuffer)
+          let buffer = Buffer.from(arrayBuffer)
           
+          // Jimp ile görseli 800px genişliğe küçült ve sıkıştır (%75 kalite)
+          try {
+            const image = await Jimp.read(buffer)
+            if (image.getWidth() > 800) {
+              image.resize(800, Jimp.AUTO)
+            }
+            image.quality(75)
+            buffer = await image.getBufferAsync(Jimp.MIME_JPEG)
+          } catch (jimpError) {
+            console.error('Jimp compression error, using original buffer:', jimpError)
+          }
+
           // Tekil görsel boyutu 4.5MB'dan büyükse atla (API limitini aşmamak için)
           if (buffer.length > 4.5 * 1024 * 1024) {
             console.warn('Görsel boyutu çok büyük olduğu için atlanıyor:', url)
