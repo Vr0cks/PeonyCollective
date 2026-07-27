@@ -568,8 +568,7 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
             if (image.width > 800) {
               image.resize({ w: 800 })
             }
-            image.quality(75)
-            buffer = await image.getBuffer("image/jpeg")
+            buffer = await image.getBuffer("image/jpeg", { quality: 75 })
           } catch (jimpError) {
             console.error('Jimp compression error, using original buffer:', jimpError)
           }
