@@ -8,7 +8,7 @@ const anthropic = new Anthropic({
 
 export async function POST(request: Request) {
   try {
-    const { productId, locale = 'en', getStyling = false } = await request.json()
+    const { productId, locale = 'en', getStyling = false, getInvestment = false } = await request.json()
     if (!productId) {
       return NextResponse.json({ error: 'Missing productId' }, { status: 400 })
     }
@@ -32,11 +32,49 @@ export async function POST(request: Request) {
             : `This luxury ${product.brand} piece would pair beautifully with a tailored suit or an elegant evening gown.`
         })
       }
+      if (getInvestment) {
+        return NextResponse.json({
+          investment: locale === 'tr'
+            ? `Bu lüks ${product.brand} ürünü harika bir yatırım değerine sahiptir, lüks çanta pazarı değerini korumaktadır.`
+            : `This luxury ${product.brand} piece holds strong investment value, retaining its price in the luxury resale market.`
+        })
+      }
       return NextResponse.json({ 
         curation: locale === 'tr' 
           ? `${product.brand} markasının eşsiz ${product.model_name} tasarımı.`
           : `The exquisite ${product.model_name} from ${product.brand}.`
       })
+    }
+
+    if (getInvestment) {
+      // 1. Get INVESTMENT advice
+      const systemPrompt = `
+        Sen Peony Collective'in lüks moda ve yatırım danışmanı "Peony Muse"sun.
+        Kullanıcıya bu ürün için neden lüks bir yatırım değeri taşıdığını, nadirliğini ve koleksiyon değerini ("less is more" felsefesine uygun) anlatacaksın.
+        
+        KURALLAR:
+        - Yanıtın kesinlikle en fazla 2 veya 3 cümle olmalıdır. Uzun listeler veya paragraflar yazma.
+        - Dil: Yanıtı ${locale === 'tr' ? 'Türkçe' : 'İngilizce'} olarak yaz.
+        - Ton: Premium, VIP, finansal/arşivsel değer vurgulayan elit bir asistan tonu kullan.
+        - Neden bu parçaya sahip olması gerektiğini ikna edici şekilde açıkla.
+      `
+
+      const prompt = `
+        Ürün: ${product.brand} - ${product.model_name} (${product.category})
+        Açıklama: ${product.description}
+        
+        Lütfen bu ürün için kısa ve etkileyici bir yatırım gerekçesi yaz.
+      `
+
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 200,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: prompt }]
+      })
+
+      const investmentText = response.content[0].type === 'text' ? response.content[0].text.trim() : ''
+      return NextResponse.json({ investment: investmentText })
     }
 
     if (getStyling) {

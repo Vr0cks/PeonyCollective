@@ -17,6 +17,7 @@ export default function PeonyMuseCuration({ productId }: PeonyMuseCurationProps)
 
   // Fetch Curation Summary on load or language change
   useEffect(() => {
+    setStyling(null)
     async function fetchCuration() {
       setLoadingCuration(true)
       try {
