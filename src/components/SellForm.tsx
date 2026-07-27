@@ -1527,71 +1527,86 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                   </div>
                 )}
 
-                {/* Peony VIP Toggle */}
-                {(!showSupplierField || !supplier) && (
-                  <div className="bg-[#AF9164]/5 border border-[#AF9164]/20 p-5 rounded-xl">
-                    <label className="flex items-start gap-4 cursor-pointer group">
-                      <input type="checkbox" className="hidden" checked={isPeonyVip} onChange={(e) => setIsPeonyVip(e.target.checked)} />
-                      <div className={`w-6 h-6 shrink-0 rounded border flex items-center justify-center transition-colors mt-0.5 ${isPeonyVip ? 'bg-[#AF9164] border-[#AF9164] text-white' : 'border-gray-300 group-hover:border-[#AF9164] text-transparent'}`}>
-                        <Check size={14} strokeWidth={3} />
+                {/* Müşteri Komisyon & Fiyatlandırma Bloğu (Sadece Normal Müşteriler İçin Gösterilir) */}
+                {userRole !== 'admin' && (
+                  <>
+                    {(!showSupplierField || !supplier) && (
+                      <div className="bg-[#AF9164]/5 border border-[#AF9164]/20 p-5 rounded-xl">
+                        <label className="flex items-start gap-4 cursor-pointer group">
+                          <input type="checkbox" className="hidden" checked={isPeonyVip} onChange={(e) => setIsPeonyVip(e.target.checked)} />
+                          <div className={`w-6 h-6 shrink-0 rounded border flex items-center justify-center transition-colors mt-0.5 ${isPeonyVip ? 'bg-[#AF9164] border-[#AF9164] text-white' : 'border-gray-300 group-hover:border-[#AF9164] text-transparent'}`}>
+                            <Check size={14} strokeWidth={3} />
+                          </div>
+                          <div>
+                            <span className="text-sm font-bold text-gray-900 block mb-1">Peony VIP (Kargolamayı Biz Yapalım)</span>
+                            <span className="text-xs text-gray-600 leading-relaxed block">
+                              Ürününüz satıldığında lojistik süreçleriyle siz uğraşmayın. Peony ekibi adresinizden teslim alsın ve alıcıya sigortalı ulaştırsın. (Bu hizmet seçildiğinde komisyon oranınız standart %20 yerine %30 olarak hesaplanır).
+                            </span>
+                          </div>
+                        </label>
                       </div>
-                      <div>
-                        <span className="text-sm font-bold text-gray-900 block mb-1">Peony VIP (Kargolamayı Biz Yapalım)</span>
-                        <span className="text-xs text-gray-600 leading-relaxed block">
-                          Ürününüz satıldığında lojistik süreçleriyle siz uğraşmayın. Peony ekibi adresinizden teslim alsın ve alıcıya sigortalı ulaştırsın. (Bu hizmet seçildiğinde komisyon oranınız standart %20 yerine %30 olarak hesaplanır).
-                        </span>
-                      </div>
-                    </label>
-                  </div>
-                )}
+                    )}
 
-                <div className="text-center">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-3">Satış Fiyatı Belirleyin (TL)</label>
-                  <div className="relative">
-                    <input 
-                      type="number" 
-                      className="w-full text-center text-4xl font-light py-4 bg-transparent border-b-2 border-gray-200 focus:border-black focus:outline-none transition-colors" 
-                      value={formPrice} 
-                      onChange={(e) => setFormPrice(e.target.value)} 
-                      placeholder="0.00" 
-                      required 
-                    />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl font-light text-gray-400">₺</span>
-                  </div>
-                  {renderErrorMsg('price')}
-                  
-                  {formPrice && !isNaN(Number(formPrice)) && Number(formPrice) > 0 && (
-                    <div className="mt-6">
-                      {showSupplierField && supplier ? (
-                        <div className="p-5 rounded-xl border border-black bg-black text-white text-center">
-                          <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">{supplier} Payı (%63)</p>
-                          <p className="text-2xl serif-display">{(Number(formPrice) * 0.63).toLocaleString('tr-TR')} ₺</p>
-                          <p className="text-[9px] opacity-50 mt-1.5">%37 Peony Komisyonu ({(Number(formPrice) * 0.37).toLocaleString('tr-TR')} ₺)</p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className={`p-4 rounded-xl border ${!isPeonyVip ? 'border-black bg-black text-white' : 'border-gray-200 bg-gray-50'}`}>
-                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Standart Kazanç</p>
-                            <p className="text-xl serif-display">{(Number(formPrice) * 0.8).toLocaleString('tr-TR')} ₺</p>
-                            <p className="text-[9px] opacity-50 mt-1">%20 Komisyon</p>
-                          </div>
-                          <div className={`p-4 rounded-xl border ${isPeonyVip ? 'border-[#AF9164] bg-[#AF9164] text-white' : 'border-[#AF9164]/20 bg-[#AF9164]/5'}`}>
-                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">VIP Kazanç</p>
-                            <p className="text-xl serif-display">{(Number(formPrice) * 0.7).toLocaleString('tr-TR')} ₺</p>
-                            <p className="text-[9px] opacity-70 mt-1">%30 Komisyon (Kargo Bizden)</p>
-                          </div>
+                    <div className="text-center">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-3">Satış Fiyatı Belirleyin (TL)</label>
+                      <div className="relative">
+                        <input 
+                          type="number" 
+                          className="w-full text-center text-4xl font-light py-4 bg-transparent border-b-2 border-gray-200 focus:border-black focus:outline-none transition-colors" 
+                          value={formPrice} 
+                          onChange={(e) => setFormPrice(e.target.value)} 
+                          placeholder="0.00" 
+                          required={userRole !== 'admin'}
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl font-light text-gray-400">₺</span>
+                      </div>
+                      {renderErrorMsg('price')}
+                      
+                      {formPrice && !isNaN(Number(formPrice)) && Number(formPrice) > 0 && (
+                        <div className="mt-6">
+                          {showSupplierField && supplier ? (
+                            <div className="p-5 rounded-xl border border-black bg-black text-white text-center">
+                              <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">{supplier} Payı (%63)</p>
+                              <p className="text-2xl serif-display">{(Number(formPrice) * 0.63).toLocaleString('tr-TR')} ₺</p>
+                              <p className="text-[9px] opacity-50 mt-1.5">%37 Peony Komisyonu ({(Number(formPrice) * 0.37).toLocaleString('tr-TR')} ₺)</p>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className={`p-4 rounded-xl border ${!isPeonyVip ? 'border-black bg-black text-white' : 'border-gray-200 bg-gray-50'}`}>
+                                <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Standart Kazanç</p>
+                                <p className="text-xl serif-display">{(Number(formPrice) * 0.8).toLocaleString('tr-TR')} ₺</p>
+                                <p className="text-[9px] opacity-50 mt-1">%20 Komisyon</p>
+                              </div>
+                              <div className={`p-4 rounded-xl border ${isPeonyVip ? 'border-[#AF9164] bg-[#AF9164] text-white' : 'border-[#AF9164]/20 bg-[#AF9164]/5'}`}>
+                                <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">VIP Kazanç</p>
+                                <p className="text-xl serif-display">{(Number(formPrice) * 0.7).toLocaleString('tr-TR')} ₺</p>
+                                <p className="text-[9px] opacity-70 mt-1">%30 Komisyon (Kargo Bizden)</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
 
                 <button 
                   type="submit" 
                   disabled={isSubmitting} 
-                  className={`w-full py-5 rounded-full text-sm font-bold uppercase tracking-widest transition-all ${isSubmitting ? 'bg-gray-100 text-gray-400' : 'bg-black text-white hover:bg-[#AF9164] hover:shadow-2xl hover:shadow-[#AF9164]/20 cursor-pointer'}`}
+                  className={`w-full py-5 rounded-full text-sm font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                    isSubmitting 
+                      ? 'bg-gray-100 text-gray-400' 
+                      : userRole === 'admin'
+                        ? 'bg-[#1A1A1A] text-[#AF9164] border border-[#AF9164]/30 hover:bg-[#AF9164] hover:text-white shadow-xl hover:shadow-[#AF9164]/20'
+                        : 'bg-black text-white hover:bg-[#AF9164] hover:shadow-2xl hover:shadow-[#AF9164]/20'
+                  }`}
                 >
-                  {isSubmitting ? 'SİSTEME İŞLENİYOR...' : 'ONAYA GÖNDER'}
+                  {isSubmitting 
+                    ? 'SİSTEME İŞLENİYOR...' 
+                    : userRole === 'admin'
+                      ? '✦ ÜRÜNÜ KAYDET VE YAYINLA'
+                      : 'ONAYA GÖNDER'
+                  }
                 </button>
               </div>
             </div>

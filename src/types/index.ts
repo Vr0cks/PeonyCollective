@@ -63,6 +63,10 @@ export interface Product {
   entrupy_certificate_url?: string | null;
   supplier?: string | null;
   supplier_id?: string | null;
+  seller_payout?: number | null;
+  is_featured?: boolean | null;
+  is_vip_exclusive?: boolean | null;
+  is_deal?: boolean | null;
   created_at: string;
   profiles?: Partial<Profile>;
   suppliers?: Supplier | null;

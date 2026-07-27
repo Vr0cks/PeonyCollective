@@ -133,8 +133,17 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     </p>
                   </div>
 
-                  <div className="w-28 text-right shrink-0">
+                  <div className="w-36 text-right shrink-0">
                     <p className="text-sm font-bold text-white">{(product.price || 0).toLocaleString('tr-TR')} ₺</p>
+                    {product.seller_payout && product.seller_payout > 0 ? (
+                      <p className="text-[9px] text-emerald-400 font-mono font-bold mt-0.5">
+                        Kar: {((product.price || 0) - product.seller_payout).toLocaleString('tr-TR')} ₺
+                      </p>
+                    ) : (
+                      <p className="text-[9px] text-[#AF9164] opacity-60 font-mono mt-0.5">
+                        Hak Ediş: {((product.price || 0) * 0.8).toLocaleString('tr-TR')} ₺ (%20)
+                      </p>
+                    )}
                   </div>
 
                   <div className="shrink-0">
