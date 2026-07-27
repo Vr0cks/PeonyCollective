@@ -86,7 +86,7 @@ export default function PeonyMuseVipWidget({ productId, brand }: PeonyMuseVipWid
   if (!isVisible) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-[99] max-w-[340px] w-full bg-white/95 backdrop-blur-lg border border-[#AF9164]/30 shadow-2xl rounded-2xl p-5 text-gray-900 animate-in slide-in-from-bottom-5 duration-300">
+    <div className="fixed bottom-24 right-6 z-[99] max-w-[340px] w-full bg-white/95 backdrop-blur-lg border border-[#AF9164]/30 shadow-2xl rounded-2xl p-5 text-gray-900 animate-in slide-in-from-bottom-5 duration-300">
       
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-3">

@@ -12,7 +12,6 @@ import FadeIn from '@/src/components/animations/FadeIn'
 import ProductActionButtons from '@/src/components/ProductActionButtons'
 import DynamicPriceDisplay from '@/src/components/DynamicPriceDisplay'
 import PeonyMuseCuration from '@/src/components/PeonyMuseCuration'
-import PeonyMuseVipWidget from '@/src/components/PeonyMuseVipWidget'
 
 export async function generateMetadata({
   params,
@@ -246,9 +245,6 @@ export default async function ProductDetailPage({
             </div>
           </div>
         </div>
-        
-        {/* Peony Muse VIP Widget (Quiet scroll/time popup) */}
-        <PeonyMuseVipWidget productId={product.id} brand={product.brand} />
       </div>
     </main>
   )
