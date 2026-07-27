@@ -88,10 +88,10 @@ export default async function ProductDetailPage({
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
           
           {/* SOL: GÖRSEL GALERİSİ */}
-          <div className="lg:col-span-7 flex flex-col gap-2">
+          <div className="lg:col-span-6 xl:col-span-5 max-w-[580px] w-full mx-auto flex flex-col gap-2">
             {/* FOTOĞRAF GALERİSİ */}
             <FadeIn delay={0.1}>
               <ProductGallery 
@@ -120,7 +120,7 @@ export default async function ProductDetailPage({
           </div>
 
           {/* SAĞ: STICKY ÜRÜN BİLGİLERİ */}
-          <div className="lg:col-span-5 relative">
+          <div className="lg:col-span-6 xl:col-span-7 relative">
             <div className="sticky top-32 space-y-10 pb-20">
               
               {/* Başlık ve Fiyat */}
