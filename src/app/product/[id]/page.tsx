@@ -11,81 +11,7 @@ import ProductGallery from '@/src/components/ProductGallery'
 import FadeIn from '@/src/components/animations/FadeIn'
 import ProductActionButtons from '@/src/components/ProductActionButtons'
 import DynamicPriceDisplay from '@/src/components/DynamicPriceDisplay'
-
-// Helper to parse **bold** text inside lines
-function parseBoldText(text: string) {
-  const parts = text.split(/\*\*([^*]+)\*\*/g)
-  return parts.map((part, i) => {
-    if (i % 2 === 1) {
-      return <strong key={i} className="font-semibold text-black">{part}</strong>
-    }
-    return part
-  })
-}
-
-// Markdown Formatter Helper
-function renderFormattedDescription(text: string) {
-  if (!text) return null
-  
-  // Normalize newlines and split into lines
-  const lines = text.replace(/\\n/g, '\n').split('\n')
-  
-  return (
-    <div className="space-y-6 text-sm text-gray-700 leading-relaxed font-sans max-w-full">
-      {lines.map((line, idx) => {
-        const trimmed = line.trim()
-        if (!trimmed) return <div key={idx} className="h-2" />
-        
-        // Horizontal rule
-        if (trimmed === '---') {
-          return <hr key={idx} className="my-8 border-gray-100" />
-        }
-        
-        // Headers
-        if (trimmed.startsWith('# ')) {
-          return (
-            <h2 key={idx} className="text-xl font-playfair font-normal text-black mt-8 mb-4 tracking-wide uppercase border-b border-gray-100 pb-2">
-              {trimmed.substring(2)}
-            </h2>
-          )
-        }
-        if (trimmed.startsWith('## ')) {
-          return (
-            <h3 key={idx} className="text-lg font-playfair font-normal text-black mt-6 mb-3 tracking-wide uppercase">
-              {trimmed.substring(3)}
-            </h3>
-          )
-        }
-        if (trimmed.startsWith('### ')) {
-          return (
-            <h4 key={idx} className="text-xs font-bold text-gray-900 mt-8 mb-4 tracking-widest uppercase">
-              {trimmed.substring(4)}
-            </h4>
-          )
-        }
-        
-        // List items
-        if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
-          const content = trimmed.substring(2)
-          return (
-            <ul key={idx} className="list-disc pl-5 my-2">
-              <li className="text-gray-600 font-light">
-                {parseBoldText(content)}
-              </li>
-            </ul>
-          )
-        }
-        
-        // Regular paragraph
-        return (
-          <p key={idx} className="text-gray-600 font-light leading-relaxed">
-            {parseBoldText(trimmed)}
-          </p>
-        )
-      })}
-    </div>
-  )
-}
+import PeonyMuseCuration from '@/src/components/PeonyMuseCuration'
 
 export async function generateMetadata({
   params,
@@ -290,6 +216,13 @@ export default async function ProductDetailPage({
 
 
 
+              {/* Peony Muse Curation */}
+              {product.description && (
+                <FadeIn delay={0.5} direction="left" className="pt-6 border-t border-gray-100">
+                  <PeonyMuseCuration productId={product.id} />
+                </FadeIn>
+              )}
+
               {/* Butonlar & AR */}
               <FadeIn delay={0.6} direction="left" className="flex flex-col gap-3 pt-6 border-t border-gray-200">
                 <ProductActionButtons 
@@ -312,16 +245,6 @@ export default async function ProductDetailPage({
             </div>
           </div>
         </div>
-
-        {/* Açıklama Alanı (Geniş Yerleşim) */}
-        {product.description && (
-          <div className="mt-28 pt-20 border-t border-gray-100 max-w-3xl mx-auto">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-10 text-center">
-              ÜRÜN DETAYLARI & HİKAYESİ
-            </h3>
-            {renderFormattedDescription(product.description)}
-          </div>
-        )}
       </div>
     </main>
   )
