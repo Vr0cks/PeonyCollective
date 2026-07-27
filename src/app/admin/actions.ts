@@ -556,7 +556,21 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
       imagesToAnalyze.map(async (url: string) => {
         try {
           const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : url
-          const res = await fetch(fullUrl)
+          
+          // Supabase görsel boyutlandırma servisini kullanarak görsel boyutlarını küçült (413 Payload Too Large hatasını önlemek için)
+          let fetchUrl = fullUrl
+          if (fullUrl.includes('/storage/v1/object/public/')) {
+            fetchUrl = fullUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + '?width=800&quality=70'
+          }
+
+          let res = await fetch(fetchUrl)
+
+          // Eğer Supabase render servisinde hata oluşursa orijinal görseli indir
+          if (!res.ok && fetchUrl !== fullUrl) {
+            console.warn('Supabase render servisi hata verdi, orijinal görsel indiriliyor:', fetchUrl)
+            res = await fetch(fullUrl)
+          }
+
           if (!res.ok) return null
           const arrayBuffer = await res.arrayBuffer()
           const buffer = Buffer.from(arrayBuffer)
