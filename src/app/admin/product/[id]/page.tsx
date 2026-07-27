@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { updateProductStatus } from '../../actions'
 import { Product, Profile } from '@/src/types'
 import SafeImage from '@/src/components/SafeImage'
+import ClaudeVisionCard from '@/src/components/ClaudeVisionCard'
 
 export default async function AdminProductDetailPage({
   params,
@@ -27,7 +28,8 @@ export default async function AdminProductDetailPage({
     .select(`
       *,
       profiles:seller_id (*),
-      suppliers:supplier_id (*)
+      suppliers:supplier_id (*),
+      ai_authentication_logs (claude_verdict, claude_confidence, claude_raw_response)
     `)
     .eq('id', id)
     .single()
@@ -206,6 +208,24 @@ export default async function AdminProductDetailPage({
                 </div>
               </div>
             </div>
+
+            {/* Claude AI Vision Analizi */}
+            {(() => {
+              const aiLogs = (product as any).ai_authentication_logs
+              const validLogs = Array.isArray(aiLogs) 
+                ? aiLogs.filter((l: any) => l && l.claude_raw_response && l.claude_raw_response.trim() !== '' && !l.claude_raw_response.includes('Analiz raporu boş döndü')) 
+                : []
+              const latestLog = validLogs.length > 0 ? validLogs[validLogs.length - 1] : null
+
+              return (
+                <div className="mt-4">
+                  <ClaudeVisionCard 
+                    productId={product.id}
+                    initialLog={latestLog}
+                  />
+                </div>
+              )
+            })()}
 
             {/* Teknik Detaylar Tablosu */}
             <div className="space-y-4">

@@ -88,22 +88,26 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                 ? `${(product.profiles as Profile).first_name || ''} ${(product.profiles as Profile).last_name || ''}`.trim() || 'Anonim'
                 : 'Anonim'
               const supplierName = product.suppliers?.name || product.supplier || null
-              const ownerInfo = supplierName ? `Tedarikçi: ${supplierName}` : `Satıcı: ${sellerName}`
               const st = statusStyle[product.status] || { label: product.status, cls: 'bg-white/10 text-white/50 border-white/10' }
 
               return (
                 <div key={product.id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/3 transition-colors">
-                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 relative border border-white/5">
+                  <Link 
+                    href={`/admin/product/${product.id}`}
+                    className="w-14 h-14 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 relative border border-white/5 block hover:opacity-80 transition-opacity"
+                  >
                     {firstImage ? (
                       <Image src={firstImage} alt="" fill sizes="56px" className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-white/20 text-[10px]">—</div>
                     )}
-                  </div>
+                  </Link>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-[#AF9164] uppercase tracking-wider">{product.brand}</p>
-                    <p className="text-sm font-semibold text-white/90 truncate">{product.model_name}</p>
+                    <Link href={`/admin/product/${product.id}`} className="block hover:opacity-80">
+                      <p className="text-[10px] font-bold text-[#AF9164] uppercase tracking-wider">{product.brand}</p>
+                      <p className="text-sm font-semibold text-white/90 truncate">{product.model_name}</p>
+                    </Link>
                     <p className="text-[10px] text-white/30 mt-0.5">{product.category} · {product.condition}</p>
                     {/* Kime ait olduğunu ürünün hemen altında açıkça göster */}
                     <div className="mt-1 flex items-center gap-2 flex-wrap text-[10px]">
@@ -153,14 +157,12 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                   </div>
 
                   <div className="ml-2 flex items-center gap-2 shrink-0">
-                    {product.status === 'pending' && (
-                      <Link
-                        href="/admin/pending"
-                        className="text-[9px] font-bold uppercase tracking-wider text-amber-400/60 hover:text-amber-400 transition-colors"
-                      >
-                        İncele →
-                      </Link>
-                    )}
+                    <Link
+                      href={`/admin/product/${product.id}`}
+                      className="text-[9px] font-bold uppercase tracking-wider text-amber-400/60 hover:text-amber-400 transition-colors"
+                    >
+                      İncele →
+                    </Link>
                     <DeleteProductButton productId={product.id} />
                   </div>
                 </div>
