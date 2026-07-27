@@ -565,11 +565,11 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
           // Jimp ile görseli 800px genişliğe küçült ve sıkıştır (%75 kalite)
           try {
             const image = await Jimp.read(buffer)
-            if (image.getWidth() > 800) {
-              image.resize(800, Jimp.AUTO)
+            if (image.width > 800) {
+              image.resize({ w: 800 })
             }
             image.quality(75)
-            buffer = await image.getBufferAsync(Jimp.MIME_JPEG)
+            buffer = await image.getBuffer("image/jpeg")
           } catch (jimpError) {
             console.error('Jimp compression error, using original buffer:', jimpError)
           }
