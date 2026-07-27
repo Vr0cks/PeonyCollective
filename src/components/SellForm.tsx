@@ -805,108 +805,162 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
 
             {/* Marka & Model */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-gray-50">
-              <div className="relative">
-                <label className={labelClasses}>Marka</label>
-                <input 
-                  type="text" 
-                  className={getInputClasses('brand')} 
-                  placeholder="Marka arayın veya yeni marka yazın (örn: Hermès, Chanel)..." 
-                  value={brandSearchQuery} 
-                  onChange={(e) => {
-                    const val = e.target.value
-                    setBrandSearchQuery(val)
-                    setSelectedBrand(val)
-                    setSelectedModel('')
-                    setModelSearchQuery('')
-                  }}
-                  onFocus={() => setBrandDropdownOpen(true)}
-                  onBlur={() => setTimeout(() => setBrandDropdownOpen(false), 200)}
-                  required
-                />
-                {brandDropdownOpen && (
-                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
-                    {filteredBrands.map(b => (
+              {/* MARKA ALANI */}
+              <div className="relative space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className={labelClasses}>Marka</label>
+                  {selectedBrand && !dbBrands.some(b => b.name.toLowerCase() === selectedBrand.toLowerCase()) && (
+                    <span className="text-[9px] font-bold text-[#AF9164] bg-[#AF9164]/10 border border-[#AF9164]/20 px-2 py-0.5 rounded uppercase">
+                      ✦ Özel Marka
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    className={getInputClasses('brand')} 
+                    placeholder="Marka arayın veya yazın (örn: Hermès, Chanel)..." 
+                    value={brandSearchQuery} 
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setBrandSearchQuery(val)
+                      setSelectedBrand(val)
+                      setSelectedModel('')
+                      setModelSearchQuery('')
+                    }}
+                    onFocus={() => setBrandDropdownOpen(true)}
+                    onBlur={() => setTimeout(() => setBrandDropdownOpen(false), 250)}
+                    required
+                  />
+                  {brandDropdownOpen && (
+                    <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-[280px] overflow-y-auto divide-y divide-gray-50">
+                      {filteredBrands.map(b => (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onMouseDown={() => {
+                            setSelectedBrand(b.name)
+                            setBrandSearchQuery(b.name)
+                            setBrandDropdownOpen(false)
+                          }}
+                          className="w-full text-left px-5 py-3 text-xs font-bold hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                        >
+                          {b.name}
+                        </button>
+                      ))}
+
+                      {/* Özel Marka Ekle Butonu */}
                       <button
-                        key={b.id}
                         type="button"
-                        onClick={() => {
-                          setSelectedBrand(b.name)
-                          setBrandSearchQuery(b.name)
+                        onMouseDown={() => {
+                          const val = brandSearchQuery.trim() || 'Yeni Marka'
+                          setSelectedBrand(val)
+                          setBrandSearchQuery(val)
                           setBrandDropdownOpen(false)
                         }}
-                        className="w-full text-left px-5 py-3 text-sm hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                        className="w-full text-left px-5 py-3.5 text-xs bg-[#FAF7F2] hover:bg-[#AF9164]/20 text-[#AF9164] font-bold uppercase tracking-wider border-none cursor-pointer flex items-center justify-between"
                       >
-                        {b.name}
+                        <span>➕ {brandSearchQuery.trim() ? `"${brandSearchQuery.trim().toUpperCase()}" Markasını Ekle` : 'Listede Olmayan Yeni Marka Gir'}</span>
+                        <span className="text-[9px] bg-[#AF9164] text-white px-2 py-0.5 rounded font-mono">Özel Marka</span>
                       </button>
-                    ))}
-                    {brandSearchQuery.trim().length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedBrand(brandSearchQuery.trim())
-                          setBrandSearchQuery(brandSearchQuery.trim())
-                          setBrandDropdownOpen(false)
-                        }}
-                        className="w-full text-left px-5 py-3 text-sm bg-gray-50 hover:bg-[#AF9164]/20 text-[#AF9164] font-bold uppercase tracking-wider border-none cursor-pointer"
-                      >
-                        ➕ &quot;{brandSearchQuery.trim().toUpperCase()}&quot; Markasını Manuel Ekle / Yaz
-                      </button>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-gray-400">Aradığınız marka listede yok mu?</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBrandDropdownOpen(true)
+                      if (!brandSearchQuery) setBrandSearchQuery('')
+                    }}
+                    className="text-[#AF9164] font-bold hover:underline cursor-pointer"
+                  >
+                    + Yeni Marka Ekle
+                  </button>
+                </div>
                 {renderErrorMsg('brand')}
               </div>
               
-              <div className="relative">
-                <label className={labelClasses}>Model Adı</label>
-                <input 
-                  type="text" 
-                  className={getInputClasses('model')} 
-                  placeholder={selectedBrand ? "Model arayın veya yazın (örn: Birkin 30)..." : "Önce marka seçiniz veya yazınız"} 
-                  value={modelSearchQuery} 
-                  onChange={(e) => {
-                    const val = e.target.value
-                    setModelSearchQuery(val)
-                    setSelectedModel(val)
-                  }}
-                  onFocus={() => {
-                    if (selectedBrand) setModelDropdownOpen(true)
-                  }}
-                  onBlur={() => setTimeout(() => setModelDropdownOpen(false), 200)}
-                  disabled={!selectedBrand}
-                  required
-                />
-                {modelDropdownOpen && (
-                  <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
-                    {filteredModels.map(m => (
+              {/* MODEL ALANI */}
+              <div className="relative space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className={labelClasses}>Model Adı</label>
+                  {selectedModel && !dbModels.some(m => m.name.toLowerCase() === selectedModel.toLowerCase()) && (
+                    <span className="text-[9px] font-bold text-[#AF9164] bg-[#AF9164]/10 border border-[#AF9164]/20 px-2 py-0.5 rounded uppercase">
+                      ✦ Özel Model
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    className={getInputClasses('model')} 
+                    placeholder={selectedBrand ? "Model arayın veya yazın (örn: Birkin 30)..." : "Önce marka seçiniz veya yazınız"} 
+                    value={modelSearchQuery} 
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setModelSearchQuery(val)
+                      setSelectedModel(val)
+                    }}
+                    onFocus={() => {
+                      if (selectedBrand) setModelDropdownOpen(true)
+                    }}
+                    onBlur={() => setTimeout(() => setModelDropdownOpen(false), 250)}
+                    disabled={!selectedBrand}
+                    required
+                  />
+                  {modelDropdownOpen && (
+                    <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-[280px] overflow-y-auto divide-y divide-gray-50">
+                      {filteredModels.map(m => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onMouseDown={() => {
+                            setSelectedModel(m.name)
+                            setModelSearchQuery(m.name)
+                            setModelDropdownOpen(false)
+                          }}
+                          className="w-full text-left px-5 py-3 text-xs font-bold hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                        >
+                          {m.name}
+                        </button>
+                      ))}
+
+                      {/* Özel Model Ekle Butonu */}
                       <button
-                        key={m.id}
                         type="button"
-                        onClick={() => {
-                          setSelectedModel(m.name)
-                          setModelSearchQuery(m.name)
+                        onMouseDown={() => {
+                          const val = modelSearchQuery.trim() || 'Yeni Model'
+                          setSelectedModel(val)
+                          setModelSearchQuery(val)
                           setModelDropdownOpen(false)
                         }}
-                        className="w-full text-left px-5 py-3 text-sm hover:bg-[#AF9164]/10 transition-colors uppercase tracking-wider text-gray-800 border-none cursor-pointer bg-white"
+                        className="w-full text-left px-5 py-3.5 text-xs bg-[#FAF7F2] hover:bg-[#AF9164]/20 text-[#AF9164] font-bold uppercase tracking-wider border-none cursor-pointer flex items-center justify-between"
                       >
-                        {m.name}
+                        <span>➕ {modelSearchQuery.trim() ? `"${modelSearchQuery.trim().toUpperCase()}" Modelini Ekle` : 'Listede Olmayan Yeni Model Gir'}</span>
+                        <span className="text-[9px] bg-[#AF9164] text-white px-2 py-0.5 rounded font-mono">Özel Model</span>
                       </button>
-                    ))}
-                    {modelSearchQuery.trim().length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedModel(modelSearchQuery.trim())
-                          setModelSearchQuery(modelSearchQuery.trim())
-                          setModelDropdownOpen(false)
-                        }}
-                        className="w-full text-left px-5 py-3 text-sm bg-gray-50 hover:bg-[#AF9164]/20 text-[#AF9164] font-bold uppercase tracking-wider border-none cursor-pointer"
-                      >
-                        ➕ &quot;{modelSearchQuery.trim().toUpperCase()}&quot; Modelini Manuel Yaz / Ekle
-                      </button>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-gray-400">Aradığınız model listede yok mu?</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedBrand) setModelDropdownOpen(true)
+                    }}
+                    className="text-[#AF9164] font-bold hover:underline cursor-pointer disabled:opacity-50"
+                    disabled={!selectedBrand}
+                  >
+                    + Yeni Model Ekle
+                  </button>
+                </div>
                 {renderErrorMsg('model')}
               </div>
             </div>
