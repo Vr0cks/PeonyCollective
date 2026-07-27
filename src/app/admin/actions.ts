@@ -549,9 +549,9 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.peony-collective.com'
 
-    // Claude API'sine görselleri base64 formatında besle (Maksimum 10 fotoğraf)
+    // Claude API'sine görselleri base64 formatında besle (Maksimum 5 fotoğraf ve toplam yük sınırına uymak için)
     const imageBlocks = await Promise.all(
-      imagesToAnalyze.slice(0, 10).map(async (url: string) => {
+      imagesToAnalyze.slice(0, 5).map(async (url: string) => {
         try {
           const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : url
           const res = await fetch(fullUrl)
@@ -559,6 +559,12 @@ export async function runClaudeVisionPrecheck(productId: string, bypassAdminChec
           const arrayBuffer = await res.arrayBuffer()
           const buffer = Buffer.from(arrayBuffer)
           
+          // Tekil görsel boyutu 4.5MB'dan büyükse atla (API limitini aşmamak için)
+          if (buffer.length > 4.5 * 1024 * 1024) {
+            console.warn('Görsel boyutu çok büyük olduğu için atlanıyor:', url)
+            return null
+          }
+
           const contentType = res.headers.get('content-type') || ''
           let media_type: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg'
           if (contentType.includes('png')) media_type = 'image/png'
