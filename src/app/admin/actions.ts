@@ -2,7 +2,7 @@
 
 import { createClient, createAdminClient } from '@/src/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import Jimp from 'jimp'
+import { Jimp } from 'jimp'
 
 // Ürünün durumunu değiştiren fonksiyon
 export async function updateProductStatus(
