@@ -157,7 +157,7 @@ const StepAccordion = ({ stepNum, title, desc, children, activeStep, setActiveSt
 }
 
 // ─── Reusable File Upload Component ───
-const FileUploadZone = ({ id, label, icon, onChange, multiple = true, accept, previews }: any) => {
+const FileUploadZone = ({ id, label, icon, onChange, multiple = true, accept, previews, onRemove }: any) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -201,6 +201,19 @@ const FileUploadZone = ({ id, label, icon, onChange, multiple = true, accept, pr
           {previews.map((url: string, i: number) => (
             <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative group">
               <img src={url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Preview" />
+              {onRemove && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onRemove(i);
+                  }}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-md z-10"
+                >
+                  <span className="text-[10px] font-bold">×</span>
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -522,11 +535,10 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
         alert(errorMsg)
       }
 
-      oldPreviews.forEach(url => URL.revokeObjectURL(url))
       const newUrls = validFiles.map(file => URL.createObjectURL(file))
       allGeneratedUrls.current.push(...newUrls)
-      setFiles(validFiles)
-      setPreviews(newUrls)
+      setFiles((prev: File[]) => [...prev, ...validFiles])
+      setPreviews((prev: string[]) => [...prev, ...newUrls])
     } finally {
       setIsProcessingFiles(false)
     }
@@ -535,6 +547,24 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
   const handlePublicFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => processFiles(Array.from(e.target.files || []), publicPreviews, setPublicFiles, setPublicPreviews)
   const handleFlawFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => processFiles(Array.from(e.target.files || []), flawPreviews, setFlawFiles, setFlawPreviews)
   
+  const handleRemovePublicFile = (index: number) => {
+    setPublicPreviews(prev => {
+      const urlToRemove = prev[index]
+      if (urlToRemove) URL.revokeObjectURL(urlToRemove)
+      return prev.filter((_, i) => i !== index)
+    })
+    setPublicFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleRemoveFlawFile = (index: number) => {
+    setFlawPreviews(prev => {
+      const urlToRemove = prev[index]
+      if (urlToRemove) URL.revokeObjectURL(urlToRemove)
+      return prev.filter((_, i) => i !== index)
+    })
+    setFlawFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
   const handleVerificationFilesChange = async (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const rawFiles = Array.from(e.target.files || [])
     setIsProcessingFiles(true)
@@ -572,15 +602,38 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
         alert(errorMsg)
       }
 
-      const oldUrls = verificationPreviews[key] || []
-      oldUrls.forEach(url => URL.revokeObjectURL(url))
       const newUrls = validFiles.map(file => URL.createObjectURL(file))
       allGeneratedUrls.current.push(...newUrls)
-      setVerificationFiles(prev => ({ ...prev, [key]: validFiles }))
-      setVerificationPreviews(prev => ({ ...prev, [key]: newUrls }))
+      setVerificationFiles(prev => ({
+        ...prev,
+        [key]: [...(prev[key] || []), ...validFiles]
+      }))
+      setVerificationPreviews(prev => ({
+        ...prev,
+        [key]: [...(prev[key] || []), ...newUrls]
+      }))
     } finally {
       setIsProcessingFiles(false)
     }
+  }
+
+  const handleRemoveVerificationFile = (key: string, index: number) => {
+    setVerificationPreviews(prev => {
+      const oldUrls = prev[key] || []
+      const urlToRemove = oldUrls[index]
+      if (urlToRemove) URL.revokeObjectURL(urlToRemove)
+      return {
+        ...prev,
+        [key]: oldUrls.filter((_, i) => i !== index)
+      }
+    })
+    setVerificationFiles(prev => {
+      const oldFiles = prev[key] || []
+      return {
+        ...prev,
+        [key]: oldFiles.filter((_, i) => i !== index)
+      }
+    })
   }
 
   const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1152,6 +1205,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                 accept="image/jpeg,image/png,image/webp,image/heic"
                 onChange={handlePublicFilesChange}
                 previews={publicPreviews}
+                onRemove={handleRemovePublicFile}
               />
               <FileUploadZone 
                 id="flaw-files"
@@ -1160,6 +1214,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                 accept="image/*"
                 onChange={handleFlawFilesChange}
                 previews={flawPreviews}
+                onRemove={handleRemoveFlawFile}
               />
             </div>
 
@@ -1235,6 +1290,18 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
                           <div key={i} className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 relative group">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={url} className="w-full h-full object-cover" alt="" />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleRemoveVerificationFile(cat.key, i);
+                              }}
+                              className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow-sm z-20 opacity-90 hover:opacity-100"
+                              title="Sil"
+                            >
+                              <span className="text-[9px] font-bold leading-none">×</span>
+                            </button>
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[9px] font-bold">
                               ✓ Yüklendi
                             </div>
