@@ -1188,9 +1188,9 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
             <div className="bg-[#AF9164]/5 border border-[#AF9164]/20 p-6 rounded-2xl flex items-start gap-4">
               <ShieldCheck className="text-[#AF9164] shrink-0" size={24} strokeWidth={1.5} />
               <div>
-                <h4 className="text-sm font-bold text-gray-900 mb-1">Peony Lab™ Gizli Doğrulama (Claude AI Vision & Uzman İncelemesi)</h4>
+                <h4 className="text-sm font-bold text-gray-900 mb-1">Peony Lab™ Gizli Doğrulama</h4>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  Buraya yükleyeceğiniz makro fotoğraflar <strong>sitede müşterilere asla gösterilmez (gizlidir)</strong>. Sadece Peony Orijinallik Uzmanları ve <strong>Claude AI Vision Orijinallik Analiz Motoru</strong> tarafından kullanılır. Lütfen fotoğrafların net ve aydınlık çekildiğinden emin olun.
+                  Buraya yükleyeceğiniz makro fotoğraflar <strong>sitede müşterilere asla gösterilmez (gizlidir)</strong>. Sadece Peony Orijinallik Uzmanları ve <strong>Peony AI Vision Orijinallik Analiz Motoru</strong> tarafından kullanılır. Lütfen fotoğrafların net ve aydınlık çekildiğinden emin olun.
                 </p>
               </div>
             </div>

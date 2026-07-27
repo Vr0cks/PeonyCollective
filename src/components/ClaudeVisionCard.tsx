@@ -43,7 +43,7 @@ export default function ClaudeVisionCard({ productId, initialLog }: ClaudeVision
       })
       router.refresh()
     } catch (err: any) {
-      console.error('Claude Vision error:', err)
+      console.error('Peony Vision error:', err)
       setErrorMsg(err.message || 'Analiz sırasında bir hata oluştu.')
     } finally {
       setLoading(false)
@@ -94,14 +94,14 @@ export default function ClaudeVisionCard({ productId, initialLog }: ClaudeVision
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Fotoğraflar Claude Sonnet 4.5 Vision AI tarafından analiz ediliyor, lütfen bekleyin...
+            Fotoğraflar Peony AI Vision motoru tarafından analiz ediliyor, lütfen bekleyin...
           </span>
         ) : log ? (
           log.claude_raw_response || 'Analiz raporu boş döndü.'
         ) : errorMsg ? (
           <span className="text-red-400 font-medium">{errorMsg}</span>
         ) : (
-          'Fotoğraflar yüklendi. Claude Vision ön inceleme raporu oluşturulmaya hazır.'
+          'Fotoğraflar yüklendi. Peony AI Vision ön inceleme raporu oluşturulmaya hazır.'
         )}
       </p>
 
@@ -118,12 +118,12 @@ export default function ClaudeVisionCard({ productId, initialLog }: ClaudeVision
         {loading ? (
           <>
             <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            CLAUDE VISION İNCELİYOR...
+            PEONY AI VISION İNCELİYOR...
           </>
         ) : log ? (
           '🔄 YENİDEN ANALİZ ET'
         ) : (
-          '⚡ CLAUDE VISION ANALİZİNİ BAŞLAT'
+          '⚡ PEONY AI VISION ANALİZİNİ BAŞLAT'
         )}
       </button>
     </div>

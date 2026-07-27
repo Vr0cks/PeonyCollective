@@ -363,7 +363,7 @@ export default function AdminGuidedPhotoCapture({
           </div>
           <h2 className="serif-display text-2xl font-light text-black">Açı Bazlı Detaylı Fotoğraf Çekimi</h2>
           <p className="text-gray-500 text-xs mt-1">
-            Claude AI Orijinallik İncelemesi için ürünü belirlenen açılardan kamerayla çekin veya dosya olarak yükleyin.
+            Peony AI Orijinallik İncelemesi için ürünü belirlenen açılardan kamerayla çekin veya dosya olarak yükleyin.
           </p>
         </div>
 
@@ -414,12 +414,12 @@ export default function AdminGuidedPhotoCapture({
             {isAnalyzing ? (
               <>
                 <RefreshCw size={16} className="animate-spin text-[#AF9164]" />
-                Claude Vision İncelyor...
+                Peony AI Vision İncelyor...
               </>
             ) : (
               <>
                 <Sparkles size={16} className="text-[#AF9164]" />
-                Claude AI Orijinallik Analizi Başlat
+                Peony AI Orijinallik Analizi Başlat
               </>
             )}
           </button>
@@ -542,7 +542,7 @@ export default function AdminGuidedPhotoCapture({
                   <Sparkles className="text-[#AF9164]" size={24} />
                 </div>
                 <div>
-                  <h3 className="serif-display text-xl text-white">Claude AI Vision Ekspertiz Raporu</h3>
+                  <h3 className="serif-display text-xl text-white">Peony AI Vision Ekspertiz Raporu</h3>
                   <p className="text-xs text-gray-400">Görseller çok açılı olarak analiz edildi</p>
                 </div>
               </div>
