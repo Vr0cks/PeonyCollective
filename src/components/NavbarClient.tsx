@@ -117,8 +117,8 @@ export default function NavbarClient({ user, profile, logoutAction }: NavbarClie
         </div>
 
         {/* Orta: Logo (Masaüstü ve Mobilde Mükemmel Ortalı ve Taşmayan Yapı) */}
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-lg sm:text-2xl lg:text-3xl font-playfair tracking-[0.15em] sm:tracking-[0.35em] uppercase whitespace-nowrap text-[#1A1A1A] transition-all hover:opacity-80">
-          PEONY<span className="italic font-light lowercase text-base sm:text-3xl lg:text-4xl ml-1 text-[#AF9164]">collective</span>
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-sm sm:text-2xl lg:text-3xl font-playfair tracking-[0.08em] sm:tracking-[0.35em] uppercase whitespace-nowrap text-[#1A1A1A] transition-all hover:opacity-80">
+          PEONY<span className="italic font-light lowercase text-xs sm:text-3xl lg:text-4xl ml-0.5 sm:ml-1 text-[#AF9164]">collective</span>
         </Link>
 
         {/* Sağ: İkonlar, Arama ve Profil */}
@@ -127,7 +127,7 @@ export default function NavbarClient({ user, profile, logoutAction }: NavbarClie
           <CartTrigger />
           
           {user ? (
-            <div className="flex items-center gap-4 lg:gap-6">
+            <div className="hidden sm:flex items-center gap-4 lg:gap-6">
               <Link href="/messages" className="text-[#1A1A1A] hover:text-[#AF9164] transition-colors relative" title="Mesajlarım">
                 <MessageSquare size={18} strokeWidth={1.5} />
               </Link>
