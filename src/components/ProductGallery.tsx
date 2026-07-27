@@ -31,11 +31,13 @@ export default function ProductGallery({ images, brand, videoUrl }: ProductGalle
             playsInline 
           />
         ) : (
-          <MagnifierImage
-            src={images[hasVideo ? selectedIndex - 1 : selectedIndex]}
-            alt={`${brand} - ${selectedIndex}`}
-            priority={true}
-          />
+          <div key={selectedIndex} className="w-full h-full animate-in fade-in duration-500">
+            <MagnifierImage
+              src={images[hasVideo ? selectedIndex - 1 : selectedIndex]}
+              alt={`${brand} - ${selectedIndex}`}
+              priority={true}
+            />
+          </div>
         )}
       </div>
 
