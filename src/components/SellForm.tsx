@@ -1367,8 +1367,21 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
             {/* Teknik Detaylar */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-gray-50">
               <div>
-                <label className={labelClasses}>Boyutlar (cm)</label>
-                <input className={getInputClasses('dimensions')} value={formDimensions} onChange={(e) => setFormDimensions(e.target.value)} placeholder="Örn: 30 x 22 x 16" />
+                <label className={labelClasses}>
+                  {selectedCategory === 'Ayakkabı' ? 'Topuk / Boyut Detayı' : 'Boyutlar (cm)'}
+                </label>
+                <input 
+                  className={getInputClasses('dimensions')} 
+                  value={formDimensions} 
+                  onChange={(e) => setFormDimensions(e.target.value)} 
+                  placeholder={
+                    selectedCategory === 'Ayakkabı' 
+                      ? 'Örn: Topuk Yüksekliği 11 cm' 
+                      : selectedCategory === 'Kıyafet' 
+                      ? 'Örn: Göğüs: 48cm, Boy: 70cm' 
+                      : 'Örn: 30 x 22 x 16'
+                  } 
+                />
               </div>
               <div>
                 <label className={labelClasses}>Satın Alındığı Yıl</label>
