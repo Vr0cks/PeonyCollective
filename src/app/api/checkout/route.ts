@@ -278,6 +278,16 @@ export async function POST(req: Request) {
         if (result.status === 'success') {
           return NextResponse.json({ token: result.token, merchantOid })
         } else {
+          console.error('[PAYTR TOKEN ERROR] PayTR API Yanıtı:', {
+            status: result.status,
+            reason: result.reason,
+            merchantId: process.env.PAYTR_MERCHANT_ID,
+            sandbox: process.env.PAYTR_SANDBOX,
+            testMode: process.env.PAYTR_SANDBOX === 'false' ? '0' : '1',
+            merchantOid,
+            paymentAmount: tokenParams.paymentAmount,
+            fullResponse: textRes,
+          })
           return NextResponse.json({ error: result.reason || 'PayTR Hatası' }, { status: 400 })
         }
       } catch (e) {
