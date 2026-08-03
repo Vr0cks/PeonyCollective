@@ -171,7 +171,48 @@ export const brands: BrandModels[] = [
   },
 ]
 
-// ─── Materyal Listesi (Genel) ───
+// ─── Materyal Listeleri (Kategoriye Özel) ───
+export const shoeMaterials = [
+  'Hakiki Deri',
+  'Süet',
+  'Rugan (Patent Deri)',
+  'Kumaş / Kanvas',
+  'File / Mesh',
+  'Saten',
+  'Kadife',
+  'Nubuk',
+  'Kürk / Peluş',
+  'Sentetik / Naylon',
+  'Diğer',
+]
+
+export const clothingMaterials = [
+  'Pamuk',
+  'İpek',
+  'Yün / Kaşmir',
+  'Keten',
+  'Deri',
+  'Denim (Kot)',
+  'Triko',
+  'Kadife',
+  'Tweed',
+  'Polyester / Sentetik',
+  'Dantel',
+  'Süet',
+  'Diğer',
+]
+
+export const accessoryMaterials = [
+  'Deri',
+  'Altın Kaplama',
+  'Gümüş',
+  'Pirinç / Metal',
+  'İpek',
+  'Plastik / Asetat',
+  'Kristal / Taşlı',
+  'Diğer',
+]
+
 export const generalMaterials = [
   'Togo Deri',
   'Epsom Deri',
@@ -205,7 +246,16 @@ export function getModelsForBrand(brandName: string): string[] {
   return found?.models || []
 }
 
-// ─── Helper: Marka adına göre materyalleri bul ───
+// ─── Helper: Kategori ve Markaya göre materyalleri bul ───
+export function getMaterialsForCategoryAndBrand(category: string, brandName: string): string[] {
+  if (category === 'Ayakkabı') return shoeMaterials
+  if (category === 'Kıyafet') return clothingMaterials
+  if (category === 'Aksesuar') return accessoryMaterials
+  
+  const found = brands.find(b => b.name.toLowerCase() === brandName.toLowerCase())
+  return found?.materials || generalMaterials
+}
+
 export function getMaterialsForBrand(brandName: string): string[] {
   const found = brands.find(b => b.name.toLowerCase() === brandName.toLowerCase())
   return found?.materials || generalMaterials
