@@ -27,64 +27,251 @@ import {
 } from '@/src/utils/categoryData'
 
 // ─── Onay Fotoğrafları Kategorileri (Entrupy Tarzı Detaylı Açı Çekimleri) ───
-const verificationCategories = [
-  { 
-    key: 'front', 
-    icon: '👜', 
-    label: 'Ön Yüz (Genel Simetri)', 
-    desc: 'Çantayı düz, aydınlık bir zemine koyup tam karşıdan dik açıyla çekin. Tüm gövde görünmeli.', 
-    min: 1 
-  },
-  { 
-    key: 'back', 
-    icon: '💼', 
-    label: 'Arka Yüz (Dikiş Hizası)', 
-    desc: 'Arka yüzü dik açıyla çekin. Dikiş hizası ve cep yapısı net görünmeli.', 
-    min: 1 
-  },
-  { 
-    key: 'base', 
-    icon: '📐', 
-    label: 'Taban & Köşeler', 
-    desc: 'Çantanın alt kısmını ve köşe aşınmalarını çekin. Metal ayaklar ve taban dikişleri net olmalı.', 
-    min: 1 
-  },
-  { 
-    key: 'stamp', 
-    icon: '🏷️', 
-    label: 'Sıcak Baskı / İç Logo Stamp', 
-    desc: 'Derideki sıcak baskı veya metal marka plakasını tam dikten, parlamasız makro çekin.', 
-    min: 1 
-  },
-  { 
-    key: 'serial', 
-    icon: '🔢', 
-    label: 'Seri Kodu / Date Code', 
-    desc: 'İç etiketteki veya deri flaptaki seri numarasını/tarih kodunu okunaklı açıyla çekin.', 
-    min: 1 
-  },
-  { 
-    key: 'hardware', 
-    icon: '🔩', 
-    label: 'Metal Aksam & Gravürler', 
-    desc: 'Fermuar elciği, kilit, halkanın üzerindeki gravür yazısını yakın plandan çekin.', 
-    min: 1 
-  },
-  { 
-    key: 'stitching', 
-    icon: '🧵', 
-    label: 'Makro Dikiş Yakın Çekimi', 
-    desc: 'Dikişlerin eğim açısını (örn: Hermès 18° eğik dikiş kalıbı) göstermek için 5-10cm mesafeden makro çekin.', 
-    min: 1 
-  },
-  { 
-    key: 'receipt', 
-    icon: '📄', 
-    label: 'Fatura / Sertifika / Belge', 
-    desc: 'Varsa orijinal fatura, kutu veya sertifika belgesi.', 
-    min: 0 
-  },
-]
+// ─── Onay Fotoğrafları Kategorileri (Kategoriye Özel Ekspertiz Çekim Rehberi) ───
+export function getVerificationCategories(category?: string) {
+  if (category === 'Ayakkabı') {
+    return [
+      { 
+        key: 'front', 
+        icon: '👠', 
+        label: 'Ön & Yan Profil (Genel Simetri)', 
+        desc: 'Ayakkabıları düz, aydınlık zeminde yan profilden ve üstten çekin. Formu net görünmeli.', 
+        min: 1 
+      },
+      { 
+        key: 'back', 
+        icon: '👢', 
+        label: 'Topuk & Arka Profil', 
+        desc: 'Topuk yüksekliği, arka dikişler ve topuk ucu kondisyonunu gösteren dik çekim.', 
+        min: 1 
+      },
+      { 
+        key: 'base', 
+        icon: '👟', 
+        label: 'Alt Taban & Logo Baskısı', 
+        desc: 'Ayakkabının alt tabanını, numara baskısını ve taban aşınmasını gösteren çekim.', 
+        min: 1 
+      },
+      { 
+        key: 'stamp', 
+        icon: '🏷️', 
+        label: 'İç Taban Logo & Beden Stampı', 
+        desc: 'İç tabandaki altın/gümüş marka logosunu ve beden yazısını tam dikten çekin.', 
+        min: 1 
+      },
+      { 
+        key: 'serial', 
+        icon: '🔢', 
+        label: 'Seri Kodu / Dil Etiketi', 
+        desc: 'Ayakkabı dilinin altındaki veya iç yanındaki seri numarasını/beden etiketini çekin.', 
+        min: 1 
+      },
+      { 
+        key: 'hardware', 
+        icon: '🔩', 
+        label: 'Tokalar, Bağcık & Metal Aksam', 
+        desc: 'Varsa metal toka, fermuar, bağcık kapsülleri veya aksamların yakın çekimi.', 
+        min: 1 
+      },
+      { 
+        key: 'stitching', 
+        icon: '🧵', 
+        label: 'Makro Dikiş & Malzeme Dokusu', 
+        desc: 'Dikiş kalitesini ve deri/kumaş dokusunu göstermek için yakın makro çekim yapın.', 
+        min: 1 
+      },
+      { 
+        key: 'receipt', 
+        icon: '📦', 
+        label: 'Kutu / Toz Torbası / Fatura', 
+        desc: 'Varsa orijinal kutusu, toz torbaları, yedek topuk uçları veya faturası.', 
+        min: 0 
+      },
+    ]
+  }
+
+  if (category === 'Kıyafet') {
+    return [
+      { 
+        key: 'front', 
+        icon: '👗', 
+        label: 'Ön Yüz (Genel Silüet)', 
+        desc: 'Kıyafeti askıda veya düz zeminde dik açıyla çekin. Tüm kesim ve gövde görünmeli.', 
+        min: 1 
+      },
+      { 
+        key: 'back', 
+        icon: '🧥', 
+        label: 'Arka Yüz & Dikişler', 
+        desc: 'Arka yüzü ve sırt dikiş hatlarını gösteren çekim.', 
+        min: 1 
+      },
+      { 
+        key: 'base', 
+        icon: '👔', 
+        label: 'Yaka, Omuz & Manşet Detayları', 
+        desc: 'Yaka kesimini, omuz ve kol manşet dikişlerini yakın açıyla çekin.', 
+        min: 1 
+      },
+      { 
+        key: 'stamp', 
+        icon: '🏷️', 
+        label: 'İç Boyun Marka Etiketi', 
+        desc: 'Kıyafetin içindeki ana dikişli marka etiketini parlamasız makro çekin.', 
+        min: 1 
+      },
+      { 
+        key: 'serial', 
+        icon: '🔢', 
+        label: 'İç Yıkama & Malzeme Etiketi', 
+        desc: 'İç yandaki % kumaş kompozisyonu ve seri numarasının bulunduğu etiket.', 
+        min: 1 
+      },
+      { 
+        key: 'hardware', 
+        icon: '🔘', 
+        label: 'Düğmeler, Fermuar & Metal Aksam', 
+        desc: 'Logolu özel düğmeler, fermuar elciği veya aksam gravür yakın çekimi.', 
+        min: 1 
+      },
+      { 
+        key: 'stitching', 
+        icon: '🧵', 
+        label: 'Dikiş & Kumaş Dokusu', 
+        desc: 'Kumaş dokusu, astar dikişleri ve kenar bitişlerinin makro çekimi.', 
+        min: 1 
+      },
+      { 
+        key: 'receipt', 
+        icon: '📄', 
+        label: 'Yedek Düğme / Fatura / Etiket', 
+        desc: 'Varsa faturası, yedek düğmeleri veya orijinal kağıt etiketleri.', 
+        min: 0 
+      },
+    ]
+  }
+
+  if (category === 'Aksesuar') {
+    return [
+      { 
+        key: 'front', 
+        icon: '🕶️', 
+        label: 'Genel Görünüm (Ön Yüz)', 
+        desc: 'Aksesuarı/Takıyı aydınlık zeminde tam karşıdan çekin.', 
+        min: 1 
+      },
+      { 
+        key: 'back', 
+        icon: '💎', 
+        label: 'Arka & Yan Detaylar', 
+        desc: 'Kemer tokası arkası, gözlük sapı yanları veya takının kilit mekanizması.', 
+        min: 1 
+      },
+      { 
+        key: 'base', 
+        icon: '🔒', 
+        label: 'Klips / Kilit / Kemer Delikleri', 
+        desc: 'Kemer delikleri, kordon tokası veya kolye kilit mekanizması çekimi.', 
+        min: 1 
+      },
+      { 
+        key: 'stamp', 
+        icon: '🏷️', 
+        label: 'Ayar Damgası / Logo Stampı', 
+        desc: 'Takıdaki 750/18K damgası, kemer içi beden yazısı veya marka logosu.', 
+        min: 1 
+      },
+      { 
+        key: 'serial', 
+        icon: '🔢', 
+        label: 'Seri Numarası / Model Gravürü', 
+        desc: 'Sap içindeki model kodu veya takı üzerindeki seri numara gravürü.', 
+        min: 1 
+      },
+      { 
+        key: 'hardware', 
+        icon: '🔩', 
+        label: 'Metal İşçilik & Vidalar', 
+        desc: 'Gözlük menteşeleri, kemer toka dikişleri veya aksesuar metalleri.', 
+        min: 1 
+      },
+      { 
+        key: 'stitching', 
+        icon: '✨', 
+        label: 'Taş / Doku Yakın Çekimi', 
+        desc: 'Taş yuvaları, mineli yüzeyler veya malzeme dokusu makro çekimi.', 
+        min: 1 
+      },
+      { 
+        key: 'receipt', 
+        icon: '📦', 
+        label: 'Kutu / Kese / Fatura', 
+        desc: 'Varsa orijinal kutusu, derisi kesesi, garanti kartı veya faturası.', 
+        min: 0 
+      },
+    ]
+  }
+
+  // Varsayılan: Çanta Kategorisi
+  return [
+    { 
+      key: 'front', 
+      icon: '👜', 
+      label: 'Ön Yüz (Genel Simetri)', 
+      desc: 'Çantayı düz, aydınlık bir zemine koyup tam karşıdan dik açıyla çekin. Tüm gövde görünmeli.', 
+      min: 1 
+    },
+    { 
+      key: 'back', 
+      icon: '💼', 
+      label: 'Arka Yüz (Dikiş Hizası)', 
+      desc: 'Arka yüzü dik açıyla çekin. Dikiş hizası ve cep yapısı net görünmeli.', 
+      min: 1 
+    },
+    { 
+      key: 'base', 
+      icon: '📐', 
+      label: 'Taban & Köşeler', 
+      desc: 'Çantanın alt kısmını ve köşe aşınmalarını çekin. Metal ayaklar ve taban dikişleri net olmalı.', 
+      min: 1 
+    },
+    { 
+      key: 'stamp', 
+      icon: '🏷️', 
+      label: 'Sıcak Baskı / İç Logo Stamp', 
+      desc: 'Derideki sıcak baskı veya metal marka plakasını tam dikten, parlamasız makro çekin.', 
+      min: 1 
+    },
+    { 
+      key: 'serial', 
+      icon: '🔢', 
+      label: 'Seri Kodu / Date Code', 
+      desc: 'İç etiketteki veya deri flaptaki seri numarasını/tarih kodunu okunaklı açıyla çekin.', 
+      min: 1 
+    },
+    { 
+      key: 'hardware', 
+      icon: '🔩', 
+      label: 'Metal Aksam & Gravürler', 
+      desc: 'Fermuar elciği, kilit, halkanın üzerindeki gravür yazısını yakın plandan çekin.', 
+      min: 1 
+    },
+    { 
+      key: 'stitching', 
+      icon: '🧵', 
+      label: 'Makro Dikiş Yakın Çekimi', 
+      desc: 'Dikişlerin eğim açısını göstermek için 5-10cm mesafeden makro çekin.', 
+      min: 1 
+    },
+    { 
+      key: 'receipt', 
+      icon: '📄', 
+      label: 'Fatura / Sertifika / Belge', 
+      desc: 'Varsa orijinal fatura, kutu veya sertifika belgesi.', 
+      min: 0 
+    },
+  ]
+}
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/jpg', 'image/heif'];
@@ -349,7 +536,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
       }
       
       // Her kategori için fotoğraf sayılarını denetle
-      verificationCategories.forEach(cat => {
+      getVerificationCategories(selectedCategory).forEach(cat => {
         const filesCount = verificationFiles[cat.key]?.length || 0
         if (filesCount < cat.min) {
           errors[cat.key] = `Bu alan için en az ${cat.min} fotoğraf yüklemelisiniz. (Şu an: ${filesCount})`
@@ -1272,7 +1459,7 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {verificationCategories.map(cat => (
+              {getVerificationCategories(selectedCategory).map(cat => (
                 <div key={cat.key} className={`border rounded-2xl p-5 hover:border-[#AF9164]/50 transition-all bg-white flex flex-col justify-between ${fieldErrors[cat.key] ? 'border-red-200 bg-red-50/10' : 'border-gray-200 shadow-sm'}`}>
                   <div>
                     <div className="flex items-center justify-between mb-2">
