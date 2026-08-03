@@ -861,7 +861,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
               </div>
               <div className="lg:col-span-4 text-center lg:text-right shrink-0">
                 <a 
-                  href="https://wa.me/905555555555?text=Merhaba, Peony VIP satış hizmetiniz hakkında bilgi almak istiyorum." 
+                  href="https://wa.me/905523652093?text=Merhaba, Peony VIP satış hizmetiniz hakkında bilgi almak istiyorum." 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 border border-[#AF9164] text-[#AF9164] px-6 py-3 hover:bg-[#AF9164] hover:text-white transition-all duration-300 text-xs tracking-wider uppercase font-bold rounded-lg"

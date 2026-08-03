@@ -82,7 +82,7 @@ export default function NavbarClient({ user, profile, logoutAction }: NavbarClie
         {/* Sağ: VIP Whatsapp & Dil / Para Birimi Seçici */}
         <div className="flex items-center gap-4 shrink-0">
           <a 
-            href="https://wa.me/908508854110" 
+            href="https://wa.me/905523652093" 
             target="_blank" 
             rel="noopener noreferrer"
             className="hidden md:flex items-center gap-1.5 text-zinc-400 hover:text-[#AF9164] transition-colors text-[9px] font-bold tracking-wider uppercase"

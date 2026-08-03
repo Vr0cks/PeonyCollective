@@ -51,6 +51,21 @@ interface ProductDetailsScreenProps {
   onBack: () => void;
 }
 
+function formatCleanDescription(rawDesc?: string): string {
+  if (!rawDesc) {
+    return 'Bu lüks parça Peony Collective eksperleri tarafından incelenmiş ve %100 orijinal olduğu doğrulanmıştır.';
+  }
+
+  // Strip raw markdown headers, dividers, and asterisks for a clean AI summary look
+  return rawDesc
+    .replace(/^#+\s+/gm, '')        // Remove #, ##, ### headers
+    .replace(/---/g, '')            // Remove --- dividers
+    .replace(/\*\*/g, '')           // Remove bold **
+    .replace(/^\s*\*\s*/gm, '• ')   // Convert bullet * to •
+    .replace(/\n\s*\n\s*\n/g, '\n\n') // Clean excessive empty lines
+    .trim();
+}
+
 export default function ProductDetailsScreen({ product, onBack }: ProductDetailsScreenProps) {
   const [offerText, setOfferText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -220,11 +235,13 @@ export default function ProductDetailsScreen({ product, onBack }: ProductDetails
           </View>
         )}
 
-        {/* Description */}
+        {/* Description - Formatted AI Clean Summary */}
         <View style={styles.descriptionSection}>
-          <Text style={styles.sectionHeader}>AÇIKLAMA</Text>
+          <View style={styles.aiSummaryBadge}>
+            <Text style={styles.aiSummaryBadgeText}>✨ EDITÖR ÖZETİ & ÖZELLİKLER</Text>
+          </View>
           <Text style={styles.descriptionText}>
-            {product.description || 'Bu lüks parça Peony Collective eksperleri tarafından incelenmiş ve doğrulanmıştır. Herhangi bir aşınma veya yıpranma bulunmamaktadır.'}
+            {formatCleanDescription(product.description)}
           </Text>
         </View>
 
@@ -502,6 +519,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 30,
     backgroundColor: 'transparent',
+  },
+  aiSummaryBadge: {
+    backgroundColor: '#F3ECE0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+    borderWidth: 0.5,
+    borderColor: 'rgba(175, 145, 100, 0.4)'
+  },
+  aiSummaryBadgeText: {
+    color: COLORS.primary,
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.2
   },
   sectionHeader: {
     fontSize: 10,

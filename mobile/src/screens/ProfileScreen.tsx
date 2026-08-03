@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { t } from '../lib/i18n';
+import * as ImagePicker from 'expo-image-picker';
 
 const COLORS = {
   bg: '#FBFBFA', // Luxury off-white
@@ -135,7 +136,11 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
   async function fetchProfile() {
     try {
       const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
+      if (!user) {
+        setPreferredName('Misafir Kullanıcı');
+        setEmailAddr('misafir@peony.com');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('profiles')
@@ -143,23 +148,60 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
         .eq('id', user.id)
         .single();
 
-      if (error) throw error;
-      setProfile(data);
       if (data) {
-        setPreferredName(data.preferred_name || data.full_name || 'Ahmet Canlı');
-        setEmailAddr(user.email || data.email || 'ahmetcanli1943@gmail.com');
-        setPhone(data.phone || '+90 532 123 45 67');
-        setTckn(data.tckn || '12345678901');
-        setVkn(data.vkn || '9876543210');
-        setCompanyName(data.company_name || 'Canlı Lüks Giyim Ltd.');
+        setProfile(data);
+        setPreferredName(data.preferred_name || data.full_name || user.email?.split('@')[0] || 'Peony Üyesi');
+        setEmailAddr(user.email || data.email || '');
+        setPhone(data.phone || '');
+        setTckn(data.tckn || '');
+        setVkn(data.vkn || '');
+        setCompanyName(data.company_name || '');
         if (data.avatar_url) {
           setAvatarUrl(data.avatar_url);
         }
+      } else {
+        setPreferredName(user.email?.split('@')[0] || 'Peony Üyesi');
+        setEmailAddr(user.email || '');
       }
     } catch (e: any) {
-      console.error(e.message);
+      console.log('Profile fetch info:', e.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handlePickAvatar() {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert(
+          isEn ? 'Permission Required' : 'Galeri İzni Gerekli',
+          isEn ? 'Gallery permission is required to change profile picture.' : 'Profil fotoğrafı seçebilmek için galeri erişim izni vermeniz gerekmektedir.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const selectedUri = result.assets[0].uri;
+        setAvatarUrl(selectedUri);
+
+        const user = (await supabase.auth.getUser()).data.user;
+        if (user) {
+          await supabase.from('profiles').update({ avatar_url: selectedUri }).eq('id', user.id);
+          await supabase.auth.updateUser({ data: { avatar_url: selectedUri } });
+        }
+        Alert.alert(isEn ? 'Success' : 'Başarılı', isEn ? 'Profile picture updated!' : 'Profil fotoğrafınız başarıyla güncellendi!');
+      }
+    } catch (err: any) {
+      console.log('Error picking avatar:', err);
+      Alert.alert(isEn ? 'Error' : 'Hata', err.message);
     }
   }
 
@@ -209,7 +251,28 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
 
           {/* PROFILE HEADER & USER DETAILS */}
           <View style={[styles.profileHeaderBox, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
-            <Image source={{ uri: avatarUrl }} style={[styles.avatarImage, { borderColor: THEME.primary }]} />
+            <View style={{ position: 'relative' }}>
+              <Image source={{ uri: avatarUrl }} style={[styles.avatarImage, { borderColor: THEME.primary }]} />
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handlePickAvatar}
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  backgroundColor: THEME.primary,
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 2,
+                  borderColor: THEME.card
+                }}
+              >
+                <Text style={{ fontSize: 12, color: '#FFF' }}>📷</Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.profileInfoText}>
               <Text style={[styles.name, { color: THEME.text }]}>{preferredName || profile?.full_name}</Text>
               <Text style={styles.role}>
@@ -466,18 +529,20 @@ export default function ProfileScreen({ onLogout, onEnterOperations }: ProfileSc
               <Text style={[styles.sectionTitle, { color: THEME.text }]}>{isEn ? 'Order Tracking' : 'Sipariş Takibi'}</Text>
               <View style={[styles.trackerCard, { backgroundColor: THEME.card, borderColor: THEME.border }]}>
                 <View style={[styles.trackerHeader, { borderColor: THEME.border }]}>
-                  <Text style={[styles.trackerProdName, { color: THEME.text }]}>Rolex Submariner Date</Text>
-                  <Text style={[styles.trackerStatus, { color: THEME.accent }]}>{isEn ? 'Shipped 🚚' : 'Kargoya Verildi 🚚'}</Text>
+                  <Text style={[styles.trackerProdName, { color: THEME.text }]}>
+                    {isEn ? 'No Active Orders' : 'Henüz Aktif Siparişiniz Yok'}
+                  </Text>
+                  <Text style={[styles.trackerStatus, { color: THEME.primary }]}>{isEn ? 'Peony Secured' : 'Güvenli Alışveriş'}</Text>
                 </View>
                 <Text style={[styles.orderDetailText, { color: THEME.textMuted }]}>
                   {isEn 
-                    ? `Courier: Yurtiçi Kargo • Tracking No: YK837261902\nEstimated Delivery: In 2 Days`
-                    : `Kargo Firması: Yurtiçi Kargo • Takip No: YK837261902\nTahmini Teslimat: 2 Gün İçinde`}
+                    ? 'Explore our verified luxury collection to place your first order.'
+                    : 'Doğrulanmış lüks koleksiyonumuzdan ilk siparişinizi hemen oluşturabilirsiniz.'}
                 </Text>
                 {/* Visual authenticity guarantee indicator */}
                 <View style={styles.guaranteeTag}>
                   <Text style={styles.guaranteeText}>
-                    {isEn ? '✓ Spectral Analysis Approved Digital Passport Ready' : '✓ Spektral Analiz Onaylı Dijital Pasaport Hazır'}
+                    {isEn ? '✓ %100 Authenticity Guaranteed by Entrupy AI & Peony Experts' : '✓ %100 Orijinallik Garantisi (Entrupy AI & Peony Uzmanları)'}
                   </Text>
                 </View>
               </View>

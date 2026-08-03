@@ -43,6 +43,7 @@ import OperationsQueueScreen from './src/screens/OperationsQueueScreen';
 import ChatListScreen from './src/screens/ChatListScreen';
 import ChatDetailScreen from './src/screens/ChatDetailScreen';
 import SupportTicketsScreen from './src/screens/SupportTicketsScreen';
+import ProductReelsScreen from './src/screens/ProductReelsScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -59,7 +60,7 @@ const COLORS = {
   darkBar: '#12131A' // Floating navigation background
 };
 
-type Tab = 'feed' | 'sell' | 'chats' | 'support' | 'profile' | 'details' | 'chat_detail' | 'operations';
+type Tab = 'feed' | 'reels' | 'sell' | 'chats' | 'support' | 'profile' | 'details' | 'chat_detail' | 'operations';
 
 interface Product {
   id: string;
@@ -449,18 +450,31 @@ export default function App() {
     setCurrentTab('chat_detail');
   }
 
-  const isMainTab = currentTab === 'feed' || currentTab === 'sell' || currentTab === 'chats' || currentTab === 'support' || currentTab === 'profile';
+  const [isGuest, setIsGuest] = useState(false);
 
-  if (!session) {
-    return <LoginScreen onSuccess={() => setCurrentTab('feed')} />;
+  const isMainTab = currentTab === 'feed' || currentTab === 'reels' || currentTab === 'sell' || currentTab === 'chats' || currentTab === 'support' || currentTab === 'profile';
+
+  if (!session && !isGuest) {
+    return (
+      <LoginScreen 
+        onSuccess={() => setCurrentTab('feed')} 
+        onGuestSuccess={async () => {
+          try {
+            await supabase.auth.signOut();
+          } catch (e) {}
+          setIsGuest(true);
+          setCurrentTab('feed');
+        }}
+      />
+    );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+      <StatusBar barStyle={currentTab === 'reels' ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
       
-      {/* Header (Only visible on main tabs) */}
-      {isMainTab && (
+      {/* Header (Only visible on main tabs except reels which is fullscreen) */}
+      {isMainTab && currentTab !== 'reels' && (
         <View style={styles.header}>
           <View style={styles.headerTitleRow}>
             <View style={{ width: 40 }} />
@@ -494,6 +508,14 @@ export default function App() {
         <View style={{ display: currentTab === 'feed' ? 'flex' : 'none', flex: 1 }}>
           <HomeScreen 
             onSelectProduct={handleSelectProduct} 
+            likedIds={likedIds}
+            onToggleLike={toggleLike}
+            onOpenStylist={() => setStylistVisible(true)}
+          />
+        </View>
+        <View style={{ display: currentTab === 'reels' ? 'flex' : 'none', flex: 1 }}>
+          <ProductReelsScreen
+            onSelectProduct={handleSelectProduct}
             likedIds={likedIds}
             onToggleLike={toggleLike}
             onOpenStylist={() => setStylistVisible(true)}
@@ -548,10 +570,19 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.tabItem}
+              onPress={() => setCurrentTab('reels')}
+            >
+              <Text style={[styles.tabIcon, currentTab === 'reels' && styles.activeTabIcon]}>🎬</Text>
+              <Text style={[styles.tabText, currentTab === 'reels' && styles.activeTabText]}>Reels</Text>
+              {currentTab === 'reels' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.tabItem}
               onPress={() => setCurrentTab('sell')}
             >
-              <Text style={[styles.tabIcon, currentTab === 'sell' && styles.activeTabIcon]}>✦</Text>
-              <Text style={[styles.tabText, currentTab === 'sell' && styles.activeTabText]}>{t('tabAppraise')}</Text>
+              <Text style={[styles.tabIcon, currentTab === 'sell' && styles.activeTabIcon]}>➕</Text>
+              <Text style={[styles.tabText, currentTab === 'sell' && styles.activeTabText]}>Ürün Sat</Text>
               {currentTab === 'sell' && <View style={styles.activeDot} />}
             </TouchableOpacity>
 

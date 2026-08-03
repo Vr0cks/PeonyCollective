@@ -89,9 +89,9 @@ export default function Footer() {
             </p>
             <div className="text-[10px] text-zinc-500 font-light space-y-1 pt-4 border-t border-white/5">
               <p className="font-bold text-zinc-400 uppercase tracking-wider mb-1">Peony Collective</p>
-              <p>{t('footer.companyAddress', 'Adres: Mehmet Akif Mah. Şahinbey Cd. Hacı Tevfikoğulları İş Merkezi No:59, 34774 Çekmeköy/İstanbul')}</p>
-              <p>{t('footer.companyPhone', 'Telefon: 0850 885 4110 | E-posta: info@peonycollective.com')}</p>
-              <p className="text-zinc-600">{t('footer.companyTax', 'Mersis No: [Mersis No] | Vergi No: [Vergi No] ([Vergi Dairesi])')}</p>
+              <p>{t('footer.companyAddress', 'Adres: Merkez Mah. Üsküdar Cad. No: 57 İç Kapı No: 1, 34788 Çekmeköy/İstanbul')}</p>
+              <p>{t('footer.companyPhone', 'Telefon: +90 (552) 365 20 93 | E-posta: info@peonycollective.com')}</p>
+              <p className="text-zinc-600">{t('footer.companyTax', 'Vergi No: 8590652178 (Sarıgazi Vergi Dairesi)')}</p>
             </div>
           </div>
 

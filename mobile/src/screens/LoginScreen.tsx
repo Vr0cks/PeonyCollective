@@ -34,6 +34,7 @@ const COLORS = {
 
 interface LoginScreenProps {
   onSuccess: () => void;
+  onGuestSuccess?: () => void;
 }
 
 const BACKGROUND_IMAGES = [
@@ -42,7 +43,7 @@ const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=1000' // High-uptime luxury fashion image
 ];
 
-export default function LoginScreen({ onSuccess }: LoginScreenProps) {
+export default function LoginScreen({ onSuccess, onGuestSuccess }: LoginScreenProps) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
@@ -158,8 +159,15 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
             });
             if (setSessionError) throw setSessionError;
             onSuccess();
+            return;
           }
         }
+      }
+
+      // Re-check active session in case auth completed via browser redirect
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData?.session) {
+        onSuccess();
       }
     } catch (error: any) {
       alert('Google Giriş Hatası: ' + error.message);
@@ -214,10 +222,16 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
                 {/* Guest Login Option */}
                 <TouchableOpacity 
                   style={[styles.googleButton, { backgroundColor: '#AF9164', borderColor: '#AF9164', marginBottom: 12 }]} 
-                  onPress={() => onSuccess()}
+                  onPress={() => {
+                    if (onGuestSuccess) {
+                      onGuestSuccess();
+                    } else {
+                      onSuccess();
+                    }
+                  }}
                 >
                   <Text style={[styles.googleButtonText, { color: '#FFFFFF' }]}>
-                    {locale === 'tr' ? 'Şifresiz Devam Et (Misafir Girişi)' : 'Continue as Guest'}
+                    {locale === 'tr' ? '✦ Şifresiz Devam Et (Misafir Girişi)' : '✦ Continue as Guest'}
                   </Text>
                 </TouchableOpacity>
 

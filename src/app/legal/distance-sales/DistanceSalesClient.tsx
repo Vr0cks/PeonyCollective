@@ -17,11 +17,10 @@ export default function DistanceSalesClient() {
           <p>This Agreement is concluded between the parties specified below under the following terms and conditions.</p>
           <p><strong>SELLER / INTERMEDIARY SERVICE PROVIDER:</strong><br />
           Title: Peony Collective<br />
-          Address: Mehmet Akif Mah. Şahinbey Cd. Hacı Tevfikoğulları Business Center No:59, 34774 Çekmeköy / Istanbul, Turkey<br />
-          Phone: +90 850 885 4110<br />
+          Address: Merkez Mah. Üsküdar Cad. No: 57 İç Kapı No: 1, 34788 Çekmeköy / Istanbul, Turkey<br />
+          Phone: +90 (552) 365 20 93<br />
           Email: info@peonycollective.com<br />
-          Mersis No: [Mersis No]<br />
-          Tax Office / No: [Tax Office] / [Tax No]</p>
+          Tax No: 8590652178 (Sarigazi Tax Office)</p>
 
           <p><strong>BUYER:</strong><br />
           The name and address details specified on the Platform by the Buyer during order placement shall apply.</p>
@@ -62,11 +61,10 @@ export default function DistanceSalesClient() {
         <p>İşbu Sözleşme, aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde imzalanmıştır.</p>
         <p><strong>SATICI / ARACI HİZMET SAĞLAYICI:</strong><br />
         Ünvanı: Peony Collective<br />
-        Adresi: Mehmet Akif Mah. Şahinbey Cd. Hacı Tevfikoğulları İş Merkezi No:59, 34774 Çekmeköy / İstanbul<br />
-        Telefon: 0850 885 4110<br />
+        Adresi: Merkez Mah. Üsküdar Cad. No: 57 İç Kapı No: 1, 34788 Çekmeköy / İstanbul<br />
+        Telefon: +90 (552) 365 20 93<br />
         E-posta: info@peonycollective.com<br />
-        Mersis No: [Mersis No]<br />
-        Vergi Dairesi / No: [Vergi Dairesi] / [Vergi No]</p>
+        Vergi No: 8590652178 (Sarıgazi Vergi Dairesi)</p>
         
         <p><strong>ALICI:</strong><br />
         Sipariş verirken Platform'da belirtilen ad ve adres bilgileri esas alınır.</p>

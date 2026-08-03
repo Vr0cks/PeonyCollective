@@ -75,7 +75,19 @@ const translations = {
     tabMessages: 'MESAJLAR',
     tabSupport: 'DESTEK',
     tabProfile: 'PROFİL',
-    
+    // Reels Screen
+    reelsHeaderBadge: 'REELS • KEŞFET',
+    reelsSearchPlaceholder: 'Marka, model veya kategori ara...',
+    reelsInspectBtn: 'Ürünü İncele',
+    reelsQuickBuyBtn: 'Hızlı Satın Al',
+    reelsLike: 'Beğen',
+    reelsShare: 'Paylaş',
+    reelsDetails: 'Detay',
+    reelsAuthenticityVerified: '🛡️ Orijinallik Garantili',
+    reelsAuthenticitySub: 'Entrupy AI ve Peony Uzmanları Tarafından Onaylanmıştır.',
+    reelsCheckoutBtn: 'Güvenli İncele & Satın Al',
+    reelsAskMuse: '✦ Muse\'a Sor',
+
     // Favorites Modal
     wishlistTitle: 'İstek Listem & Alarmlar',
     wishlistEmpty: 'İstek listeniz henüz boş.',
@@ -305,6 +317,19 @@ const translations = {
     tabMessages: 'MESSAGES',
     tabSupport: 'SUPPORT',
     tabProfile: 'PROFILE',
+
+    // Reels Screen
+    reelsHeaderBadge: 'REELS • DISCOVER',
+    reelsSearchPlaceholder: 'Search brand, model or category...',
+    reelsInspectBtn: 'Inspect Item',
+    reelsQuickBuyBtn: 'Quick Buy',
+    reelsLike: 'Like',
+    reelsShare: 'Share',
+    reelsDetails: 'Details',
+    reelsAuthenticityVerified: '🛡️ Authenticity Guaranteed',
+    reelsAuthenticitySub: 'Verified by Entrupy AI & Peony Luxury Experts.',
+    reelsCheckoutBtn: 'Secure Checkout & Inspect',
+    reelsAskMuse: '✦ Ask Muse',
 
     // Favorites Modal
     wishlistTitle: 'My Wishlist & Alerts',
