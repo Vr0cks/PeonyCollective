@@ -200,7 +200,7 @@ export async function POST(req: Request) {
     const paymentAmount = Math.round(totalAmount * 100)
 
     // Benzersiz sipariş numarası
-    const merchantOid = `PO_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+    const merchantOid = `PO${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
 
     let totalSellerAmount = 0
 

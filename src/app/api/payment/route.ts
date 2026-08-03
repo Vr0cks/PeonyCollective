@@ -175,7 +175,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const merchantOid = newOrder.id
+    const merchantOid = newOrder.id.replace(/-/g, '') // PayTR alfanumerik gerektirir, UUID tirelerini kaldır
 
     // PAYTR PAZARYERİ (SPLIT PAYMENT) MANTIGI
     let submerchantId = null
