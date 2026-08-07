@@ -233,7 +233,10 @@ export async function POST(request: Request) {
     } else {
       submerchantId = sellerProfile?.submerchant_id
 
-      if (!submerchantId) {
+      // Admin rolündeki satıcılar (Peony'nin kendi / VIP ürünleri) için submerchant gerekmez.
+      if (sellerProfile?.role === 'admin') {
+        submerchantId = null
+      } else if (!submerchantId) {
         // Satıcının IBAN ve TCKN/VKN kontrolü
         if (!sellerProfile?.iban || (!sellerProfile?.tckn && !sellerProfile?.vkn)) {
           return NextResponse.json(

@@ -888,8 +888,8 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
   }, [modelSearchQuery, dbModels])
 
   const availableMaterials = useMemo(() => getMaterialsForCategoryAndBrand(selectedCategory, currentBrand), [selectedCategory, currentBrand])
-  const availableSubcategories = useMemo(() => selectedCategory ? getSubcategories(selectedCategory as MainCategory) : [], [selectedCategory])
-  const availableSizes = useMemo(() => selectedCategory && selectedSubcategory ? getSizesForSubcategory(selectedCategory as MainCategory, selectedSubcategory) : [], [selectedCategory, selectedSubcategory])
+  const availableSubcategories = useMemo(() => selectedCategory ? getSubcategories(selectedCategory as MainCategory, selectedGender) : [], [selectedCategory, selectedGender])
+  const availableSizes = useMemo(() => selectedCategory && selectedSubcategory ? getSizesForSubcategory(selectedCategory as MainCategory, selectedSubcategory, selectedGender) : [], [selectedCategory, selectedSubcategory, selectedGender])
 
   const labelClasses = "block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3"
   

@@ -68,7 +68,7 @@ export const categoryTree: Record<MainCategory, CategoryNode> = {
       { name: 'Sneaker', sizes: ['35', '35.5', '36', '36.5', '37', '37.5', '38', '38.5', '39', '39.5', '40', '40.5', '41', '41.5', '42', '42.5', '43', '43.5', '44', '44.5', '45'] },
       { name: 'Bot / Çizme', sizes: ['35', '35.5', '36', '36.5', '37', '37.5', '38', '38.5', '39', '39.5', '40', '40.5', '41', '41.5', '42', '42.5', '43', '43.5', '44', '44.5', '45'] },
       { name: 'Terlik / Sandalet', sizes: ['35', '35.5', '36', '36.5', '37', '37.5', '38', '38.5', '39', '39.5', '40', '40.5', '41', '41.5', '42'] },
-      { name: 'Loafer / Babet', sizes: ['35', '35.5', '36', '36.5', '37', '37.5', '38', '38.5', '39', '39.5', '40', '40.5', '41', '41.5', '42'] },
+      { name: 'Loafer', sizes: ['35', '35.5', '36', '36.5', '37', '37.5', '38', '38.5', '39', '39.5', '40', '40.5', '41', '41.5', '42'] },
       { name: 'Oxford / Derby', sizes: ['38', '38.5', '39', '39.5', '40', '40.5', '41', '41.5', '42', '42.5', '43', '43.5', '44', '44.5', '45'] },
     ],
   },
@@ -262,13 +262,24 @@ export function getMaterialsForBrand(brandName: string): string[] {
 }
 
 // ─── Helper: Alt kategori ve beden bilgisini çek ───
-export function getSubcategories(category: MainCategory): SubcategoryData[] {
-  return categoryTree[category]?.subcategories || []
+export function getSubcategories(category: MainCategory, gender?: string): SubcategoryData[] {
+  let list = categoryTree[category]?.subcategories || []
+  if (gender && (gender.toUpperCase() === 'ERKEK' || gender === 'Erkek')) {
+    if (category === 'Ayakkabı') {
+      list = list.filter(sub => sub.name !== 'Topuklu' && sub.name !== 'Babet')
+    }
+  }
+  return list
 }
 
-export function getSizesForSubcategory(category: MainCategory, subcategoryName: string): string[] {
+export function getSizesForSubcategory(category: MainCategory, subcategoryName: string, gender?: string): string[] {
   const node = categoryTree[category]
   if (!node) return []
   const sub = node.subcategories.find(s => s.name === subcategoryName)
+
+  if (category === 'Ayakkabı' && gender && (gender.toUpperCase() === 'ERKEK' || gender === 'Erkek')) {
+    return ['39', '39.5', '40', '40.5', '41', '41.5', '42', '42.5', '43', '43.5', '44', '44.5', '45', '45.5', '46', '46.5', '47']
+  }
+
   return sub?.sizes || []
 }

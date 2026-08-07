@@ -19,17 +19,22 @@ export async function GET(request: Request) {
     }
 
     // Yetki Kontrolü: RLS sayesinde eğer kullanıcının izni yoksa siparişe erişemez
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('id', orderId)
-      .single()
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId)
+    
+    let query = supabase.from('orders').select('id, payment_id')
+    if (isUuid) {
+      query = query.or(`id.eq.${orderId},payment_id.eq.${orderId}`)
+    } else {
+      query = query.eq('payment_id', orderId)
+    }
+
+    const { data: order, error: orderError } = await query.limit(1).maybeSingle()
 
     if (orderError || !order) {
       return NextResponse.json({ error: 'Sipariş bulunamadı veya erişim yetkiniz yok' }, { status: 403 })
     }
 
-    const status = await getOtoOrderStatus(orderId)
+    const status = await getOtoOrderStatus(order.id || orderId)
     return NextResponse.json(status)
   } catch (error: any) {
     return maskErrorResponse(error, 'Kargo bilgisi alınamadı')
