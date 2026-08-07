@@ -49,10 +49,25 @@ export default async function CheckoutPage({
     .from('products')
     .select('*')
     .eq('id', productId)
-    .eq('status', 'approved')
-    .single()
+    .maybeSingle()
 
   if (!product) return notFound()
+
+  if (product.status !== 'approved') {
+    return (
+      <main className="min-h-screen bg-[#FCFCFB] text-[#1A1A1A] flex items-center justify-center p-6">
+        <div className="max-w-md w-full text-center space-y-6 bg-white p-10 border border-gray-100 shadow-sm rounded-2xl">
+          <h1 className="serif-display text-2xl text-gray-900">Bu Ürün Henüz Satışta Değil</h1>
+          <p className="text-xs text-gray-500 font-light leading-relaxed uppercase tracking-wider">
+            Bu parça henüz Peony Lab onay sürecinde veya satılmış olabilir. Şu an için satın alma işlemi yapılamamaktadır.
+          </p>
+          <Link href="/#collection" className="inline-block bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#AF9164] transition-colors">
+            Koleksiyona Dön
+          </Link>
+        </div>
+      </main>
+    )
+  }
 
   // 2.5 Check if there is an active accepted offer for this buyer and product
   const { data: activeOffer } = await supabase

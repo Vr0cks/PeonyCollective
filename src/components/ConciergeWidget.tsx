@@ -132,10 +132,6 @@ export default function ConciergeWidget() {
     })
   }
 
-  if (pathname?.startsWith('/checkout')) {
-    return null;
-  }
-
   useEffect(() => {
     if (isAdmin) {
       const supabase = createClient()
@@ -160,6 +156,10 @@ export default function ConciergeWidget() {
       setChatStep(isAdmin ? 'admin_welcome' : 'welcome')
     }
   }, [isOpen, isAdmin])
+
+  if (pathname?.startsWith('/checkout')) {
+    return null;
+  }
 
   const resetChat = () => {
     setChatStep(isAdmin ? 'admin_welcome' : 'welcome')
