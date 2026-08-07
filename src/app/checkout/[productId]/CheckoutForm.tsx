@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -17,6 +17,12 @@ export default function CheckoutForm({ productId, product, currentPrice, profile
   const [error, setError] = useState<string | null>(null)
   const [needsProfileUpdate, setNeedsProfileUpdate] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState<'standard' | 'vip' | 'private_viewing'>('standard')
+
+  useEffect(() => {
+    if (iframeUrl) {
+      window.scrollTo({ top: 120, behavior: 'smooth' })
+    }
+  }, [iframeUrl])
 
   const deliveryFee = deliveryMethod === 'private_viewing' ? 15000 : deliveryMethod === 'vip' ? 2500 : 0
   const totalPrice = currentPrice + deliveryFee

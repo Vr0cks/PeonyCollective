@@ -151,16 +151,22 @@ export default function CheckoutPage() {
     )
   }
 
+  useEffect(() => {
+    if (paytrToken) {
+      window.scrollTo({ top: 120, behavior: 'smooth' })
+    }
+  }, [paytrToken])
+
   const inputClasses = "w-full border-b border-gray-300 py-3 bg-transparent focus:border-black focus:outline-none transition-colors text-sm"
 
   return (
-    <div className="min-h-screen bg-[#F9F9F8] pt-24 pb-32">
+    <div className="min-h-screen bg-[#F9F9F8] pt-6 md:pt-10 pb-24">
       <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors mb-12">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors mb-6">
           <ArrowLeft size={16} /> Geri Dön
         </button>
 
-        <h1 className="text-4xl md:text-5xl serif-display mb-12">Güvenli Ödeme</h1>
+        <h1 className="text-3xl md:text-4xl serif-display mb-6">Güvenli Ödeme</h1>
 
         {paytrToken ? (
           <div className="bg-white border border-gray-100 shadow-xl shadow-black/5 p-4 rounded-lg w-full min-h-[850px]">
