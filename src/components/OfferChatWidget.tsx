@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { getActiveOffer } from '@/src/app/messages/offers_actions_helper'
 import { acceptOffer, rejectOffer } from '@/src/app/messages/offers_actions'
 import { createClient } from '@/src/utils/supabase/client'
-import { Check, X, ShieldAlert } from 'lucide-react'
+import { Check, X, ShieldAlert, ShoppingBag } from 'lucide-react'
 
 interface OfferChatWidgetProps {
   productId: string
@@ -97,6 +98,15 @@ export default function OfferChatWidget({ productId, userId, sellerId }: OfferCh
           )}
         </div>
       </div>
+
+      {offer.status === 'accepted' && isBuyer && (
+        <Link
+          href={`/checkout/${productId}`}
+          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+        >
+          <ShoppingBag size={14} /> Teklifli Satın Al ({offer.offered_price.toLocaleString('tr-TR')} ₺)
+        </Link>
+      )}
 
       {offer.status === 'pending' && (
         <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">

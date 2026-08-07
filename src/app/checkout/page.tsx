@@ -70,6 +70,12 @@ export default function CheckoutPage() {
   const [acceptMss, setAcceptMss] = useState(false)
   const [acceptKvkk, setAcceptKvkk] = useState(false)
 
+  useEffect(() => {
+    if (paytrToken) {
+      window.scrollTo({ top: 120, behavior: 'smooth' })
+    }
+  }, [paytrToken])
+
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!acceptMss || !acceptKvkk) {
@@ -150,12 +156,6 @@ export default function CheckoutPage() {
       </div>
     )
   }
-
-  useEffect(() => {
-    if (paytrToken) {
-      window.scrollTo({ top: 120, behavior: 'smooth' })
-    }
-  }, [paytrToken])
 
   const inputClasses = "w-full border-b border-gray-300 py-3 bg-transparent focus:border-black focus:outline-none transition-colors text-sm"
 

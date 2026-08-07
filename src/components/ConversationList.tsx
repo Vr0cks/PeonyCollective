@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Conversation } from '@/src/types'
 import { useSettings } from '@/src/context/SettingsContext'
+import { maskContactInfo } from '@/src/utils/security'
 
 interface ConversationListProps {
   conversations: Conversation[]
@@ -67,7 +68,7 @@ export default function ConversationList({ conversations, activeId, onSelect }: 
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 truncate font-light mb-1">
-                    {conv.last_message || 'Sohbet başlatıldı'}
+                    {maskContactInfo(conv.last_message || 'Sohbet başlatıldı')}
                   </p>
                   {product && (
                     <p className="text-[9px] text-[#AF9164] uppercase tracking-widest font-bold truncate">

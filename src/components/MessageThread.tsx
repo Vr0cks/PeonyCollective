@@ -159,6 +159,14 @@ export default function MessageThread({
                   }`}
                 >
                   <p>{maskContactInfo(msg.content)}</p>
+                  {msg.content.includes('kabul edildi') && product && userId !== product.seller_id && (
+                    <Link
+                      href={`/checkout/${product.id}`}
+                      className="inline-flex items-center gap-1.5 mt-3 bg-[#AF9164] hover:bg-black text-white px-4 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all shadow-sm block text-center"
+                    >
+                      🛒 Teklifli Fiyatla Satın Al →
+                    </Link>
+                  )}
                   <span
                     className={`block text-[8px] mt-1 text-right leading-none ${
                       isMe ? 'text-zinc-400' : 'text-gray-400'

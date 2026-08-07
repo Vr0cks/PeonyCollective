@@ -125,6 +125,7 @@ export async function getConversations() {
           
           return {
             ...conv,
+            last_message: conv.last_message ? maskContactInfo(conv.last_message) : conv.last_message,
             other_profile: otherProfile,
           }
         })
@@ -141,6 +142,7 @@ export async function getConversations() {
           : conv.participant_1_profile
       return {
         ...conv,
+        last_message: conv.last_message ? maskContactInfo(conv.last_message) : conv.last_message,
         other_profile: otherProfile,
       }
     })

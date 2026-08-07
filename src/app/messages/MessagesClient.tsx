@@ -6,7 +6,7 @@ import { getMessages, sendMessage, markAsRead } from './actions'
 import ConversationList from '@/src/components/ConversationList'
 import MessageThread from '@/src/components/MessageThread'
 import { Conversation, Message } from '@/src/types'
-
+import { maskContactInfo } from '@/src/utils/security'
 import { useSettings } from '@/src/context/SettingsContext'
 
 interface MessagesClientProps {
@@ -80,7 +80,7 @@ export default function MessagesClient({ userId, initialConversations, activeId 
               c.id === activeConversationId
                 ? {
                     ...c,
-                    last_message: newMsg.content,
+                    last_message: maskContactInfo(newMsg.content),
                     last_message_at: newMsg.created_at,
                   }
                 : c
@@ -119,7 +119,7 @@ export default function MessagesClient({ userId, initialConversations, activeId 
           c.id === activeConversationId
             ? {
                 ...c,
-                last_message: content,
+                last_message: res.message.content || maskContactInfo(content),
                 last_message_at: new Date().toISOString(),
               }
             : c
