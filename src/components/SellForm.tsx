@@ -919,41 +919,11 @@ export default function SellForm({ userEmail, userRole }: { userEmail?: string, 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error("Oturum açmanız gerekiyor.")
 
-      // Resmi tarayıcıda sıkıştır: max 1600px, WebP %82 kalite (~%80 boyut tasarrufu)
-      const compressImage = (file: File): Promise<Blob> => {
-        return new Promise((resolve) => {
-          // Video veya webp-olmayan dosyaları doğrudan geç
-          if (file.type.startsWith('video/')) { resolve(file); return; }
-          const img = new window.Image()
-          const url = URL.createObjectURL(file)
-          img.onload = () => {
-            URL.revokeObjectURL(url)
-            const MAX = 1600
-            let { width, height } = img
-            if (width > MAX || height > MAX) {
-              if (width > height) { height = Math.round(height * MAX / width); width = MAX }
-              else { width = Math.round(width * MAX / height); height = MAX }
-            }
-            const canvas = document.createElement('canvas')
-            canvas.width = width; canvas.height = height
-            const ctx = canvas.getContext('2d')!
-            ctx.drawImage(img, 0, 0, width, height)
-            canvas.toBlob((blob) => resolve(blob || file), 'image/webp', 0.82)
-          }
-          img.onerror = () => resolve(file)
-          img.src = url
-        })
-      }
-
       // Ürün görselleri (public, flaws, videos) → product-images bucket
       const uploadFile = async (file: File, folder: string) => {
-        const isVideo = file.type.startsWith('video/')
-        const compressed = isVideo ? file : await compressImage(file)
-        const ext = isVideo ? file.name.split('.').pop() : 'webp'
+        const ext = file.name.split('.').pop()
         const fileName = `${user.id}/${folder}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
-        const { error } = await supabase.storage.from('product-images').upload(fileName, compressed, {
-          contentType: isVideo ? file.type : 'image/webp'
-        })
+        const { error } = await supabase.storage.from('product-images').upload(fileName, file)
         if (error) throw error
         const { data } = supabase.storage.from('product-images').getPublicUrl(fileName)
         return data.publicUrl
