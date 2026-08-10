@@ -2,6 +2,10 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   images: {
+    // Vercel Image Optimization kotası aşıldığında 402 hatası oluşuyor.
+    // Resimler zaten WebP/JPEG olarak yüklendiğinden Vercel proxy'sine gerek yok.
+    // Doğrudan Supabase storage'dan servis edilir.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
