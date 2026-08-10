@@ -77,10 +77,20 @@ export default async function ProductDetailPage({
       <div className="max-w-[1600px] mx-auto px-6 py-12 lg:px-12">
         
         {/* Breadcrumb - Sleek */}
-        <nav className="flex text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-12 gap-3 items-center">
-          <Link href="/#collection" className="hover:text-black transition-colors">THE EDIT</Link>
-          <span className="w-4 h-[1px] bg-gray-300"></span>
-          <span className="text-black font-bold">{product.brand}</span>
+        <nav className="flex text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-12 gap-3 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/#collection" className="hover:text-black transition-colors">THE EDIT</Link>
+            <span className="w-4 h-[1px] bg-gray-300"></span>
+            <span className="text-black font-bold">{product.brand}</span>
+          </div>
+          {isSeller && product.status !== 'sold' && (
+            <Link
+              href={`/dashboard/edit/${product.id}`}
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-gray-200 px-4 py-2 rounded-full hover:bg-black hover:text-white hover:border-black transition-all"
+            >
+              ✏️ Düzenle
+            </Link>
+          )}
         </nav>
 
         {searchError && (

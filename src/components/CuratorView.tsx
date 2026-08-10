@@ -119,7 +119,7 @@ export default function CuratorView({ myProducts, totalEarnings, activeSales, pe
               const imageUrl = p.public_images?.[0]
 
               return (
-                <div key={p.id} className="flex items-center gap-5 px-8 py-5 hover:bg-gray-50/50 transition-colors group">
+                <Link key={p.id} href={`/product/${p.id}`} className="flex items-center gap-5 px-8 py-5 hover:bg-gray-50/50 transition-colors group cursor-pointer">
                   {/* Küçük görsel */}
                   <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 relative border border-gray-100">
                     {imageUrl ? (
@@ -148,7 +148,7 @@ export default function CuratorView({ myProducts, totalEarnings, activeSales, pe
                   <div className="text-right shrink-0">
                     <p className="text-base font-bold text-gray-900">{(p.price ?? 0).toLocaleString('tr-TR')} ₺</p>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
