@@ -265,7 +265,8 @@ export function getMaterialsForBrand(brandName: string): string[] {
 // ─── Helper: Alt kategori ve beden bilgisini çek ───
 export function getSubcategories(category: MainCategory, gender?: string): SubcategoryData[] {
   let list = categoryTree[category]?.subcategories || []
-  if (gender && (gender.toUpperCase() === 'ERKEK' || gender === 'Erkek')) {
+  const isErkek = gender && (gender.toUpperCase() === 'ERKEK' || gender === 'Erkek' || gender === 'Erkek Çocuk')
+  if (isErkek) {
     if (category === 'Ayakkabı') {
       list = list.filter(sub => sub.name !== 'Topuklu' && sub.name !== 'Babet')
     }
@@ -278,8 +279,17 @@ export function getSizesForSubcategory(category: MainCategory, subcategoryName: 
   if (!node) return []
   const sub = node.subcategories.find(s => s.name === subcategoryName)
 
-  if (category === 'Ayakkabı' && gender && (gender.toUpperCase() === 'ERKEK' || gender === 'Erkek')) {
-    return ['39', '39.5', '40', '40.5', '41', '41.5', '42', '42.5', '43', '43.5', '44', '44.5', '45', '45.5', '46', '46.5', '47']
+  if (category === 'Ayakkabı' && gender) {
+    const isErkek = gender.toUpperCase() === 'ERKEK' || gender === 'Erkek'
+    const isErkekCocuk = gender === 'Erkek Çocuk'
+    if (isErkek) {
+      return ['39', '39.5', '40', '40.5', '41', '41.5', '42', '42.5', '43', '43.5', '44', '44.5', '45', '45.5', '46', '46.5', '47']
+    }
+    if (!isErkek && !isErkekCocuk) {
+      // Kadın ve Kız Çocuk için max 42
+      const sizes = sub?.sizes || []
+      return sizes.filter(s => parseFloat(s) <= 42)
+    }
   }
 
   return sub?.sizes || []
