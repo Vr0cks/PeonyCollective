@@ -54,6 +54,15 @@ export default async function AdminProductDetailPage({
             ← Panele Dön
           </Link>
           <div className="flex items-center gap-3">
+            {/* Düzenle Butonu */}
+            {product.status !== 'sold' && (
+              <Link
+                href={`/dashboard/edit/${product.id}`}
+                className="px-5 py-2 border border-gray-200 text-gray-700 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white hover:border-black transition-all"
+              >
+                ✏️ Düzenle
+              </Link>
+            )}
             {product.status === 'approved' && (
               <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-widest border border-emerald-200">
                 ✓ BU ÜRÜN ONAYLI VE YAYINDA

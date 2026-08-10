@@ -20,7 +20,11 @@ export default async function EditProductPage({
     .single()
 
   if (error || !product) return notFound()
-  if (product.seller_id !== user.id) return notFound()
+  
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const isAdmin = profile?.role === 'admin'
+  
+  if (product.seller_id !== user.id && !isAdmin) return notFound()
   if (product.status === 'sold') redirect(`/product/${id}`)
 
   return <EditProductClient product={product} />
