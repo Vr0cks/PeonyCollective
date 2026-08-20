@@ -24,10 +24,22 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { cartItems, formData } = body
+    const { cartItems, formData, locale = 'tr' } = body
 
     if (!cartItems || cartItems.length === 0) {
-      return NextResponse.json({ error: 'Sepet boş' }, { status: 400 })
+      return NextResponse.json({ error: locale === 'tr' ? 'Sepet boş' : 'Cart is empty' }, { status: 400 })
+    }
+
+    if (!formData?.firstName?.trim() || !formData?.lastName?.trim()) {
+      return NextResponse.json({ error: locale === 'tr' ? 'Ad ve soyad bilgileri zorunludur.' : 'First and last name are required.' }, { status: 400 })
+    }
+
+    if (!formData?.phone?.trim()) {
+      return NextResponse.json({ error: locale === 'tr' ? 'Kargo teslimatı için telefon numarası zorunludur.' : 'Phone number is required for shipping.' }, { status: 400 })
+    }
+
+    if (!formData?.address?.trim()) {
+      return NextResponse.json({ error: locale === 'tr' ? 'Teslimat adresi zorunludur.' : 'Shipping address is required.' }, { status: 400 })
     }
 
     // ✅ GÜVENLİK: Fiyatları client'tan almıyoruz, veritabanından doğruluyoruz
@@ -38,16 +50,16 @@ export async function POST(req: Request) {
       .in('id', productIds)
 
     if (dbError || !dbProducts || dbProducts.length === 0) {
-      return NextResponse.json({ error: 'Ürün bilgileri alınamadı.' }, { status: 500 })
+      return NextResponse.json({ error: locale === 'tr' ? 'Ürün bilgileri alınamadı.' : 'Product details could not be retrieved.' }, { status: 500 })
     }
 
     // Satışta olmayan veya bulunamayan ürün kontrolü
     for (const product of dbProducts) {
       if (product.status === 'sold') {
-        return NextResponse.json({ error: `"${product.brand} ${product.model_name}" ürünü çoktan satılmış. Lütfen sepetinizi güncelleyin.` }, { status: 409 })
+        return NextResponse.json({ error: locale === 'tr' ? `"${product.brand} ${product.model_name}" ürünü çoktan satılmış. Lütfen sepetinizi güncelleyin.` : `"${product.brand} ${product.model_name}" is already sold. Please update your cart.` }, { status: 409 })
       }
       if (product.status !== 'approved') {
-        return NextResponse.json({ error: `"${product.brand} ${product.model_name}" ürünü şu an satışta değil.` }, { status: 409 })
+        return NextResponse.json({ error: locale === 'tr' ? `"${product.brand} ${product.model_name}" ürünü şu an satışta değil.` : `"${product.brand} ${product.model_name}" is currently not available for sale.` }, { status: 409 })
       }
     }
 

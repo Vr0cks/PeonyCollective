@@ -52,6 +52,7 @@ export async function POST(request: Request) {
     const otoResponse = await createOtoOrder({
       orderId: orderId, // Peony sipariş ID
       description: `${product?.brand} ${product?.model_name}`,
+      amount: Number(order.total_amount || product?.price || 0),
       weightGrams: 500,
       createShipment: true,
       senderInformation: isStage2

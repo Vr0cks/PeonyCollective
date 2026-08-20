@@ -9,9 +9,11 @@ import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { createClient } from '@/src/utils/supabase/client'
 import { getDecryptedProfile } from '@/src/app/settings/actions'
+import { useSettings } from '@/src/context/SettingsContext'
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal } = useCart()
+  const { language, t, formatPrice } = useSettings()
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
@@ -78,8 +80,36 @@ export default function CheckoutPage() {
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      setCheckoutError(
+        language === 'tr'
+          ? 'Lütfen ad ve soyad bilgilerinizi eksiksiz girin.'
+          : 'Please provide your first and last name.'
+      )
+      return
+    }
+    if (!formData.phone.trim()) {
+      setCheckoutError(
+        language === 'tr'
+          ? 'Lütfen kargo teslimatı için geçerli bir telefon numarası girin.'
+          : 'Please provide a valid phone number for shipping delivery.'
+      )
+      return
+    }
+    if (!formData.address.trim() || !formData.city.trim()) {
+      setCheckoutError(
+        language === 'tr'
+          ? 'Lütfen teslimat adresi ve il bilgisini eksiksiz doldurun.'
+          : 'Please provide your complete shipping address and city.'
+      )
+      return
+    }
     if (!acceptMss || !acceptKvkk) {
-      setCheckoutError('Lütfen ödeme yapabilmek için Mesafeli Satış Sözleşmesi, Ön Bilgilendirme Formu, Gizlilik Politikası ve KVKK aydınlatma metinlerini onaylayın.')
+      setCheckoutError(
+        language === 'tr'
+          ? 'Lütfen ödeme yapabilmek için Mesafeli Satış Sözleşmesi, Ön Bilgilendirme Formu, Gizlilik Politikası ve KVKK aydınlatma metinlerini onaylayın.'
+          : 'Please accept the Distance Sales Agreement, Terms & Privacy Policy to proceed.'
+      )
       return
     }
     setIsProcessing(true)
@@ -89,7 +119,7 @@ export default function CheckoutPage() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cartItems, formData })
+        body: JSON.stringify({ cartItems, formData, locale: language })
       })
 
       const data = await res.json()
@@ -103,10 +133,10 @@ export default function CheckoutPage() {
       if (res.ok && data.token) {
         setPaytrToken(data.token)
       } else {
-        setCheckoutError(data.error || 'Ödeme başlatılamadı. Lütfen tekrar deneyin.')
+        setCheckoutError(data.error || (language === 'tr' ? 'Ödeme başlatılamadı. Lütfen tekrar deneyin.' : 'Payment could not be initialized. Please try again.'))
       }
     } catch (error) {
-      setCheckoutError('Bağlantı hatası oluştu. İnternet bağlantınızı kontrol edin.')
+      setCheckoutError(language === 'tr' ? 'Bağlantı hatası oluştu. İnternet bağlantınızı kontrol edin.' : 'Connection error occurred. Please check your internet connection.')
     } finally {
       setIsProcessing(false)
     }

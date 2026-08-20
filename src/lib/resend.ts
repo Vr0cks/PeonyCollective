@@ -2,7 +2,7 @@ import { Resend } from 'resend'
 
 // Resend instance'ını oluştur
 // API key yoksa hata fırlatmamak için fallback olarak 'dummy' koyabiliriz ama .env'ye eklenmesi şart.
-const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key')
+const resend = new Resend(process.env.RESEND_API_KEY || '')
 
 interface OrderConfirmationProps {
   orderId: string

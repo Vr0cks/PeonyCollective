@@ -90,10 +90,10 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "Peony Collective",
-              "url": "https://peonycollective.com",
+              "url": "https://www.peony-collective.com",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://peonycollective.com/?brand={search_term_string}",
+                "target": "https://www.peony-collective.com/?brand={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             })
@@ -106,8 +106,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Peony Collective",
-              "url": "https://peonycollective.com",
-              "logo": "https://peonycollective.com/logo.png",
+              "url": "https://www.peony-collective.com",
+              "logo": "https://www.peony-collective.com/logo.png",
               "description": "Orijinalliği onaylanmış ikinci el lüks çanta, kıyafet, ayakkabı ve aksesuar alım satım platformu."
             })
           }}
@@ -117,11 +117,7 @@ export default function RootLayout({
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful');
-                  }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                  });
+                  navigator.serviceWorker.register('/sw.js');
                 });
               }
             `

@@ -21,21 +21,29 @@ export async function POST(request: Request) {
 
     const orderId = params.merchant_oid
     const supabase = createAdminClient()
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId)
+    
+    // Alfanumerik tire-siz 32 karakterlik UUID'yi standart formata dönüştür
+    let formattedUuid = orderId
+    if (/^[0-9a-f]{32}$/i.test(orderId)) {
+      formattedUuid = `${orderId.substring(0, 8)}-${orderId.substring(8, 12)}-${orderId.substring(12, 16)}-${orderId.substring(16, 20)}-${orderId.substring(20)}`
+    }
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(formattedUuid)
 
     if (params.status === 'success') {
       // 2. Fetch orders to verify status and retrieve details
-      const query = supabase.from('orders').select('*')
+      let query = supabase.from('orders').select('*')
       if (isUuid) {
-        query.eq('id', orderId)
+        query = query.or(`id.eq.${formattedUuid},payment_id.eq.${orderId}`)
       } else {
-        query.eq('payment_id', orderId)
+        query = query.eq('payment_id', orderId)
       }
       const { data: orders, error: orderError } = await query
 
       if (orderError || !orders || orders.length === 0) {
+        console.error('[PAYTR CALLBACK ERROR] Sipariş bulunamadı:', { orderId, formattedUuid, orderError })
         return new Response('SIPARIS BULUNAMADI', { status: 404 })
       }
+
 
       // Sepette birden fazla ürün varsa tümünü dolaş
       for (const order of orders) {
@@ -80,7 +88,7 @@ export async function POST(request: Request) {
         // 6. Notify seller & OTO Kargo Integration
         const { data: fullProduct } = await supabase
           .from('products')
-          .select('brand, model_name, seller_id, is_peony_vip')
+          .select('brand, model_name, seller_id, is_peony_vip, price')
           .eq('id', order.product_id)
           .single()
 
@@ -112,6 +120,7 @@ export async function POST(request: Request) {
                const otoResult = await createOtoOrder({
                  orderId: isShippedByPeony ? `${order.id}_FINAL` : order.id,
                  description: `${fullProduct.brand} ${fullProduct.model_name}`,
+                 amount: Number(order.total_amount || fullProduct.price || 0),
                  senderInformation: {
                    firstName: isShippedByPeony ? 'Peony' : (seller?.first_name || 'Satıcı'),
                    lastName: isShippedByPeony ? 'Collective' : (seller?.last_name || ''),

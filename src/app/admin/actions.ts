@@ -222,6 +222,7 @@ export async function approveOrderInLab(orderId: string) {
   const otoResult = await createOtoOrder({
     orderId: order.id,
     description: `${product.brand} ${product.model_name} (Laboratuvar Onaylı)`,
+    amount: Number(order.total_amount || product.price || 0),
     senderInformation: {
       firstName: 'Peony',
       lastName: 'Lab',
@@ -344,12 +345,16 @@ export async function sendItSupportPingAction(messageText: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Oturum açmanız gerekiyor.' }
 
-    // Kullanıcı adı ve e-postasını al
+    // Yetkilendirme: Sadece admin rolü bu işlemi yapabilir
     const { data: profile } = await supabase
       .from('profiles')
-      .select('first_name, last_name')
+      .select('role, first_name, last_name')
       .eq('id', user.id)
       .single()
+
+    if (profile?.role !== 'admin') {
+      return { success: false, error: 'Bu işlemi yapmaya yetkiniz yok.' }
+    }
 
     const userName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Bilinmeyen Admin'
 
@@ -477,6 +482,20 @@ export async function createConciergeRequestAction(name: string, productInterest
 export async function checkSystemStatusAction() {
   try {
     const supabase = await createClient()
+
+    // Yetkilendirme: Sadece admin rolü sistem durumunu görebilir
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, dbStatus: 'UNAUTHORIZED', storageStatus: 'UNAUTHORIZED', entrupyStatus: 'UNAUTHORIZED', edgeStatus: 'UNAUTHORIZED' }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'admin') {
+      return { success: false, dbStatus: 'UNAUTHORIZED', storageStatus: 'UNAUTHORIZED', entrupyStatus: 'UNAUTHORIZED', edgeStatus: 'UNAUTHORIZED' }
+    }
 
     // 1. Postgres DB ping & latency hesapla
     const dbStartTime = Date.now()

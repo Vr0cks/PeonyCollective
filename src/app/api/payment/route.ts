@@ -159,11 +159,16 @@ export async function POST(request: Request) {
       .from('orders')
       .insert({
         buyer_id: user.id,
+        seller_id: product.seller_id,
         product_id: productId,
         total_price: finalPrice,
         commission_amount: commissionAmount,
         seller_amount: sellerAmount,
         order_status: 'pending_payment',
+        buyer_name: `${buyerProfile?.first_name || ''} ${buyerProfile?.last_name || ''}`.trim() || undefined,
+        buyer_phone: buyerProfile?.phone_number || undefined,
+        buyer_email: user.email || undefined,
+        shipping_address: buyerProfile?.address || undefined,
       })
       .select('id')
       .single()
@@ -176,6 +181,10 @@ export async function POST(request: Request) {
     }
 
     const merchantOid = newOrder.id.replace(/-/g, '') // PayTR alfanumerik gerektirir, UUID tirelerini kaldır
+    
+    // payment_id alanını da kaydet
+    await supabase.from('orders').update({ payment_id: merchantOid }).eq('id', newOrder.id)
+
 
     // PAYTR PAZARYERİ (SPLIT PAYMENT) MANTIGI
     let submerchantId = null

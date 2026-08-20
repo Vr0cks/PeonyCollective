@@ -67,7 +67,7 @@ export function createPaymentToken(params: PayTRTokenParams) {
     merchant_fail_url: params.merchantFailUrl,
     currency,
     test_mode: testMode,
-    debug_on: '1',
+    debug_on: process.env.NODE_ENV === 'development' ? '1' : '0',
     timeout_limit: '30',
   }
 

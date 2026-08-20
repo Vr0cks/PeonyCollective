@@ -205,6 +205,16 @@ export default function AdminGuidedPhotoCapture({
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  // Component unmount olduğunda kamera stream'ini otomatik durdur
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
+        streamRef.current = null
+      }
+    }
+  }, [])
+
   const currentConfig = CATEGORY_ANGLE_CONFIGS.find(c => c.id === selectedCatId) || CATEGORY_ANGLE_CONFIGS[0]
 
   // Start Camera Stream

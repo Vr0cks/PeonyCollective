@@ -14,11 +14,12 @@
 
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { Sparkles, SlidersHorizontal, ArrowUpDown, X, RotateCcw, Filter, Check, ChevronRight } from 'lucide-react'
 import ProductCard from '@/src/components/ProductCard'
 import SellPopup from '@/src/components/SellPopup'
 import CustomSelect from '@/src/components/CustomSelect'
@@ -60,11 +61,87 @@ const categoryCards = [
 ]
 
 const genderFilters = [
-  { label: 'Kadın', value: 'KADIN' },
-  { label: 'Erkek', value: 'ERKEK' },
-  { label: 'Kız Çocuk', value: 'KIZ ÇOCUK' },
-  { label: 'Erkek Çocuk', value: 'ERKEK ÇOCUK' },
+  { label: 'Kadın', value: 'Kadın' },
+  { label: 'Erkek', value: 'Erkek' },
+  { label: 'Unisex', value: 'unisex' },
 ]
+
+// The Edit: Akıllı Kürasyon Temaları (Peony Muse Edits)
+const curationThemes = [
+  { 
+    id: null, 
+    label: 'Tüm Koleksiyon', 
+    icon: '✦', 
+    desc: 'Peony Collective küratörlü lüks arşivinin tamamı.' 
+  },
+  { 
+    id: 'evening', 
+    label: 'Gece & Davet', 
+    icon: '🍸', 
+    desc: 'Topuklu silüetler, clutch\'lar, saten/rugan dokular ve gece ışıltısı taşıyan lüks parçalar.' 
+  },
+  { 
+    id: 'office', 
+    label: 'Şehir & Ofis', 
+    icon: '🏙️', 
+    desc: 'Loafer\'lar, keskin blazer ceketler, ipek gömlekler ve ikonik iş/omuz çantaları.' 
+  },
+  { 
+    id: 'resort', 
+    label: 'Resort & Hafta Sonu', 
+    icon: '⛵', 
+    desc: 'Lüks sandaletler, sneaker\'lar, keten rahatlığı ve crossbody çantalar.' 
+  },
+  { 
+    id: 'quiet_luxury', 
+    label: 'Sessiz Lüks', 
+    icon: '💎', 
+    desc: 'Bottega Veneta, The Row, Loro Piana, Hermès ve logosuz saf işçilik temsilcileri.' 
+  },
+  { 
+    id: 'investment', 
+    label: 'Yatırım Parçaları', 
+    icon: '📈', 
+    desc: 'Chanel, Hermès, Louis Vuitton ve Rolex gibi değerini katlayan arşiv klasikleri.' 
+  },
+  { 
+    id: 'under15k', 
+    label: '15.000 ₺ Altı', 
+    icon: '⚡', 
+    desc: 'Peony Lab onaylı, erişilebilir lüks seçkisi.' 
+  },
+]
+
+const mainCategoryTabs = [
+  { id: null, label: 'Tüm Kategoriler' },
+  { id: 'Çanta', label: 'Çanta' },
+  { id: 'Ayakkabı', label: 'Ayakkabı' },
+  { id: 'Kıyafet', label: 'Kıyafet' },
+  { id: 'Aksesuar', label: 'Saat & Aksesuar' },
+]
+
+const subcategoryMap: Record<string, string[]> = {
+  'Ayakkabı': ['Topuklu', 'Loafer', 'Sneaker', 'Terlik / Sandalet', 'Babet', 'Bot / Çizme'],
+  'Çanta': ['El Çantası', 'Crossbody', 'Omuz Çantası', 'Clutch', 'Sırt Çantası', 'Mini Çanta'],
+  'Kıyafet': ['Blazer / Ceket', 'Triko / Kazak', 'Gömlek', 'T-Shirt / Bluz', 'Mont / Kaban', 'Elbise', 'Etek'],
+  'Aksesuar': ['Saat', 'Kemer', 'Cüzdan', 'Şal / Eşarp', 'Takı']
+}
+
+const sortOptions = [
+  { value: 'featured', label: 'Öne Çıkanlar' },
+  { value: 'price_asc', label: 'Fiyat: Düşükten Yükseğe' },
+  { value: 'price_desc', label: 'Fiyat: Yüksekten Düşüğe' },
+  { value: 'newest', label: 'En Yeniler' },
+]
+
+const priceRangeOptions = [
+  { value: 'all', label: 'Tüm Fiyatlar' },
+  { value: 'under15k', label: '15.000 ₺ Altı' },
+  { value: '15k_35k', label: '15.000 ₺ - 35.000 ₺' },
+  { value: '35k_75k', label: '35.000 ₺ - 75.000 ₺' },
+  { value: '75k_plus', label: '75.000 ₺ ve Üzeri' },
+]
+
 
 interface HomeClientProps {
   products: Product[]
@@ -77,9 +154,37 @@ interface HomeClientProps {
 export default function HomeClient({ products, brands, brand, category, gender }: HomeClientProps) {
   const router = useRouter()
   const { language, t, formatPrice } = useSettings()
-  const hasFilter = brand || category || gender
   const [visibleCount, setVisibleCount] = useState(24)
-  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null)
+
+  // The Edit: Curation & Multi-Filter States
+  const [selectedTheme, setSelectedTheme] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(category || null)
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(brand || null)
+  const [selectedGender, setSelectedGender] = useState<string | null>(gender || null)
+  const [sortOption, setSortOption] = useState<'featured' | 'price_asc' | 'price_desc' | 'newest'>('featured')
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null)
+
+  // Sync props when URL parameters change
+  useEffect(() => {
+    if (category !== undefined) setSelectedCategory(category || null)
+  }, [category])
+  useEffect(() => {
+    if (brand !== undefined) setSelectedBrand(brand || null)
+  }, [brand])
+  useEffect(() => {
+    if (gender !== undefined) setSelectedGender(gender || null)
+  }, [gender])
+
+  // Reset subcategory if category changes and doesn't match
+  useEffect(() => {
+    if (selectedCategory && selectedSubcategory) {
+      const validSubcats = subcategoryMap[selectedCategory] || []
+      if (!validSubcats.includes(selectedSubcategory)) {
+        setSelectedSubcategory(null)
+      }
+    }
+  }, [selectedCategory])
 
   // Peony Weather Concierge States
   const [locationName, setLocationName] = useState('Bodrum')
@@ -110,7 +215,6 @@ export default function HomeClient({ products, brands, brand, category, gender }
   ])
 
   useEffect(() => {
-    // Geolocation simulation
     const locations = [
       { name: 'Bodrum', temp: 32, desc: 'Güneşli Esinti', vibe: 'Plaj Şıklığı & Akşamüstü Kokteyl Kombinleri' },
       { name: 'İstanbul', temp: 26, desc: 'Hafif Bulutlu', vibe: 'Boğaz Havası & Nişantaşı Sokak Şıklığı' },
@@ -124,35 +228,58 @@ export default function HomeClient({ products, brands, brand, category, gender }
     setCurationVibe(randomLoc.vibe)
   }, [])
 
-  function handleSendMuseMessage() {
-    if (!museInput.trim()) return
+  const [isMuseLoading, setIsMuseLoading] = useState(false)
+
+  async function handleSendMuseMessage() {
+    if (!museInput.trim() || isMuseLoading) return
     const text = museInput.trim()
     const msgId = Date.now().toString()
     setMuseMessages(prev => [...prev, { id: msgId, sender: 'user', text }])
     setMuseInput('')
+    setIsMuseLoading(true)
 
-    setTimeout(() => {
-      let reply = ''
-      let recs: any[] = []
-      const query = text.toLowerCase()
+    try {
+      const { createClient } = await import('@/src/utils/supabase/client')
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
 
-      if (query.includes('tekne') || query.includes('yat') || query.includes('deniz') || query.includes('yacht') || query.includes('plaj') || query.includes('beach') || query.includes('bodrum') || query.includes('çeşme')) {
-        reply = 'Harika bir yaz planı! Deniz havası ve yat davetlerinin o rahat ama göz alıcı şıklığı için Loewe\'nin hasır detaylı ikonik el çantasını ve gün ışığında parlayacak Rolex altın saatini öneriyorum.'
-        recs = [
-          { id: 'loewe-tote', brand: 'LOEWE', model_name: 'Basket Raffia Bag Medium', price: 24500, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
-          { id: 'rolex-sub', brand: 'ROLEX', model_name: 'Submariner Date Gold', price: 685000, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300' }
-        ]
-      } else if (query.includes('akşam') || query.includes('yemek') || query.includes('davet') || query.includes('düğün') || query.includes('gece') || query.includes('party') || query.includes('dinner')) {
-        reply = 'Şık bir gece daveti! Gecenin tüm bakışlarını üzerinizde toplamak için siyah deri Chanel Flap bag ve altın detaylı Cartier kolyeyi öneriyorum. Bu klasik şıklık asla modası geçmeyen bir yatırımdır.'
-        recs = [
-          { id: 'chanel-flap', brand: 'CHANEL', model_name: 'Classic Double Flap Black', price: 345000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' },
-          { id: 'cartier-love', brand: 'CARTIER', model_name: 'Love Necklace Gold', price: 92000, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300' }
-        ]
-      } else {
-        reply = 'Her ortama uyum sağlayacak "Quiet Luxury" (Sessiz Lüks) stilini öneriyorum. Logolar yerine mükemmel dikişleri ve deri kalitesini öne çıkaran Bottega Veneta örgü deri çanta ve Loro Piana keten şıklığı bugün harika duracaktır.'
-        recs = [
-          { id: 'bottega-cassette', brand: 'BOTTEGA VENETA', model_name: 'Padded Cassette Bag', price: 145000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300' }
-        ]
+      if (!session?.access_token) {
+        setMuseMessages(prev => [
+          ...prev,
+          {
+            id: `muse-${Date.now()}`,
+            sender: 'muse',
+            text: language === 'tr'
+              ? 'Muse ile sohbet etmek için lütfen giriş yapın.'
+              : 'Please log in to chat with Muse.'
+          }
+        ])
+        setIsMuseLoading(false)
+        return
+      }
+
+      const response = await fetch('/api/muse', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ message: text, locale: language })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setMuseMessages(prev => [
+          ...prev,
+          {
+            id: `muse-${Date.now()}`,
+            sender: 'muse',
+            text: data.error || (language === 'tr' ? 'Bir hata oluştu, lütfen tekrar deneyin.' : 'An error occurred, please try again.')
+          }
+        ])
+        setIsMuseLoading(false)
+        return
       }
 
       setMuseMessages(prev => [
@@ -160,11 +287,24 @@ export default function HomeClient({ products, brands, brand, category, gender }
         {
           id: `muse-${Date.now()}`,
           sender: 'muse',
-          text: reply,
-          products: recs
+          text: data.text,
+          products: data.products
         }
       ])
-    }, 800)
+    } catch {
+      setMuseMessages(prev => [
+        ...prev,
+        {
+          id: `muse-${Date.now()}`,
+          sender: 'muse',
+          text: language === 'tr'
+            ? 'Bağlantı hatası oluştu, lütfen tekrar deneyin.'
+            : 'Connection error, please try again.'
+        }
+      ])
+    } finally {
+      setIsMuseLoading(false)
+    }
   }
 
   // Interactive Tabs State
@@ -174,27 +314,126 @@ export default function HomeClient({ products, brands, brand, category, gender }
 
   useEffect(() => {
     setVisibleCount(24)
-  }, [brand, category, gender, selectedPeriod])
+  }, [selectedBrand, selectedCategory, selectedSubcategory, selectedGender, selectedTheme, selectedPriceRange, sortOption])
 
-  // Filter products by selected period
-  let displayProducts = products || []
-  if (selectedPeriod === 'Plaj Şıklığı') {
-    displayProducts = displayProducts.filter(p => p.category === 'Ayakkabı' || p.category === 'Aksesuar')
-  } else if (selectedPeriod === 'Şehir Esintisi') {
-    displayProducts = displayProducts.filter(p => p.category === 'Kıyafet' || p.category === 'Çanta')
-  } else if (selectedPeriod === 'Gece Daveti') {
-    displayProducts = displayProducts.filter(p => p.category === 'Kıyafet' || p.category === 'Aksesuar')
-  } else if (selectedPeriod === 'WeatherConcierge') {
-    if (locationName === 'Bodrum' || locationName === 'Çeşme') {
-      displayProducts = displayProducts.filter(p => p.category === 'Aksesuar' || p.category === 'Ayakkabı' || p.category === 'Çanta')
-    } else {
-      displayProducts = displayProducts.filter(p => p.category === 'Çanta' || p.category === 'Kıyafet')
+  // Filter and Sort Engine (High Performance)
+  const displayProducts = useMemo(() => {
+    let list = (products || []).filter((p) => {
+      // 1. Gender Filter
+      if (selectedGender) {
+        if (p.gender && p.gender.toUpperCase() !== selectedGender.toUpperCase()) return false
+      }
+
+      // 2. Category Filter
+      if (selectedCategory) {
+        if (selectedCategory === 'Aksesuar') {
+          if (p.category !== 'Aksesuar' && p.category !== 'watches') return false
+        } else {
+          if (p.category !== selectedCategory) return false
+        }
+      }
+
+      // 3. Subcategory Filter
+      if (selectedSubcategory) {
+        if (selectedSubcategory === 'Loafer' && p.subcategory === 'Loafer / Babet') {
+          // match
+        } else if (selectedSubcategory === 'Babet' && p.subcategory === 'Loafer / Babet') {
+          // match
+        } else if (p.subcategory !== selectedSubcategory) {
+          return false
+        }
+      }
+
+      // 4. Brand Filter
+      if (selectedBrand) {
+        if (p.brand?.trim().toLowerCase() !== selectedBrand.trim().toLowerCase()) return false
+      }
+
+      // 5. Price Range Filter
+      if (selectedPriceRange && selectedPriceRange !== 'all') {
+        const price = Number(p.price || 0)
+        if (selectedPriceRange === 'under15k' && price > 15000) return false
+        if (selectedPriceRange === '15k_35k' && (price <= 15000 || price > 35000)) return false
+        if (selectedPriceRange === '35k_75k' && (price <= 35000 || price > 75000)) return false
+        if (selectedPriceRange === '75k_plus' && price <= 75000) return false
+      }
+
+      // 6. Curation Theme Filter
+      if (selectedTheme === 'evening') {
+        const isEveningSubcat = ['Topuklu', 'Clutch', 'Elbise', 'Mini Çanta'].includes(p.subcategory || '')
+        const descLower = (p.description || '').toLowerCase()
+        const modelLower = (p.model_name || '').toLowerCase()
+        const isEveningKeyword = /rugan|saten|glitter|altın|gold|silver|gümüş|kristal|davet|gece|evening|stiletto|kokteyl/i.test(descLower + ' ' + modelLower)
+        const isEveningBrand = ['Christian Louboutin', 'Sergio Rossi', 'Gianvito Rossi', 'Jimmy Choo', 'Valentino'].some(b => p.brand?.toLowerCase().includes(b.toLowerCase()))
+        if (!isEveningSubcat && !isEveningKeyword && !isEveningBrand) return false
+      } else if (selectedTheme === 'office') {
+        const isOfficeSubcat = ['Loafer', 'Blazer / Ceket', 'Gömlek', 'Triko / Kazak', 'El Çantası', 'Omuz Çantası', 'Babet', 'Loafer / Babet', 'Saat'].includes(p.subcategory || '')
+        if (!isOfficeSubcat) return false
+      } else if (selectedTheme === 'resort') {
+        const isResortSubcat = ['Terlik / Sandalet', 'Sneaker', 'T-Shirt / Bluz', 'Crossbody', 'Sırt Çantası'].includes(p.subcategory || '')
+        const descLower = (p.description || '').toLowerCase()
+        const isResortKeyword = /keten|hasır|canvas|sandalet|terlik|yaz|beach|resort|raffia/i.test(descLower)
+        if (!isResortSubcat && !isResortKeyword) return false
+      } else if (selectedTheme === 'quiet_luxury') {
+        const quietBrands = ['Bottega Veneta', 'The Row', 'Loro Piana', 'Brunello Cucinelli', 'Hermès', 'Hermes', 'Céline', 'Celine', 'Loewe', 'Goyard', 'Max Mara']
+        const isQuietBrand = quietBrands.some(b => p.brand?.toLowerCase().includes(b.toLowerCase()))
+        const descLower = (p.description || '').toLowerCase()
+        const isQuietKeyword = /kaşmir|cashmere|intrecciato|deri|minimal|sade|quiet/i.test(descLower)
+        if (!isQuietBrand && !isQuietKeyword) return false
+      } else if (selectedTheme === 'investment') {
+        const investmentBrands = ['Hermès', 'Hermes', 'Chanel', 'Louis Vuitton', 'Christian Dior', 'Dior', 'Rolex', 'Cartier']
+        const isInvestBrand = investmentBrands.some(b => p.brand?.toLowerCase().includes(b.toLowerCase()))
+        const isHighValue = (p.price || 0) >= 35000
+        if (!isInvestBrand && !isHighValue) return false
+      } else if (selectedTheme === 'under15k') {
+        if ((p.price || 0) > 15000) return false
+      }
+
+      return true
+    })
+
+    // Sorting
+    const sorted = [...list]
+    if (sortOption === 'price_asc') {
+      sorted.sort((a, b) => (a.price || 0) - (b.price || 0))
+    } else if (sortOption === 'price_desc') {
+      sorted.sort((a, b) => (b.price || 0) - (a.price || 0))
+    } else if (sortOption === 'newest') {
+      sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     }
+
+    return sorted
+  }, [products, selectedGender, selectedCategory, selectedSubcategory, selectedBrand, selectedPriceRange, selectedTheme, sortOption])
+
+  const hasActiveFilters = Boolean(
+    selectedTheme ||
+    selectedCategory ||
+    selectedSubcategory ||
+    selectedBrand ||
+    selectedGender ||
+    (selectedPriceRange && selectedPriceRange !== 'all') ||
+    sortOption !== 'featured'
+  )
+
+  function clearAllFilters() {
+    setSelectedTheme(null)
+    setSelectedCategory(null)
+    setSelectedSubcategory(null)
+    setSelectedBrand(null)
+    setSelectedGender(null)
+    setSelectedPriceRange(null)
+    setSortOption('featured')
+    router.push('/#collection', { scroll: false })
   }
 
-  // Bags under 15k selector
-  const bagsUnder15k = (products || []).filter(p => p.category === 'Çanta' && (p.price ?? 0) <= 15000)
-  const displayBagsUnder15k = bagsUnder15k
+  // Active theme info
+  const currentThemeObj = curationThemes.find(t => t.id === selectedTheme)
+
+  const displayBagsUnder15k = useMemo(() => {
+    return (products || []).filter(p => p.category === 'Çanta' && (p.price ?? 0) <= 15000)
+  }, [products])
+
+
 
   return (
     <main className="relative overflow-hidden bg-[#F9F9F8]">
@@ -464,113 +703,337 @@ export default function HomeClient({ products, brands, brand, category, gender }
       </section>
 
       {/* THE EDIT - CURATED COLLECTION */}
-      <section id="collection" className="py-24 bg-[#F9F9F8] min-h-screen">
+      <section id="collection" className="py-24 bg-[#F9F9F8] min-h-screen scroll-mt-12">
         <div className="max-w-[1600px] mx-auto px-6 md:px-12">
           
-          <div className="mb-16 space-y-6 border-b border-gray-200 pb-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-              <div className="w-full md:w-auto">
-                <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">CURATED COLLECTION</span>
+          {/* Header & Main Dropdowns */}
+          <div className="mb-10 space-y-8 border-b border-gray-200/80 pb-8">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
+              <div className="w-full lg:w-auto">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">CURATED COLLECTION</span>
+                  <span className="w-8 h-[1px] bg-[#AF9164]/40" />
+                </div>
                 <h2 className="text-4xl md:text-6xl serif-display tracking-tight text-[#1A1A1A] mt-2">
                   The <span className="italic">Edit</span>
                 </h2>
               </div>
               
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
+              {/* Quick Selectors Toolbar */}
+              <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                {/* Gender Selector */}
                 <CustomSelect
-                  value={gender || ''}
-                  placeholder={t('home.allGenders', 'Tüm Cinsiyetler')}
+                  value={selectedGender || ''}
+                  placeholder="Tüm Cinsiyetler"
                   options={genderFilters.map(g => ({ value: g.value, label: g.label }))}
                   onChange={(val) => {
-                    if (val) {
-                      router.push(`/?gender=${val}${brand ? `&brand=${brand}` : ''}#collection`)
-                    } else {
-                      router.push(`/?${brand ? `brand=${brand}` : ''}#collection`)
-                    }
+                    setSelectedGender(val || null)
                   }}
                 />
                 
+                {/* Brand Selector */}
                 <CustomSelect
-                  value={brand || ''}
-                  placeholder={t('home.allBrands', 'Tüm Markalar')}
+                  value={selectedBrand || ''}
+                  placeholder="Tüm Markalar"
                   options={brands.map(b => ({ value: b, label: b }))}
                   onChange={(val) => {
-                    if (val) {
-                      router.push(`/?brand=${encodeURIComponent(val)}${gender ? `&gender=${gender}` : ''}#collection`)
-                    } else {
-                      router.push(`/?${gender ? `gender=${gender}` : ''}#collection`)
-                    }
+                    setSelectedBrand(val || null)
+                  }}
+                />
+
+                {/* Price Range Selector */}
+                <CustomSelect
+                  value={selectedPriceRange || 'all'}
+                  placeholder="Fiyat Aralığı"
+                  options={priceRangeOptions}
+                  onChange={(val) => {
+                    setSelectedPriceRange(val === 'all' ? null : val)
+                  }}
+                />
+
+                {/* Sort Option Selector */}
+                <CustomSelect
+                  value={sortOption}
+                  placeholder="Sıralama"
+                  options={sortOptions}
+                  onChange={(val) => {
+                    setSortOption(val as any)
                   }}
                 />
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2.5 pb-2">
-              {[
-                { id: null, label: t('home.allCollection', 'Tüm Koleksiyon') },
-                { id: 'Plaj Şıklığı', label: t('home.beachVibe', 'Plaj Şıklığı ⛵') },
-                { id: 'Şehir Esintisi', label: t('home.cityBreeze', 'Şehir Esintisi 🏙️') },
-                { id: 'Gece Daveti', label: t('home.eveningEvent', 'Gece Daveti 🍸') },
-              ].map((p) => (
-                <button
-                  key={p.label}
-                  onClick={() => setSelectedPeriod(p.id)}
-                  className={`sans-detail px-5 py-2.5 text-[9px] tracking-widest uppercase border transition-all duration-300 rounded-full cursor-pointer shrink-0 ${
-                    selectedPeriod === p.id
-                      ? 'bg-black text-white border-black font-bold shadow-sm'
-                      : 'bg-white text-gray-500 border-gray-200 hover:text-black hover:border-black'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
+            {/* 1. AKILLI KÜRASYON TEMALARI (Peony Muse Curated Edits) */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-gray-500 flex items-center gap-1.5">
+                  <Sparkles size={13} className="text-[#AF9164]" /> KÜRATÖR TEMALARI & STILLER
+                </span>
+                {selectedTheme && (
+                  <button
+                    onClick={() => setSelectedTheme(null)}
+                    className="text-[10px] text-gray-400 hover:text-black transition-colors underline"
+                  >
+                    Temayı Kaldır
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
+                {curationThemes.map((theme) => {
+                  const isSelected = selectedTheme === theme.id
+                  return (
+                    <button
+                      key={theme.label}
+                      onClick={() => setSelectedTheme(theme.id)}
+                      className={`sans-detail px-4 py-2.5 text-[10px] tracking-wider uppercase border transition-all duration-300 rounded-full cursor-pointer shrink-0 snap-start flex items-center gap-2 ${
+                        isSelected
+                          ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] font-bold shadow-md shadow-black/10 scale-[1.02]'
+                          : 'bg-white text-gray-600 border-gray-200/80 hover:text-black hover:border-black'
+                      }`}
+                    >
+                      <span className="text-xs">{theme.icon}</span>
+                      <span>{theme.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* 2. KATEGORİ & DİNAMİK ALT KATEGORİ SEÇİCİ */}
+            <div className="pt-2 space-y-4">
+              {/* Ana Kategori Sekmeleri */}
+              <div className="flex flex-wrap gap-2 border-b border-gray-200/60 pb-3">
+                {mainCategoryTabs.map((cat) => {
+                  const isSelected = selectedCategory === cat.id
+                  return (
+                    <button
+                      key={cat.label}
+                      onClick={() => {
+                        setSelectedCategory(cat.id)
+                        setSelectedSubcategory(null)
+                      }}
+                      className={`text-xs tracking-widest uppercase pb-2 px-3 transition-all relative font-medium ${
+                        isSelected
+                          ? 'text-black font-bold'
+                          : 'text-gray-400 hover:text-black'
+                      }`}
+                    >
+                      {cat.label}
+                      {isSelected && (
+                        <motion.div
+                          layoutId="categoryIndicator"
+                          className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#AF9164]"
+                        />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Dinamik Alt Kategoriler (Sadece Kategori Seçiliyse veya Tümü ise) */}
+              <AnimatePresence mode="wait">
+                {selectedCategory && subcategoryMap[selectedCategory] && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="flex flex-wrap items-center gap-2 pt-1"
+                  >
+                    <span className="text-[9px] uppercase tracking-widest text-gray-400 mr-2 font-semibold">Alt Kategori:</span>
+                    <button
+                      onClick={() => setSelectedSubcategory(null)}
+                      className={`text-[9px] uppercase tracking-wider px-3 py-1.5 rounded-md border transition-all ${
+                        !selectedSubcategory
+                          ? 'bg-[#AF9164]/15 border-[#AF9164] text-[#AF9164] font-bold'
+                          : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'
+                      }`}
+                    >
+                      Tümü
+                    </button>
+                    {subcategoryMap[selectedCategory].map((subcat) => {
+                      const isSubSelected = selectedSubcategory === subcat
+                      return (
+                        <button
+                          key={subcat}
+                          onClick={() => setSelectedSubcategory(isSubSelected ? null : subcat)}
+                          className={`text-[9px] uppercase tracking-wider px-3 py-1.5 rounded-md border transition-all ${
+                            isSubSelected
+                              ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white font-bold'
+                              : 'bg-white text-gray-600 border-gray-200 hover:text-black hover:border-black'
+                          }`}
+                        >
+                          {subcat}
+                        </button>
+                      )
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
-
-
-          {(hasFilter || selectedPeriod) && (
-            <div className="mb-12 flex items-center gap-3">
-              <span className="sans-detail text-gray-400 text-xs">Aktif Seçimler:</span>
-              <div className="flex gap-2">
-                {gender && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200">{gender}</span>}
-                {category && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200">{category}</span>}
-                {brand && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200 text-[#AF9164]">{brand}</span>}
-                {selectedPeriod && <span className="sans-detail text-xs bg-white px-3 py-1 border border-gray-200 text-[#AF9164]">{selectedPeriod}</span>}
+          {/* MUSE STİL & KÜRASYON BİLGİ KARTI (Aktif Tema Varsa) */}
+          {currentThemeObj && currentThemeObj.id && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-10 bg-gradient-to-r from-[#FAF6F0] via-[#FAF8F5] to-white border border-[#AF9164]/30 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#AF9164]/10 border border-[#AF9164]/30 flex items-center justify-center text-xl shrink-0">
+                  {currentThemeObj.icon}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#AF9164]">PEONY MUSE KÜRASYONU</span>
+                    <span className="text-xs text-gray-400">•</span>
+                    <h4 className="text-sm font-bold text-gray-900">{currentThemeObj.label}</h4>
+                  </div>
+                  <p className="text-xs text-gray-600 font-light mt-0.5 max-w-2xl leading-relaxed">
+                    {currentThemeObj.desc}
+                  </p>
+                </div>
               </div>
-              <button 
+
+              <button
                 onClick={() => {
-                  setSelectedPeriod(null)
-                  router.push('/#collection')
-                }} 
-                className="sans-detail text-xs text-gray-400 hover:text-black border-b border-transparent hover:border-black ml-4"
+                  setMuseInput(`Bana ${currentThemeObj.label} için bu seçkiden en uygun kombin önerilerini yapar mısın?`)
+                  setIsMuseOpen(true)
+                }}
+                className="sans-detail shrink-0 flex items-center gap-2 text-[9px] tracking-widest uppercase bg-[#1A1A1A] text-white px-5 py-2.5 rounded-full hover:bg-[#AF9164] transition-all font-bold"
               >
-                Temizle
+                <Sparkles size={12} className="text-[#AF9164]" />
+                Muse ile Kombinle
               </button>
-            </div>
+            </motion.div>
           )}
 
+          {/* AKTİF FİLTRELER & CANLI SAYAÇ BARI */}
+          <div className="mb-10 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400 font-light text-xs">
+                Toplam <strong className="font-semibold text-black">{products?.length || 0}</strong> arşiv parçasından{' '}
+                <strong className="font-bold text-[#AF9164]">{displayProducts.length}</strong> tanesi listeleniyor
+              </span>
+            </div>
+
+            {hasActiveFilters && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Aktif:</span>
+                
+                {selectedTheme && (
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-[#AF9164] text-[#AF9164] text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full">
+                    {currentThemeObj?.label}
+                    <button onClick={() => setSelectedTheme(null)} className="hover:text-black">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {selectedCategory && (
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-gray-300 text-black text-[10px] uppercase tracking-wider font-medium px-2.5 py-1 rounded-full">
+                    {selectedCategory}
+                    <button onClick={() => { setSelectedCategory(null); setSelectedSubcategory(null); }} className="hover:text-red-500">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {selectedSubcategory && (
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-gray-300 text-black text-[10px] uppercase tracking-wider font-medium px-2.5 py-1 rounded-full">
+                    {selectedSubcategory}
+                    <button onClick={() => setSelectedSubcategory(null)} className="hover:text-red-500">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {selectedBrand && (
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-[#AF9164] text-[#AF9164] text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full">
+                    {selectedBrand}
+                    <button onClick={() => setSelectedBrand(null)} className="hover:text-black">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {selectedGender && (
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-gray-300 text-black text-[10px] uppercase tracking-wider font-medium px-2.5 py-1 rounded-full">
+                    {selectedGender}
+                    <button onClick={() => setSelectedGender(null)} className="hover:text-red-500">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {selectedPriceRange && (
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-gray-300 text-black text-[10px] uppercase tracking-wider font-medium px-2.5 py-1 rounded-full">
+                    {priceRangeOptions.find(p => p.value === selectedPriceRange)?.label}
+                    <button onClick={() => setSelectedPriceRange(null)} className="hover:text-red-500">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {sortOption !== 'featured' && (
+                  <span className="inline-flex items-center gap-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full">
+                    {sortOptions.find(s => s.value === sortOption)?.label}
+                    <button onClick={() => setSortOption('featured')} className="hover:text-black">
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                <button
+                  onClick={clearAllFilters}
+                  className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-black uppercase tracking-widest font-semibold ml-2 underline transition-colors"
+                >
+                  <RotateCcw size={11} /> Sıfırla
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* ÜRÜN LİSTESİ VEYA BOŞ DURUM */}
           {!displayProducts || displayProducts.length === 0 ? (
-            <div className="py-24 text-center">
-              <p className="text-gray-400 italic serif-display text-2xl">Bu seçki için parça bulunmuyor.</p>
+            <div className="py-24 text-center bg-white border border-gray-100 rounded-3xl p-12 max-w-xl mx-auto space-y-4">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-400">
+                <Filter size={24} strokeWidth={1.5} />
+              </div>
+              <h3 className="text-2xl serif-display italic text-gray-900">Bu filtre kombinasyonuna uygun parça bulunamadı.</h3>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">
+                Filtrelerinizi genişleterek veya temayı değiştirerek 270+ parçalık koleksiyonumuzdaki diğer lüks tasarımları keşfedebilirsiniz.
+              </p>
+              <div className="pt-4">
+                <button
+                  onClick={clearAllFilters}
+                  className="sans-detail px-8 py-3 bg-[#1A1A1A] text-white hover:bg-[#AF9164] transition-all text-[10px] tracking-widest uppercase font-bold rounded-full"
+                >
+                  Filtreleri Temizle
+                </button>
+              </div>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-12 gap-y-16">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-10 gap-y-14">
                 {displayProducts.slice(0, visibleCount).map((p, i) => (
-                  <FadeIn key={p.id} delay={i % 4 * 0.1} direction="up">
+                  <FadeIn key={p.id} delay={i % 4 * 0.08} direction="up">
                     <ProductCard product={p} />
                   </FadeIn>
                 ))}
               </div>
               
               {displayProducts.length > visibleCount && (
-                <div className="mt-16 flex justify-center">
+                <div className="mt-20 flex flex-col items-center gap-3">
+                  <p className="text-xs text-gray-400 font-light">
+                    {Math.min(visibleCount, displayProducts.length)} / {displayProducts.length} parça gösteriliyor
+                  </p>
                   <button 
                     onClick={() => setVisibleCount(prev => prev + 24)}
-                    className="sans-detail px-10 py-3.5 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors duration-500 text-xs tracking-[0.2em] uppercase font-bold"
+                    className="sans-detail px-10 py-4 border border-[#1A1A1A] bg-white hover:bg-[#1A1A1A] hover:text-white transition-all duration-500 text-[10px] tracking-[0.25em] uppercase font-bold shadow-sm rounded-full"
                   >
-                    Daha Fazla Ürün Göster
+                    Daha Fazla Parça Keşfet (+24)
                   </button>
                 </div>
               )}
@@ -578,6 +1041,7 @@ export default function HomeClient({ products, brands, brand, category, gender }
           )}
         </div>
       </section>
+
 
       {/* THE TRUST HUB: MERGED TABBED SYSTEM FOR LAB, ENTRUPY, CERTIFICATE, STORIES, AND PROCESS */}
       <section className="py-20 md:py-28 bg-[#1A1A1A] text-white">

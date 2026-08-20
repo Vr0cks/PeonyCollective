@@ -81,6 +81,35 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/admin',
+        destination: 'https://www.egm.gov.tr/siber',
+        permanent: false,
+      },
+      {
+        source: '/admin/:path*',
+        destination: 'https://www.egm.gov.tr/siber',
+        permanent: false,
+      },
+      {
+        source: '/wp-admin/:path*',
+        destination: 'https://www.egm.gov.tr/siber',
+        permanent: false,
+      },
+      {
+        source: '/wp-login.php',
+        destination: 'https://www.egm.gov.tr/siber',
+        permanent: false,
+      },
+      {
+        source: '/administrator/:path*',
+        destination: 'https://www.egm.gov.tr/siber',
+        permanent: false,
+      },
+    ]
+  },
 }
 
 export default nextConfig

@@ -163,6 +163,8 @@ export interface OtoCreateOrderParams {
   weightGrams?: number
   /** COD (kapıda ödeme) tutarı — escrow modelde 0 */
   codAmount?: number
+  /** Sipariş toplam tutarı (TRY) */
+  amount?: number
   /** Gönderici (satıcı) bilgileri */
   senderInformation: OtoContactInfo
   /** Alıcı (alıcı) bilgileri */
@@ -233,7 +235,7 @@ export async function createOtoOrder(params: OtoCreateOrderParams): Promise<OtoO
     orderId: params.orderId,
     createShipment: params.createShipment ?? true,
     payment_method: 'paid',
-    amount: 100,
+    amount: params.amount !== undefined ? params.amount : 0,
     amount_due: params.codAmount ?? 0,
     currency: 'TRY',
     ...(params.deliveryOptionId && { deliveryOptionId: params.deliveryOptionId }),

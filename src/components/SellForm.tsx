@@ -412,14 +412,7 @@ const FileUploadZone = ({ id, label, icon, onChange, multiple = true, accept, pr
 export default function SellForm({ userEmail, userRole }: { userEmail?: string, userRole?: string }) {
   const router = useRouter()
   
-  const ALLOWED_EMAILS = [
-    'ahmetcanli1943@gmail.com',
-    'designer_7150@peony.com',
-    'ela@peonycollective.com',
-    'rabiakacar86@gmail.com',
-    'info@peonycollective.com'
-  ]
-  const showSupplierField = true // Enabled for all accounts during testing
+  const showSupplierField = userRole === 'admin' || userRole === 'supplier'
 
   const [activeStep, setActiveStep] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)

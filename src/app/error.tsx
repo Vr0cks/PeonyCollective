@@ -33,12 +33,12 @@ export default function Error({ error, reset }: ErrorProps) {
           >
             Yeniden Dene
           </button>
-          <a
+          <Link
             href="/"
             className="w-full sm:w-auto px-8 py-3 border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all duration-300 font-light tracking-wider text-xs uppercase text-center block"
           >
             Ana Sayfaya Dön
-          </a>
+          </Link>
         </div>
       </div>
     </div>

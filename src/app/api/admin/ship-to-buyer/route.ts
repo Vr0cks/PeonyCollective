@@ -53,6 +53,7 @@ export async function POST(request: Request) {
     const otoResult = await createOtoOrder({
       orderId: order.id + '_FINAL', // Aynı orderId ile çakışmaması için suffix eklenebilir
       description: `${product.brand} ${product.model_name}`,
+      amount: Number(order.total_amount || product.price || 0),
       senderInformation: {
         firstName: 'Peony',
         lastName: 'Collective',

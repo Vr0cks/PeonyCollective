@@ -150,7 +150,7 @@ function EntrupyRequestForm() {
                   required
                   value={formData.sellerName}
                   onChange={e => setFormData({ ...formData, sellerName: e.target.value })}
-                  placeholder="Örn: Ahmet Yiğit Canlı"
+                  placeholder="Örn: Yiğit Canlı"
                   className="w-full bg-[#1C1D24] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#AF9164] transition-colors"
                 />
               </div>

@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signup, login, signInWithProvider, resetPassword } from './actions'
 
-export default function AuthPage() {
+function AuthForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams.get('redirect') || '/'
+
   const [isLogin, setIsLogin] = useState(true)
   const [role, setRole] = useState<'buyer' | 'seller'>('buyer')
   const [message, setMessage] = useState('')
@@ -56,7 +59,7 @@ export default function AuthPage() {
         if (result?.error) {
           setMessage(result.error)
         } else if (result?.success) {
-          router.push('/')
+          router.push(redirectUrl)
           router.refresh()
         }
       } else {
@@ -312,5 +315,17 @@ export default function AuthPage() {
         </form>
       </div>
     </main>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <AuthForm />
+    </Suspense>
   )
 }

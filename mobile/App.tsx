@@ -364,7 +364,7 @@ export default function App() {
             return;
           }
           token = (await Notifications.getExpoPushTokenAsync({
-            projectId: 'peony-collective-project-id' // Placeholder Project ID matching Expo credentials
+            projectId: Constants.expoConfig?.extra?.eas?.projectId || '3acc787f-db2b-4691-9b45-43786c624db4'
           })).data;
         }
       } else {

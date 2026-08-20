@@ -17,13 +17,22 @@ export default async function OrderSuccessPage({
   
   let order = null
   if (order_id) {
-    const { data } = await supabase
-      .from('orders')
-      .select('*, products(*)')
-      .eq('id', order_id)
-      .single()
-    order = data
+    let formattedUuid = order_id
+    if (/^[0-9a-f]{32}$/i.test(order_id)) {
+      formattedUuid = `${order_id.substring(0, 8)}-${order_id.substring(8, 12)}-${order_id.substring(12, 16)}-${order_id.substring(16, 20)}-${order_id.substring(20)}`
+    }
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(formattedUuid)
+
+    let query = supabase.from('orders').select('*, products(*)')
+    if (isUuid) {
+      const { data } = await query.or(`id.eq.${formattedUuid},payment_id.eq.${order_id}`).limit(1).maybeSingle()
+      order = data
+    } else {
+      const { data } = await query.eq('payment_id', order_id).limit(1).maybeSingle()
+      order = data
+    }
   }
+
 
   const product = order?.products
 

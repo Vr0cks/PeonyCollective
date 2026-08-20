@@ -20,15 +20,49 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params
   const supabase = await createClient()
-  const { data: product } = await supabase.from('products').select('brand, model_name').eq('id', id).single()
+  const { data: product } = await supabase
+    .from('products')
+    .select('brand, model_name, description, price, condition, material, public_images')
+    .eq('id', id)
+    .single()
 
-  if (!product) return { title: 'Ürün Bulunamadı | Peony' }
+  if (!product) return { title: 'Ürün Bulunamadı | Peony Collective' }
+
+  const title = `${product.brand} ${product.model_name} | Peony Collective`
+  const cleanDescription = product.description 
+    ? `${product.brand} ${product.model_name} - ${product.condition || 'Mükemmel'} Kondisyon. ${product.description.substring(0, 150)}...`
+    : `${product.brand} ${product.model_name} model lüks çanta. Peony Lab uzmanları tarafından 32 noktalı fiziksel inceleme ve Entrupy ile orijinalliği onaylanmış arşiv parçası.`
+  
+  const mainImage = product.public_images && product.public_images.length > 0 
+    ? product.public_images[0] 
+    : 'https://www.peony-collective.com/luxury_wardrobe_bg.png'
 
   return {
-    title: `${product.brand} ${product.model_name} | Peony Collective`,
-    description: `${product.brand} markasına ait ${product.model_name} model lüks çanta. Orijinalliği onaylanmış, yatırım değeri taşıyan arşiv parçası.`,
+    title,
+    description: cleanDescription,
+    openGraph: {
+      title,
+      description: cleanDescription,
+      type: 'website',
+      url: `https://www.peony-collective.com/product/${id}`,
+      images: [
+        {
+          url: mainImage,
+          width: 800,
+          height: 800,
+          alt: `${product.brand} ${product.model_name}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: cleanDescription,
+      images: [mainImage],
+    },
   }
 }
+
 
 export default async function ProductDetailPage({
   params,
@@ -72,8 +106,36 @@ export default async function ProductDetailPage({
 
   const sellerProfile = product.profiles as Profile
 
+  const productJsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": `${product.brand} ${product.model_name}`,
+    "image": product.public_images || [],
+    "description": product.description || `${product.brand} ${product.model_name} lüks ikinci el arşiv parçası.`,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand
+    },
+    "itemCondition": "https://schema.org/UsedCondition",
+    "offers": {
+      "@type": "Offer",
+      "url": `https://www.peony-collective.com/product/${product.id}`,
+      "priceCurrency": "TRY",
+      "price": product.price,
+      "availability": product.status === 'sold' ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Peony Collective"
+      }
+    }
+  }
+
   return (
     <main className="min-h-screen bg-white text-[#1A1A1A]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div className="max-w-[1600px] mx-auto px-6 py-12 lg:px-12">
         
         {/* Breadcrumb - Sleek */}

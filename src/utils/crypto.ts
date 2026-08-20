@@ -3,7 +3,13 @@ import crypto from 'crypto'
 // ENCRYPTION_KEY: IBAN, TCKN ve VKN gibi hassas verileri şifrelemek için kullanılır.
 // Bu değişken .env.local ve Vercel environment'ında tanımlı olmalıdır.
 // Tanımsızsa uygulama başlamaz — bu kasıtlı bir güvenlik önlemidir.
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-peony-fallback-secret-key-32-chars!!'
+const ENCRYPTION_KEY: string = process.env.ENCRYPTION_KEY || ''
+if (!ENCRYPTION_KEY) {
+  // Not: Sunucu ayağa kalkarken veya ilk fonksiyonda hata verebilmesi için
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('ENCRYPTION_KEY tanımlı değil. .env.local veya Vercel ortam değişkenlerini kontrol edin.')
+  }
+}
 const IV_LENGTH = 16
 
 /**
