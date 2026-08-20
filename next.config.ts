@@ -85,27 +85,47 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/admin',
-        destination: 'https://www.egm.gov.tr/siber',
+        destination: '/security-incident?target=/admin',
         permanent: false,
       },
       {
         source: '/admin/:path*',
-        destination: 'https://www.egm.gov.tr/siber',
+        destination: '/security-incident?target=/admin/:path*',
+        permanent: false,
+      },
+      {
+        source: '/wp-admin',
+        destination: '/security-incident?target=/wp-admin',
         permanent: false,
       },
       {
         source: '/wp-admin/:path*',
-        destination: 'https://www.egm.gov.tr/siber',
+        destination: '/security-incident?target=/wp-admin/:path*',
         permanent: false,
       },
       {
         source: '/wp-login.php',
-        destination: 'https://www.egm.gov.tr/siber',
+        destination: '/security-incident?target=/wp-login.php',
+        permanent: false,
+      },
+      {
+        source: '/administrator',
+        destination: '/security-incident?target=/administrator',
         permanent: false,
       },
       {
         source: '/administrator/:path*',
-        destination: 'https://www.egm.gov.tr/siber',
+        destination: '/security-incident?target=/administrator/:path*',
+        permanent: false,
+      },
+      {
+        source: '/cpanel/:path*',
+        destination: '/security-incident?target=/cpanel',
+        permanent: false,
+      },
+      {
+        source: '/phpmyadmin/:path*',
+        destination: '/security-incident?target=/phpmyadmin',
         permanent: false,
       },
     ]

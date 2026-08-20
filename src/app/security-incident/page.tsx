@@ -6,13 +6,45 @@ import { ShieldAlert, Terminal, Lock, AlertTriangle, Scale, ExternalLink } from 
 
 export default function SecurityIncidentPage() {
   const searchParams = useSearchParams()
-  const ip = searchParams.get('ip') || '127.0.0.1'
-  const target = searchParams.get('target') || '/admin'
+  const targetParam = searchParams.get('target') || '/admin'
+  const [ip, setIp] = useState<string>('Tespit Ediliyor...')
+  const [target, setTarget] = useState(targetParam)
   const [countdown, setCountdown] = useState(6)
   const [userAgent, setUserAgent] = useState('')
 
   useEffect(() => {
-    setUserAgent(navigator.userAgent || 'Mozilla/5.0')
+    const ua = navigator.userAgent || 'Mozilla/5.0'
+    setUserAgent(ua)
+
+    // Fetch real visitor IP
+    async function initIncident() {
+      let clientIp = '127.0.0.1'
+      try {
+        const ipRes = await fetch('https://api.ipify.org?format=json')
+        const ipData = await ipRes.json()
+        if (ipData?.ip) {
+          clientIp = ipData.ip
+          setIp(ipData.ip)
+        }
+      } catch (_) {
+        setIp('192.168.1.1 (Masked)')
+      }
+
+      // Send silent instant Telegram alert
+      try {
+        await fetch('/api/security-alert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ip: clientIp,
+            target: targetParam,
+            userAgent: ua,
+          }),
+        })
+      } catch (_) {}
+    }
+
+    initIncident()
 
     const timer = setInterval(() => {
       setCountdown((prev) => {
@@ -26,7 +58,7 @@ export default function SecurityIncidentPage() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [targetParam])
 
   return (
     <div className="min-h-screen bg-[#07080A] text-red-100 flex items-center justify-center p-4 sm:p-6 font-mono selection:bg-red-600 selection:text-white">
