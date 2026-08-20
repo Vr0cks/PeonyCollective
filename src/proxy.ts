@@ -75,25 +75,46 @@ export async function proxy(request: NextRequest) {
     path.startsWith('/orders') ||
     path.startsWith('/checkout')
 
-  const isAdminRoute = path.startsWith('/admin')
+  const isAdminRoute = 
+    path.startsWith('/admin') ||
+    path.startsWith('/wp-admin') ||
+    path.startsWith('/administrator') ||
+    path.startsWith('/cpanel') ||
+    path.startsWith('/phpmyadmin')
 
-  if (isProtected && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirect', path)
-    return NextResponse.redirect(url)
-  }
-
+  // Honeypot: Ana vitrin sitesinde /admin rotasını tamamen kapat ve TCK Bilişim Suçları / Siber İhbar'a yönlendir
   if (isAdminRoute) {
-    if (!user) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/login'
-      url.searchParams.set('redirect', path)
-      return NextResponse.redirect(url)
-    }
+    const userAgent = request.headers.get('user-agent') || 'Bilinmeyen Tarayıcı'
+    
+    // Telegram Alert gönder (Asenkron - kullanıcıyı bekletmeden)
+    try {
+      const botToken = '8445991080:AAHzYmgYwxvYgTyrKpQC4-SLvLuaKrLD29k'
+      const chatId = '7752066304'
+      const text = `🚨 *YETKİSİZ ERİŞİM GİRİŞİMİ TESPİT EDİLDİ*\n\n` +
+        `🌐 *Site:* Peony Collective Vitrin\n` +
+        `📍 *Hedef Dizin:* \`${path}\`\n` +
+        `👤 *IP Adresi:* \`${ip}\`\n` +
+        `💻 *Cihaz:* ${userAgent.slice(0, 100)}\n` +
+        `⏰ *Zaman:* ${new Date().toLocaleString('tr-TR')}\n\n` +
+        `_Kullanıcı TCK Bilişim Suçları ve EGM Siber İhbar sistemine yönlendirildi._`
 
-    // NOT: Veritabanı (profiles) kontrolü Edge middleware üzerinden kaldırıldı. (Performans Optimizasyonu)
-    // Admin yetki kontrolü artık sunucu bileşeni olan src/app/admin/layout.tsx dosyasında yapılıyor.
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text,
+          parse_mode: 'Markdown',
+        }),
+      }).catch(() => {})
+    } catch (_) {}
+
+    // 5237 Sayılı TCK Madde 243-244 & Adli Siber Güvenlik Honeypot Ekranına yönlendir
+    const incidentUrl = request.nextUrl.clone()
+    incidentUrl.pathname = '/security-incident'
+    incidentUrl.searchParams.set('ip', ip)
+    incidentUrl.searchParams.set('target', path)
+    return NextResponse.redirect(incidentUrl)
   }
 
   return response
