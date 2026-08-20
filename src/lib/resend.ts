@@ -1,8 +1,7 @@
 import { Resend } from 'resend'
 
-// Resend instance'ını oluştur
-// API key yoksa hata fırlatmamak için fallback olarak 'dummy' koyabiliriz ama .env'ye eklenmesi şart.
-const resend = new Resend(process.env.RESEND_API_KEY || '')
+// Resend instance'ını oluştur (Vercel build time değerlendirmelerinde boş olsa bile patlamaz)
+const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key_for_build_evaluation')
 
 interface OrderConfirmationProps {
   orderId: string
