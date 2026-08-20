@@ -98,8 +98,10 @@ export default function SecurityIncidentPage() {
           </div>
 
           <div className="flex justify-between items-center border-b border-zinc-800 pb-2">
-            <span className="text-zinc-500">ZAMAN DAMGASI:</span>
-            <span className="text-zinc-300">{new Date().toLocaleString('tr-TR')}</span>
+            <span className="text-zinc-500">ZAMAN DAMGASI (TSİ):</span>
+            <span className="text-zinc-300">
+              {new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })} (GMT+3)
+            </span>
           </div>
 
           <div className="flex justify-between items-start pt-1">
