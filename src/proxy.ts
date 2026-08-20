@@ -88,25 +88,28 @@ export async function proxy(request: NextRequest) {
     
     // Telegram Alert gönder (Asenkron - kullanıcıyı bekletmeden)
     try {
-      const botToken = '8445991080:AAHzYmgYwxvYgTyrKpQC4-SLvLuaKrLD29k'
-      const chatId = '7752066304'
-      const text = `🚨 *YETKİSİZ ERİŞİM GİRİŞİMİ TESPİT EDİLDİ*\n\n` +
-        `🌐 *Site:* Peony Collective Vitrin\n` +
-        `📍 *Hedef Dizin:* \`${path}\`\n` +
-        `👤 *IP Adresi:* \`${ip}\`\n` +
-        `💻 *Cihaz:* ${userAgent.slice(0, 100)}\n` +
-        `⏰ *Zaman:* ${new Date().toLocaleString('tr-TR')}\n\n` +
-        `_Kullanıcı TCK Bilişim Suçları ve EGM Siber İhbar sistemine yönlendirildi._`
+      const botToken = process.env.TELEGRAM_BOT_TOKEN
+      const chatId = process.env.TELEGRAM_CHAT_ID
 
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text,
-          parse_mode: 'Markdown',
-        }),
-      }).catch(() => {})
+      if (botToken && chatId) {
+        const text = `🚨 *YETKİSİZ ERİŞİM GİRİŞİMİ TESPİT EDİLDİ*\n\n` +
+          `🌐 *Site:* Peony Collective Vitrin\n` +
+          `📍 *Hedef Dizin:* \`${path}\`\n` +
+          `👤 *IP Adresi:* \`${ip}\`\n` +
+          `💻 *Cihaz:* ${userAgent.slice(0, 100)}\n` +
+          `⏰ *Zaman:* ${new Date().toLocaleString('tr-TR')}\n\n` +
+          `_Kullanıcı TCK Bilişim Suçları ve EGM Siber İhbar sistemine yönlendirildi._`
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            parse_mode: 'Markdown',
+          }),
+        }).catch(() => {})
+      }
     } catch (_) {}
 
     // 5237 Sayılı TCK Madde 243-244 & Adli Siber Güvenlik Honeypot Ekranına yönlendir
