@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { ShieldAlert, AlertOctagon, Terminal, ExternalLink, ShieldCheck } from 'lucide-react'
+import { AlertOctagon, ExternalLink } from 'lucide-react'
 
 export default function SecurityIncidentPage() {
   const searchParams = useSearchParams()
@@ -10,6 +10,7 @@ export default function SecurityIncidentPage() {
   const [ip, setIp] = useState<string>('Tespit Ediliyor...')
   const [location, setLocation] = useState<string>('Analiz Ediliyor...')
   const [isp, setIsp] = useState<string>('Sorgulanıyor...')
+  const [device, setDevice] = useState<string>('Tespit Ediliyor...')
   const [time, setTime] = useState<string>('')
   const [countdown, setCountdown] = useState(5)
   const [incidentId] = useState(() => 'SEC-' + Math.random().toString(36).substring(2, 9).toUpperCase())
@@ -18,11 +19,25 @@ export default function SecurityIncidentPage() {
     const ua = navigator.userAgent || 'Mozilla/5.0'
 
     async function initIncident() {
+      let clientIp = ''
+
+      // 1. Grab public IP first
+      try {
+        const ipRes = await fetch('https://api.ipify.org?format=json')
+        const ipData = await ipRes.json()
+        if (ipData?.ip) {
+          clientIp = ipData.ip
+          setIp(ipData.ip)
+        }
+      } catch (_) {}
+
+      // 2. Fire enriched security alert
       try {
         const res = await fetch('/api/security-alert', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            ip: clientIp,
             target: targetParam,
             userAgent: ua,
           }),
@@ -30,20 +45,13 @@ export default function SecurityIncidentPage() {
 
         if (res.ok) {
           const data = await res.json()
+          if (data.ip && !clientIp) setIp(data.ip)
           if (data.location) setLocation(data.location)
           if (data.isp) setIsp(data.isp)
+          if (data.device) setDevice(data.device)
           if (data.time) setTime(data.time)
         }
       } catch (_) {}
-
-      // Fallback IP lookup
-      try {
-        const ipRes = await fetch('https://api.ipify.org?format=json')
-        const ipData = await ipRes.json()
-        if (ipData?.ip) setIp(ipData.ip)
-      } catch (_) {
-        setIp('176.240.82.114')
-      }
     }
 
     initIncident()
@@ -116,6 +124,11 @@ export default function SecurityIncidentPage() {
           <div className="flex justify-between border-b border-zinc-800/80 pb-2">
             <span className="text-zinc-500">TESPİT EDİLEN KONUM &amp; ISS:</span>
             <span className="text-zinc-300">{location} • {isp}</span>
+          </div>
+
+          <div className="flex justify-between border-b border-zinc-800/80 pb-2">
+            <span className="text-zinc-500">CİHAZ VE İŞLETİM SİSTEMİ:</span>
+            <span className="text-zinc-300">{device}</span>
           </div>
 
           <div className="flex justify-between pt-1">
