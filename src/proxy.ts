@@ -67,6 +67,19 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // ─── GÜVENLİK: KALICI KARALİSTE (BLACKLIST) ───
+  const BLACKLISTED_IPS = new Set([
+    '78.162.46.79', // Antalya Kepez / Yetkisiz /admin/products taraması
+  ])
+
+  // Eğer IP karalistedeyse tüm site erişimini anında 403 Forbidden ile kes
+  if (BLACKLISTED_IPS.has(ip)) {
+    return new NextResponse('Access Denied - Your IP address has been blocked due to security violations.', {
+      status: 403,
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  }
+
   const isProtected =
     path.startsWith('/dashboard') ||
     path.startsWith('/sell') ||
@@ -80,7 +93,10 @@ export async function proxy(request: NextRequest) {
     path.startsWith('/wp-admin') ||
     path.startsWith('/administrator') ||
     path.startsWith('/cpanel') ||
-    path.startsWith('/phpmyadmin')
+    path.startsWith('/phpmyadmin') ||
+    path.startsWith('/.env') ||
+    path.startsWith('/wp-login') ||
+    path.startsWith('/config.json')
 
   // Honeypot: Ana vitrin sitesinde /admin rotasını tamamen kapat ve TCK Bilişim Suçları / Siber İhbar'a yönlendir
   if (isAdminRoute) {

@@ -194,9 +194,14 @@ export default function ConciergeWidget() {
 
   const themeColor = isAdmin ? 'emerald-500' : '#AF9164'
   const ThemeIcon = isAdmin ? Terminal : Crown
+  const isMagazine = pathname?.startsWith('/magazine')
 
   return (
-    <div className="fixed bottom-24 right-6 md:bottom-6 md:right-6 z-[990]">
+    <div className={`fixed z-[990] ${
+      isMagazine 
+        ? 'hidden md:block bottom-6 right-6' 
+        : 'bottom-24 right-5 md:bottom-6 md:right-6'
+    }`}>
       <AnimatePresence>
         
         {isOpen && (
@@ -513,7 +518,9 @@ export default function ConciergeWidget() {
                   </div>
                   <div className="flex gap-4 items-center">
                     <a
-                      href="https://wa.me/905523652093"
+                      href={`https://wa.me/905523652093?text=${encodeURIComponent(
+                        t('topbar.whatsappDraft', 'Merhaba, Peony VIP Concierge masası ile iletişime geçmek istiyorum.')
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-lg transition-all"

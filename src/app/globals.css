@@ -21,12 +21,15 @@
     -webkit-overflow-scrolling: touch;
   }
   
+  html[lang="en"], [lang="en"] {
+    font-feature-settings: "locl" 0 !important;
+  }
+  
   body { 
     font-family: var(--font-inter);
     background-color: var(--bg-luxury);
     color: var(--text-main);
     -webkit-font-smoothing: antialiased;
-    /* iOS'te mobil menü açıldığında falan elastik scrollu önlemek için faydalı olabilir ama bazen genel scrollu bozar. Bu yüzden sadece overflow-x ve width %100 koyuyoruz */
   }
 }
 

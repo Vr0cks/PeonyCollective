@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Search, Compass, PlusSquare, UserCircle, ShoppingBag } from 'lucide-react'
 import { useCart } from '@/src/context/CartContext'
+import { useSettings } from '@/src/context/SettingsContext'
 import { useEffect, useState } from 'react'
 
 /**
@@ -12,6 +13,7 @@ import { useEffect, useState } from 'react'
  */
 export default function BottomTabBar() {
   const pathname = usePathname()
+  const { language } = useSettings()
   const { cartItems } = useCart()
   const cartCount = cartItems?.length || 0
   const [mounted, setMounted] = useState(false)
@@ -30,11 +32,11 @@ export default function BottomTabBar() {
   }
 
   const TABS = [
-    { name: 'Keşfet', icon: Compass, href: '/' },
-    { name: 'Arama', icon: Search, href: '/#collection' },
-    { name: 'Sat', icon: PlusSquare, href: '/sell' },
-    { name: 'Sepet', icon: ShoppingBag, href: '/checkout', badge: cartCount },
-    { name: 'Hesap', icon: UserCircle, href: '/dashboard' }
+    { name: language === 'en' ? 'Explore' : 'Keşfet', icon: Compass, href: '/' },
+    { name: language === 'en' ? 'Search' : 'Arama', icon: Search, href: '/#collection' },
+    { name: language === 'en' ? 'Sell' : 'Sat', icon: PlusSquare, href: '/sell' },
+    { name: language === 'en' ? 'Cart' : 'Sepet', icon: ShoppingBag, href: '/checkout', badge: cartCount },
+    { name: language === 'en' ? 'Account' : 'Hesap', icon: UserCircle, href: '/dashboard' }
   ]
 
   // Enforces visibility exclusively on viewports matching the 'md:hidden' tailwind directive.

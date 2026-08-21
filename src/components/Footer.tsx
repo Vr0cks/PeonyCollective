@@ -8,7 +8,7 @@ import { useSettings } from '@/src/context/SettingsContext'
 import CurrencyLanguageSelector from './CurrencyLanguageSelector'
 
 export default function Footer() {
-  const { t } = useSettings()
+  const { t, language } = useSettings()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -66,41 +66,106 @@ export default function Footer() {
       {/* İnce Altın Parıltı Dekoru */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#AF9164]/40 to-transparent" />
 
-      <div className="max-w-[1800px] mx-auto px-8">
+      <div className="max-w-[1800px] mx-auto px-6 sm:px-10">
         
-        {/* Üst Alan: 3 Kolonlu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-8 pb-20 border-b border-white/10">
+        {/* ─── Üst Alan: 4 Kolonlu Dengeli Lüks Mimari ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 pb-16 border-b border-white/10">
           
-          {/* Kolon 1: Marka Tanıtımı ve Şirket Bilgileri */}
-          <div className="space-y-6">
-            <Link href="/" className="block max-w-[200px] transition-all duration-300 hover:opacity-80">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
-                src="/logo.png" 
-                alt="Peony Collective Logo" 
-                className="h-10 sm:h-12 w-auto object-contain invert opacity-90 hover:opacity-100 transition-opacity duration-300" 
-              />
+          {/* Kolon 1: Marka Tanıtımı ve Şirket Bilgileri (lg:col-span-4) */}
+          <div className="lg:col-span-4 space-y-6">
+            <Link href="/" className="inline-block transition-all duration-300 hover:opacity-90">
+              <span className="font-playfair text-2xl tracking-[0.15em] uppercase text-white font-bold block">
+                PEONY COLLECTIVE
+              </span>
+              <span className="text-[8px] font-mono tracking-[0.3em] text-[#C2A676] uppercase block mt-0.5">
+                MAISON ARCHIVES • İSTANBUL
+              </span>
             </Link>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#AF9164] font-bold">
+
+            <p className="text-xs uppercase tracking-[0.2em] text-[#C2A676] font-bold font-mono">
               {t('footer.tagline', 'Mirasın Yeni Sahibi')}
             </p>
-            <p className="text-sm font-light leading-relaxed text-zinc-400 max-w-sm">
-              {t('footer.aboutText', 'Yarım milyonluk bir yatırımı şansa bırakamazsınız. Peony Collective, her parçayı 32 noktalı fiziksel ekspertiz ve 3D Spektral Analizden geçirerek orijinalliğini garantiler.')}
+            
+            <p className="text-xs font-light leading-relaxed text-zinc-400 max-w-sm">
+              {t('footer.aboutText', 'Yarım milyonluk bir yatırımı şansa bırakamazsınız. Peony Collective, her parçayı 32 noktalı fiziksel ekspertiz ve mikroskobik optik analizden geçirerek orijinalliğini garantiler.')}
             </p>
-            <div className="text-[10px] text-zinc-500 font-light space-y-1 pt-4 border-t border-white/5">
-              <p className="font-bold text-zinc-400 uppercase tracking-wider mb-1">Peony Collective</p>
+
+            {/* VIP WhatsApp Concierge Butonu */}
+            <div className="pt-2">
+              <a
+                href={`https://wa.me/905523652093?text=${encodeURIComponent(
+                  language === 'en'
+                    ? 'Hello, I would like to get information about Peony Collective.'
+                    : 'Merhaba, Peony Collective hakkında bilgi almak istiyorum.'
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-[#C2A676]/20 border border-white/10 hover:border-[#C2A676]/40 text-[#E2C79E] text-xs transition-all font-mono shadow-sm"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{language === 'en' ? 'VIP Concierge: +90 (552) 365 20 93' : 'VIP Danışma: +90 (552) 365 20 93'}</span>
+              </a>
+            </div>
+
+            <div className="text-[10px] text-zinc-500 font-light space-y-1 pt-3 border-t border-white/5">
+              <p className="font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Peony Collective Lüks Moda A.Ş.</p>
               <p>{t('footer.companyAddress', 'Adres: Merkez Mah. Üsküdar Cad. No: 57 İç Kapı No: 1, 34788 Çekmeköy/İstanbul')}</p>
-              <p>{t('footer.companyPhone', 'Telefon: +90 (552) 365 20 93 | E-posta: info@peonycollective.com')}</p>
-              <p className="text-zinc-600">{t('footer.companyTax', 'Vergi No: 8590652178 (Sarıgazi Vergi Dairesi)')}</p>
+              <p>{t('footer.companyPhone', 'E-posta: info@peonycollective.com')}</p>
+              <p className="text-zinc-600">{t('footer.companyTax', 'Vergi No: 8590652178 (Sarıgazi V.D.)')}</p>
             </div>
           </div>
 
-          {/* Kolon 2: Hukuki & Yasal Metinler */}
-          <div className="space-y-6 lg:pl-12">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">
+          {/* Kolon 2: Koleksiyonlar & Keşfet (lg:col-span-2) */}
+          <div className="lg:col-span-2 space-y-5 lg:pl-4">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#C2A676] font-mono">
+              {language === 'en' ? 'COLLECTIONS' : 'KOLEKSİYONLAR'}
+            </h4>
+            <ul className="space-y-2.5 text-xs text-zinc-400 font-light">
+              <li>
+                <Link href="/catalog?category=Çanta" className="hover:text-white transition-colors">
+                  {language === 'en' ? 'Bags & Leather Goods' : 'Çanta & Deri İşçiliği'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/catalog?category=Kıyafet" className="hover:text-white transition-colors">
+                  {language === 'en' ? 'Haute Couture & Apparel' : 'Kıyafet & Elbise'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/catalog?category=Ayakkabı" className="hover:text-white transition-colors">
+                  {language === 'en' ? 'Designer Footwear' : 'Tasarımcı Ayakkabıları'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/catalog?category=Aksesuar" className="hover:text-white transition-colors">
+                  {language === 'en' ? 'Horology & Accessories' : 'Saat & Aksesuar'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/magazine" className="text-[#C2A676] hover:text-white font-medium transition-colors flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C2A676] animate-pulse" />
+                  <span>{language === 'en' ? 'Peony Gazette (Issue 01)' : 'Peony Magazine (Sayı 01)'}</span>
+                </Link>
+              </li>
+              <li className="pt-2 border-t border-white/5">
+                <Link href="/sell" className="text-[#E2C79E] hover:text-white font-medium transition-colors">
+                  {language === 'en' ? 'VIP Consignment Desk' : 'VIP Konsinye Başvurusu'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/#trust" className="hover:text-white transition-colors">
+                  {language === 'en' ? 'Authenticity Standard' : 'Orijinallik Güvencesi'}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Kolon 3: Hukuki & Yasal Metinler (lg:col-span-3) */}
+          <div className="lg:col-span-3 space-y-5 lg:pl-4">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#C2A676] font-mono">
               {t('footer.legalTitle', 'Yasal Belgeler')}
             </h4>
-            <ul className="space-y-3 text-xs text-zinc-400 font-light">
+            <ul className="space-y-2 text-xs text-zinc-400 font-light">
               <li>
                 <Link href="/legal/terms" className="hover:text-white transition-colors">
                   {t('footer.terms', 'Kullanım Koşulları')}
@@ -139,31 +204,31 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Kolon 3: VIP Bülten Aboneliği */}
-          <div className="space-y-6 lg:pl-12">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#AF9164]">
+          {/* Kolon 4: VIP Bülten Aboneliği (lg:col-span-3) */}
+          <div className="lg:col-span-3 space-y-5">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#C2A676] font-mono">
               {t('footer.privateListTitle', 'Private List')}
             </h4>
-            <p className="text-sm font-light text-zinc-400">
+            <p className="text-xs font-light text-zinc-400 leading-relaxed">
               {t('footer.privateListDesc', 'Özel kürasyonlardan, gizli butik satışlarından ve VIP davetlerden ilk siz haberdar olun.')}
             </p>
-            <form onSubmit={handleSubscribe} className="relative mt-4 group">
+            <form onSubmit={handleSubscribe} className="relative mt-3 group">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('footer.emailPlaceholder', 'E-POSTA ADRESİNİZ')}
-                className="w-full bg-zinc-900 border-b border-zinc-700 focus:border-[#AF9164] py-3.5 px-0 text-xs font-bold tracking-widest uppercase text-white placeholder-zinc-500 focus:outline-none transition-colors duration-500"
+                className="w-full bg-zinc-900 border-b border-zinc-700 focus:border-[#C2A676] py-3.5 px-0 text-xs font-bold tracking-widest uppercase text-white placeholder-zinc-500 focus:outline-none transition-colors duration-500"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-[#AF9164] transition-colors cursor-pointer"
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-[#C2A676] transition-colors cursor-pointer"
                 aria-label="Abone Ol"
               >
                 {loading ? (
-                  <Loader2 className="w-4.5 h-4.5 animate-spin text-[#AF9164]" />
+                  <Loader2 className="w-4.5 h-4.5 animate-spin text-[#C2A676]" />
                 ) : (
                   <ArrowRight size={18} strokeWidth={1.5} />
                 )}
@@ -184,59 +249,67 @@ export default function Footer() {
 
         </div>
 
-        {/* Alt Alan: Güven Rozetleri ve Copyright */}
-        <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
+        {/* ─── Alt Alan: Güven Rozetleri, Copyright & İmzalar ─── */}
+        <div className="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
           
           {/* Sol: Copyright, Credit ve Dil/Para Birimi Seçici */}
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
-                {t('footer.copyright', '© 2026 PEONY COLLECTIVE. BÜTÜN HAKLARI SAKLIDIR. MIRASIN DİJİTAL SAHİBİ.')}
-              </div>
-              <div className="text-[8px] font-medium tracking-[0.2em] text-zinc-600 text-center md:text-left">
-                CRAFTED BY <a href="https://www.vr0cks.com/en" target="_blank" rel="noopener noreferrer" className="text-[#AF9164] hover:text-white transition-colors">VR0CKS</a>
-              </div>
-              <div className="pt-3 flex justify-center md:justify-start">
-                <CurrencyLanguageSelector dropUp={true} variant="dark" align="left" />
-              </div>
+          <div className="flex flex-col gap-3">
+            <div className="text-[10px] font-medium tracking-[0.15em] text-zinc-500 text-center md:text-left">
+              {t('footer.copyright', '© 2026 PEONY COLLECTIVE. TÜM HAKLARI SAKLIDIR.')}
+            </div>
+            
+            <div className="text-[8px] font-mono tracking-[0.25em] text-zinc-600 text-center md:text-left uppercase">
+              DIGITAL ARCHITECTURE BY{' '}
+              <a 
+                href="https://www.vr0cks.com/en" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-[#C2A676] hover:text-white transition-colors underline underline-offset-2"
+              >
+                VR0CKS
+              </a>
+            </div>
+
+            <div className="pt-1 flex justify-center md:justify-start">
+              <CurrencyLanguageSelector dropUp={true} variant="dark" align="left" />
             </div>
           </div>
 
           {/* Sağ: Sosyal Medya ve Güven Rozetleri */}
-          <div className="flex flex-col items-center md:items-end gap-6">
+          <div className="flex flex-col items-center md:items-end gap-5">
             <div className="flex gap-4 text-zinc-400">
-              <a href="https://www.instagram.com/peonycollectivebrands?igsh=MWFpbnp3bGIzejRwbg==" target="_blank" rel="noopener noreferrer" className="hover:text-[#AF9164] transition-colors" aria-label="Instagram">
+              <a href="https://www.instagram.com/peonycollectivebrands?igsh=MWFpbnp3bGIzejRwbg==" target="_blank" rel="noopener noreferrer" className="hover:text-[#C2A676] transition-colors" aria-label="Instagram">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
               </a>
-              <a href="https://www.linkedin.com/company/peonycollective/" target="_blank" rel="noopener noreferrer" className="hover:text-[#AF9164] transition-colors" aria-label="LinkedIn">
+              <a href="https://www.linkedin.com/company/peonycollective/" target="_blank" rel="noopener noreferrer" className="hover:text-[#C2A676] transition-colors" aria-label="LinkedIn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
               </a>
             </div>
             
-            <div className="flex flex-wrap justify-center gap-8 opacity-40 hover:opacity-75 transition-opacity duration-500">
+            <div className="flex flex-wrap justify-center gap-6 opacity-50 hover:opacity-85 transition-opacity duration-500">
               <div className="flex items-center gap-2">
-                <ShieldCheck size={14} className="text-[#AF9164]" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                <ShieldCheck size={14} className="text-[#C2A676]" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-300">
                   {t('footer.authenticity', 'Orijinallik Garantisi')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Award size={14} className="text-[#AF9164]" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
-                  {t('footer.labApproved', 'Peony Lab™ Onaylı')}
+                <Award size={14} className="text-[#C2A676]" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-300">
+                  {t('footer.labApproved', 'Entrupy Onaylı')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-[#AF9164]" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                <CheckCircle2 size={14} className="text-[#C2A676]" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-300">
                   {t('footer.insuredDelivery', 'VIP Sigortalı Teslimat')}
                 </span>
               </div>
             </div>
             
             {/* Ödeme Logoları */}
-            <div className="flex flex-wrap justify-center md:justify-end gap-2 items-center opacity-30 hover:opacity-60 transition-opacity duration-500 pt-2">
-              <span className="text-[8px] tracking-widest uppercase text-zinc-400 mr-1">
+            <div className="flex flex-wrap justify-center md:justify-end gap-2 items-center opacity-40 hover:opacity-75 transition-opacity duration-500 pt-1">
+              <span className="text-[8px] tracking-widest uppercase text-zinc-400 mr-1 font-mono">
                 {t('footer.securePayment', 'GÜVENLİ ÖDEME:')}
               </span>
               <span className="text-[9px] font-bold border border-zinc-700 px-2 py-0.5 rounded text-zinc-300 tracking-wider">PayTR</span>

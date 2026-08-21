@@ -89,7 +89,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="antialiased flex flex-col min-h-[100dvh] pb-16 md:pb-0">
+      <body className="antialiased flex flex-col min-h-[100dvh] bg-[#0C0D10] text-[#1A1D24]">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -134,7 +134,7 @@ export default function RootLayout({
           <SettingsProvider>
             <Navbar />
             <CartDrawer />
-            <div className="flex-grow">{children}</div>
+            <div className="flex-grow pb-16 md:pb-0 bg-[#FBF9F6]">{children}</div>
             <Footer />
             <ConciergeWidget />
             <BottomTabBar />
