@@ -124,6 +124,36 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
+        source: '/privacy',
+        destination: '/legal/privacy',
+        permanent: true,
+      },
+      {
+        source: '/terms',
+        destination: '/legal/terms',
+        permanent: true,
+      },
+      {
+        source: '/kvkk',
+        destination: '/legal/kvkk',
+        permanent: true,
+      },
+      {
+        source: '/delivery',
+        destination: '/legal/delivery',
+        permanent: true,
+      },
+      {
+        source: '/return-policy',
+        destination: '/legal/return-policy',
+        permanent: true,
+      },
+      {
+        source: '/distance-sales',
+        destination: '/legal/distance-sales',
+        permanent: true,
+      },
+      {
         source: '/phpmyadmin/:path*',
         destination: '/security-incident?target=/phpmyadmin',
         permanent: false,
